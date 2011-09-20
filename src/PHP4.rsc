@@ -56,30 +56,30 @@ syntax InlineHtmlPart
 //  = LAYOUT* 
 //  ;
 
-layout LAYOUTLIST = LAYOUT* !>> [\t-\n \r \ ] !>> "//" !>> "/*";
+layout LAYOUTLIST = LAYOUT* !>> [\t-\n \r \ ] !>> "//" !>> "/*" !>> "#";
 
 syntax Expr
   = ObjectCVar "\<\<=" Expr 
-    > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+    > Expr "and" Expr 
     |  IsNotEqual: Expr "\<\>" Expr 
-    |  Die: "die" !>> [0-9 A-Z _ a-z] "(" Expr ")" 
+    |  Die: "die" "(" Expr ")" 
     | CommonScalar 
     |  Greater: Expr "\>" Expr 
     |  IsNotEqual: Expr "!=" Expr 
-    |  Die: "die" !>> [0-9 A-Z _ a-z] 
-    |  Less: Expr "\<" !>> [\>] Expr 
+    |  Die: "die" 
+    |  Less: Expr "\<" Expr 
     |  IntCast: "(" "int" ")" Expr 
-    |  Die: "die" !>> [0-9 A-Z _ a-z] "(" ")" 
+    |  Die: "die" "(" ")" 
     | left Div: Expr "/" Expr 
     | Variable 
     |  PostDec: ObjectCVar "--" 
-    |  Positive: "+" !>> [+] Expr 
-    |  Exit: "exit" !>> [0-9 A-Z _ a-z] 
+    |  Positive: "+" Expr 
+    |  Exit: "exit"  
     | New 
     |  GreaterEqual: Expr "\>=" Expr 
     | FunctionCall 
     | left BinXor: Expr "^" Expr 
-    |  Print: "print" !>> [0-9 A-Z _ a-z] Expr 
+    |  Print: "print" Expr 
     |  ShellCommand: "`" CommandPart* "`" 
     |  SLAssign: ObjectCVar "\<\<=" Expr 
     |  Neg: "~" Expr 
@@ -88,7 +88,7 @@ syntax Expr
     |  ListAssign: List "=" Expr 
     |  StringCast: "(" "string" ")" Expr 
     | left Mod: Expr "%" Expr 
-    |  NullCast: "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    |  NullCast: "(" "unset" ")" Expr 
     |  Assign: ObjectCVar "=" Expr 
     |  Not: "!" Expr 
     |  ReferenceAssign: ObjectCVar "=" "&" ObjectFunctionCall 
@@ -98,16 +98,16 @@ syntax Expr
     |  FloatCast: "(" "float" ")" Expr 
     |  XorAssign: ObjectCVar "^=" Expr 
     |  BoolCast: "(" "bool" ")" Expr 
-    | left Plus: Expr "+" !>> [+] Expr 
+    | left Plus: Expr "+" Expr 
     | left Mul: Expr "*" Expr 
-    | left LOr: Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+    | left LOr: Expr "or" Expr 
     | left BinAnd: Expr "&" Expr 
     |  IsIdentical: Expr "===" Expr 
     |  PreDec: "--" ObjectCVar 
-    |  ArrayCast: "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    |  ArrayCast: "(" "array" ")" Expr 
     |  PlusAssign: ObjectCVar "+=" Expr 
     |  SRAssign: ObjectCVar "\>\>=" Expr 
-    | left Min: Expr "-" !>> [\-] Expr 
+    | left Min: Expr "-" Expr 
     | @NotSupported="prefer" ErrorFree: "@" Expr 
     |  PostInc: ObjectCVar "++" 
     |  InternalFunction: InternalFunction 
@@ -115,20 +115,20 @@ syntax Expr
     | left Ternary: Expr "?" Expr ":" Expr 
     | Array 
     |  ModAssign: ObjectCVar "%=" Expr 
-    | left LXor: Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+    | left LXor: Expr "xor" Expr 
     |  FloatCast: "(" "real" ")" Expr 
     | left BinOr: Expr "|" Expr 
     | left Or: Expr "||" Expr 
     | bracket"(" Expr ")" 
-    |  Exit: "exit" !>> [0-9 A-Z _ a-z] "(" Expr ")" 
+    |  Exit: "exit" "(" Expr ")" 
     |  IsNotIdentical: Expr "!==" Expr 
     |  ConcatAssign: ObjectCVar ".=" Expr 
-    |  Exit: "exit" !>> [0-9 A-Z _ a-z] "(" ")" 
+    |  Exit: "exit" "(" ")" 
     |  ObjectCast: "(" "object" ")" Expr 
     |  AndAssign: ObjectCVar "&=" Expr 
-    | left LAnd: Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+    | left LAnd: Expr "and" Expr 
     |  MulAssign: ObjectCVar "*=" Expr 
-    |  Negative: "-" !>> [\-] Expr 
+    |  Negative: "-" Expr 
     |  ReferenceAssign: ObjectCVar "=" "&" FunctionCall 
     | left SR: Expr "\>\>" Expr 
     | left SL: Expr "\<\<" Expr 
@@ -140,222 +140,223 @@ syntax Expr
     |  DivAssign: ObjectCVar "/=" Expr 
     | left Concat: Expr "." Expr 
     |  PreInc: "++" ObjectCVar 
+    ;
+/*    | "(" "boolean" ")" Expr 
+      > Expr "and" Expr 
     | "(" "boolean" ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor" Expr 
     | "(" "boolean" ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | "(" "boolean" ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or" Expr 
     | "!" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or" Expr 
     | "~" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or" Expr 
     | "@" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or" Expr 
     | "!" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and" Expr 
     | "~" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and" Expr 
     | "@" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and" Expr 
     | "!" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor" Expr 
     | "~" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor" Expr 
     | "@" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor" Expr 
     | "(" "double" ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
-    | "+" !>> [+] Expr 
-      > Expr "-" !>> [\-] Expr 
-    | Expr "-" !>> [\-] Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "\<" Expr 
+    | "+" Expr 
+      > Expr "-" Expr 
+    | Expr "-" Expr 
+      > "require_once" Expr 
     | ObjectCVar "\>\>=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and" Expr 
     | Expr "*" Expr 
-      > "+" !>> [+] Expr 
+      > "+" Expr 
     | Expr "/" Expr 
-      > "+" !>> [+] Expr 
+      > "+" Expr 
     | Expr "%" Expr 
-      > "+" !>> [+] Expr 
+      > "+" Expr 
     | ObjectCVar "|=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or" Expr 
     | ObjectCVar "&=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or" Expr 
     | ObjectCVar "%=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or" Expr 
     | ObjectCVar "\<\<=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor" Expr 
     | ObjectCVar "\>\>=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar "^=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | ObjectCVar "=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | ObjectCVar "+=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | ObjectCVar "-=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | ObjectCVar "*=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | ObjectCVar "/=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | ObjectCVar ".=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | ObjectCVar "\<\<=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | ObjectCVar "\>\>=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | ObjectCVar "^=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar "|=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar "&=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar "%=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar ".=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar "/=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar "*=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar "-=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar "+=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar "=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | ObjectCVar "=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | ObjectCVar "+=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | ObjectCVar "-=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | ObjectCVar "*=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | ObjectCVar "/=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | ObjectCVar ".=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | ObjectCVar "%=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | ObjectCVar "&=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | ObjectCVar "|=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | ObjectCVar "^=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-    | "-" !>> [\-] Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-    | "-" !>> [\-] Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | "-" !>> [\-] Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
+    | "-"  Expr 
+      > Expr "or"  Expr 
+    | "-"  Expr 
+      > Expr "xor"  Expr 
+    | "-"  Expr 
+      > Expr "and"  Expr 
     | "(" "float" ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | "(" "integer" ")" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | "(" "float" ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | "(" "float" ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | "(" "real" ")" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | Expr "?" Expr ":" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "?" Expr ":" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "?" Expr ":" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "+" !>> [+] Expr 
+      > Expr "xor"  Expr 
+    | Expr "+"  Expr 
       > List "=" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "||" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "&&" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "|" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "&" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "^" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "." Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "*" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "/" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "%" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "\<\<" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "\>\>" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "==" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "\<\>" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "!=" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "\<=" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "\>" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "\>=" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "===" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "array"  ")" Expr 
       > Expr "!==" Expr 
-    | Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+    | Expr "or"  Expr 
+      > "include"  Expr 
     | "(" "string" ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | "(" "string" ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "+" !>> [+] Expr 
+      > Expr "xor"  Expr 
+    | Expr "+"  Expr 
       > Expr "." Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "||" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "&&" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "|" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "&" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "^" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "\<\<" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "\>\>" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "==" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "\<\>" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "!=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "\<=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "\>" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "\>=" Expr 
     | "(" "string" ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "+" !>> [+] Expr 
+      > Expr "or"  Expr 
+    | Expr "+"  Expr 
       > Expr "!==" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "===" Expr 
-    | Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+    | Expr "and"  Expr 
+      > "include"  Expr 
     | "(" "bool" ")" Expr 
       > Expr "===" Expr 
     | "(" "bool" ")" Expr 
       > Expr "!==" Expr 
-    | Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+    | Expr "xor"  Expr 
+      > "include"  Expr 
     | "(" "bool" ")" Expr 
       > Expr "\>=" Expr 
     | "(" "bool" ")" Expr 
@@ -391,49 +392,49 @@ syntax Expr
     | "(" "bool" ")" Expr 
       > Expr "||" Expr 
     | Expr "||" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "&&" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "|" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "&" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "^" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "." Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "*" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "/" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "%" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "\<\<" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "\>\>" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "==" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "\<\>" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "!=" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "\<=" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "\>" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "\>=" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "===" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "require_once"  Expr 
     | Expr "!==" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
-    | "-" !>> [\-] Expr 
+      > "require_once"  Expr 
+    | "-"  Expr 
       > Expr "?" Expr ":" Expr 
-    | Expr "+" !>> [+] Expr 
-      > Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
+      > Expr "+"  Expr 
     | "(" "bool" ")" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | "(" "float" ")" Expr 
       > Expr "?" Expr ":" Expr 
     | Expr "||" Expr 
@@ -892,12 +893,12 @@ syntax Expr
       > ObjectCVar "|=" Expr 
     | Expr "!==" Expr 
       > ObjectCVar "^=" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "+" !>> [+] Expr 
+    | "(" "array"  ")" Expr 
+      > Expr "+"  Expr 
     | "(" "double" ")" Expr 
-      > Expr "-" !>> [\-] Expr 
-    | "+" !>> [+] Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "-"  Expr 
+    | "+"  Expr 
+      > Expr "\<"  Expr 
     | Expr "?" Expr ":" Expr 
       > Expr "?" Expr ":" Expr 
     | "(" "integer" ")" Expr 
@@ -976,12 +977,12 @@ syntax Expr
       > Expr "===" Expr 
     | "(" "real" ")" Expr 
       > Expr "!==" Expr 
-    | Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+    | Expr "or"  Expr 
+      > "include_once"  Expr 
+    | Expr "and"  Expr 
+      > "include_once"  Expr 
+    | Expr "xor"  Expr 
+      > "include_once"  Expr 
     | "(" "string" ")" Expr 
       > Expr "?" Expr ":" Expr 
     | "!" Expr 
@@ -990,62 +991,62 @@ syntax Expr
       > Expr "?" Expr ":" Expr 
     | "@" Expr 
       > Expr "?" Expr ":" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "!=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "\<\>" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "==" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "^" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "&" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "|" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "&&" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "||" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "\>=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "\>" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "\<=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "!==" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > Expr "===" Expr 
     | "(" "boolean" ")" Expr 
       > Expr "?" Expr ":" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "+=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "-=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "*=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "/=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar ".=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "%=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "&=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "|=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "^=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "\>\>=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > ObjectCVar "\<\<=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > List "=" Expr 
     | Expr "?" Expr ":" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | "(" "object" ")" Expr 
       > Expr "!==" Expr 
     | "(" "object" ")" Expr 
@@ -1085,7 +1086,7 @@ syntax Expr
     | "(" "object" ")" Expr 
       > Expr "\>=" Expr 
     | "(" "string" ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | "(" "int" ")" Expr 
       > Expr "||" Expr 
     | "(" "int" ")" Expr 
@@ -1124,108 +1125,108 @@ syntax Expr
       > Expr "===" Expr 
     | "(" "int" ")" Expr 
       > Expr "!==" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "?" Expr ":" Expr 
     | Expr "?" Expr ":" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "-" !>> [\-] Expr 
-      > Expr "+" !>> [+] Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+      > "include_once"  Expr 
+    | Expr "-"  Expr 
+      > Expr "+"  Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "||" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "&&" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "|" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "&" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "^" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "." Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "*" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "/" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "%" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "\<\<" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "\>\>" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "==" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "\<\>" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "!=" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "\<=" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "\>" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "\>=" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "===" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "!==" Expr 
-    | Expr "\<" !>> [\>] Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+    | Expr "\<"  Expr 
+      > "require_once"  Expr 
     | "(" "float" ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
-    | "-" !>> [\-] Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
+    | "-"  Expr 
+      > Expr "\<"  Expr 
     | "(" "double" ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | "(" "double" ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | "(" "double" ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "." Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | Expr "*" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | Expr "/" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | Expr "%" Expr 
-      > Expr "+" !>> [+] Expr 
-    | Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "^=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "|=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "&=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "%=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar ".=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "/=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "*=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "-=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "+=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "\<\<=" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > ObjectCVar "\>\>=" Expr 
     | "(" "boolean" ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
-    | Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
-    | Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
-    | Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > Expr "\<"  Expr 
+    | Expr "and"  Expr 
+      > "require"  Expr 
+    | Expr "xor"  Expr 
+      > "require"  Expr 
+    | Expr "or"  Expr 
+      > "require"  Expr 
     | "!" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | "~" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | "@" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | Expr "===" Expr 
       > List "=" Expr 
     | Expr "!==" Expr 
@@ -1265,7 +1266,7 @@ syntax Expr
     | Expr "\>=" Expr 
       > List "=" Expr 
     | "(" "string" ")" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | Expr "!==" Expr 
       > Expr "===" Expr 
     | Expr "===" Expr 
@@ -1680,298 +1681,298 @@ syntax Expr
       > Expr "&&" Expr 
     | Expr "||" Expr 
       > Expr "||" Expr 
-    | Expr "+" !>> [+] Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+    | Expr "+"  Expr 
+      > "require_once"  Expr 
     | "(" "float" ")" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | "(" "double" ")" Expr 
       > Expr "?" Expr ":" Expr 
-    | "-" !>> [\-] Expr 
-      > Expr "-" !>> [\-] Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | "-"  Expr 
+      > Expr "-"  Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "^=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "|=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "&=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "%=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar ".=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "/=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "*=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "-=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "+=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "\>\>=" Expr 
-    | Expr "\<" !>> [\>] Expr 
+    | Expr "\<"  Expr 
       > ObjectCVar "\<\<=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > List "=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "\>=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "\>" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "\<=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "!=" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "\<\>" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "==" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "\>\>" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "\<\<" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "^" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "&" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "|" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "&&" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "||" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "." Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "!==" Expr 
-    | Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
       > Expr "===" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "+" !>> [+] Expr 
+    | "(" "unset"  ")" Expr 
+      > Expr "+"  Expr 
     | Expr "?" Expr ":" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
-    | "+" !>> [+] Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-    | "+" !>> [+] Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | "+" !>> [+] Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > "include"  Expr 
+    | "+"  Expr 
+      > Expr "or"  Expr 
+    | "+"  Expr 
+      > Expr "xor"  Expr 
+    | "+"  Expr 
+      > Expr "and"  Expr 
+    | Expr "or"  Expr 
+      > Expr "or"  Expr 
     | "(" "object" ")" Expr 
-      > Expr "+" !>> [+] Expr 
-    | Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "+"  Expr 
+    | Expr "and"  Expr 
+      > Expr "xor"  Expr 
+    | Expr "and"  Expr 
+      > Expr "and"  Expr 
+    | Expr "xor"  Expr 
+      > Expr "or"  Expr 
+    | Expr "xor"  Expr 
+      > Expr "xor"  Expr 
+    | Expr "and"  Expr 
+      > Expr "or"  Expr 
     | "!" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | "~" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | "@" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | "(" "int" ")" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | Expr "?" Expr ":" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | "(" "boolean" ")" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | "(" "integer" ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | "(" "real" ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
-    | Expr "-" !>> [\-] Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "-" !>> [\-] Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "-" !>> [\-] Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "\<"  Expr 
+    | Expr "-"  Expr 
+      > Expr "or"  Expr 
+    | Expr "-"  Expr 
+      > Expr "xor"  Expr 
+    | Expr "-"  Expr 
+      > Expr "and"  Expr 
     | "(" "object" ")" Expr 
       > Expr "?" Expr ":" Expr 
     | "(" "int" ")" Expr 
       > Expr "?" Expr ":" Expr 
-    | Expr "+" !>> [+] Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
-    | Expr "+" !>> [+] Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
-    | "+" !>> [+] Expr 
+    | Expr "+"  Expr 
+      > "include"  Expr 
+    | Expr "+"  Expr 
+      > "print"  Expr 
+    | "+"  Expr 
       > Expr "||" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "&&" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "|" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "&" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "^" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "." Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "\<\<" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "\>\>" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "==" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "\<\>" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "!=" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "\<=" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "\>" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "\>=" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "===" Expr 
-    | "+" !>> [+] Expr 
+    | "+"  Expr 
       > Expr "!==" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
+    | "(" "unset"  ")" Expr 
       > Expr "?" Expr ":" Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "-" !>> [\-] Expr 
+    | "(" "array"  ")" Expr 
+      > Expr "-"  Expr 
     | Expr "!==" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "||" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "&&" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "|" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "&" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "^" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "." Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "\>=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "\>" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "\<=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "!=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "\<\>" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "==" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "===" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "\>\>" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "\<\<" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "%" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "/" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "*" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "!==" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | "(" "double" ")" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | Expr "===" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "||" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "&&" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "|" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "&" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "^" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "." Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "\>=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "\>" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "\<=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "!=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "\<\>" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "==" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "\>\>" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "\<\<" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "%" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "/" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "*" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | Expr "!==" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "==" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "===" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | Expr "\>\>" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "\<\<" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "%" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "/" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "*" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "." Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "^" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "&" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "|" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "&&" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "||" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "\<\>" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "!=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "\<=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "\>" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "\>=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "?" Expr ":" Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "+" !>> [+] Expr 
-      > Expr "-" !>> [\-] Expr 
+      > "require_once"  Expr 
+    | Expr "+"  Expr 
+      > Expr "-"  Expr 
     | "(" "bool" ")" Expr 
-      > Expr "-" !>> [\-] Expr 
-    | Expr "\<" !>> [\>] Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "-"  Expr 
+    | Expr "\<"  Expr 
+      > "include_once"  Expr 
     | List "=" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | List "=" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | List "=" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "\<" !>> [\>] Expr 
-      > Expr "\<" !>> [\>] Expr 
-    | Expr "\<" !>> [\>] Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "-" !>> [\-] Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > Expr "xor"  Expr 
+    | Expr "\<"  Expr 
+      > Expr "\<"  Expr 
+    | Expr "\<"  Expr 
+      > "print"  Expr 
+    | Expr "-"  Expr 
+      > "require"  Expr 
     | Expr "||" Expr 
       > Expr "?" Expr ":" Expr 
     | Expr "&&" Expr 
@@ -2011,17 +2012,17 @@ syntax Expr
     | Expr "!==" Expr 
       > Expr "?" Expr ":" Expr 
     | "(" "integer" ")" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | "(" "real" ")" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | Expr "*" Expr 
-      > "-" !>> [\-] Expr 
+      > "-"  Expr 
     | Expr "/" Expr 
-      > "-" !>> [\-] Expr 
+      > "-"  Expr 
     | Expr "%" Expr 
-      > "-" !>> [\-] Expr 
-    | Expr "\<" !>> [\>] Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "-"  Expr 
+    | Expr "\<"  Expr 
+      > "include"  Expr 
     | Expr "?" Expr ":" Expr 
       > ObjectCVar "\>\>=" Expr 
     | Expr "?" Expr ":" Expr 
@@ -2085,187 +2086,187 @@ syntax Expr
     | "(" "double" ")" Expr 
       > Expr "\>=" Expr 
     | Expr "!==" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > "require"  Expr 
+    | "(" "array"  ")" Expr 
+      > Expr "\<"  Expr 
     | Expr "===" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "||" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "&&" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "|" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "&" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "^" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "." Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "*" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "/" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "%" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "\<\<" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "\>\>" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "==" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "\<\>" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "!=" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "\<=" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "\>" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "require"  Expr 
     | Expr "\>=" Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
-    | Expr "-" !>> [\-] Expr 
+      > "require"  Expr 
+    | Expr "-"  Expr 
       > Expr "?" Expr ":" Expr 
-    | "+" !>> [+] Expr 
-      > Expr "+" !>> [+] Expr 
-    | "print" !>> [0-9 A-Z _ a-z] Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-    | "print" !>> [0-9 A-Z _ a-z] Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-    | "print" !>> [0-9 A-Z _ a-z] Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+    | "+"  Expr 
+      > Expr "+"  Expr 
+    | "print"  Expr 
+      > Expr "or"  Expr 
+    | "print"  Expr 
+      > Expr "and"  Expr 
+    | "print"  Expr 
+      > Expr "xor"  Expr 
     | "(" "int" ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | "(" "int" ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | "(" "int" ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "+" !>> [+] Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "and"  Expr 
+    | Expr "+"  Expr 
+      > Expr "\<"  Expr 
     | "(" "object" ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | "(" "object" ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | "(" "bool" ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | "(" "object" ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "+" !>> [+] Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "xor"  Expr 
+    | Expr "+"  Expr 
+      > "include_once"  Expr 
+    | "(" "unset"  ")" Expr 
+      > Expr "xor"  Expr 
+    | "(" "unset"  ")" Expr 
+      > Expr "and"  Expr 
+    | "(" "unset"  ")" Expr 
+      > Expr "or"  Expr 
+    | "(" "unset"  ")" Expr 
+      > Expr "-"  Expr 
     | Expr "!==" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "===" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "||" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "&&" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "|" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "&" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "^" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "." Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "*" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "/" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "%" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "\<\<" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "\>\>" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "==" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "\<\>" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "!=" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "\<=" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "\>" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > "include_once"  Expr 
     | Expr "\>=" Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "\<" !>> [\>] Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "\<" !>> [\>] Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "\<" !>> [\>] Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "+" !>> [+] Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include_once"  Expr 
+    | Expr "\<"  Expr 
+      > Expr "or"  Expr 
+    | Expr "\<"  Expr 
+      > Expr "xor"  Expr 
+    | Expr "\<"  Expr 
+      > Expr "and"  Expr 
+    | Expr "+"  Expr 
+      > "require"  Expr 
     | "(" "object" ")" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | "!" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | "~" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | "@" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | "(" "int" ")" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | "(" "boolean" ")" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | Expr "." Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | Expr "*" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | Expr "/" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | Expr "%" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | Expr "\<\<" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | Expr "\>\>" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | Expr "\<=" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | Expr "\>" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | Expr "\>=" Expr 
-      > Expr "\<" !>> [\>] Expr 
-    | Expr "-" !>> [\-] Expr 
-      > "include_once" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "\<"  Expr 
+    | Expr "-"  Expr 
+      > "include_once"  Expr 
     | "(" "string" ")" Expr 
-      > Expr "+" !>> [+] Expr 
+      > Expr "+"  Expr 
     | "(" "bool" ")" Expr 
       > Expr "?" Expr ":" Expr 
-    | Expr "+" !>> [+] Expr 
+    | Expr "+"  Expr 
       > Expr "?" Expr ":" Expr 
-    | "-" !>> [\-] Expr 
-      > Expr "+" !>> [+] Expr 
+    | "-"  Expr 
+      > Expr "+"  Expr 
     | "(" "real" ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | "(" "real" ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | "(" "real" ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | "(" "integer" ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | "(" "integer" ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | "(" "integer" ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | "(" "float" ")" Expr 
-      > Expr "+" !>> [+] Expr 
-    | Expr "-" !>> [\-] Expr 
-      > Expr "\<" !>> [\>] Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
+      > Expr "+"  Expr 
+    | Expr "-"  Expr 
+      > Expr "\<"  Expr 
+    | "(" "array"  ")" Expr 
       > Expr "?" Expr ":" Expr 
-    | "(" "unset" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
+    | "(" "unset"  ")" Expr 
+      > Expr "\<"  Expr 
     | "(" "float" ")" Expr 
       > Expr "!==" Expr 
     | "(" "float" ")" Expr 
@@ -2304,62 +2305,62 @@ syntax Expr
       > Expr "\>" Expr 
     | "(" "float" ")" Expr 
       > Expr "\>=" Expr 
-    | Expr "-" !>> [\-] Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
-    | Expr "-" !>> [\-] Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "\<" !>> [\>] Expr 
-      > "require" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
-    | "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
+      > "include"  Expr 
+    | Expr "-"  Expr 
+      > "print"  Expr 
+    | Expr "\<"  Expr 
+      > "require"  Expr 
+    | "-"  Expr 
       > Expr "||" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "&&" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "|" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "&" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "^" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "." Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "\<\<" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "\>\>" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "==" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "\<\>" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "!=" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "\<=" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "\>" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "\>=" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "===" Expr 
-    | "-" !>> [\-] Expr 
+    | "-"  Expr 
       > Expr "!==" Expr 
     | "(" "int" ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | "(" "bool" ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "or"  Expr 
     | "(" "bool" ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "and"  Expr 
     | "(" "bool" ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "xor"  Expr 
     | Expr "?" Expr ":" Expr 
       > List "=" Expr 
     | "(" "object" ")" Expr 
-      > Expr "\<" !>> [\>] Expr 
+      > Expr "\<"  Expr 
     | "(" "string" ")" Expr 
       > Expr "!==" Expr 
     | "(" "string" ")" Expr 
       > Expr "===" Expr 
-    | Expr "+" !>> [+] Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+    | Expr "+"  Expr 
+      > Expr "or"  Expr 
     | "(" "string" ")" Expr 
       > Expr "||" Expr 
     | "(" "string" ")" Expr 
@@ -2394,111 +2395,111 @@ syntax Expr
       > Expr "\>" Expr 
     | "(" "string" ")" Expr 
       > Expr "\>=" Expr 
-    | Expr "+" !>> [+] Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "+" !>> [+] Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
+    | Expr "+"  Expr 
+      > Expr "xor"  Expr 
+    | Expr "+"  Expr 
+      > Expr "and"  Expr 
     | Expr "." Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | Expr "*" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | Expr "/" Expr 
-      > Expr "-" !>> [\-] Expr 
+      > Expr "-"  Expr 
     | Expr "%" Expr 
-      > Expr "-" !>> [\-] Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-    | "(" "array" !>> [0-9 A-Z _ a-z] ")" Expr 
-      > Expr "or" !>> [0-9 A-Z _ a-z] Expr 
+      > Expr "-"  Expr 
+    | "(" "array"  ")" Expr 
+      > Expr "xor"  Expr 
+    | "(" "array"  ")" Expr 
+      > Expr "and"  Expr 
+    | "(" "array"  ")" Expr 
+      > Expr "or"  Expr 
     | "(" "real" ")" Expr 
       > Expr "?" Expr ":" Expr 
     | "(" "integer" ")" Expr 
       > Expr "?" Expr ":" Expr 
-    | Expr "or" !>> [0-9 A-Z _ a-z] Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "xor" !>> [0-9 A-Z _ a-z] Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "and" !>> [0-9 A-Z _ a-z] Expr 
-      > "require_once" !>> [0-9 A-Z _ a-z] Expr 
+    | Expr "or"  Expr 
+      > "require_once"  Expr 
+    | Expr "xor"  Expr 
+      > "require_once"  Expr 
+    | Expr "and"  Expr 
+      > "require_once"  Expr 
     | Expr "!==" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "===" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "||" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "&&" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "|" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "&" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "^" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "." Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "*" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "/" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "%" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "\<\<" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "\>\>" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "==" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "\<\>" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "!=" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "\<=" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "\>" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "\>=" Expr 
-      > "include" !>> [0-9 A-Z _ a-z] !>> [_] Expr 
+      > "include"  Expr 
     | Expr "||" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "&&" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "|" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "&" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "^" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "." Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "*" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "/" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "%" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "\<\<" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "\>\>" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "==" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "\>" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "\<=" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "!=" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "\<\>" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "\>=" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "===" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
+      > "print"  Expr 
     | Expr "!==" Expr 
-      > "print" !>> [0-9 A-Z _ a-z] Expr 
-    | Expr "\<" !>> [\>] Expr 
+      > "print"  Expr 
+    | Expr "\<"  Expr 
       > Expr "?" Expr ":" Expr 
     | "!" Expr 
       > Expr "!==" Expr 
@@ -2652,10 +2653,10 @@ syntax Expr
       > Expr "\>" Expr 
     | "(" "boolean" ")" Expr 
       > Expr "\>=" Expr 
-    | Expr "-" !>> [\-] Expr 
-      > Expr "-" !>> [\-] Expr 
+    | Expr "-"  Expr 
+      > Expr "-"  Expr 
   ;
-
+*/
 syntax ClassMember
   =  InstanceVariable: "var" !>> [0-9 A-Z _ a-z] {InstanceVariable ","}+ ";" 
     | FunctionDecl 
@@ -3123,9 +3124,10 @@ lexical HereDocStart
 //    |  TemplateDocument: InlineHTML 
 //  ;
 
-syntax Document
+start syntax Document
   =  Document: InlineHTML !>> [\t-\n \r \ ] PHPOpenTag TopStatement* 
-    |  Document: InlineHTML !>> [\t-\n \r \ ] PHPOpenTag TopStatement* PHPCloseTag [\t-\n \r \ ] !<< InlineHTML 
+    |  Document: InlineHTML !>> [\t-\n \r \ ] PHPOpenTag TopStatement* PHPCloseTag [\t-\n \r \ ] !<< InlineHTML
+    |  Document: PHPOpenTag TopStatement* PHPCloseTag  
     |  TemplateDocument: InlineHTML 
   ;
 
