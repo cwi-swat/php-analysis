@@ -1,0 +1,16 @@
+module languages/php/version5/literals/VariableLiterals5
+exports
+
+  %% A function can be used as an object in version 5.
+  sorts FunctionCall ObjectFunctionCall ObjectProperty ObjectCVar CallParam
+  context-free syntax
+  
+   %% This goes straight to Variable because $foo()->bar()-pal() is handed by the cases below
+   FunctionCall       "->" ObjectProperty  -> Variable {cons("ObjectAccess")}
+   ObjectFunctionCall "->" ObjectProperty  -> Variable {cons("ObjectAccess")}
+   
+   %% Prefer is needed to prevent ambiguity in foo()->foo()->foo()
+   ObjectFunctionCall "->" ObjectProperty "(" {CallParam ","}* ")" -> ObjectFunctionCall {cons("FunctionCall"),prefer}
+   FunctionCall       "->" ObjectProperty "(" {CallParam ","}* ")" -> ObjectFunctionCall {cons("FunctionCall")}
+   
+

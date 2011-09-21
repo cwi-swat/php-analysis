@@ -1,0 +1,3 @@
+%% Dummy module to include all literals
+module languages/php/common/Literals
+imports languages/php/common/literals/LiteralsMain

@@ -1,0 +1,26 @@
+%%
+%% There are two kind of documents:
+%%  1) Document with PHP possible surrounded by HTML
+%%     This document has an optional end-tag. The reason why
+%%     we prefer a seperate consturctor with different amount of childeren is
+%%     because optional end-tag with optional InlineHtml does not make any
+%%     sense.
+%%  2) Document without PHP. Only InlineHTML or InlineEcho's
+%%     This document is a TemplateDocument because it is 
+%%     Likely to be a webpage with only some variables injected
+%%     in it.
+%%
+%% @author Eric Bouwers
+module languages/php/common/Main
+exports
+  sorts Document InlineHTML PHPOpenTag TopStatement PHPCloseTag
+
+syntax
+  <InlineHTML-CF> <PHPOpenTag-CF> <LAYOUT?-CF> <TopStatement*-CF> <LAYOUT?-CF> <PHPCloseTag-CF> <InlineHTML-CF>
+    -> Document {cons("Document")}
+
+  <InlineHTML-CF> <PHPOpenTag-CF> <LAYOUT?-CF> <TopStatement*-CF> <LAYOUT?-CF>
+    -> Document {cons("Document")}
+
+  <InlineHTML-CF>
+    -> Document {cons("TemplateDocument")}

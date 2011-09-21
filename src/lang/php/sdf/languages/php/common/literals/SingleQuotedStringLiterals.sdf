@@ -1,0 +1,37 @@
+%%
+%% Singlequoted literals are defined in the same way as Doublequoted literals.
+%% See DoubleQuotedStringLiterals for more details. The difference is that
+%% Singlequoted strings have only one escape, the '.
+%% The Non-terminals have a similar name, but prefixed with 'S' to avoid nameclashes
+%% with the Non-terminals for DoubleQuoted strings.
+%%
+%% @author Eric Bouwers
+module languages/php/common/literals/SingleQuotedStringLiterals
+exports
+
+  sorts SingleQuotedPart ConstantEncapsedString
+  syntax
+  %% A singlequoted string is a list of parts.
+    "'" SingleQuotedPart* "'"  -> <ConstantEncapsedString-CF> {cons("SingleQuoted")}
+
+  %% Only literals and the escape are allowed
+     <SingleQuotedLit-LEX>  -> SingleQuotedPart {cons("Literal")}
+     SEscape                -> SingleQuotedPart
+
+  sorts SSlashCharLit SingleQuotedLit
+  lexical syntax
+  %% Slash seperatly defined to be able to define follow-restriction
+     (~[\'\\] | SSlashCharLit)+ -> SingleQuotedLit
+     "\\"                       -> SSlashCharLit
+
+  lexical restrictions
+  %% This makes sure that the longest literal is chosen, and that the 
+  %% escapes are not parsed as literals
+    SSlashCharLit   -/- [\'\\]
+    SingleQuotedLit -/- ~[\'\\]
+    SingleQuotedLit -/- [\\] . ~[\'\\]
+
+  sorts SEscape
+  syntax
+  %% There are two escapes, either the slash or the '
+    "\\" [\'\\] -> SEscape {cons("Escape")}

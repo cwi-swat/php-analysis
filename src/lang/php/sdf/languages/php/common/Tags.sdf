@@ -1,0 +1,45 @@
+module languages/php/common/Tags
+exports
+%% Introduces the tags for PHP. It also defines the characters surrounding open
+%% and close tags.
+
+  sorts PHPOpenTag PHPCloseTag PHPEchoOpenTag
+  context-free syntax
+  %% Five different types of open tags and only 1 close tag.
+    '<?php' -> PHPOpenTag      {cons("FullOpenTag")}
+    "<?"    -> PHPOpenTag      {cons("ShortOpenTag")}
+    "<%"    -> PHPOpenTag      {cons("ASPOpenTag")}
+    "<?="   -> PHPEchoOpenTag  {cons("EchoOpenTag")}
+
+    "?>"      -> PHPCloseTag     {cons("CloseTag")}
+    "%>"      -> PHPCloseTag     {cons("ASPCloseTag")}
+
+  sorts InlineHTMLChar InlineHTMLChars NonOpenTag
+  lexical syntax
+  %% We are not interested in the stuff that is not between php-tags.
+  %% Everything is parsed 'as-is'.
+    ~[\<]           -> InlineHTMLChar
+    InlineHTMLChar+ -> InlineHTMLChars {cons("Literal")}
+
+    "<" ~[\?\%]     -> NonOpenTag {cons("Literal")}
+
+  lexical restrictions
+    InlineHTMLChars -/- ~[\<]
+    PHPOpenTag      -/- ~[\ \n\r\t]
+  
+  %% Full open tag must not be recognized as a short and a constant
+    "<?" -/- [pP]
+
+  sorts InlineHTML InlineEcho Semicolon Expr InlineHtmlPart
+  context-free syntax
+  %% Everything that is not between normal open and close tags is 
+  %% considered HTML, including the InlineEcho.
+    PHPEchoOpenTag Expr Semicolon PHPCloseTag -> InlineEcho {cons("InlineEcho")}
+    
+    InlineHTMLChars  -> InlineHtmlPart {cons("Literal")}
+    NonOpenTag       -> InlineHtmlPart {cons("Literal")}
+    InlineEcho       -> InlineHtmlPart
+
+  %% Layout is not allowed between the parts.
+  syntax
+    <InlineHtmlPart-CF>*   -> <InlineHTML-CF>

@@ -1,0 +1,39 @@
+%%
+%% Integers are named DNumber. Floats are named LNumber. 
+%% Automatic conversion from Int to float when the Integer is to
+%% big should happen on application detail.
+%%
+%% @author Eric Bouwers
+module languages/php/common/literals/NumberLiterals
+exports
+
+  sorts LNumber DNumber Deci Octa Hexa
+
+  lexical syntax
+   %%An integer can either be decimal, hexidecimal or octal
+    [1-9][0-9]*                  -> Deci
+    [0]                          -> Deci
+
+    [0][xX][0-9a-fA-F]+			 -> Hexa
+
+  %%Should actually be:
+  %%[0][0-7]+				 -> Octa
+  %%But that is the definition of interpertation, 8 and 9 should
+  %%be parseable
+    [0][0-9]+				 -> Octa
+
+    [0-9]*[\.][0-9]+			 -> DNumber {prefer}
+    [0-9]+[\.][0-9]* 			 -> DNumber
+    ([0-9]+ | DNumber)[eE][\+\-]?[0-9]+  -> DNumber
+    [0-9]+                               -> DNumber {reject}
+
+  lexical restrictions
+    Deci       -/- [0-9\.]
+    Hexa       -/- [0-9a-fA-F]
+    Octa       -/- [0-9]
+    DNumber    -/- [0-9]
+
+  context-free syntax
+    Deci -> LNumber{cons("Deci")}
+    Hexa -> LNumber{cons("Hexa")}
+    Octa -> LNumber{cons("Octa")}

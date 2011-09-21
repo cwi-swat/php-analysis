@@ -1,0 +1,6594 @@
+module languages/php/version5/Precedence5
+imports 
+   languages/php/common/Expressions
+   languages/php/common/Operators
+
+exports
+  context-free priorities
+    'print' Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    'print' Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    'print' Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "@" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'unset' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'boolean' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'bool' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'object' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'array' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'string' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'double' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'real' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'float' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "(" 'int' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "(" 'integer' ")" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <4> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <4> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <4> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "?" Expr ":" Expr -> Expr 
+    <4> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    "!" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    "-" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    "+" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "%" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "/" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "*" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "-" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "+" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "." Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr 'instanceof' ClassNameReference -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr ">=" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr ">" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "<=" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "<" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "!=" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "<>" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "==" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "!==" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "===" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "~" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "!" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "-" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    "+" Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr ">>" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "<<" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    "-" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    "+" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "-" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "+" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "." Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "%" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "/" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "*" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "-" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "+" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "." Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "%" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    "-" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    "+" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "-" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "+" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "." Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "%" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "/" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "*" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "-" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "+" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "." Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "/" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    "-" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    "+" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "-" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "+" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "." Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "%" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "/" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "*" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "-" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "+" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "." Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "*" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "-" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "+" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "." Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "-" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "-" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "+" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "." Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "+" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr ">" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "<" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "==" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "===" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "-" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "+" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "." Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "." Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "^" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <2> . >
+    Expr "^" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <2> . >
+    Expr "&" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "&" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <2> . >
+    Expr "|" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "|" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr 'xor' Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr 'xor' Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr 'xor' Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr 'xor' Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr 'xor' Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr 'xor' Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr 'xor' Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr 'and' Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr 'and' Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr 'and' Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr 'and' Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr 'and' Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr 'and' Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr 'and' Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr 'and' Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr 'and' Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr 'or' Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr 'or' Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr 'or' Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr 'or' Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr 'or' Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <2> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    Expr "&&" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    'require_once' Expr -> InternalFunction 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    'require' Expr -> InternalFunction 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    'include_once' Expr -> InternalFunction 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    'include' Expr -> InternalFunction 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    'print' Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar "<<=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar ">>=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar "^=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar "|=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar "&=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar "%=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar ".=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar "/=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar "*=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar "-=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar "+=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    ObjectCVar "=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <0> . >
+    List "=" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <2> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    Expr "||" Expr -> Expr 
+    <2> . >
+    Expr "||" Expr -> Expr 
+    ,
+    ObjectCVar "<<=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar "<<=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar "<<=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    ObjectCVar ">>=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar ">>=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar ">>=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    ObjectCVar "^=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar "^=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar "^=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    ObjectCVar "|=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar "|=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar "|=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    ObjectCVar "&=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar "&=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar "&=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    ObjectCVar "%=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar "%=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar "%=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    ObjectCVar ".=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar ".=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar ".=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    ObjectCVar "/=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar "/=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar "/=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    ObjectCVar "*=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar "*=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar "*=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    ObjectCVar "-=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar "-=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar "-=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    ObjectCVar "+=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar "+=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar "+=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "?" Expr ":" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr 'instanceof' ClassNameReference -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr ">=" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr ">" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "<=" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "<" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "!=" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "<>" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "==" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "!==" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "===" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr ">>" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "<<" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "%" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "/" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "*" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "-" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "+" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "." Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "^" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "&" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "|" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "&&" Expr -> Expr 
+    ,
+    'clone' Expr -> Expr 
+    <1> . >
+    Expr "||" Expr -> Expr 
+    ,
+    ObjectCVar "=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    ObjectCVar "=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    ObjectCVar "=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 
+    ,
+    List "=" Expr -> Expr 
+    <2> . >
+    Expr 'xor' Expr -> Expr 
+    ,
+    List "=" Expr -> Expr 
+    <2> . >
+    Expr 'and' Expr -> Expr 
+    ,
+    List "=" Expr -> Expr 
+    <2> . >
+    Expr 'or' Expr -> Expr 

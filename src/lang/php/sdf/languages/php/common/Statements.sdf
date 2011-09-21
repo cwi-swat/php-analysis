@@ -1,0 +1,208 @@
+%%
+%% Module containing all statements shared by both PHP4 and PHP5.
+%%
+%% @author Eric Bouwers
+module languages/php/common/Statements
+exports
+
+  sorts HiddenSemicolon Expr
+  context-free syntax
+    Expr HiddenSemicolon  -> Statement {cons("Expr")}
+    Expr ";"              -> Statement {cons("Expr")}
+
+  sorts TopStatement FunctionDecl ClassDecl
+  context-free syntax
+    FunctionDecl   -> TopStatement
+    ClassDecl      -> TopStatement
+    Statement      -> TopStatement
+
+%% Block statement
+  sorts Statement TopStatementBlock
+  context-free syntax
+  %% A list of statements. Used in alternative notation of statements.
+   "{" Statement* "}"    -> Statement{cons("Block")}
+
+  %% If we have a function within an if it has to be in a block
+   "{" TopStatement* "}" -> TopStatementBlock{cons("Block"),prefer} %% prevent a choice between a list of statements
+    TopStatement         -> TopStatementBlock   %% If and similar constructs can have a single statement as body
+
+%% If statement
+  sorts ElseIfStatement AltElseifStatement
+  context-free syntax
+  %% The if statement has two different notations
+  %% Temp hack until real solution has been found for 'dangling enter'
+     'if'     "(" Expr ")" TopStatementBlock  -> Statement {prefer, cons("If")}
+
+     'if'     "(" Expr ")" TopStatementBlock
+     ElseIfStatement+                         -> Statement {prefer, cons("If")}
+
+     'if'     "(" Expr ")" TopStatementBlock
+     ElseIfStatement*
+     'else' TopStatementBlock                 -> Statement {cons("If")}
+
+    'elseif' "(" Expr ")" TopStatementBlock   -> ElseIfStatement {cons("ElseIf")}
+
+%% Alternative syntax for the if
+     'if'     "(" Expr ")" ":" TopStatement*
+     'endif' ";"                              -> Statement {cons("AltIf")}
+
+     'if'     "(" Expr ")" ":" TopStatement*
+     AltElseifStatement+
+     'endif' ";"                              -> Statement {cons("AltIf")}
+
+     'if'     "(" Expr ")" ":" TopStatement*
+     AltElseifStatement*
+     'else' ":" TopStatement*  'endif' ";"       -> Statement {cons("AltIf")}
+
+
+    'elseif' "(" Expr ")" ":" TopStatement*   -> AltElseifStatement {cons("AltElseIf")}
+
+  lexical restrictions
+    'else' -/- [i]
+
+%% While statement
+  context-free syntax
+  %% The while has two notations
+    'while' "(" Expr ")" TopStatementBlock              -> Statement {cons("While")}
+    'while' "(" Expr ")" ":" TopStatement* "endwhile" ";"  -> Statement {cons("AltWhile")}
+
+%% Do statement
+  context-free syntax
+  %% The do statement has only one notation
+    'do' TopStatementBlock 'while' "(" Expr ")" ";" -> Statement {cons("DoWhile")}
+
+%% For statement
+  context-free syntax
+  %% For statement also has two notations. Notice that there can be several expressions
+  %% in the conditions
+    'for' "(" {Expr ","}* ";"
+              {Expr ","}* ";"
+              {Expr ","}*
+          ")"
+          Statement                   -> Statement {cons("For")}
+    'for' "(" {Expr ","}* ";"
+              {Expr ","}* ";"
+              {Expr ","}*
+          ")"
+          ":" Statement* 'endfor' ";" -> Statement {cons("AltFor")}
+
+%% Switch statement
+  sorts Case CaseSeperator
+  lexical syntax
+    ":" -> CaseSeperator
+    ";" -> CaseSeperator
+  context-free syntax
+  %% Two different types of cases to be recognized
+
+    'case' Expr CaseSeperator TopStatement* -> Case {cons("Case")}
+    'default'   CaseSeperator TopStatement* -> Case {cons("DefaultCase")}
+
+  %% Several notations for the switch
+    'switch' "(" Expr ")" "{" Case* "}"                 -> Statement {cons("Switch")}
+    'switch' "(" Expr ")" "{" ";" Case* "}"             -> Statement {cons("Switch")}
+    'switch' "(" Expr ")" ":" Case* 'endswitch' ";"     -> Statement {cons("AltSwitch")}
+    'switch' "(" Expr ")" ":" ";" Case* 'endswitch' ";" -> Statement {cons("AltSwitch")}
+
+%% Control flow statements
+  context-free syntax
+  %% break, continue and return statements
+    'break'    Expr? ";"    -> Statement {cons("Break")}
+    'continue' Expr? ";"    -> Statement {cons("Continue")}
+    'return'   Expr? ";"    -> Statement {cons("Return")}
+
+%% Global variable statements
+  sorts CVar
+  context-free syntax
+  %% Declaration of global variables
+    'global' {CVar ","}+ ";" -> Statement {cons("DeclareGlobal")}
+
+%% Static variable statements
+  sorts StaticVariable StaticScalar TVariable
+  context-free syntax
+    TVariable                    -> StaticVariable {cons("StaticVariable")}
+    TVariable "=" StaticScalar   -> StaticVariable {cons("StaticVariable")}
+
+    'static' {StaticVariable ","}+ ";" -> Statement {cons("DeclareStatic")}
+
+%% Unset variable statement
+  sorts ObjectCVar
+  context-free syntax
+  %% Unsetting of variables
+    'unset' "(" {ObjectCVar ","}+ ")" ";" -> Statement {cons("Unset")}
+
+%% Echo statement
+  context-free syntax
+    'echo' {Expr ","}+ HiddenSemicolon -> Statement {cons("Echo")}
+    'echo' {Expr ","}+ ";"             -> Statement {cons("Echo")}
+
+%% InlineHTML statement
+  sorts InlineEcho PHPCloseTag PHPOpenTag PHPEchoOpenTag InlineHTML
+  syntax
+  %% Maybe seperate HTML parsing file?
+    <PHPCloseTag-CF> <InlineHTML-CF> <PHPOpenTag-CF> -> <Statement-CF> {cons("InlineHTML")}
+
+%% Foreach statement
+  sorts ForEachVar ForEachKey ForEachPattern
+  context-free syntax
+  %% The foreach has two notations, but the subject of the
+  %% foreach can be an expression or a variable
+    CVar                          -> ForEachVar
+    ForEachVar "=>"               -> ForEachKey {cons("Key")}
+    ForEachKey? ForEachVar -> ForEachPattern {cons("Pattern")}
+
+    'foreach' "(" Expr 'as' ForEachPattern ")"
+              Statement                            -> Statement {cons("ForEach")}
+    'foreach' "(" Expr 'as' ForEachPattern ")"
+              ':' Statement* 'endforeach' ";"      -> Statement {cons("AltForEach")}
+
+%% Empty statement
+  context-free syntax
+    ";" -> Statement{cons("Empty")}
+
+%% Declare statement
+  sorts Directive
+  context-free syntax
+  String "=" StaticScalar          ->  Directive{cons("Directive")} 
+ 
+ 'declare' "(" Directive*  ")"
+     Statement                     -> Statement{cons("Declare")}
+
+%% Function decleration statement
+  sorts Param
+  context-free syntax
+  %% We should define parameters to be given to function.
+  %% Notice that we use TVariable. Just plain $variablename
+    TVariable                  -> Param{cons("Param")}
+    "&" TVariable              -> Param{cons("ParamRef")}
+    'const' TVariable          -> Param{cons("ParamConstant")}
+    TVariable "=" StaticScalar -> Param{cons("ParamDefault")}
+
+   'function'     String "("{Param ","}* ")" "{" TopStatement* "}" -> FunctionDecl{cons("FunctionDecl")}
+   'function' "&" String "("{Param ","}* ")" "{" TopStatement* "}" -> FunctionDecl{cons("FunctionDeclRef")}
+
+%% Class decleration statement
+  sorts ClassType ExtendsClause String ClassMember
+  context-free syntax
+  %% This is not complete. There are big differences between the class declarations of version
+  %% 4 and version 5. The difference is captured in modules for the specific modules
+
+  %% Both versions can extend a certain class
+    'extends' String -> ExtendsClause {cons("Extends")}
+
+  %% Both versions have function declarations
+    FunctionDecl    -> ClassMember 
+
+  %% There are several class types which are different for different versions
+  %% This is the only one in common
+    'class'    -> ClassType {cons("Normal")}
+
+  sorts InstanceVariable
+  context-free syntax
+  %% An instance variable can be declared with and without a default value.
+  %% In both versions
+    TVariable                   -> InstanceVariable {cons("Normal")}
+    TVariable "=" StaticScalar  -> InstanceVariable {cons("Default")}
+
+  context-free syntax
+  %% supported in both version 4 and 5
+    'var' {InstanceVariable ","}+ ";"           -> ClassMember {cons("InstanceVariable")}

@@ -1,0 +1,89 @@
+%%
+%% Module containing layout, from java-front definition
+%%
+%% @author Martin Bravenboer
+%% @author Eric Bouwers
+module languages/php/common/Layout
+
+exports
+  sorts
+    Comment
+    EOLCommentChars
+    CommentPart
+    BlockCommentChars
+    Asterisk
+    EscEscChar
+    EscChar
+    BeforeCloseTag
+    EOLCommentQuestionMark
+
+%% comes from Java-front.
+  lexical syntax
+    Comment -> LAYOUT
+
+    "//" EOLCommentChars LineTerminator -> Comment
+    "#"  EOLCommentChars LineTerminator -> Comment
+
+    "//" EOLCommentChars BeforeCloseTag -> Comment {avoid}
+    "#"  EOLCommentChars BeforeCloseTag -> Comment {avoid}
+
+    (~[\n\r\?] | EOLCommentQuestionMark )* -> EOLCommentChars
+     "?" -> EOLCommentQuestionMark
+
+     %% The non-existing character before a close tag
+         -> BeforeCloseTag
+
+    "/*"  CommentPart* "*/" -> Comment
+
+    BlockCommentChars -> CommentPart
+    EscChar           -> CommentPart
+    EscEscChar        -> CommentPart
+    Asterisk          -> CommentPart
+
+    ~[\*\\]+ -> BlockCommentChars
+
+    "*"    -> Asterisk
+    "\\\\" -> EscEscChar
+    "\\"   -> EscChar
+
+  lexical restrictions
+    Asterisk -/- [\/]
+    EscChar  -/- [\\u]
+
+    BlockCommentChars -/- ~[\*\\]
+    EOLCommentChars   -/- ~[\n\13\?]
+    EOLCommentQuestionMark  -/- [\>]
+
+    %% Before a close tag is only recognized if followed by a close-tag
+    BeforeCloseTag -/- ~[\?].~[\>]
+  
+context-free restrictions
+    LAYOUT?  -/- [\/].[\*]
+    LAYOUT?  -/- [\/].[\/]
+
+%% comes from Java-front. Should be in seperate file? LineTerminators
+sorts LineTerminator EndOfFile CarriageReturn
+  lexical syntax
+    [\n]           -> LineTerminator
+    [\r][\n]       -> LineTerminator
+    CarriageReturn -> LineTerminator
+    EndOfFile      -> LineTerminator
+
+    [\r] -> CarriageReturn
+
+  lexical restrictions
+    CarriageReturn -/- [\n]
+
+  %% End of file is empty.
+  lexical syntax
+    -> EndOfFile
+
+  lexical restrictions
+    EndOfFile -/- ~[]
+    
+%% comes from java-front, whitespace
+  lexical syntax
+    [\ \t\12\r\n] -> LAYOUT
+
+  context-free restrictions
+    LAYOUT? -/- [\ \t\12\n\r]

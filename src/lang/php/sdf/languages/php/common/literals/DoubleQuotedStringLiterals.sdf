@@ -1,0 +1,143 @@
+%%
+%% Double quoted string literals are more difficult to parse because there are certian
+%% escapes that should be performed. In order to mimick this, a double wuoted string is
+%% parsed as a list of things that can be in a doublequoted string. These things are
+%% the escapes like '\n' or '\01'. The variables that can be in a string enclosed in
+%% curly braces are also parsed seperatly. Everything that is not special but just a
+%% part of the string is parsed as a Literal.
+%%
+%% @author Eric Bouwers
+%% @author Matin Bravenboer
+module languages/php/common/literals/DoubleQuotedStringLiterals
+
+imports
+  languages/php/common/literals/VariableLiterals
+  languages/php/common/literals/NumberLiterals
+
+exports
+
+  sorts DoubleQuotedPart ConstantEncapsedString DQContent DQList DoubleQuotedPartSpecial
+  syntax
+  %% A double quoted string is a list parts
+    "\"" DQContent "\"" -> <ConstantEncapsedString-CF> {cons("DoubleQuoted")}
+
+    <DoubleQuotedPart?-CF> DQList <DoubleQuotedPart?-CF> -> DQContent {cons("DQContent")}
+    <DoubleQuotedPart?-CF>                               -> DQContent {cons("DQContent")}
+
+    DQList <DoubleQuotedPart?-CF>  DQList -> DQList {cons("DQContent"), left}
+    DoubleQuotedPartSpecial               -> DQList
+
+  %% Parts that can be in a string
+    <DoubleQuotedLit-LEX>  -> <DoubleQuotedPart-CF> {cons("Literal")}
+    Escape                 -> DoubleQuotedPartSpecial
+    HexaCharacter          -> DoubleQuotedPartSpecial
+    OctaCharacter          -> DoubleQuotedPartSpecial
+    EscapeVariable         -> DoubleQuotedPartSpecial
+    BracedVariable         -> DoubleQuotedPartSpecial
+
+%% Literals. Notice that a slash or the dollar should only be parsed seperatly if
+%% they actually escape something. If they do not escape anything, the characters must
+%% appear in the literal.
+  sorts SlashCharLit DollarCharLit CurlyBracketLit DoubleQuotedLit
+  lexical syntax
+     (~[\"\\\$\{] | SlashCharLit | DollarCharLit | CurlyBracketLit)+ -> DoubleQuotedLit
+     "\\" -> SlashCharLit
+     "$"  -> DollarCharLit
+     "{"  -> CurlyBracketLit
+
+%% Take the longest literal
+  lexical restrictions
+    DoubleQuotedLit -/- ~[\"\\\$\{]
+
+    DoubleQuotedLit -/- [\$] . ~[a-zA-Z0-9\_\{]
+    DoubleQuotedLit -/- [\{] . ~[\$]
+
+
+%% A Literal Slash may not be followed by something that it can escape. This
+%% makes sure that the escapes are parsed to seperate strings. Otherwise the
+%% escapes would just appear as part of the literal
+  lexical restrictions
+    SlashCharLit -/- [\\\$\"rnt\']
+    SlashCharLit -/- [x] . [0-9A-Fa-f]
+    SlashCharLit -/- [x] . [0-9A-Fa-f] . [0-9A-Fa-f]
+    SlashCharLit -/- [0-7]
+    SlashCharLit -/- [0-7] . [0-7]
+    SlashCharLit -/- [0-7] . [0-7] . [0-7]
+
+%% Same holds for the Dollar. The dollar represents a variable and this
+%% should be parsed. A dollar with characters after it is not a part of the
+%% literal
+  lexical restrictions
+    DollarCharLit -/- [a-zA-Z\_]
+    DollarCharLit -/- [\{]
+
+%% A curly open bracket is evaluated differently if it is followed by a Dollar
+  lexical restrictions
+    CurlyBracketLit -/- [\$]
+
+%% Basic escapes
+  sorts Escape
+  syntax
+    "\\" [\\\$\"rnt\'] -> Escape {cons("Escape")}
+
+%% Hexa escapes. A character encoded by it's hexadecimal value.
+  sorts HexaCharacterOne HexaCharacterTwo HexaCharacter
+  syntax
+    "\\" "x" [0-9A-Fa-f]             -> HexaCharacterOne {cons("HexaChar")}
+    "\\" "x" [0-9A-Fa-f][0-9A-Fa-f]  -> HexaCharacterTwo {cons("HexaChar")}
+
+    HexaCharacterOne -> HexaCharacter
+    HexaCharacterTwo -> HexaCharacter
+
+  restrictions
+    HexaCharacterOne -/- [0-9A-Fa-f]
+
+%% Octa escapes.
+  sorts OctaCharacterOne OctaCharacterTwo OctaCharacterThree OctaCharacter
+  syntax
+    "\\" [0-7]           -> OctaCharacterOne   {cons("OctaChar")}
+    "\\" [0-7][0-7]      -> OctaCharacterTwo   {cons("OctaChar")}
+    "\\" [0-7][0-7][0-7] -> OctaCharacterThree {cons("OctaChar")}
+
+    OctaCharacterOne     -> OctaCharacter
+    OctaCharacterTwo     -> OctaCharacter
+    OctaCharacterThree   -> OctaCharacter
+
+  restrictions
+    OctaCharacterOne   -/- [0-7]
+    OctaCharacterTwo   -/- [0-7]
+
+%% Variable escapes. Partly rebuild of VariableLiterals, but other cases are too general.
+%% Only one-dimensional array's and single object-acces are allowed in simple syntax
+%% This is only for simple syntax
+  sorts EscapeVariable TVariable String CompoundVariable EscapeSimpleVariable EmbeddedString
+  syntax
+    EscapeSimpleVariable -> EscapeVariable
+   <TVariable-CF>        -> EscapeSimpleVariable
+
+   "${" <String-LEX> "}"                         -> EscapeVariable {cons("VariableBraced")}
+   <TVariable-CF> "->" <String-LEX>              -> EscapeVariable {cons("ObjectAccess")}
+
+        <TVariable-CF> "[" <String-LEX> "]"      -> EscapeVariable {cons("ArrayAccess")}
+   "${" <String-LEX>   "[" <String-LEX> "]" "}"  -> EscapeVariable {cons("BracedArrayAccess")}
+  
+   "'" <String-LEX> "'" -> EmbeddedString {cons("EmbeddedString")}
+   "${" <String-LEX>    -> EmbeddedArrayVariable {cons("EmbeddedArrayVariable")} 
+   
+   %% Embedded String can only occur when the arrayAccess is braced
+   EmbeddedArrayVariable "[" EmbeddedString "]" "}"  -> EscapeVariable {cons("BracedArrayAccess")}
+      
+        <TVariable-CF>   "[" <CompoundVariable-CF> "]"     -> EscapeVariable {cons("ArrayAccess")}
+   EmbeddedArrayVariable "[" <CompoundVariable-CF> "]" "}" -> EscapeVariable {cons("BracedArrayAccess")}
+   
+        <TVariable-CF>   "[" <LNumber-CF> "]"      -> EscapeVariable {cons("ArrayAccess")}
+   EmbeddedArrayVariable "[" <LNumber-CF> "]" "}"  -> EscapeVariable {cons("BracedArrayAccess")}
+
+  restrictions
+    EscapeSimpleVariable -/- [\[]
+    EscapeSimpleVariable -/- [\-].[\>]
+
+  %% Variable escapes in complex syntax
+  sorts BracedVariable
+  syntax
+   "{" <Variable-CF> "}" -> BracedVariable {cons("Braced")}

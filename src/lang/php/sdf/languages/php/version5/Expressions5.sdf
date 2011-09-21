@@ -1,0 +1,49 @@
+%%%
+ %% Module with expressions introduced in version 5
+ %%
+ %% @author Eric Bouwers
+ %%%
+module languages/php/version5/Expressions5
+imports
+  languages/php/common/Expressions
+  languages/php/common/Operators
+
+exports
+
+  %%%
+   %% Method is a new magic constant
+   %%%
+  lexical syntax
+    '__METHOD__'                           -> MagicConstant
+
+
+  %%%
+   %% There is an extra static scalar. A constant from within a class
+   %% Object operators are not allowed on the RHS. So only CVar
+   %%%
+  sorts ClassConstant Name
+  context-free syntax
+    String "::" CVar  -> ClassConstant { cons("ClassConstant")}
+    String "::" Name  -> ClassConstant { cons("ClassConstant")}
+
+    String -> Name { cons("Name")}
+
+    %%%
+     %% Both a StaticScalar and a ObjectCVar.
+     %% But scalar is not a Expressions because String is not an Expression
+     %%%
+    ClassConstant -> StaticScalar
+    ClassConstant -> ObjectCVar
+
+  %%%
+   %% The clone command
+   %%%
+  context-free syntax
+    'clone'  Expr  -> Expr {cons("Clone")}
+    'clone'        -> FunctionName {reject}
+
+  %%%
+   %% The instance of operator
+   %%%
+  context-free syntax
+    Expr 'instanceof' ClassNameReference -> Expr { cons("Instanceof") }

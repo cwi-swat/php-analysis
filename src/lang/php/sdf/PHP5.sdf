@@ -1,0 +1,5 @@
+module PHP5
+imports languages/php/version5/Main5
+exports
+  start-symbols Document
+

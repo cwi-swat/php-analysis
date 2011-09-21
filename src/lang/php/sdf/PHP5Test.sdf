@@ -1,0 +1,7 @@
+module PHP5Test
+imports languages/php/version5/Main5
+exports
+  start-symbols Document
+  context-free start-symbols
+    TopStatement Statement Expr Variable
+    FullyQualifiedClassName ClassNameReference

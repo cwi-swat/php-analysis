@@ -1,0 +1,136 @@
+%%
+%% Module with operators shared by PHP4 and PHP5.
+%%
+%% @author Eric Bouwers 
+module languages/php/common/Operators
+exports
+  sorts CallParam String Expr CVar
+
+  lexical restrictions
+    "+"   -/- [\+]
+    "-"   -/- [\-]
+    "<"   -/- [\>]
+    'new' -/- [a-zA-Z0-9\_] %% prevents ambiguity with function call that starts with new..
+
+  context-free syntax
+    "(" Expr ")" -> Expr {bracket}
+
+  context-free syntax
+  %% Assignment
+    ObjectCVar "="   Expr -> Expr {cons("Assign")}
+    ObjectCVar "+="  Expr -> Expr {cons("PlusAssign")}
+    ObjectCVar "-="  Expr -> Expr {cons("MinAssign")}
+    ObjectCVar "*="  Expr -> Expr {cons("MulAssign")}
+    ObjectCVar "/="  Expr -> Expr {cons("DivAssign")}
+    ObjectCVar ".="  Expr -> Expr {cons("ConcatAssign")}
+    ObjectCVar "%="  Expr -> Expr {cons("ModAssign")}
+    ObjectCVar "&="  Expr -> Expr {cons("AndAssign")}
+    ObjectCVar "|="  Expr -> Expr {cons("OrAssign")}
+    ObjectCVar "^="  Expr -> Expr {cons("XorAssign")}
+    ObjectCVar "<<=" Expr -> Expr {cons("SLAssign")}
+    ObjectCVar ">>=" Expr -> Expr {cons("SRAssign")}
+
+  context-free syntax
+  %% Increment / Decrement
+    ObjectCVar "++" -> Expr {cons("PostInc")}
+    "++" ObjectCVar -> Expr {cons("PreInc")}
+    ObjectCVar "--" -> Expr {cons("PostDec")}
+    "--" ObjectCVar -> Expr {cons("PreDec")}
+
+  context-free syntax
+  %% Logical / Bitwise
+    Expr "||" Expr  -> Expr {left,cons("Or")}
+    Expr "&&" Expr  -> Expr {left,cons("And")}
+    Expr 'or' Expr  -> Expr {left,cons("LOr")}
+    Expr 'and' Expr -> Expr {left,cons("LAnd")}
+    Expr 'xor' Expr -> Expr {left,cons("LXor")}
+    Expr "|" Expr   -> Expr {left,cons("BinOr")}
+    Expr "&" Expr   -> Expr {left,cons("BinAnd")}
+    Expr "^" Expr   -> Expr {left,cons("BinXor")}
+
+  context-free syntax
+  %% Arithmetic / bitwise
+    Expr "." Expr  -> Expr {left,cons("Concat")}
+    Expr "+" Expr  -> Expr {left,cons("Plus")}
+    Expr "-" Expr  -> Expr {left,cons("Min")}
+    Expr "*" Expr  -> Expr {left,cons("Mul")}
+    Expr "/" Expr  -> Expr {left,cons("Div")}
+    Expr "%" Expr  -> Expr {left,cons("Mod")}
+    Expr "<<" Expr -> Expr {left,cons("SL")}
+    Expr ">>" Expr -> Expr {left,cons("SR")}
+
+   %%%
+   %% Unary
+   %%
+   %% Bug in PHP grammar: there is no separate precedence
+   %% for unary operators. This means results in prefer semantics.
+   %%%
+  context-free syntax
+    "+" Expr -> Expr {cons("Positive"), prefer}
+    "-" Expr -> Expr {cons("Negative"), prefer}
+    "!" Expr -> Expr {cons("Not")}
+    "~" Expr -> Expr {cons("Neg")}
+
+  context-free syntax
+  %% Cast
+    "(" 'int' ")" Expr      -> Expr {cons("IntCast")}
+    "(" 'integer' ")" Expr  -> Expr {cons("IntCast")}
+
+    "(" 'bool'    ")" Expr  -> Expr {cons("BoolCast")}
+    "(" 'boolean' ")" Expr  -> Expr {cons("BoolCast")}
+    "(" 'real'    ")" Expr  -> Expr {cons("FloatCast")}
+    "(" 'double'  ")" Expr  -> Expr {cons("FloatCast")}
+    "(" 'float'   ")" Expr  -> Expr {cons("FloatCast")}
+    "(" 'string'  ")" Expr  -> Expr {cons("StringCast"),prefer}
+    "(" 'array'   ")" Expr  -> Expr {cons("ArrayCast")}
+    "(" 'object'  ")" Expr  -> Expr {cons("ObjectCast")}
+    "(" 'unset'   ")" Expr  -> Expr {cons("NullCast")}
+
+  context-free syntax
+  %% Comparison
+    Expr "===" Expr -> Expr {cons("IsIdentical")}
+    Expr "!==" Expr -> Expr {cons("IsNotIdentical")}
+    Expr "==" Expr  -> Expr {cons("IsEqual")}
+    Expr "!=" Expr  -> Expr {cons("IsNotEqual")}
+    Expr "<>" Expr  -> Expr {cons("IsNotEqual")}
+    Expr "<" Expr   -> Expr {cons("Less")}
+    Expr "<=" Expr  -> Expr {cons("LessEqual")}
+    Expr ">" Expr   -> Expr {cons("Greater")}
+    Expr ">=" Expr  -> Expr {cons("GreaterEqual")}
+
+  context-free syntax
+  %% Ternary
+   Expr "?" Expr ":" Expr -> Expr {left,cons("Ternary")}
+
+  context-free syntax
+  %% Error 
+    "@" Expr        -> Expr{prefer,cons("ErrorFree")}
+
+
+  %%%
+   %% Class creation
+   %%%
+  sorts New ObjectCVar FullyQualifiedClassName ClassNameReference
+  DynamicClassNameReference
+  context-free syntax
+   'new' ClassNameReference "(" {CallParam ","}* ")" -> New {cons("ObjectCreation")}
+   'new' ClassNameReference -> New {cons("ObjectCreation")}
+
+    Expr    -> CallParam {cons("Param")}
+    "&"Expr -> CallParam {cons("RefParam")}
+
+    New -> Expr
+
+  %%%
+   %% Class names
+   %%%
+  context-free syntax
+    String -> ClassNameReference {cons("ClassName")}
+    DynamicClassNameReference -> ClassNameReference
+    ObjectCVar -> DynamicClassNameReference
+
+    String -> FullyQualifiedClassName {cons("ClassName")}
+
+  sorts InternalFunction 
+  context-free syntax
+    InternalFunction -> Expr {cons("InternalFunction")}

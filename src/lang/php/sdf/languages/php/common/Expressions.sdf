@@ -1,0 +1,188 @@
+%%
+%% Module containing the expression used in both PHP4 ans PHP5
+%%
+%% @author Eric Bouwers
+module languages/php/common/Expressions
+exports
+
+  sorts Expr Bool Null ObjectCVar ObjectFunctionCall ConstantVariable Variable
+  context-free syntax
+  %% A lot of things are expressions. Some non terminals from the language_parser are
+  %% left out because they did not add anything
+    FunctionCall           -> Expr
+    CommonScalar           -> Expr
+    ConstantVariable       -> Expr
+    Variable               -> Expr  %% CVar is element of ObjectCVar
+
+  sorts MagicConstant
+  lexical syntax
+  %% Pre defined magic constants
+    "__LINE__"                             -> MagicConstant
+    "__FILE__"                             -> MagicConstant
+    "__CLASS__"                            -> MagicConstant
+    "__FUNCTION__"                         -> MagicConstant
+
+  sorts LNumber DNumber ConstantEncapsedString CommonScalar StaticScalar CommonScalarType
+  context-free syntax
+  %% All common scalar from language parser
+    LNumber 				   -> CommonScalarType {cons("LNumber")}
+    DNumber 				   -> CommonScalarType {cons("DNumber")}
+    ConstantEncapsedString 	           -> CommonScalarType {cons("ConstantEncapsedString")}
+    MagicConstant                          -> CommonScalarType {cons("MagicConstant")}
+    Bool                                   -> CommonScalarType
+    Null                                   -> CommonScalarType
+    
+   %% All CommonScalars can be positive and negative. The rejection of for example a
+   %% negative array happens after parsing. So we allow all of them to be wrapped in a 
+   %% plus or a minus.
+   %% We do want to avoid this, we much rather have a positive or negative expression.
+    "-" CommonScalarType                   -> CommonScalar {cons("Negative"),avoid}
+    "+" CommonScalarType                   -> CommonScalar {cons("Positive"),avoid}
+        CommonScalarType                   -> CommonScalar
+
+  %% All static scalar from language parser
+    CommonScalar              -> StaticScalar {prefer}
+    ConstantVariable          -> StaticScalar 
+    Array                     -> StaticScalar
+
+  sorts String FunctionCall CVar CallParam FunctionName FullyQualifiedClassName
+  context-free syntax
+  %% Normal function call and function calls on static objects
+     FunctionName       "(" {CallParam ","}* ")"     -> FunctionCall {cons("FunctionCall")}
+     CVar               "(" {CallParam ","}* ")"     -> FunctionCall {cons("FunctionCall")}
+
+     FullyQualifiedClassName "::" FunctionName "(" {CallParam ","}* ")" -> FunctionCall {cons("StaticFunctionCall")}
+     FullyQualifiedClassName "::" CVar         "(" {CallParam ","}* ")" -> FunctionCall {cons("StaticFunctionCall")}
+
+     String         -> FunctionName {cons("FunctionName")}
+
+  %% The following names are not allowed as a function name. This is because
+  %% they are parsed in a different manner. 
+  %% This is not the same set as KeyWord because a function such as true() can
+  %% be defined.
+     'isset'        -> FunctionName {reject}
+     'empty'        -> FunctionName {reject}
+     'eval'         -> FunctionName {reject}
+     'exit'         -> FunctionName {reject}
+     'array'        -> FunctionName {reject}
+     'print'        -> FunctionName {reject}
+     'include'      -> FunctionName {reject}
+     'include_once' -> FunctionName {reject}
+     'require'      -> FunctionName {reject}
+     'require_once' -> FunctionName {reject}
+     'declare'      -> FunctionName {reject}
+     'echo'         -> FunctionName {reject}
+     'global'       -> FunctionName {reject}                                                                          
+     'if'           -> FunctionName {reject}
+     'else'         -> FunctionName {reject}
+     'while'        -> FunctionName {reject}
+     'elseif'       -> FunctionName {reject}
+     'break'        -> FunctionName {reject}
+     'return'       -> FunctionName {reject}
+     'continue'     -> FunctionName {reject}
+     'static'       -> FunctionName {reject}
+     'unset'        -> FunctionName {reject}
+     'die'          -> FunctionName {reject}
+
+  %%Some more involved Expressions
+  %%Operator expressions are in Operators.sdf
+  sorts AssignmentListElem List
+  context-free syntax
+    'list' "(" AssignmentListElem? ")"        -> List {cons("List"),prefer} %% To prevent Ambiguity
+    'list' "(" {AssignmentListElem? ","}+ ")" -> List {cons("List")}
+
+    List "=" Expr -> Expr {cons("ListAssign")}
+
+    List       -> AssignmentListElem
+    ObjectCVar -> AssignmentListElem
+
+  %%% 
+   %% Some variabels can be explicitly assigned as a reference.
+   %%%
+  sorts New
+  context-free syntax
+    ObjectCVar "=" "&" ObjectCVar         -> Expr{cons("ReferenceAssign")}
+    ObjectCVar "=" "&" FunctionCall       -> Expr{cons("ReferenceAssign")}
+    ObjectCVar "=" "&" New                -> Expr{cons("ReferenceAssign")}
+    ObjectCVar "=" "&" ObjectFunctionCall -> Expr{cons("ReferenceAssign")}
+
+  %%%
+   %% Exit expression
+   %%%
+  context-free syntax
+    'exit'              -> Expr {cons("Exit"), prefer}
+    'exit' "(" ")"      -> Expr {cons("Exit"), prefer}
+    'exit' "(" Expr ")" -> Expr {cons("Exit"), prefer}
+
+    'die'              -> Expr {cons("Die"), prefer}
+    'die' "(" ")"      -> Expr {cons("Die"), prefer}
+    'die' "(" Expr ")" -> Expr {cons("Die"), prefer}
+
+  sorts ArrayPair Array ArrayValue ArrayKey
+  context-free syntax
+  %% Array syntax
+    Array -> Expr
+
+    %% Array with pairs
+    'array' "(" {ArrayPair ","}* ")"     -> Array {cons("Array")}
+    'array' "(" {ArrayPair ","}+ "," ")" -> Array {cons("Array")} %% Strange, but correct syntax
+                                                                  %% We avoid a new constructor
+    %% Which are key-values pairs with an optional key
+    ArrayKey? ArrayValue -> ArrayPair {cons("Pair")}
+
+    Expr "=>" -> ArrayKey {cons("Key")}
+
+    Expr           -> ArrayValue {cons("Value")}
+    "&" ObjectCVar -> ArrayValue {cons("RefValue")}
+
+  %%%
+   %% The print command
+   %%%
+  context-free syntax
+    'print' Expr  -> Expr {cons("Print"), prefer}
+
+  sorts InternalFunction
+  context-free syntax
+  %% Special functions that are performed internally
+  'isset' "(" {ObjectCVar ","}+  ")" -> InternalFunction {cons("Isset")}
+  'empty' "(" ObjectCVar         ")" -> InternalFunction {cons("Empty")}
+  'eval'  "(" Expr ")"         -> InternalFunction {cons("Eval")}
+  'include' Expr               -> InternalFunction {cons("Include")}
+  'include_once' Expr          -> InternalFunction {cons("IncludeOnce")}
+  'require' Expr               -> InternalFunction {cons("Require")}
+  'require_once' Expr          -> InternalFunction {cons("RequireOnce")}
+
+  lexical restrictions
+  %% Make sure that require_once and include_once are not broken into pieces
+    'require' -/- [\_]
+    'include' -/- [\_]
+
+%%Calling from the commandline can be specified in the same manner as
+%%DoubleQuotedStrings are parsed. This means that we have to extend the
+%%syntax of doubleQuoted strings and add some more rules to it.
+
+  sorts CommandPart Escape HexaCharacter OctaCharacter EscapeVariable BracedVariable DollarCharLit CurlyBracketLit SlashCharLit
+  syntax
+    "`" CommandPart* "`"  -> <Expr-CF> {cons("ShellCommand")}
+
+    CommandPart+ CommandPart+ -> CommandPart+ {avoid}
+
+    <CommandLit-LEX>   -> CommandPart {cons("Literal")}  
+     EEscape           -> CommandPart
+     Escape            -> CommandPart
+     HexaCharacter     -> CommandPart
+     OctaCharacter     -> CommandPart
+     EscapeVariable    -> CommandPart
+     BracedVariable    -> CommandPart         
+
+  sorts EEscape ESlashCharLit CommandLit
+  lexical syntax
+     (~[\`\\\$\{] | ESlashCharLit | DollarCharLit | CurlyBracketLit)+ -> CommandLit
+     SlashCharLit             -> ESlashCharLit
+
+  lexical restrictions
+    CommandLit      -/- ~[\\\$\{\`]   
+    ESlashCharLit   -/- [\`]
+
+  syntax
+    "\\" [\`] -> EEscape {cons("Escape")}

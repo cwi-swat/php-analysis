@@ -1,0 +1,17 @@
+%%
+%% Main module importing all modules for version 5
+%%
+%% @author Eric Bouwers
+module languages/php/version5/Main5
+imports
+  languages/php/version5/Statements5
+  languages/php/version5/Keywords5
+  languages/php/version5/Expressions5
+  languages/php/version5/literals/VariableLiterals5
+  languages/php/version5/Precedence5
+  
+  languages/php/common/Main
+  languages/php/common/Literals
+  languages/php/common/Layout
+  languages/php/common/HiddenSemiColon
+  languages/php/common/Operators

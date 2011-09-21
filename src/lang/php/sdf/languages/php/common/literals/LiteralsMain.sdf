@@ -1,0 +1,12 @@
+%%
+%% Main module which imports the different literals
+%%
+%% @author Eric Bouwers
+module languages/php/common/literals/LiteralsMain
+imports 
+  languages/php/common/literals/DoubleQuotedStringLiterals
+  languages/php/common/literals/HeredocLiterals
+  languages/php/common/literals/NumberLiterals
+  languages/php/common/literals/SingleQuotedStringLiterals
+  languages/php/common/literals/VariableLiterals
+  languages/php/common/literals/StringLiteral

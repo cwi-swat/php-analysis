@@ -1,0 +1,38 @@
+%%
+%% Module with keywords introduced in version 5.
+%%
+%% @author Eric Bouwers
+module languages/php/version5/Keywords5
+imports
+   languages/php/common/Keywords
+exports
+
+  sorts Keyword
+
+  lexical syntax
+  '__METHOD__'       -> Keyword
+  'abstract'         -> Keyword
+  'catch'            -> Keyword
+  'clone'            -> Keyword
+  'const'            -> Keyword
+  'exception'        -> Keyword
+  'final'            -> Keyword
+  'php_user_filter'  -> Keyword
+  'protected'        -> Keyword
+  'self'             -> Keyword
+  'throw'            -> Keyword
+  'try'              -> Keyword
+
+  lexical restrictions     
+  '__METHOD__'       -/- [a-zA-Z0-9\_]
+  'abstract'         -/- [a-zA-Z0-9\_]
+  'catch'            -/- [a-zA-Z0-9\_]
+  'clone'            -/- [a-zA-Z0-9\_]
+  'const'            -/- [a-zA-Z0-9\_]
+  'exception'        -/- [a-zA-Z0-9\_]
+  'final'            -/- [a-zA-Z0-9\_]
+  'php_user_filter'  -/- [a-zA-Z0-9\_]
+  'protected'        -/- [a-zA-Z0-9\_]
+  'self'             -/- [a-zA-Z0-9\_]
+  'throw'            -/- [a-zA-Z0-9\_]
+  'try'              -/- [a-zA-Z0-9\_]

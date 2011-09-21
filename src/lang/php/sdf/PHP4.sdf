@@ -1,0 +1,4 @@
+module PHP4
+imports languages/php/version4/Main4
+exports
+  start-symbols Document

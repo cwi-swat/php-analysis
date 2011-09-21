@@ -1,0 +1,23 @@
+%%
+%% PHP's lexer silently inserts a ";" token when it encounters a
+%% "?>" close tag.  Simulate this as best as we can, by interpreting
+%% an empty production as a semicolon IF it is followed by a "?>".
+%%
+%% @author Eric Bouwers
+module languages/php/common/HiddenSemiColon
+imports 
+    languages/php/common/Tags    
+    
+exports
+    
+  sorts Semicolon HiddenSemicolon
+
+  lexical syntax
+    ";" -> Semicolon
+    HiddenSemicolon -> Semicolon
+
+    -> HiddenSemicolon
+
+  lexical restrictions
+    HiddenSemicolon -/- ~[\?].~[\>]
+    HiddenSemicolon -/-  [\;]   

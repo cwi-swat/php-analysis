@@ -1,0 +1,14 @@
+%%
+%% The language parser uses T_STRING for label names. 
+%% Non-terminal String is used as an equivalent for this token
+%%
+%% @author Eric Bouwers
+module languages/php/common/literals/StringLiteral
+exports
+
+   sorts String Keyword
+   lexical syntax
+    [a-zA-Z\_][a-zA-Z0-9\_]* 		-> String
+
+  lexical restrictions
+    String     -/- [a-zA-Z0-9\_]

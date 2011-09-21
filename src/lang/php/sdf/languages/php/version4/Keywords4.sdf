@@ -1,0 +1,19 @@
+%%
+%% Keywords specific for version 4.
+%% 
+%% @author Eric Bouwers
+module languages/php/version4/Keywords4
+imports
+   languages/php/common/Keywords
+exports
+
+  sorts Keyword
+
+  lexical syntax
+  
+  'cfunction'	    -> Keyword
+  'old_function'    -> Keyword
+     
+  lexical restrictions     
+  'cfunction'	    -/- [a-zA-Z0-9\_]
+  'old_function'    -/- [a-zA-Z0-9\_]

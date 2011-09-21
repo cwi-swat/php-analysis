@@ -1,0 +1,21 @@
+%%
+%% Statements specific for version 4.
+%% This includes the syntax for a class decleration
+%% and definition of an old_function.
+%%
+%% @author Eric Bouwers
+module languages/php/version4/Statements4
+imports
+    languages/php/common/Statements
+exports
+
+  sorts ClassDecl String ExtendsClause ClassType
+  context-free syntax
+  %% The real class declaration
+    ClassType String ExtendsClause? "{" ClassMember* "}" -> ClassDecl {cons("Class")}
+
+  sorts Param Statement FunctionDecl
+  context-free syntax
+  %% PHP4 supports old function declerations
+   'old_function'     String {Param ","}* "(" Statement* ")" ";" -> FunctionDecl {cons("OldFunctionDecl")}
+   'old_function' "&" String {Param ","}* "(" Statement* ")" ";" -> FunctionDecl {cons("OldFunctionDeclRef")}

@@ -1,0 +1,17 @@
+%%
+%% Imports all of the modules for version 4.
+%%
+%% @author Eric Bouwers
+module languages/php/version4/Main4
+imports
+  languages/php/version4/Statements4
+  languages/php/version4/Keywords4
+  languages/php/version4/Precedence4
+
+  languages/php/common/Main
+  languages/php/common/HiddenSemiColon
+  languages/php/common/Layout
+  languages/php/common/Literals
+  languages/php/common/Expressions
+  languages/php/common/Operators
+  languages/php/common/Tags

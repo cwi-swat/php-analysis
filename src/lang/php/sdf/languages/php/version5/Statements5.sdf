@@ -1,0 +1,110 @@
+%%
+%% Module with statements introduced in version 5
+%%
+%% @author Eric Bouwers
+module languages/php/version5/Statements5
+imports 
+   languages/php/common/Statements
+   languages/php/common/Expressions
+	
+exports
+
+  context-free syntax
+  %% Varion 5 allow references in foreach vars
+    "&" CVar -> ForEachVar {cons("Ref")}
+
+  sorts ImplementsClause
+  context-free syntax
+  %% The real class declaration
+    ClassType String ExtendsClause? ImplementsClause? "{" ClassMember* "}" -> ClassDecl {cons("Class")}
+
+  %% Classes can implement multiple interfaces
+    'implements' { Name "," }+ -> ImplementsClause {cons("Implements")}
+
+  sorts ClassType VarModifiers VarModifier Public
+  context-free syntax
+  %% Classes in version 5 are more involved
+  %% Two more types of classes besides the normal type
+    'abstract' 'class' -> ClassType {cons("AbstractClass")}
+    'final' 'class'    -> ClassType {cons("FinalClass")}
+
+  %% Class variables can have modifiers
+  %% Public is special, we need it at interfaces
+    'public'    -> VarModifier {cons("Public")}
+    'protected' -> VarModifier {cons("Protected")}
+    'private'   -> VarModifier {cons("Private")}
+    'static'    -> VarModifier {cons("Static")}
+    'final'     -> VarModifier {cons("Final")}
+    'abstract'  -> VarModifier {cons("Abstract")}
+
+  %% Notice that 'public protected' is parsed, but raises a fatal error afterwards
+  %% This also holds for 'final abstract'
+    VarModifier+ -> VarModifiers {cons("Modifiers")}
+
+  context-free syntax
+  %% Version 5 also supports modified instance variables
+    VarModifiers {InstanceVariable ","}+ ";"    -> ClassMember {cons("InstanceVariable")}
+
+  sorts ClassConstantDecl ClassConstantDeclList
+  context-free syntax
+  %% There is also support for class constants
+    String "=" StaticScalar ->  ClassConstantDecl {cons("ClassConstantDecl")}
+    
+    'const' { ClassConstantDecl "," }+ ";" ->  ClassConstantDeclList {cons("ClassConstantDeclList")} 
+
+    ClassConstantDeclList -> ClassMember
+    ClassConstantDeclList -> InterfaceMember
+
+  sorts ClassMethodBody 
+  context-free syntax
+    "{" TopStatement* "}" -> ClassMethodBody {cons("MethodBody")}
+    ";"                   -> ClassMethodBody {cons("AbstractMethodBody")}
+
+  context-free syntax
+  %% Within classes, a function _can_ have modifiers. So we add a new FunctionDecl with modifers as ClassMember
+    VarModifiers 'function'     String "("{Param ","}* ")" ClassMethodBody -> ClassMember {cons("FunctionDecl")}
+    VarModifiers 'function' "&" String "("{Param ","}* ")" ClassMethodBody -> ClassMember {cons("FunctionDeclRef")}
+    
+%% Version 5 supports interfaces, try catch clauses and some type hinting
+  sorts InterFaceExtendsClause InterfaceMember InterfaceDecl Name
+  context-free syntax
+  %% Some support for interfaces
+    'interface' String InterFaceExtendsClause? "{" InterfaceMember* "}" -> InterfaceDecl {cons("InterfaceDecl")}
+
+     'extends' { Name "," }+  -> InterFaceExtendsClause {cons("InterfaceExtends")}
+
+  %% function should be public, so this is the only one parsed
+    VarModifiers? 'function'     String "("{Param ","}* ")" ";"  -> InterfaceMember {cons("InterfaceFunction")}
+    VarModifiers? 'function' "&" String "("{Param ","}* ")" ";"  -> InterfaceMember {cons("InterfaceFunctionRef")}
+
+
+    InterfaceDecl -> TopStatement
+
+  sorts Body Catch Try
+  context-free syntax
+  %% try - catch support
+    "{" TopStatement* "}" -> Body {cons("Body")}
+
+    'catch' "(" String TVariable ")" Body -> Catch {cons("Catch")}
+
+    'try' Body Catch*  -> Try {cons("Try")}
+    
+    Try -> Statement
+
+  context-free syntax
+  %% Throw is also a statement.
+    'throw' Expr ";" -> Statement {cons("Throw")}
+    'throw'          -> FunctionName {reject}
+
+  sorts TypeHint
+  context-free syntax
+  %% Version 5 supports type hinting for functions. This includes a String before a function
+  %% Note that the constant parameter cannot be type-hinted
+    TypeHint TVariable                  -> Param{cons("Param")}
+    TypeHint "&" TVariable              -> Param{cons("ParamRef")}
+    TypeHint TVariable "=" StaticScalar -> Param{cons("ParamDefault")}
+    
+  %% Minor problem. One can typehint or have a constant parameter.
+  %% So 'const' should not be considered a typehint
+  String  -> TypeHint
+  'const' -> TypeHint {reject}

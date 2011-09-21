@@ -1,0 +1,74 @@
+%%
+%% Definition of different variables used within PHP and
+%% the way to access them.
+%%
+%% @author Eric Bouwers
+module languages/php/common/literals/VariableLiterals
+exports
+%% Variables can be defined in a lot of ways. A normal variable is a Dollar with
+%% a label. But there can also be an array. A variable can also be made by a dollar
+%% and an expression between curly braces.
+
+  sorts CompoundVariable Expr
+  context-free syntax
+  %% Reference variables. A normal variable, acces to an array or maybe acces to
+  %% a index in a string.
+    CompoundVariable                       -> ReferenceVariable
+    ReferenceVariable "[" Expr? "]"        -> ReferenceVariable {cons("ArrayAccess")}
+    ReferenceVariable "{" Expr "}"         -> ReferenceVariable {cons("StringAccess")}
+
+%% There are two kind of variables defined. A TVariable which is a basic variable
+%% and a CompundVariable that can be a complecated variable. A TVariable can be
+%% used as a CompundVariable but not vice versa
+  sorts  String TVariable SimpleVariableName
+  syntax
+    "$" <SimpleVariableName-CF> -> <TVariable-CF>        {cons("Variable")}
+    "$" <VariableName-CF>       -> <CompoundVariable-CF> {cons("Variable")}
+
+%% Complex variable names
+  context-free syntax
+    SimpleVariableName         -> VariableName
+    "{" SimpleVariableName "}" -> VariableName {prefer, cons("Braced")} %% we prefer this instead of a constant variable
+    "{" Expr "}"               -> VariableName {cons("Braced")}
+
+    String -> SimpleVariableName {cons("Simple")}
+
+%% A special place for constant variables.
+  sorts MagicConstant Keyword  ConstantVariable
+  context-free syntax
+    String        -> ConstantVariable {cons("ConstantVariable")}
+    MagicConstant -> ConstantVariable{reject}
+    Keyword       -> ConstantVariable{reject}
+    
+%% These definitions represent the accessing of an object or an array.
+%% The language parser does not see this as epxressions. So this is placed
+%% here because the variables are related.
+  sorts ReferenceVariable ObjectProperty VariableName 
+        CVar ObjectCVar ObjectFunctionCall CallParam Variable
+  context-free syntax
+    %% Included in language parser. Only translated it to assign things to the
+    %% Expr. It expresses the accesing of normal variables and the
+    %% variables inside objects
+     ObjectCVar            	  -> Variable
+     ObjectFunctionCall           -> Variable
+     
+     ReferenceVariable            -> CVar
+     "$" CVar                     -> CVar {cons("IndirectReference")}
+
+     CVar                               -> ObjectCVar
+     ObjectCVar "->" ObjectProperty     -> ObjectCVar {cons("ObjectAccess")}
+
+     ObjectCVar                         -> ObjectProperty {cons("ObjectProperty")}
+     VariableName                       -> ObjectProperty {cons("ObjectProperty")}
+
+     ObjectProperty "[" Expr? "]"       -> ObjectProperty     {cons("ArrayAccess")}
+     ObjectProperty "{" Expr "}"        -> ObjectProperty     {cons("StringAccess")}
+
+     ObjectCVar  "->" ObjectProperty "(" {CallParam ","}* ")" -> ObjectFunctionCall {cons("FunctionCall")}
+
+%% The following Variables are special variables and should be recognized as such
+  sorts Bool Null
+  context-free syntax
+    'true'  -> Bool {cons("True")}
+    'false' -> Bool {cons("False")}
+    'null'  -> Null {cons("Null")}

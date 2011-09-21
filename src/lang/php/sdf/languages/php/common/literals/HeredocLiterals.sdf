@@ -1,0 +1,53 @@
+%%
+%% Heredoc string literal. A start- and an end-label with a literal string
+%% in between. The start- and end-label should match. This is not checked
+%% because that can not be done this way.
+%% The escapes are the same as within Double-quoted strings
+%%
+%% @author Eric Bouwers
+%% @author Martin Bravenboer
+module languages/php/common/literals/HeredocLiterals
+exports      
+
+  sorts String
+        DoubleQuotedPart HereDocStart HereDocEnd 
+        ConstantEncapsedString HereDocPart Escape
+        HexaCharacter OctaCharacter EscapeVariable BracedVariable
+        HereDocPartSpecial HereDocContent HereDocList
+  syntax
+    HereDocStart HereDocContent <HereDocEnd-LEX>
+  ->
+    <ConstantEncapsedString-CF> {cons("HereDoc")}
+
+    <HereDocPart?-CF> HereDocList <HereDocPart?-CF> -> HereDocContent {cons("HereDocContent")}
+    <HereDocPart?-CF>                               -> HereDocContent {cons("HereDocContent")}
+
+    HereDocList <HereDocPart?-CF> HereDocList -> HereDocList {cons("HereDocContent"), left}
+    HereDocPartSpecial                        -> HereDocList
+
+    <HereDocLit-LEX>  -> <HereDocPart-CF> {cons("Literal")}
+    Escape            -> HereDocPartSpecial
+    HexaCharacter     -> HereDocPartSpecial
+    OctaCharacter     -> HereDocPartSpecial
+    EscapeVariable    -> HereDocPartSpecial
+    BracedVariable    -> HereDocPartSpecial
+
+    "<<<" <LAYOUT?-CF> <String-LEX>    -> HereDocStart {cons("HereDocStart")}
+
+  sorts HereDocLit DollarCharLit CurlyBracketLit HereDocLineTerminator
+        LineTerminator SlashCharLit
+  lexical syntax
+     (~[\\\$\{\n\r]
+     | DollarCharLit
+     | CurlyBracketLit
+     | SlashCharLit
+     | HereDocLineTerminator)+ -> HereDocLit
+
+     LineTerminator -> HereDocLineTerminator
+
+    LineTerminator String  -> HereDocEnd 
+
+  lexical restrictions
+    HereDocLit -/- ~[\\\$\{\r\n]
+    HereDocEnd -/- ~[\;\r\n]
+    HereDocEnd -/- [\;].~[\r\n]

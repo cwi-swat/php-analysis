@@ -1,0 +1,7 @@
+module PHP4Test
+imports languages/php/version4/Main4
+exports
+  start-symbols Document
+  context-free start-symbols
+    TopStatement Statement Expr Variable
+    FullyQualifiedClassName ClassNameReference
