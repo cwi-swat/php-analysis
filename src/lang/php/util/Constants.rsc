@@ -6,10 +6,9 @@
   http://www.eclipse.org/legal/epl-v10.html
 }
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
-module lang::php::types::Types
+module lang::php::util::Constants
 
-data Type = Boolean() | Integer() | Float() | String() 
-          | Array(Type from, Type to)
-          | Class(str className)
-          | Interface(str interfaceName)
-          ;
+public loc mediawiki162 = |file:///Users/mhills/Projects/phpsa/mediawiki/mediawiki-1.6.12|;
+public set[str] mediawiki162Prefixes = { "includes" };
+public set[str] mediawiki162Libs = { "Mail.php" };
+

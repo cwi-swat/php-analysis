@@ -6,10 +6,4 @@
   http://www.eclipse.org/legal/epl-v10.html
 }
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
-module lang::php::types::Types
-
-data Type = Boolean() | Integer() | Float() | String() 
-          | Array(Type from, Type to)
-          | Class(str className)
-          | Interface(str interfaceName)
-          ;
+module lang::php::analysis::CheckAliasedUses

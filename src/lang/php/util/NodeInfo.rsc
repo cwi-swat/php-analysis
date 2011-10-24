@@ -6,10 +6,8 @@
   http://www.eclipse.org/legal/epl-v10.html
 }
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
-module lang::php::types::Types
+module lang::php::util::NodeInfo
 
-data Type = Boolean() | Integer() | Float() | String() 
-          | Array(Type from, Type to)
-          | Class(str className)
-          | Interface(str interfaceName)
-          ;
+import Node;
+
+public anno node node@nodecat; 
