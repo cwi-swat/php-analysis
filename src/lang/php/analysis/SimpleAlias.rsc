@@ -1167,7 +1167,7 @@ public AAInfo propagatePairs(AAInfo aaInfo) {
 		rel[str,MemItem] res = { };
 		
 		// First, assign directly from the target to the base
-		res = res + { target } * aaInfo.abstractStore["<item>"];
+		res = res + { target } * aaInfo.abstractStore[item];
 		
 		// Now, attempt to do the same for arrays
 		if ("<item>[]" in aaInfo.abstractStore<0>) res = res + deepAssign(aaInfo, "<target>[]", "<item>[]");

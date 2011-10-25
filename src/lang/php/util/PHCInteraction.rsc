@@ -45,9 +45,9 @@ public map[loc,node] loadPHPFiles(loc l) {
 
 public map[str,node] getPHPFileMap(loc l) {
 	m = loadPHPFiles(l);
-	return ( x : m[i] | i <- m<0>, /.*6[.]12[\/]<x:.*>/ := i.path );
+	return ( substring(i.path,size(l.path)+1) : m[i] | i <- m<0> );
 }
 
 public map[str,node] getPHPFileMap(map[loc,node] loadedFiles) {
-	return ( x : loadedFiles[i] | i <- loadedFiles<0>, /.*6[.]12[\/]<x:.*>/ := i.path );
+	return ( substring(i.path,size(l.path)+1) : loadedFiles[i] | i <- loadedFiles<0> );
 }
