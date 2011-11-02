@@ -58,8 +58,8 @@ data MemItem = scalarVal() | arrayVal() | objectVal(str className, int allocatio
 // the mappings from the various names found in the code to abstract values.
 //
 data AAInfo 
-	= aainfo(set[str] definedClasses, InheritanceGraph ig, FieldsRel definedFields, MethodsRel definedMethods, rel[str,str] classAliases, rel[str,str] methodAliases)
-	| aainfo(set[str] definedClasses, InheritanceGraph ig, FieldsRel definedFields, MethodsRel definedMethods, rel[str,MemItem] abstractStore, map[str,node] signatures, rel[str,str] referencePairs, set[str] unknownMethods, rel[str,str] classAliases, rel[str,str] methodAliases)
+	= aainfo(set[str] definedClasses, InheritanceGraph ig, FieldsRel definedFields, MethodsRel definedMethods, rel[str,str] targetFields, rel[str,str] classAliases, rel[str,str] methodAliases)
+	| aainfo(set[str] definedClasses, InheritanceGraph ig, FieldsRel definedFields, MethodsRel definedMethods, rel[str,MemItem] abstractStore, map[str,node] signatures, rel[str,str] referencePairs, set[str] unknownMethods, rel[str,str] targetFields, rel[str,str] classAliases, rel[str,str] methodAliases)
 	;
 
 //
@@ -74,7 +74,7 @@ public AAInfo calculateAliases(node scr) {
 	scr = markAllocationSites(scr);
 	
 	ig = calculateInheritance(scr);
-	AAInfo aaInfo = aainfo(getDefinedClasses(scr), ig, calculateFieldsRel(scr, ig), calculateMethodsRel(scr, ig), { }, { });
+	AAInfo aaInfo = aainfo(getDefinedClasses(scr), ig, calculateFieldsRel(scr, ig), calculateMethodsRel(scr, ig), { }, { }, { });
 	rel[str,MemItem] res = { };
 	map[str,node] signatures = ( );
 	
@@ -105,7 +105,7 @@ public AAInfo calculateAliases(node scr) {
 		
 		// We now have the initial abstract store, with all allocations, and the signatures, keyed by function or class::method name.
 		// Extend aaInfo with this new information.
-		aaInfo = aainfo(aaInfo.definedClasses, aaInfo.ig, aaInfo.definedFields, aaInfo.definedMethods, res, signatures, { }, { }, aaInfo.classAliases, aaInfo.methodAliases);
+		aaInfo = aainfo(aaInfo.definedClasses, aaInfo.ig, aaInfo.definedFields, aaInfo.definedMethods, res, signatures, { }, { }, aaInfo.targetFields, aaInfo.classAliases, aaInfo.methodAliases);
 		
 		// Continue propagation until the abstact store stabilizes
 		solve(aaInfo) {
@@ -191,7 +191,7 @@ public rel[str,MemItem] getInitializingAssignments(AAInfo aaInfo, str namePrefix
 			fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),nd@asite) >;
 
 		case assign_var(variable_name(vn),ref(b),nd:new(variable_class(_), actuals(al))) : 
-			for (cn <- definedClasses) fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),nd@asite) >;
+			for (cn <- aaInfo.definedClasses) fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),nd@asite) >;
 		
 		case assign_var(variable_name(vn),ref(b),nd:cast(cast("object"),_)) :			
 			for (cn <- definedClassesForCast) fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),nd@asite) >;
@@ -233,6 +233,7 @@ public rel[str,MemItem] getInitializingAssignments(AAInfo aaInfo, str namePrefix
 			//	for (cn <- definedClassesForCast) fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),af@asite) >;
 			//}
 			fiStore = fiStore + < "<namePrefix>::<vn>.<fn>", objectVal(unaliasClass(cnf),nd@asite) >;
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", fn >; 
 		}
 
 		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:new(variable_class(_), actuals(al))) : { 
@@ -241,7 +242,8 @@ public rel[str,MemItem] getInitializingAssignments(AAInfo aaInfo, str namePrefix
 			//} else { 
 			//	for (cn <- definedClassesForCast) fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),af@asite) >;
 			//}
-			for (cnf <- definedClasses) fiStore = fiStore + < "<namePrefix>::<vn>.<fn>", objectVal(unaliasClass(cnf),nd@asite) >;
+			for (cnf <- aaInfo.definedClasses) fiStore = fiStore + < "<namePrefix>::<vn>.<fn>", objectVal(unaliasClass(cnf),nd@asite) >;
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", fn >; 
 		}
 		
 		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:cast(cast("object"),_)) : {			
@@ -251,21 +253,30 @@ public rel[str,MemItem] getInitializingAssignments(AAInfo aaInfo, str namePrefix
 			//	for (cn <- definedClassesForCast) fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),af@asite) >;
 			//}
 			for (cnf <- definedClassesForCast) fiStore = fiStore + < "<namePrefix>::<vn>.<fn>", objectVal(unaliasClass(cnf),nd@asite) >;
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", fn >; 
 		}
 			
-		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:cast(cast("array"),_)) :
-			fiStore = fiStore + < "<namePrefix>::<vn>.<fn>", arrayVal() >;			
+		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:cast(cast("array"),_)) : {
+			fiStore = fiStore + < "<namePrefix>::<vn>.<fn>", arrayVal() >;
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", fn >;
+		}	
 
-		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:cast(_,_)) :
+		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:cast(_,_)) : {
 			fiStore = fiStore + < "<namePrefix>::<vn>.<fn>", scalarVal() >;			
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", fn >; 
+		}			
 
-		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) :
+		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) : {
 			if (hasSummary(mn), allocatorFun(mn))
 				fiStore = fiStore + initLibraryAllocators({"<namePrefix>::<vn>.<fn>"}, mn, al, nd@asite);
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", fn >; 
+		}
 
-		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) :
+		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) : {
 			if (hasSummary(mn), !allocatorFun(mn), !returnsVoid(mn))
 				fiStore = fiStore + < "<namePrefix>::<vn>.<fn>", scalarVal() >;
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", fn >; 
+		}
 
 		case af:assign_field(variable_name(vn),field_name(fn),ref(r),e) : {
 			//if (fn in invert(aaInfo.definedFields)<0>) {
@@ -277,6 +288,7 @@ public rel[str,MemItem] getInitializingAssignments(AAInfo aaInfo, str namePrefix
 				fiStore = fiStore + < "<namePrefix>::<vn>.<fn>", arrayVal() > + < "<namePrefix>::<vn>.<fn>[]", scalarVal() >;
 			else if (getName(e) in scalarExprs)
 				fiStore = fiStore + < "<namePrefix>::<vn>.<fn>", scalarVal() >;
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", fn >; 
 		}
 
 		// Assignments into variable fields. We assign into an "@anyfield" field, which we can
@@ -284,38 +296,50 @@ public rel[str,MemItem] getInitializingAssignments(AAInfo aaInfo, str namePrefix
 		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:new(class_name(cn), actuals(al))) : { 
 			//for (cn <- definedClassesForCast) fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),af@asite) >;
 			fiStore = fiStore + < "<namePrefix>::<vn>.@anyfield", objectVal(unaliasClass(cnf),nd@asite) >;
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", "@anyfield" >; 
 		}
 
 		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:new(variable_class(_), actuals(al))) : { 
 			//for (cn <- definedClassesForCast) fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),af@asite) >;
-			for (cnf <- definedClasses) fiStore = fiStore + < "<namePrefix>::<vn>.@anyfield", objectVal(unaliasClass(cnf),nd@asite) >;
+			for (cnf <- aaInfo.definedClasses) fiStore = fiStore + < "<namePrefix>::<vn>.@anyfield", objectVal(unaliasClass(cnf),nd@asite) >;
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", "@anyfield" >; 
 		}
 		
 		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:cast(cast("object"),_)) : { 
 			//for (cn <- definedClassesForCast) fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),af@asite) >;
 			for (cnf <- definedClassesForCast) fiStore = fiStore + < "<namePrefix>::<vn>.@anyfield", objectVal(unaliasClass(cnf),nd@asite) >;
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", "@anyfield" >; 
 		}
 			
-		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:cast(cast("array"),_)) :
+		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:cast(cast("array"),_)) : {
 			fiStore = fiStore + < "<namePrefix>::<vn>.@anyfield", arrayVal() >;			
-
-		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:cast(_,_)) :
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", "@anyfield" >; 
+		}
+		
+		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:cast(_,_)) : {
 			fiStore = fiStore + < "<namePrefix>::<vn>.@anyfield", scalarVal() >;			
-
-		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) :
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", "@anyfield" >; 
+		}
+		
+		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) : {
 			if (hasSummary(mn), allocatorFun(mn))
 				fiStore = fiStore + initLibraryAllocators({"<namePrefix>::<vn>.@anyfield"}, mn, al, nd@asite);
-
-		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) :
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", "@anyfield" >; 
+		}
+		
+		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) : {
 			if (hasSummary(mn), !allocatorFun(mn), !returnsVoid(mn))
 				fiStore = fiStore + < "<namePrefix>::<vn>.<fn>.@anyfield", scalarVal() >;
-
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", "@anyfield" >; 
+		}
+		
 		case af:assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),nd:e) : { 
 			//for (cn <- definedClassesForCast) fiStore = fiStore + < "<namePrefix>::<vn>", objectVal(unaliasClass(cn),af@asite) >;
 			if (getName(e) in { "static_array" })
 				fiStore = fiStore + < "<namePrefix>::<vn>.@anyfield", arrayVal() > + < "<namePrefix>::<vn>.@anyfield[]", scalarVal() >;
 			else if (getName(e) in scalarExprs)
 				fiStore = fiStore + < "<namePrefix>::<vn>.@anyfield", scalarVal() >;
+			aaInfo.targetFields = aaInfo.targetFields + < "<namePrefix>::<vn>", "@anyfield" >; 
 		}
 
 		// If we treat a name like an array, assume it is one. All elements in the array are assumed to have
@@ -326,7 +350,7 @@ public rel[str,MemItem] getInitializingAssignments(AAInfo aaInfo, str namePrefix
 
 		case assign_array(variable_name(vn),rv,ref(r),nd:new(variable_class(_), actuals(al))) : {
 			fiStore = fiStore + < "<namePrefix>::<vn>", arrayVal() >;
-			for (cn <- definedClasses) fiStore = fiStore + < "<namePrefix>::<vn>[]", objectVal(unaliasClass(cn),nd@asite) >;
+			for (cn <- aaInfo.definedClasses) fiStore = fiStore + < "<namePrefix>::<vn>[]", objectVal(unaliasClass(cn),nd@asite) >;
 		}
 		
 		case assign_array(variable_name(vn),rv,ref(r),nd:cast(cast("object"),_)) : {			
@@ -371,7 +395,7 @@ public rel[str,MemItem] getInitializingAssignments(AAInfo aaInfo, str namePrefix
 
 		case assign_var_var(variable_name(vn),ref(r),nd:new(variable_class(_), actuals(al))) : {
 			fiStore = fiStore + < "<namePrefix>::<vn>", scalar() >; // since it is a string, if it is used as a varvar 
-			for (vni <- vars, cn <- definedClasses) fiStore = fiStore + < "<namePrefix>::<vni>", objectVal(unaliasClass(cn),nd@asite) >;
+			for (vni <- vars, cn <- aaInfo.definedClasses) fiStore = fiStore + < "<namePrefix>::<vni>", objectVal(unaliasClass(cn),nd@asite) >;
 		} 
 		
 		case assign_var_var(variable_name(vn),ref(r),nd:cast(cast("object"),_)) : {
@@ -416,7 +440,7 @@ public rel[str,MemItem] getInitializingAssignments(AAInfo aaInfo, str namePrefix
 
 		case assign_next(variable_name(vn),ref(r),nd:new(variable_class(_), actuals(al))) : {
 			fiStore = fiStore + < "<namePrefix>::<vn>", arrayVal() >;
-			for (cn <- definedClasses) fiStore = fiStore + < "<namePrefix>::<vn>[]", objectVal(unaliasClass(cn),nd@asite) >;
+			for (cn <- aaInfo.definedClasses) fiStore = fiStore + < "<namePrefix>::<vn>[]", objectVal(unaliasClass(cn),nd@asite) >;
 		}
 		
 		case assign_next(variable_name(vn),ref(r),nd:cast(cast("object"),_)) : {			
@@ -461,15 +485,15 @@ public rel[str,MemItem] getInitializingAssignments(AAInfo aaInfo, str namePrefix
 public AAInfo propagate(AAInfo aaInfo, str namePrefix, set[str] vars, list[node] body) {
 
 	set[str] fieldNameSet(str vn, str fn) {
-		return ({ "<namePrefix>::<vn>.<fn>" } + (("<namePrefix>::<vn>.@anyfield" in aaInfo.abstractStore<0>) ? { "<namePrefix>::<vn>.@anyfield" } : { }));
+		return { "<namePrefix>::<vn>.<fn>" } + ( ("@anyfield" in aaInfo.targetFields["<namePrefix>::<vn>"]) ? { "<namePrefix>::<vn>.@anyfield" } : { });
 	}
 	
 	set[str] allFieldsOf(str base, str vn) {
-		return { s | s <- aaInfo.abstractStore<0>, startsWith(s, "<base>::<vn>."), isFieldName(s) } + (("<base>::<vn>.@anyfield" in aaInfo.abstractStore<0>) ? { "<base>::<vn>.@anyfield" } : { });
+		return { "<base>::<vn>.<fn>" | fn <- aaInfo.targetFields["<base>::<vn>"] };
 	}
 
 	set[str] allFieldNamesOf(str base, str vn) {
-		return { justFieldNameOf(s) | s <- allFieldsOf(base,vn) };
+		return aaInfo.targetFields["<base>::<vn>"];
 	}
 
 	rel[str,MemItem] deepAssign(str target, str base, str item) {
@@ -540,7 +564,7 @@ public AAInfo propagate(AAInfo aaInfo, str namePrefix, set[str] vars, list[node]
 			res = res + deepAssign(targets, fname, "@return");
 
 			// If we return by reference, add that into the pairs here... 
-			if (rr && refTarget) aaInfo.referencePairs = aaInfo.referencePairs + targets * "<fname>::@return";
+			if (rr && refTarget) aaInfo.referencePairs = aaInfo.referencePairs + targets * { "<fname>::@return" };
 			
 			return res;
 		} else {
@@ -815,7 +839,7 @@ public AAInfo propagate(AAInfo aaInfo, str namePrefix, set[str] vars, list[node]
 			aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke({}, namePrefix, cn, al); 
 
 		case eval_expr(new(variable_class(_), actuals(al))) : 
-			for (cn <- definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke({}, namePrefix, cn, al);
+			for (cn <- aaInfo.definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke({}, namePrefix, cn, al);
 
 		// For assignments into var vn, we propagate the memory items assigned to the right-hand-side
 		// items into the variable on the left-hand side. For fields, we need to remember to also take
@@ -855,7 +879,7 @@ public AAInfo propagate(AAInfo aaInfo, str namePrefix, set[str] vars, list[node]
 		} 
 
 		case assign_var(variable_name(vn),ref(b),nd:new(variable_class(_), actuals(al))) : { 
-			for (cn <- definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke("<namePrefix>::<vn>", namePrefix, cn, al);
+			for (cn <- aaInfo.definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke("<namePrefix>::<vn>", namePrefix, cn, al);
 		}
 
 		case assign_var(variable_name(vn),ref(b),invoke(target(), method_name(mn), actuals(al))) : {
@@ -908,7 +932,7 @@ public AAInfo propagate(AAInfo aaInfo, str namePrefix, set[str] vars, list[node]
 			aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke(fieldNameSet(vn,fn), namePrefix, cn, al); 
 
 		case assign_field(variable_name(vn),field_name(fn),ref(r),new(variable_class(_), actuals(al))) : 
-			for (cn <- definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke(fieldNameSet(vn,fn), namePrefix, cn, al);
+			for (cn <- aaInfo.definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke(fieldNameSet(vn,fn), namePrefix, cn, al);
 
 		case assign_field(variable_name(vn),field_name(fn),ref(r),invoke(target(), method_name(mn), actuals(al))) :
 			aaInfo.abstractStore = aaInfo.abstractStore + handleFunctionInvoke(fieldNameSet(vn,fn), r, namePrefix, mn, al);
@@ -951,7 +975,7 @@ public AAInfo propagate(AAInfo aaInfo, str namePrefix, set[str] vars, list[node]
 			aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke(allFieldsOf(namePrefix,vn), namePrefix, cn, al); 
 
 		case assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),new(variable_class(_), actuals(al))) : 
-			for (cn <- definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke(allFieldsOf(namePrefix,vn), namePrefix, cn, al);
+			for (cn <- aaInfo.definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke(allFieldsOf(namePrefix,vn), namePrefix, cn, al);
 
 		case assign_field(variable_name(vn),variable_field(variable_name(fn)),ref(r),invoke(target(), method_name(mn), actuals(al))) :
 			aaInfo.abstractStore = aaInfo.abstractStore + handleFunctionInvoke(allFieldsOf(namePrefix,vn), r, namePrefix, mn, al);
@@ -994,7 +1018,7 @@ public AAInfo propagate(AAInfo aaInfo, str namePrefix, set[str] vars, list[node]
 			aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke("<namePrefix>::<vn>[]", namePrefix, cn, al); 
 
 		case assign_array(variable_name(vn),rv,ref(r),new(variable_class(_), actuals(al))) : 
-			for (cn <- definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke("<namePrefix>::<vn>[]", namePrefix, cn, al);
+			for (cn <- aaInfo.definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke("<namePrefix>::<vn>[]", namePrefix, cn, al);
 
 		case assign_array(variable_name(vn),rv,ref(r),invoke(target(), method_name(mn), actuals(al))) :
 			aaInfo.abstractStore = aaInfo.abstractStore + handleFunctionInvoke("<namePrefix>::<vn>[]", r, namePrefix, mn, al);
@@ -1039,7 +1063,7 @@ public AAInfo propagate(AAInfo aaInfo, str namePrefix, set[str] vars, list[node]
 			aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke({ "<namePrefix>::<vn>" | vn <- vars }, namePrefix, cn, al); 
 
 		case assign_var_var(variable_name(_),ref(r),new(variable_class(_), actuals(al))) : 
-			for (cn <- definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke({ "<namePrefix>::<vn>" | vn <- vars }, namePrefix, cn, al);
+			for (cn <- aaInfo.definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke({ "<namePrefix>::<vn>" | vn <- vars }, namePrefix, cn, al);
 
 		case assign_var_var(variable_name(_),ref(r),invoke(target(), method_name(mn), actuals(al))) :
 			aaInfo.abstractStore = aaInfo.abstractStore + handleFunctionInvoke({ "<namePrefix>::<vn>" | vn <- vars }, r, namePrefix, mn, al);
@@ -1085,7 +1109,7 @@ public AAInfo propagate(AAInfo aaInfo, str namePrefix, set[str] vars, list[node]
 			aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke("<namePrefix>::<vn>[]", namePrefix, cn, al); 
 
 		case assign_array(variable_name(vn),rv,ref(r),new(variable_class(_), actuals(al))) : 
-			for (cn <- definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke("<namePrefix>::<vn>[]", namePrefix, cn, al);
+			for (cn <- aaInfo.definedClasses) aaInfo.abstractStore = aaInfo.abstractStore + handleConstructorInvoke("<namePrefix>::<vn>[]", namePrefix, cn, al);
 
 		case assign_next(variable_name(vn),ref(r),invoke(target(), method_name(mn), actuals(al))) :
 			aaInfo.abstractStore = aaInfo.abstractStore + handleFunctionInvoke("<namePrefix>::<vn>[]", r, namePrefix, mn, al);
@@ -1111,11 +1135,11 @@ public AAInfo propagate(AAInfo aaInfo, str namePrefix, set[str] vars, list[node]
 
 public AAInfo propagateClassInfo(AAInfo aaInfo, str className, set[str] methodNames) {
 	set[str] allFieldsOf(str base, str vn) {
-		return { s | s <- aaInfo.abstractStore<0>, startsWith(s, "<base>::<vn>."), isFieldName(s) } + (("<base>::<vn>.@anyfield" in aaInfo.abstractStore<0>) ? { "<base>::<vn>.@anyfield" } : { });
+		return { "<base>::<vn>.<fn>" | fn <- aaInfo.targetFields["<base>::<vn>"] };
 	}
 
 	set[str] allFieldNamesOf(str base, str vn) {
-		return { justFieldNameOf(s) | s <- allFieldsOf(base,vn) };
+		return aaInfo.targetFields["<base>::<vn>"];
 	}
 
 	rel[str,MemItem] deepAssign(str target, str base, str item) {
@@ -1155,31 +1179,31 @@ public AAInfo propagateClassInfo(AAInfo aaInfo, str className, set[str] methodNa
 }
 
 public AAInfo propagatePairs(AAInfo aaInfo) {
-	set[str] allFieldsOf(AAInfo aaInfo, str vn) {
-		return { s | s <- aaInfo.abstractStore<0>, startsWith(s, "<vn>."), isFieldName(s) } + (("<vn>.@anyfield" in aaInfo.abstractStore<0>) ? { "<vn>.@anyfield" } : { });
+	set[str] allFieldsOf(str vn) {
+		return { "<vn>.<fn>" | fn <- aaInfo.targetFields["<vn>"] };
 	}
 
-	set[str] allFieldNamesOf(AAInfo aaInfo, str vn) {
-		return { justFieldNameOf(s) | s <- allFieldsOf(aaInfo, vn) };
+	set[str] allFieldNamesOf(str vn) {
+		return aaInfo.targetFields["<vn>"];
 	}
 
-	rel[str,MemItem] deepAssign(AAInfo aaInfo, str target, str item) {
+	rel[str,MemItem] deepAssign(str target, str item) {
 		rel[str,MemItem] res = { };
 		
 		// First, assign directly from the target to the base
 		res = res + { target } * aaInfo.abstractStore[item];
 		
 		// Now, attempt to do the same for arrays
-		if ("<item>[]" in aaInfo.abstractStore<0>) res = res + deepAssign(aaInfo, "<target>[]", "<item>[]");
+		if ("<item>[]" in aaInfo.abstractStore<0>) res = res + deepAssign("<target>[]", "<item>[]");
 		
 		// Now, do so for any fields
-		for (fn <- allFieldNamesOf(aaInfo,item)) res = res + deepAssign(aaInfo, "<target>.<fn>", "<item>.<fn>");
+		for (fn <- allFieldNamesOf(item)) res = res + deepAssign("<target>.<fn>", "<item>.<fn>");
 		
 		return res;
 	}
 
 	solve(aaInfo) {
-		for ( < i1, i2 > <- aaInfo.referencePairs ) aaInfo.abstractStore = aaInfo.abstractStore + deepAssign(aaInfo, i1, i2) + deepAssign(aaInfo, i2, i1);
+		for ( < i1, i2 > <- aaInfo.referencePairs ) aaInfo.abstractStore = aaInfo.abstractStore + deepAssign(i1, i2) + deepAssign(i2, i1);
 	}
 	
 	return aaInfo;
@@ -1235,17 +1259,3 @@ public rel[str,MemItem] propagateLibraryAllocators(AAInfo aaInfo, set[str] targe
 	}
 	return res;
 }
-
-public bool isFieldName(str s) {
-	return /^([^:]+[:][:])+[^\.]+[\.][^\.\[]+$/ := s;
-}
-
-public str justFieldNameOf(str s) {
-	if (/^[^.]+\.<fname:[^\.\[]+>$/ := s) return fname;
-	throw "WARNING: Cannot extract field name from <s>";
-}
-
-public bool isFieldNameOf(str target, str s) {
-	return startsWith(s, target) && (/^([^:]+[:][:])+[^\.]+[\.][^\.\[]+$/ := s);
-}
-

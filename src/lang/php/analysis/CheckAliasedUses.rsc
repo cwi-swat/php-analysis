@@ -81,29 +81,50 @@ public void processBody(AAInfo aaInfo, str base, set[str] paramNames, list[node]
 		writingFields = writtenObjectFields[wf];
 		// Get back each pair of targets that have not already been processed and that are assigned
 		// from a parameter.
-		for ({f1,f2,_*} := writingFields, <f1,f2> notin problemPairs, size(ichains[getOneFrom(writtenFields[f1]<0>)] & paramNames) > 0, size(ichains[getOneFrom(writtenFields[f2]<0>)] & paramNames) > 0) {
-			f1params = ichains[getOneFrom(writtenFields[f1]<0>)] & paramNames; // Which parameters assign into f1?
-			f2params = ichains[getOneFrom(writtenFields[f2]<0>)] & paramNames; // Which parameters assign into f2?
-			paramPaths = f1params + f2params;
-			// If the union has size > 1, this means multiple parameters reach a write to object wf.
-			if (size(paramPaths) > 1) {
-				println("WARNING: Writes to the same object can occur through variables <f1> (parameter(s) <f1params>) and <f2> (parameter(s) <f2params>");
-				problemPairs = problemPairs + { < f1, f2 > , < f2, f1 > };
+		for ({f1,f2,_*} := writingFields, <f1,f2> notin problemPairs) {
+			if (size(ichains[getOneFrom(writtenFields[f1]<0>)] & paramNames) > 0, size(ichains[getOneFrom(writtenFields[f2]<0>)] & paramNames) > 0) {
+				f1params = ichains[getOneFrom(writtenFields[f1]<0>)] & paramNames; // Which parameters assign into f1?
+				f2params = ichains[getOneFrom(writtenFields[f2]<0>)] & paramNames; // Which parameters assign into f2?
+				paramPaths = f1params + f2params;
+				// If the union has size > 1, this means multiple parameters reach a write to object wf.
+				if (size(paramPaths) > 1) {
+					println("WARNING: Writes to the same object can occur through variables <f1> (parameter(s) <f1params>) and <f2> (parameter(s) <f2params>");
+					problemPairs = problemPairs + { < f1, f2 > , < f2, f1 > };
+				}
+			} else {
+				if (size(ichains[getOneFrom(writtenFields[f1]<0>)] & paramNames) == 0) {
+					println("WARNING: Write to object through <f1>, no path back to parameter");
+				} else {
+					println("WARNING: Write to object through <f2>, no path back to parameter");				
+				}
 			}
 		}
 	}
 	
 	// Read/write problems, where we read through one param and write through another
 	// NOTE: We do not differentiate between fields here, but maybe should
-	for (wf <- writtenObjectFields<0>, wf in readObjectFields<0>, f1 <- writtenObjectFields[wf], f2 <- readObjectFields[wf], <f1, f2> notin problemPairs, size(ichains[f1] & paramNames) > 0, size(ichains[f2] & paramNames) > 0) {
-		f1params = ichains[f1] & paramNames;
-		f2params = ichains[f2] & paramNames;
-		paramPaths = f1params & f2params;
-		if (size(paramPaths) > 1) {
-			println("WARNING: Writes to the same object can occur through variables <f1> (parameter(s) <f1params>) and <f2> (parameter(s) <f2params>)");
-			problemPairs = problemPairs + { < f1, f2 > , < f2, f1 > };
+	for (wf <- writtenObjectFields<0>, wf in readObjectFields<0>, f1 <- writtenObjectFields[wf], f2 <- readObjectFields[wf], <f1, f2> notin problemPairs) {
+		if (size(ichains[f1] & paramNames) > 0, size(ichains[f2] & paramNames) > 0) {
+			f1params = ichains[f1] & paramNames;
+			f2params = ichains[f2] & paramNames;
+			paramPaths = f1params & f2params;
+			if (size(paramPaths) > 1) {
+				println("WARNING: Writes to the same object can occur through variables <f1> (parameter(s) <f1params>) and <f2> (parameter(s) <f2params>)");
+				problemPairs = problemPairs + < f1, f2 >;
+			}
+		} else {
+			if (size(ichains[getOneFrom(writtenFields[f1]<0>)] & paramNames) == 0) {
+				println("WARNING: Write to object through <f1>, no path back to parameter");
+			} else {
+				println("WARNING: Read from object through <f2>, no path back to parameter");				
+			}
 		}
 	}
+}
+
+public void simpleCheck(node scr) {
+	AAInfo aaInfo = calculateAliases(scr);
+	simpleCheck(aaInfo, scr);
 }
 
 public void simpleCheck(AAInfo aaInfo, node scr) {
