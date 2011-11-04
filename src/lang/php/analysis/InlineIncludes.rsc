@@ -15,50 +15,61 @@ import Set;
 import Node;
 import IO;
 import List;
+import ValueIO;
 
 //
-// TODO: Should probably pass (and use!) include path as well, just in case there are files that we
-// do not find otherwise...
+// Given the file sname, include prefixes, libraries, and a function that can get the node
+// representatino of a file, replace all include and require calls in the body of the
+// given script with the contents of the included file.
 //
-public map[str,node] inlineAllIncludes(loc base, map[str,node] scripts, set[str] prefixes, set[str] libs) {
+public node inlineIncludesForFile(str sname, list[str] prefixes, set[str] libs, node(str) getFile, bool(str) fileExists) {
 	int idx = 1;
 	map[str,node] inlined = ( );
-	for (s <- scripts<0>) < inlined, idx > = inlineIncludes(base, s, scripts, inlined, idx, prefixes, libs);
-	return inlined; 
-}
-
-public node inlineIncludesForFile(loc base, str sname, map[str,node] scripts, set[str] prefixes, set[str] libs) {
-	int idx = 1;
-	map[str,node] inlined = ( );
-	< inlined, idx > = inlineIncludes(base, sname, scripts, inlined, idx, prefixes, libs);
+	< inlined, idx > = inlineIncludes(sname, prefixes, libs, getFile, fileExists, inlined, idx);
 	return inlined[sname]; 
 }
 
-private tuple[map[str,node],int] inlineIncludes(loc base, str sname, map[str,node] scripts, map[str,node] inlined, int idx, set[str] prefixes, set[str] libs) {
+//
+// Internal version of the above. This also keeps track of already-inlined files and of an index used
+// for alpha-renaming temp vars.
+//
+private tuple[map[str,node],int] inlineIncludes(str sname, list[str] prefixes, set[str] libs, node(str) getFile, bool(str) fileExists, map[str,node] inlined, int idx) {
 	println("Inlining required and included scripts for file <sname>");
-	return inlineIncludes(base, sname, scripts, inlined, idx, { sname }, prefixes, libs);
+	return inlineIncludes(sname, prefixes, libs, getFile, fileExists, inlined, idx, { sname });
 }
 
-private tuple[map[str,node],int] inlineIncludes(loc base, str sname, map[str,node] scripts, map[str,node] inlined, int idx, set[str] included, set[str] prefixes, set[str] libs) {
+//
+// Internal version of the above. In addition to the above function, this also tracks a set of included file names. This is used for something
+// terribly useful that I cannot fully remember.
+//
+private tuple[map[str,node],int] inlineIncludes(str sname, list[str] prefixes, set[str] libs, node(str) getFile, bool(str) fileExists, map[str,node] inlined, int idx, set[str] included) {
+	// If we have already inlined this, just return it
 	if (sname in inlined) return < inlined, idx >;
 	
-	println("Inlining <sname>");
-	// First, get the paths for any includes we can find, in those cases where the include is a string literal
-	scr = propIncludesRequires(scripts[sname]);
-	set[str] includes = getLiteralIncludes(scr);
-	for (i <- (includes & libs)) println("Script <sname>: using library <i>");
-	includes = includes - libs; // TODO: Should not which includes are being included, so we can model them
+	// Do a simple constant propagation to move strings back into include and require calls
+	scr = propIncludesRequires(getFile(sname));
 	
-	// Resolve the paths so they match actual files in the scripts map
-	map[str,str] resolvedIncludes = ( i : resolveInclude(i, sname, base, |file:///| + (base + sname).parent, scripts, prefixes) | i <- includes, resolvableInclude(i, sname, base, |file:///| + (base + sname).parent, scripts, prefixes) );
-						    
-	// For each include, get the related script, then figure out what top-level components each has and what 
-	// needs to be inserted in place of each include or require call.
+	// Get back the strings in these calls; this gives us the files to load
+	set[str] includes = getLiteralIncludes(scr);
+	
+	// Remove any of these that are libraries (i.e., that we cannot load the files of)
+	for (i <- (includes & libs)) println("Script <sname>: using library <i>");
+	includes = includes - libs;
+	
+	// Resolve these includes to the names of the actual files we have available. We first add the
+	// base directory of the current script into the prefixes, so we will use it first to try
+	// to resolve the file names.
+	base = reverse(sname); if (/[^\/]+[\/]<rest:.*>/ := base) base = trim(rest); else base = ""; prefixes = reverse(base) + prefixes;
+	map[str,str] resolvedIncludes = ( i : j | i <- includes, j := resolveInclude(i, prefixes, fileExists), j != "");
+	prefixes = tail(prefixes);
+	
+	// For each include, get the related (inlined version of) the script, then divide it up into top-level components
+	// and code that is inserted at the include or require call site.
 	list[node] toplevelStuff = [ ];
 	map[str,list[node]] inclusionInserts = ( );
 	for (i <- includes, i in resolvedIncludes, resolvedIncludes[i] notin included) {
 		included = included + resolvedIncludes[i];
-		< inlined, idx > = inlineIncludes(base,resolvedIncludes[i],scripts,inlined,idx,included,prefixes,libs);
+		< inlined, idx > = inlineIncludes(resolvedIncludes[i], prefixes, libs, getFile, fileExists, inlined, idx, included);
 		idx = idx + 1;
 		
 		if (script(sc) := inlined[resolvedIncludes[i]]) {
@@ -66,12 +77,19 @@ private tuple[map[str,node],int] inlineIncludes(loc base, str sname, map[str,nod
 			sc = visit(sc) {
 				case variable_name(vn) : if(/^<nm:[0-9]+><pre:[^\$]+>$/ := reverse(vn), startsWithTempPrefix(reverse(pre))/*, !startsWith(pre,"__")*/) insert("variable_name"(vn + "__<idx>"));
 			}
-			// Grab out all the top-level stuff from the script, so we can make it top-level in the input script
-			toplevelStuff = toplevelStuff + [ n | n <- sc, getName(n) in { "class_def", "interface_def", "method" } ];
 			
-			// Grab out all the stuff to insert, which is everything we didn't pull out in the last step
-			list[node] toInsert = [ n | n <- sc, getName(n) notin { "class_def", "interface_def", "method" } ];
-			inclusionInserts[i] = toInsert;
+			// Split the file into top-level and non-top-level items
+			list[node] atTop = [ ]; list[node] atPoint = [ ];
+			for (n <- sc) {
+				if (getName(n) in { "class_def", "interface_def", "method" })
+					atTop += n;
+				else
+					atPoint += n;
+			}
+			
+			println("In Script <sname>, Include File <i> Adding <size(atTop)> Top-Level and <size(atPoint)> At-Point Lines"); 
+			toplevelStuff = toplevelStuff + atTop;
+			inclusionInserts[i] = atPoint;
 		} else {
 			throw "Unexpected script format";
 		}
@@ -91,38 +109,27 @@ private tuple[map[str,node],int] inlineIncludes(loc base, str sname, map[str,nod
 	return < inlined, idx >;
 }
 
-private str resolveInclude(str include, str toplevel, loc base, loc scriptBase, map[str,node] scripts, set[str] prefixes) {
-	< s, b > = resolveIncludeInternal(include,toplevel,base,scriptBase,scripts,prefixes);
-	return s;
-}
-
-private bool resolvableInclude(str include, str toplevel, loc base, loc scriptBase, map[str,node] scripts, set[str] prefixes) {
-	< s, b > = resolveIncludeInternal(include,toplevel,base,scriptBase,scripts,prefixes);
-	if (!b) println("WARNING: <include> not resolvable");
-	return b;
-}
-
-private tuple[str,bool] resolveIncludeInternal(str include, str toplevel, loc base, loc scriptBase, map[str,node] scripts, set[str] prefixes) {
-	// println("Trying to find <include>");
-	// Is the include in the scripts map? If so, just return it
-	if (include in scripts) return < include, true >;
-	
-	// Is the include in the scripts map if we stick the base onto it?
-	//println("Script base <scriptBase.path>"); println("Base <base.path>");
-	str basePart = (scriptBase.path == base.path) ? base.path : substring(scriptBase.path, endsWith(base.path,"/") ? size(base.path) : size(base.path)+1);
-	if ( (basePart + "/" + include) in scripts ) return < basePart + "/" + include, true >;
-	
-	// Is the include in the scripts map if we stick any of the prefixes onto it?
-	for (pre <- prefixes) if ( (pre + "/" + include) in scripts ) return < pre + "/" + include, true >;
-	
+private str resolveInclude(str include, list[str] prefixes, bool(str) fileExists) {
 	// Does the include start with "./"? Then, take that off and invoke recursively.
-	if (size(include) > 2 && include[0] == "." && include[1] == "/") return resolveIncludeInternal(substring(include,2), toplevel, base, scriptBase, scripts, prefixes);
+	if (size(include) > 2 && include[0] == "." && include[1] == "/") return resolveInclude(substring(include,2), prefixes, fileExists);
 	
 	// Does the include start with "../"? Then, take that off and invoke recursively, 
 	// using the parent of the script path
-	if (size(include) > 3 && include[0] == "." && include[1] == "." && include[2] == ".") return resolveIncludeInternal(substring(include,3), toplevel, base, ( |file:///| + (scriptBase.parent)), scripts, prefixes);
-	
-	return < "", false >;
+	if (size(include) > 3 && include[0] == "." && include[1] == "." && include[2] == ".") {
+		base = reverse(prefixes[0]);
+		if (/[^\/]+[\/]<rest:.*>/ := base) base = rest;
+		prefixes[0] = reverse(base);
+		return resolveInclude(substring(include,3), prefixes, fileExists);
+	}
+
+	// Check to see if we can find the file after attaching one of the prefixes. The first is the
+	// working directory (if that was not empty), the rest are library paths.
+	for (pre <- prefixes) if (fileExists(pre + "/" + include)) {
+		return pre + "/" + include;
+	}
+
+	println("failed to resolve <include>");
+	return "";
 }
 
 private node replaceInvokes(node scr, map[str,list[node]] inclusionInserts) {
@@ -192,11 +199,4 @@ private set[str] getLiteralIncludes(node scr) {
 		   { s | /i:invoke(target(),method_name("require"),actuals([actual(ref(false),str(s))])) <- scr } +
 		   { s | /i:invoke(target(),method_name("include_once"),actuals([actual(ref(false),str(s))])) <- scr } +
 		   { s | /i:invoke(target(),method_name("include"),actuals([actual(ref(false),str(s))])) <- scr };
-}
-
-public set[node] getIncludes(node scr) {
-	return { i | /i:invoke(target(),method_name("require_once"),actuals(_)) <- scr } +
-		   { i | /i:invoke(target(),method_name("require"),actuals(_)) <- scr } +
-		   { i | /i:invoke(target(),method_name("include_once"),actuals(_)) <- scr } +
-		   { i | /i:invoke(target(),method_name("include"),actuals(_)) <- scr };
 }
