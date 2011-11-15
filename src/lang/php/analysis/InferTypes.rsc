@@ -12,6 +12,8 @@ module lang::php::analysis::InferTypes
 import lang::php::util::NodeInfo;
 import lang::php::pp::PrettyPrinter;
 import lang::php::analysis::Split;
+import lang::php::analysis::NamePaths;
+
 import Node;
 import IO;
 import List;

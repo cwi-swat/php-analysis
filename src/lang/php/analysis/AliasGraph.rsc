@@ -17,10 +17,16 @@ import IO;
 import String;
 import Graph;
 import DateTime;
+import ValueIO;
+import Map;
 
 import lang::php::pp::PrettyPrinter;
 import lang::php::analysis::Inheritance;
 import lang::php::analysis::FunctionSummaries;
+import lang::php::analysis::MemoryNode;
+import lang::php::analysis::ReferenceStructures;
+
+public set[str] unknownFuns = { };
 
 //
 // TODO
@@ -53,116 +59,20 @@ import lang::php::analysis::FunctionSummaries;
 // 
 
 //
-// Abstract memory items. For objects, we track the instantiated class and the allocation site,
-// which we use as a shorthand to keep track of unique objects. This is part of the flow
-// insensitivity of this analysis -- all objects allocated at a given allocation site are considered
-// to be the same object, which could lead to bigger points-to sets.
+// CHANGES
 //
-data MemItem = scalarVal() | arrayVal() | objectVal(str className, int allocationSite);
-
-data NamePart = root() | global() | class(str className) | method(str methodName) | field(str fieldName) | var(str varName) | arrayContents() ;
-alias NamePath = list[NamePart];
-
-data MemoryNode = mnode(set[MemItem] memItems, map[NamePart, MemoryNode] childNodes);
-
-public MemoryNode makeRootNode() { return mnode({ }, ( ) ); }
-
-public MemoryNode addItems(MemoryNode mNode, NamePath npath, NamePart np, set[MemItem] items) {
-	if (size(npath) == 0) {
-		if (np in mNode.childNodes) {
-			mNode.childNodes[np].memItems += items;
-		} else {
-			mNode.childNodes[np] = mnode(items, ( ) );
-		}
-	} else {
-		headPart = head(npath);
-		if (headPart notin mNode.childNodes) mNode.childNodes[headPart] = mnode({ }, ( ) );
-		mNode.childNodes[headPart] = addItems(mNode.childNodes[headPart], tail(npath), np, items);
-	}
-	return mNode;
-}
-
-public MemoryNode addItems(MemoryNode mNode, NamePath npath, NamePart np, MemItem item) = addItems(mNode,npath,np,{ item });
-
-public MemoryNode addItems(MemoryNode mNode, NamePath npath, set[MemItem] items) = addItems(mNode,take(size(npath)-1,npath),last(npath),items);
-
-public MemoryNode addItems(MemoryNode mNode, NamePath npath, MemItem item) = addItems(mNode,take(size(npath)-1,npath),last(npath),{ item });
-
-public set[MemItem] getItems(MemoryNode mNode, NamePath npath) {
-	if (size(npath) == 0) throw "Need a valid path";
-	
-	if (size(npath) == 1, head(npath) in mNode.childNodes) return mNode.childNodes[head(npath)].memItems;
-	
-	if (size(npath) > 1, head(npath) in mNode.childNodes) return getItems(mNode.childNodes[head(npath)], tail(npath));
-	
-	return { };
-}
-
-public MemoryNode getNode(MemoryNode mNode, NamePath npath) {
-	if (size(npath) == 0) throw "Need a valid path";
-	
-	if (size(npath) == 1, head(npath) in mNode.childNodes) return mNode.childNodes[head(npath)];
-	
-	if (size(npath) > 1, head(npath) in mNode.childNodes) return getNode(mNode.childNodes[head(npath)], tail(npath));
-	
-	return { };
-}
-
-public bool hasNode(MemoryNode mNode, NamePath npath) {
-	if (size(npath) == 1, head(npath) in mNode.childNodes) return true;
-	
-	if (size(npath) > 1, head(npath) in mNode.childNodes) return hasNode(mNode.childNodes[head(npath)], tail(npath));
-	
-	return false;
-}
-
-public MemoryNode copyItems(MemoryNode mNode, NamePath from, NamePath to) {
-	return addItems(mNode, to, getItems(mNode, from));
-}
-
-// NOTE: We assume that fromTop exists. We make no assumptions on toTop.
-public tuple[MemoryNode,bool] mergeNodes(MemoryNode mNodeTop, NamePath fromTop, NamePath toTop) {
-	bool modified = false;
-	
-	MemoryNode mergeTwoNodes(MemoryNode sourceNode, MemoryNode targetNode) {
-		if (!isEmpty(sourceNode.memItems - targetNode.memItems)) {
-			targetNode.memItems += sourceNode.memItems;
-			modified = true;
-		}
-		for (ci <- sourceNode.childNodes<0>) {
-			if (ci notin targetNode.childNodes) {
-				targetNode.childNodes[ci] = mnode({ }, ( ) );
-				modified = true;
-			}
-			targetNode.childNodes[ci] = mergeTwoNodes(sourceNode.childNodes[ci],targetNode.childNodes[ci]);
-		}
-		return targetNode;
-	}
-	
-	MemoryNode mergeInternal(MemoryNode mNode, NamePath to) {
-		if (size(to) == 1) {
-			np = head(to);
-			if (np notin mNode.childNodes) {
-				mNode.childNodes[np] = mnode({ }, ( ) );
-				modified = true;
-			}
-			targetNode = mNode.childNodes[np];
-			sourceNode = getNode(mNodeTop, fromTop);
-			targetNode = mergeTwoNodes(sourceNode, targetNode);
-			mNode.childNodes[np] = targetNode;
-	 	} else {
-			headPart = head(to);
-			if (headPart notin mNode.childNodes) {
-				mNode.childNodes[headPart] = mnode({ }, ( ) );
-				modified = true;
-			}
-			mNode.childNodes[headPart] = mergeInternal(mNode.childNodes[headPart], tail(to));
-		}
-		return mNode;
-	}
-	
-	return < mergeInternal(mNodeTop, toTop), modified >;
-}
+// 1. This code no longer captures information about array values. These aren't used in
+//    the current analysis, and don't really provide any information that we either can't
+//    get elsewhere (i.e., if the name has an arrayContents() item in the child path, then
+//    it can be an array) or don't really need (we only really care about objects).
+//
+// 2. Casts to object are now treated as allocation sites only for instances of stdClass.
+//    An aflow edge is put in from the cast source to the cast target now to indicate that
+//    the object(s) represented by the source can flow to the target. This is closer to
+//    the actual semantics: casting an object instance to object is a no-op, just assigning
+//    the source value through, while casting a non-object to an object actually allocates
+//    an object of class stdClass.
+//
 
 alias AssignmentFlow = Graph[NamePath];
 
@@ -236,7 +146,7 @@ public AAInfo calculateAliases(node scr) {
 	AAInfo aaInfo = aainfo(getDefinedClasses(scr), ig, frel, mrel, { }, { }, { });
 	rel[NamePath,MemItem] res = { };
 	map[NamePath,node] signatures = ( );
-	MemoryNode mNode = makeRootNode();
+	MemoryNode mNode = makeRootNode(frel);
 	map[NamePath,CallNodes] callNodes = ( );
 	map[NamePath,AssignmentFlow] assignmentFlows = ( );
 	rel[NamePath,NamePath] globals = { };
@@ -253,7 +163,7 @@ public AAInfo calculateAliases(node scr) {
 		println("INFO: Calculating initial allocations for the global scope");
 		gbody = [ b | b <- bs, getName(b) notin { "class_def", "interface_def", "method" }];
 		set[str] vars = { vn | b <- gbody, /variable_name(vn) <- b };
-		mNode = getInitializingAssignments(aaInfo, mNode, [global()], vars, gbody);
+		getInitializingAssignments(aaInfo, mNode, [global()], vars, gbody);
 		println("INFO: Calculating assignment flow for the global scope");
 		< aflow, cnodes, gs > = extractAssignmentFlow(aaInfo,[global()], gbody);
 		callNodes[[global()]] = cnodes;
@@ -262,11 +172,12 @@ public AAInfo calculateAliases(node scr) {
 		
 		// Also get allocations in each global function
 		for (f:method(sig:signature(_,_,_,_,_,_,_,_,method_name(mn),parameters(fpl)),body(b)) <- bs) {
-			println("INFO: Calculating initial allocations for function <mn>");
+			println("INFO: Processing function <mn>");
+			//println("INFO: Calculating initial allocations for function <mn>");
 			vars = { vn | bi <- b, /variable_name(vn) <- bi } + { vn | name(variable_name(vn),_) <- fpl };
-			mNode = getInitializingAssignments(aaInfo, mNode, [global(),method(mn)], vars, b);
+			getInitializingAssignments(aaInfo, mNode, [global(),method(mn)], vars, b);
 			signatures[[global(),method(mn)]] = sig;
-			println("INFO: Calculating assignment flow for function <mn>");
+			//println("INFO: Calculating assignment flow for function <mn>");
 			< aflow, cnodes, gs > = extractAssignmentFlow(aaInfo,[global(),method(mn)], b);
 			callNodes[[global(),method(mn)]] = cnodes;
 			assignmentFlows[[global(),method(mn)]] = aflow;
@@ -278,11 +189,11 @@ public AAInfo calculateAliases(node scr) {
 			println("INFO: Processing class <cn>");
 			set[NamePart] methodParts = { method(mn) | method(sig:signature(_,_,_,_,_,_,_,_,method_name(mn),parameters(fpl)),body(b)) <- ml };
 			for (f:method(sig:signature(_,_,_,_,_,_,_,_,method_name(mn),parameters(fpl)),body(b)) <- ml) {
-				println("INFO: Calculating initial allocations for method <cn>::<mn>");
+				//println("INFO: Calculating initial allocations for method <cn>::<mn>");
 				vars = { vn | bi <- b, /variable_name(vn) <- bi } + { vn | name(variable_name(vn),_) <- fpl };
-				mNode = getInitializingAssignments(aaInfo, mNode, [class(cn),method(mn)], vars, b);
+				getInitializingAssignments(aaInfo, mNode, [class(cn),method(mn)], vars, b);
 				signatures[[class(cn),method(mn)]] = sig;
-				println("INFO: Calculating assignment flow for method <cn>::<mn>");
+				//println("INFO: Calculating assignment flow for method <cn>::<mn>");
 				< aflow, cnodes, gs > = extractAssignmentFlow(aaInfo,[class(cn),method(mn)], b);
 				callNodes[[class(cn),method(mn)]] = cnodes;
 				assignmentFlows[[class(cn),method(mn)]] = aflow;
@@ -295,8 +206,8 @@ public AAInfo calculateAliases(node scr) {
 		aaInfo = aainfo(aaInfo.definedClasses, aaInfo.ig, aaInfo.definedFields, aaInfo.definedMethods, mNode, signatures, { }, aaInfo.targetFields, aaInfo.classAliases, aaInfo.methodAliases, callNodes, assignmentFlows, globals);
 
 		// First, try a simple propagation. We can make this more exact later...
-		println("INFO: Performing context-insensitive alias propagation");
-		//aaInfo = contextInsensitivePropagation(aaInfo);
+		//println("INFO: Performing context-insensitive alias propagation");
+		aaInfo = contextInsensitivePropagation(aaInfo);
 	} else {
 		throw "Expected script, got <prettyPrinter(scr)>";
 	}
@@ -334,7 +245,7 @@ public node markAllocationSites(node n) {
 // new values that are assigned into variables/fields/array locations/etc. At this stage we
 // do not reason across method boundaries.
 //
-public MemoryNode getInitializingAssignments(AAInfo aaInfo, MemoryNode mNode, NamePath namePrefix, set[str] vars, list[node] body) {
+public void getInitializingAssignments(AAInfo aaInfo, MemoryNode mNode, NamePath namePrefix, set[str] vars, list[node] body) {
 	set[str] definedClassesForCast = aaInfo.definedClasses + "stdClass";
 	
 	str unaliasClass(str cn) {
@@ -351,165 +262,166 @@ public MemoryNode getInitializingAssignments(AAInfo aaInfo, MemoryNode mNode, Na
 		// or arrays, or can yield scalars. NOTE: these same rules are used below as well
 		// for assignments into arrays, fields, etc.
 		case assign_var(variable_name(vn),ref(b),nd:new(class_name(cn), actuals(al))) : 
-			mNode = addItems(mNode, namePrefix + var(vn), objectVal(unaliasClass(cn),nd@asite));
+			addItems(mNode, namePrefix + var(vn), objectVal(unaliasClass(cn),nd@asite));
 
 		case assign_var(variable_name(vn),ref(b),nd:new(variable_class(_), actuals(al))) : 
-			for (cn <- aaInfo.definedClasses) mNode = addItems(mNode, namePrefix + var(vn), objectVal(unaliasClass(cn),nd@asite));
+			for (cn <- aaInfo.definedClasses) addItems(mNode, namePrefix + var(vn), objectVal(unaliasClass(cn),nd@asite));
 
-		// TODO: We may want to move this into the propagation code, since we will have more information
-		// about what we are casting from at that point. 
+		// Since we don't know the type of the source behind the cast, we include stdClass
+		// here as well. The type inferencer should be able to sort this out, so
+		// TODO: Once we have inference info, use it here to determine the type(s) of
+		// the source, so we know if this cast is taking a scalar or array to stdClass.
 		case assign_var(variable_name(vn),ref(b),nd:cast(cast("object"),_)) :			
-			for (cn <- definedClassesForCast) mNode = addItems(mNode, namePrefix + var(vn), objectVal(unaliasClass(cn),nd@asite));
+			addItems(mNode, namePrefix + var(vn), objectVal("stdClass",nd@asite));
 
-		case assign_var(variable_name(vn),ref(b),nd:cast(cast("array"),_)) :
-			mNode = addItems(mNode, namePrefix + var(vn), arrayVal());			
+		//case assign_var(variable_name(vn),ref(b),nd:cast(cast("array"),_)) :
+		//	addItems(mNode, namePrefix + var(vn), arrayVal());			
 
 		case assign_var(variable_name(vn),ref(b),nd:invoke(target(), method_name(mn), actuals(al))) :
 			if (hasSummary(mn), allocatorFun(mn))
-				mNode = initLibraryAllocators(mNode, namePrefix + var(vn), mn, al, nd@asite);
+				initLibraryAllocators(mNode, namePrefix + var(vn), mn, al, nd@asite);
 
-		case assign_var(variable_name(vn),ref(b),static_array(_)) :
-			mNode = addItems(mNode, namePrefix + var(vn), arrayVal());
+		//case assign_var(variable_name(vn),ref(b),static_array(_)) :
+		//	addItems(mNode, namePrefix + var(vn), arrayVal());
 
 		// Assignments into fields. If the field name is known, we presume that vn must be one
 		// of the classes that implements this field (including extenders) or an instance of
 		// stdClass, which could contain theoretically a field of any name. This is overly
 		// conservative, a type inferencer would provide more precise results.
 		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:new(class_name(cnf), actuals(al))) :
-			mNode = addItems(mNode, namePrefix + var(vn) + field(fn), objectVal(unaliasClass(cnf),nd@asite));
+			addItems(mNode, namePrefix + var(vn) + field(fn), objectVal(unaliasClass(cnf),nd@asite));
 
 		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:new(variable_class(_), actuals(al))) : 
-			for (cnf <- aaInfo.definedClasses) mNode = addItems(mNode, namePrefix + var(vn) + field(fn), objectVal(unaliasClass(cnf),nd@asite));
+			for (cnf <- aaInfo.definedClasses) addItems(mNode, namePrefix + var(vn) + field(fn), objectVal(unaliasClass(cnf),nd@asite));
 		
 		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:cast(cast("object"),_)) :			
-			for (cnf <- definedClassesForCast) mNode  = addItems(mNode, namePrefix + var(vn) + field(fn), objectVal(unaliasClass(cnf),nd@asite));
+			addItems(mNode, namePrefix + var(vn) + field(fn), objectVal("stdClass",nd@asite));
 			
-		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:cast(cast("array"),_)) :
-			mNode = addItems(mNode, namePrefix + var(vn) + field(fn), arrayVal());
+		//case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:cast(cast("array"),_)) :
+		//	addItems(mNode, namePrefix + var(vn) + field(fn), arrayVal());
 
 		case af:assign_field(variable_name(vn),field_name(fn),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) :
 			if (hasSummary(mn), allocatorFun(mn))
-				mNode = initLibraryAllocators(mNode, namePrefix + var(vn) + field(fn), mn, al, nd@asite);
+				initLibraryAllocators(mNode, namePrefix + var(vn) + field(fn), mn, al, nd@asite);
 
-		case af:assign_field(variable_name(vn),field_name(fn),ref(r),static_array(_)) :
-			mNode = addItems(mNode, namePrefix + var(vn) + field(fn), arrayVal());
+		//case af:assign_field(variable_name(vn),field_name(fn),ref(r),static_array(_)) :
+		//	addItems(mNode, namePrefix + var(vn) + field(fn), arrayVal());
 
 		// Assignments into variable fields. We assign into an "@anyfield" field, which we can
 		// then use to propagate through to the other fields.
 		case af:assign_field(variable_name(vn),variable_field(_),ref(r),nd:new(class_name(cn), actuals(al))) : 
-			mNode = addItems(mNode, namePrefix + var(vn) + field("@anyfield"), objectVal(unaliasClass(cnf),nd@asite));
+			addItems(mNode, namePrefix + var(vn) + field("@anyfield"), objectVal(unaliasClass(cnf),nd@asite));
 
 		case af:assign_field(variable_name(vn),variable_field(_),ref(r),nd:new(variable_class(_), actuals(al))) :
-			for (cnf <- aaInfo.definedClasses) mNode = addItems(mNode, namePrefix + var(vn) + field("@anyfield"), objectVal(unaliasClass(cnf),nd@asite));
+			for (cnf <- aaInfo.definedClasses) addItems(mNode, namePrefix + var(vn) + field("@anyfield"), objectVal(unaliasClass(cnf),nd@asite));
 		
 		case af:assign_field(variable_name(vn),variable_field(_),ref(r),nd:cast(cast("object"),_)) : 
-			for (cnf <- definedClassesForCast) mNode = addItems(mNode, namePrefix + var(vn) + field("@anyfield"), objectVal(unaliasClass(cnf),nd@asite));
+			addItems(mNode, namePrefix + var(vn) + field("@anyfield"), objectVal("stdClass",nd@asite));
 			
-		case af:assign_field(variable_name(vn),variable_field(_),ref(r),nd:cast(cast("array"),_)) :
-			mNode = addItems(mNode, namePrefix + var(vn) + field("@anyfield"), arrayVal());			
+		//case af:assign_field(variable_name(vn),variable_field(_),ref(r),nd:cast(cast("array"),_)) :
+		//	addItems(mNode, namePrefix + var(vn) + field("@anyfield"), arrayVal());			
 		
 		case af:assign_field(variable_name(vn),variable_field(_),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) :
 			if (hasSummary(mn), allocatorFun(mn))
-				mNode = initLibraryAllocators(mNode, namePrefix + var(vn) + field("@anyfield"), mn, al, nd@asite);
+				initLibraryAllocators(mNode, namePrefix + var(vn) + field("@anyfield"), mn, al, nd@asite);
 		
-		case af:assign_field(variable_name(vn),variable_field(_),ref(r),nd:static_array(_)) : 
-			mNode = addItems(mNode, namePrefix + var(vn) + field("@anyfield"), arrayVal());
+		//case af:assign_field(variable_name(vn),variable_field(_),ref(r),nd:static_array(_)) : 
+		//	addItems(mNode, namePrefix + var(vn) + field("@anyfield"), arrayVal());
 
 		// If we treat a name like an array, assume it is one. All elements in the array are assumed to have
 		// the same value.
 		case assign_array(variable_name(vn),rv,ref(r),nd:new(class_name(cn), actuals(al))) :
-			mNode = addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
+			//addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
+			addItems(mNode, namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
 
 		case assign_array(variable_name(vn),rv,ref(r),nd:new(variable_class(_), actuals(al))) : {
-			mNode = addItems(mNode, namePrefix + var(vn), arrayVal());
-			for (cn <- aaInfo.definedClasses) mNode = addItems(mNode, namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
+			//addItems(mNode, namePrefix + var(vn), arrayVal());
+			for (cn <- aaInfo.definedClasses) addItems(mNode, namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
 		}
 		
 		case assign_array(variable_name(vn),rv,ref(r),nd:cast(cast("object"),_)) : {			
-			mNode = addItems(mNode, namePrefix + var(vn), arrayVal());
-			for (cn <- definedClassesForCast) mNode = addItems(mNode, namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
+			//addItems(mNode, namePrefix + var(vn), arrayVal());
+			addItems(mNode, namePrefix + var(vn) + arrayContents(), objectVal("stdClass",nd@asite));
 		}
 			
-		case assign_array(variable_name(vn),rv,ref(r),nd:cast(cast("array"),_)) :
-			mNode = addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), arrayVal());
+		//case assign_array(variable_name(vn),rv,ref(r),nd:cast(cast("array"),_)) :
+		//	addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), arrayVal());
 
 		case assign_array(variable_name(vn),rv,ref(r),nd:invoke(target(), method_name(mn), actuals(al))) : {
-			mNode = addItems(namePrefix + var(vn), arrayVal());
+			//addItems(mNode, namePrefix + var(vn), arrayVal());
 			if (hasSummary(mn), allocatorFun(mn))
-				mNode = initLibraryAllocators(mNode, namePrefix + var(vn) + arrayContents(), mn, al, nd@asite);
+				initLibraryAllocators(mNode, namePrefix + var(vn) + arrayContents(), mn, al, nd@asite);
 		}
 
-		case assign_array(variable_name(vn),rv,ref(r),nd:invoke(target(), method_name(mn), actuals(al))) :
-			mNode = addItems(mNode, namePrefix + var(vn), arrayVal());
+		//case assign_array(variable_name(vn),rv,ref(r),nd:invoke(target(), method_name(mn), actuals(al))) :
+		//	addItems(mNode, namePrefix + var(vn), arrayVal());
 
-		case assign_array(variable_name(vn),rv,ref(r),static_array(_)) :
-			mNode = addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), arrayVal());
+		//case assign_array(variable_name(vn),rv,ref(r),static_array(_)) :
+		//	addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), arrayVal());
 
-		case assign_array(variable_name(vn),rv,ref(r),_) :
-			mNode = addItems(mNode, namePrefix + var(vn), arrayVal());
+		//case assign_array(variable_name(vn),rv,ref(r),_) :
+		//	addItems(mNode, namePrefix + var(vn), arrayVal());
 
 		// If we have variable variables we are sunk -- they could assign to any name in scope. To remain
 		// conservative, we need to add a mapping from all vars in scope to whatever the type is, all the
 		// while cursing whoever added this stupid feature.
 		case assign_var_var(variable_name(vn),ref(r),nd:new(class_name(cn), actuals(al))) : {
-			for (vni <- vars) mNode = addItems(mNode, namePrefix + var(vni), objectVal(unaliasClass(cn),nd@asite));
+			for (vni <- vars) addItems(mNode, namePrefix + var(vni), objectVal(unaliasClass(cn),nd@asite));
 		}
 
 		case assign_var_var(variable_name(vn),ref(r),nd:new(variable_class(_), actuals(al))) : {
-			for (vni <- vars, cn <- aaInfo.definedClasses) mNode = addItems(mNode, namePrefix + var(vni), objectVal(unaliasClass(cn),nd@asite));
+			for (vni <- vars, cn <- aaInfo.definedClasses) addItems(mNode, namePrefix + var(vni), objectVal(unaliasClass(cn),nd@asite));
 		} 
 		
 		case assign_var_var(variable_name(vn),ref(r),nd:cast(cast("object"),_)) : {
-			for (vni <- vars, cn <- definedClassesForCast) mNode = addItems(mNode, namePrefix + var(vni), objectVal(unaliasClass(cn),nd@asite));
+			for (vni <- vars) addItems(mNode, namePrefix + var(vni), objectVal("stdClass",nd@asite));
 		}			
 
-		case assign_var_var(variable_name(vn),ref(r),nd:cast(cast("array"),_)) : {
-			for (vni <- vars, cn <- definedClassesForCast) mNode = addItems(mNode, namePrefix + var(vni), arrayVal());
-		}
+		//case assign_var_var(variable_name(vn),ref(r),nd:cast(cast("array"),_)) : {
+		//	for (vni <- vars, cn <- definedClassesForCast) addItems(mNode, namePrefix + var(vni), arrayVal());
+		//}
 			
 		case assign_var_var(variable_name(vn),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) : {
 			if (hasSummary(mn), allocatorFun(mn))
-				mNode = initLibraryAllocators(mNode, {namePrefix + var(vni) | vni <- vars}, mn, al, nd@asite);
+				initLibraryAllocators(mNode, {namePrefix + var(vni) | vni <- vars}, mn, al, nd@asite);
 		}
 
-		case assign_var_var(variable_name(vn),ref(r),static_array(_)) : {
-			for (vni <- vars) mNode = addItems(mNode, namePrefix + var(vni), arrayVal());
-		}
+		//case assign_var_var(variable_name(vn),ref(r),static_array(_)) :
+		//	for (vni <- vars) addItems(mNode, namePrefix + var(vni), arrayVal());
 			
 		// Assign next is treated just like assign array, above. 
 		case assign_next(variable_name(vn),ref(r),nd:new(class_name(cn), actuals(al))) :
-			mNode = addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
+			//addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
+			addItems(mNode, namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
 
 		case assign_next(variable_name(vn),ref(r),nd:new(variable_class(_), actuals(al))) : {
-			mNode = addItems(mNode, namePrefix + var(vn), arrayVal());
-			for (cn <- aaInfo.definedClasses) mNode = addItems(mNode, namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
+			//addItems(mNode, namePrefix + var(vn), arrayVal());
+			for (cn <- aaInfo.definedClasses) addItems(mNode, namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
 		}
 		
 		case assign_next(variable_name(vn),ref(r),nd:cast(cast("object"),_)) : {			
-			mNode = addItems(mNode, namePrefix + var(vn), arrayVal());
-			for (cn <- definedClassesForCast) mNode = addItems(mNode, namePrefix + var(vn) + arrayContents(), objectVal(unaliasClass(cn),nd@asite));
+			//addItems(mNode, namePrefix + var(vn), arrayVal());
+			addItems(mNode, namePrefix + var(vn) + arrayContents(), objectVal("stdClass",nd@asite));
 		}
 			
-		case assign_next(variable_name(vn),ref(r),nd:cast(cast("array"),_)) :
-			mNode = addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), arrayVal());
+		//case assign_next(variable_name(vn),ref(r),nd:cast(cast("array"),_)) :
+		//	addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), arrayVal());
 
 		case assign_next(variable_name(vn),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) : {
-			mNode = addItems(namePrefix + var(vn), arrayVal());
+			//addItems(mNode, namePrefix + var(vn), arrayVal());
 			if (hasSummary(mn), allocatorFun(mn))
-				mNode = initLibraryAllocators(mNode, namePrefix + var(vn) + arrayContents(), mn, al, nd@asite);
+				initLibraryAllocators(mNode, namePrefix + var(vn) + arrayContents(), mn, al, nd@asite);
 		}
 
-		case assign_next(variable_name(vn),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) :
-			mNode = addItems(mNode, namePrefix + var(vn), arrayVal());
+		//case assign_next(variable_name(vn),ref(r),nd:invoke(target(), method_name(mn), actuals(al))) :
+		//	addItems(mNode, namePrefix + var(vn), arrayVal());
 
-		case assign_next(variable_name(vn),ref(r),static_array(_)) :
-			mNode = addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), arrayVal());
+		//case assign_next(variable_name(vn),ref(r),static_array(_)) :
+		//	addItems(addItems(mNode, namePrefix + var(vn), arrayVal()), namePrefix + var(vn) + arrayContents(), arrayVal());
 
-		case assign_next(variable_name(vn),ref(r),_) :
-			mNode = addItems(mNode, namePrefix + var(vn), arrayVal());
+		//case assign_next(variable_name(vn),ref(r),_) :
+		//	addItems(mNode, namePrefix + var(vn), arrayVal());
 	}
-	
-	return mNode;
 }
 
 //
@@ -599,6 +511,11 @@ public tuple[AssignmentFlow aflow, CallNodes callNodes, UsedGlobals globals] ext
 			if (b) aflow += < namePrefix + var(vn), namePrefix + var(vn2) + arrayContents() >;
 		}
 
+		case assign_var(variable_name(vn),ref(b),cast(cast("object"),variable_name(vn2))) : {
+			aflow += < namePrefix + var(vn2), namePrefix + var(vn) >;
+			if (b) aflow += < namePrefix + var(vn), namePrefix + var(vn2) >;			
+		}
+
 		case assign_var(variable_name(vn),ref(b),nd:new(class_name(cn), actuals(al))) :
 			callNodes += ccall(cn, al, namePrefix + var(vn), b);
 
@@ -656,6 +573,11 @@ public tuple[AssignmentFlow aflow, CallNodes callNodes, UsedGlobals globals] ext
 			if (r) aflow += < namePrefix + var(vn) + field(fn), namePrefix + var(vn2) + arrayContents() >;
 		}
 		
+		case assign_field(variable_name(vn),field_name(fn),ref(r),cast(cast("object"),variable_name(vn2))) : {
+			aflow += < namePrefix + var(vn2), namePrefix + var(vn) + field(fn) >;
+			if (r) aflow += < namePrefix + var(vn) + field(fn), namePrefix + var(vn2) >;			
+		}
+
 		case assign_field(variable_name(vn),field_name(fn),ref(b),nd:new(class_name(cn), actuals(al))) :
 			callNodes += ccall(cn, al, namePrefix + var(vn) + field(fn), b);
 
@@ -715,6 +637,11 @@ public tuple[AssignmentFlow aflow, CallNodes callNodes, UsedGlobals globals] ext
 			if (r) aflow += < namePrefix + var(vn) + field("@anyfield"), namePrefix + var(vn2) + arrayContents() >;
 		}
 		
+		case assign_field(variable_name(vn),variable_field(_),ref(r),cast(cast("object"),variable_name(vn2))) : {
+			aflow += < namePrefix + var(vn2), namePrefix + var(vn) + field("@anyfield") >;
+			if (r) aflow += < namePrefix + var(vn) + field("@anyfield"), namePrefix + var(vn2) >;			
+		}
+
 		case assign_field(variable_name(vn),variable_field(_),ref(b),nd:new(class_name(cn), actuals(al))) :
 			callNodes += ccall(cn, al, namePrefix + var(vn) + field("@anyfield"), b);
 
@@ -770,6 +697,11 @@ public tuple[AssignmentFlow aflow, CallNodes callNodes, UsedGlobals globals] ext
 		case assign_array(variable_name(vn),rv,ref(b),foreach_get_val(variable_name(vn2),_)) : {
 			aflow += < namePrefix + var(vn2) + arrayContents(), namePrefix + var(vn) + arrayContents() >; 
 			if (b) aflow += < namePrefix + var(vn) + arrayContents(), namePrefix + var(vn2) + arrayContents() >;
+		}
+
+		case assign_array(variable_name(vn),rv,ref(b),cast(cast("object"),variable_name(vn2))) : {
+			aflow += < namePrefix + var(vn2), namePrefix + var(vn) + arrayContents() >;
+			if (b) aflow += < namePrefix + var(vn) + arrayContents(), namePrefix + var(vn2) >;			
 		}
 
 		case assign_array(variable_name(vn),rv,ref(b),new(class_name(cn), actuals(al))) :
@@ -829,6 +761,11 @@ public tuple[AssignmentFlow aflow, CallNodes callNodes, UsedGlobals globals] ext
 			if (b) aflow += < namePrefix + var("@anyvar"), namePrefix + var(vn2) + arrayContents() >;
 		}
 
+		case assign_var_var(variable_name(_),ref(b),cast(cast("object"),variable_name(vn2))) : {
+			aflow += < namePrefix + var(vn2), namePrefix + var("@anyvar") >;
+			if (b) aflow += < namePrefix + var("@anyvar"), namePrefix + var(vn2) >;			
+		}
+
 		case assign_var_var(variable_name(_),ref(b),new(class_name(cn), actuals(al))) :
 			callNodes += ccall(cn, al, namePrefix + var("@anyvar"), b);
 
@@ -886,6 +823,11 @@ public tuple[AssignmentFlow aflow, CallNodes callNodes, UsedGlobals globals] ext
 			if (b) aflow += < namePrefix + var(vn) + arrayContents(), namePrefix + var(vn2) + arrayContents() >;
 		}
 
+		case assign_next(variable_name(vn),ref(b),cast(cast("object"),variable_name(vn2))) : {
+			aflow += < namePrefix + var(vn2), namePrefix + var(vn) + arrayContents() >;
+			if (b) aflow += < namePrefix + var(vn) + arrayContents(), namePrefix + var(vn2) >;			
+		}
+
 		case assign_next(variable_name(vn),ref(b),new(class_name(cn), actuals(al))) :
 			callNodes += ccall(cn, al, namePrefix + var(vn) + arrayContents(), b);
 
@@ -939,33 +881,60 @@ public tuple[AssignmentFlow aflow, CallNodes callNodes, UsedGlobals globals] ext
 // NOTE: We should handle all allocation here (i.e., any new objVals should be created here),
 // but can wire up the constructors, etc below.
 //
-public MemoryNode initLibraryAllocators(MemoryNode mNode, set[NamePath] targets, str fname, list[node] actuals, int allocationSite) {
+public void initLibraryAllocators(MemoryNode mNode, set[NamePath] targets, str fname, list[node] actuals, int allocationSite) {
 	switch(fname) {
 		case "mysql_fetch_object" :
 			if (size(actuals) == 1)
-				for (t <- targets) mNode = addItems(mNode, t, objectVal("stdClass", allocationSite));
+				for (t <- targets) addItems(mNode, t, objectVal("stdClass", allocationSite));
 		case "array_keys" :
 			// The keys are always scalars, so we can assume that here. This acts as an allocation.
-			for (t <- targets) mNode = addItems(mNode, t, arrayVal());
+			for (t <- targets) addItems(mNode, t, arrayVal());
 		case "explode" :
 			// The result is always a newly allocated array of strings.
-			for (t <- targets) mNode = addItems(mNode, t, arrayVal());
+			for (t <- targets) addItems(mNode, t, arrayVal());
 		case "str_replace" :
-			for (t <- targets) mNode = addItems(mNode, t, arrayVal());
+			for (t <- targets) addItems(mNode, t, arrayVal());
 	}
-	return mNode;
 }
 
-public MemoryNode initLibraryAllocators(MemoryNode mNode, NamePath target, str fname, list[node] actuals, int allocationSite) {
-	return initLibraryAllocators(mNode, {target},fname,actuals,allocationSite);
+public void initLibraryAllocators(MemoryNode mNode, NamePath target, str fname, list[node] actuals, int allocationSite) {
+	initLibraryAllocators(mNode, {target},fname,actuals,allocationSite);
 }
-
 
 alias ActualsInfo = list[tuple[bool isRef, bool hasName, str aname, node anode]];
 
 public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
-	// Form an overall assignment flow graph by collapsing all the individual graphs into one.
-	AssignmentFlow af = { aaInfo.assignmentFlows[afn] | afn <- aaInfo.assignmentFlows<0> };
+	//// Form an overall assignment flow graph by collapsing all the individual graphs into one.
+	//println("INFO: Creating consolidated assignment flow relation");
+	//AssignmentFlow af = { aaInfo.assignmentFlows[afn] | afn <- aaInfo.assignmentFlows<0> };
+	//
+	//println("INFO: Creating set-valued map from consolidated assignment flow relation...");
+	//SetValuedMap svm = createFromRelation(af);
+	//println("INFO: Done");
+	
+	SetValuedMap svm = makeSetValuedMap();
+	println("INFO: Creating set-valued map from assignment flow relations...");
+	for (afn <- aaInfo.assignmentFlows<0>, afs <- aaInfo.assignmentFlows[afn]<0>)
+		addValues(svm, afs, aaInfo.assignmentFlows[afn][afs]);
+	println("INFO: Done");
+	
+	println("INFO: Calculating supplemental edges...");
+	//svmInv = createFromRelation(invert(asRelation(svm)));
+	toAdd = { };
+	for (k <- getKeys(svm)) {
+		wk = k;
+		variants = { };
+		while (field(_) := last(wk) || arrayContents() := last(wk)) {
+			wk = take(size(wk)-1,wk);
+			//if (size(getValues(svmInv,wk)) > 0) 
+			variants += wk;
+		}
+		// TODO: Note, this could introduce some unproductive edges
+		if (size(variants) > 0) toAdd += { < v, k > | v <- variants };
+	}
+	for ( < k , v > <- toAdd ) addValue(svm, k, v);
+	//deleteSetValuedMap(svmInv);
+	println("INFO: Done");
 	
 	//
 	// Given a named function, a call site, and the actual parameters, add assignment flows
@@ -986,9 +955,9 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 			// flows from literals.
 			// TODO: See if we need to do anything about pass_rest_by_ref, probably only for varargs...
 			while (idx < min(size(paramNames),size(actuals)), actuals[idx].hasName) {
-				af += < callSite + var(actuals[idx].aname), funName + var(paramNames[idx]) > ;
+				addValue(svm, callSite + var(actuals[idx].aname), funName + var(paramNames[idx]));
 				if (actuals[idx].isRef || paramIsRef[idx]) {
-					af += < funName + var(paramNames[idx]), callSite + var(actuals[idx].aname) >; 
+					addValue(svm, funName + var(paramNames[idx]), callSite + var(actuals[idx].aname)); 
 				}
 				idx = idx + 1;
 			}
@@ -997,8 +966,8 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 			// TODO: We need to add support when building the flow to account for uses of the
 			// functions that allow reading the arguments used in varargs functions.
 			while (idx < size(actuals), actuals[idx].hasName) {
-				af += < callSite + var(actuals[idx].aname), funName + var("@varargs") >;
-				if (actuals[idx].isRef || pbr) af += < funName + var("@varargs"), callSite + var(actuals[idx].aname) >;
+				addValue(svm, callSite + var(actuals[idx].aname), funName + var("@varargs"));
+				if (actuals[idx].isRef || pbr) addValue(svm, funName + var("@varargs"), callSite + var(actuals[idx].aname));
 				idx = idx + 1;
 			}
 
@@ -1011,10 +980,10 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 			}
 			
 			// Fourth, map the return value for the function into the return targets. 
-			for (t <- assignmentTargets) af += < funName + var("@return"), t >;
+			for (t <- assignmentTargets) addValue(svm, funName + var("@return"), t );
 
 			// Fifth, iIf we return by reference, add that to the flow as well 
-			if (rr && refAssign) for (t <- assignmentTargets) af += < t, funName + var("@return") >; 
+			if (rr && refAssign) for (t <- assignmentTargets) addValue(svm, t, funName + var("@return")); 
 		} else {
 			throw "Invalid signature for <funName>: <aaInfo.signatures[funName]>";
 		}
@@ -1038,8 +1007,8 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 				// TODO: Verify that the replacement is not in-place.
 				if (size(actuals) >= 3, actuals[2].hasName) {
 					for (t <- assignmentTargets) {
-						af += < callSite + var(actuals[2].aname), t >;
-						if (refAssign) af += < t, callSite + var(actuals[2].aname) >;
+						addValue(svm, callSite + var(actuals[2].aname), t );
+						if (refAssign) addValue(svm, t, callSite + var(actuals[2].aname) );
 					} 
 				} else if (size(actuals) >= 3) {
 					println("WARNING: In call to str_replace, cannot handle a non-variable parameter for $subject");
@@ -1095,6 +1064,7 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 			mapParams([global(),method(funName)], callSite, assignmentTargets, refAssign, actuals);
 		} else {
 			println("WARNING: Function <funName> not known, assuming this creates and returns no aliases");
+			unknownFuns += funName;
 		}
 	}
 	
@@ -1128,7 +1098,8 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 			if ("<invoker>-\><methodName>" in aaInfo.unknownMethods) aaInfo.unknownMethods = aaInfo.unknownMethods - "<invoker>-\><methodName>";
 			for (pm <- possibleMethods) {
 				mapParams(pm, callSite, assignmentTargets, refAssign, actuals);
-				af += { < invoker, pm + var("this") >, < pm + var("this"), invoker > };
+				addValue(svm, invoker, pm + var("this")); 
+				addValue(svm, pm + var("this"), invoker);
 			}
 		}
 	}
@@ -1173,7 +1144,10 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 		
 		if (getDefiningClass(className,className) != "") { 
 			mapParams([class(className),method(className)], callSite, assignmentTargets, false, actuals);
-			for (t <- assignmentTargets) af += { < t, [class(className),method(className),var("this")] >, < [class(className),method(className),var("this")], t > };
+			for (t <- assignmentTargets) {
+				addValue(svm, t, [class(className),method(className),var("this")]);
+				addValue(svm, [class(className),method(className),var("this")], t );
+			}
 		}
 	}
 
@@ -1197,7 +1171,7 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 		}
 		
 		if (matched == 0)
-			println("WARNING: No viable functions found, assuming this creates and returns no aliases");
+			println("WARNING: No viable functions found at call stie <callSite> with targets <assignmentTargets>, assuming this creates and returns no aliases");
 	}
 	
 	void invokeAnyFunction(NamePath callSite, NamePath assignmentTarget, bool refAssign, ActualsInfo actuals) {
@@ -1231,12 +1205,13 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 			if (size(actuals) >= minParams) {
 				matched = matched + 1;
 				mapParams(pm, callSite, assignmentTargets, refAssign, actuals);
-				af += { < invoker, pm + var("this") >, < pm + var("this"), invoker > };
+				addValue(svm, invoker, pm + var("this"));
+				addValue(svm, pm + var("this"), invoker);
 			}
 		}
 
 		if (matched == 0)
-			println("WARNING: No viable methods found, assuming this creates and returns no aliases");
+			println("WARNING: No viable methods found on target <invoker> assigning to <assignmentTargets>, assuming this creates and returns no aliases");
 	}
 	
 	void invokeAnyMethod(NamePath invoker, NamePath callSite, NamePath assignmentTarget, bool refAssign, ActualsInfo actuals) {
@@ -1335,10 +1310,114 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 	callNames = { < cn.target, np, cn > | np <- aaInfo.callNodes<0>, cn <- aaInfo.callNodes[np], cn is mcall };
 	justNames = callNames<0>;
 	triggeredClasses = { < jn, cn > | jn <- justNames, cn <- { cn | objectVal(cn,_) <- getItems(aaInfo.abstractStore, jn) } };
+		
+	// Get back names used as actual parameters or as targets of method calls. 
+	// Discovering new method calls during execution can make these names targets
+	// of additional aflow sources.
+	println("INFO: Computing names of actuals and targets");
+	actualsNames = { np + var(an) | np <- aaInfo.callNodes<0>, cn <- aaInfo.callNodes[np], cn is mcall, actual(_,variable_name(an)) <- cn.actuals };
+	targetNames = { cn.assignTo | np <- aaInfo.callNodes<0>, cn <- aaInfo.callNodes[np], cn is mcall, cn.assignTo? };
+	atNames = actualsNames + targetNames; 	
+
+	// Get back names of items that contribute through an initial allocation.
+	println("INFO: Computing allocator names");
+	allocNames = collapseToRelation(aaInfo.abstractStore)<0>;
 	
+	// Get back names of all targets with only one source
+	bool collapsing = true;
+	while (collapsing) {
+		collapsing = false;
+		
+		println("INFO: Computing those nodes that only have one assignment source");
+		svmi = createFromRelation(invert(asRelation(svm)));
+		map[NamePath,int] targetCount = getKeyCountMap(svmi);
+		oneSource = { t | t <- targetCount<0>, targetCount[t] == 1 };
+		
+		// These nodes are the "useless" nodes that only transit information through
+		// the aflow graph, but can never receive new incoming edges. For each, we
+		// want to trace it back to the first "non-transit" node in the graph. We
+		// can then constrain it to be the results of solving for that name.
+		println("INFO: Computing transit nodes");
+		transitNodes = oneSource - allocNames - atNames;
+		println("INFO: Found <size(transitNodes)> transit nodes");
+		
+		println("INFO: Computing providers for transit nodes, plus adding indirection links");
+		nodeProvider = ( );
+		keysToRemove = { };
+		edgesToRemove = { };
+		
+		for (tn <- transitNodes) {
+			// Check for cycles. We do this by keeping track of each node we visit in a set.
+			// If we encounter the same node again, this means we must have a cycle, since
+			// we are following predecessor edges, and, by definition, each node here only
+			// has one predecessor. 	
+			noCycle = true;
+			seenBefore = { tn };
+			
+			// Seed the backward search with the first predecessor.
+			tns = getOneFrom(getValues(svmi,tn));
+			edgesToRemove += < tns, tn >;
+			
+			if (tns in seenBefore) {
+				noCycle = false;			
+			} else {
+				//println("INFO: tn = <tn>, tns = <tns>");
+				seenBefore += tns;
+				// Continue going backwards until we hit a cycle or we hit a node that
+				// is not another transit node.
+				while (tns in transitNodes && noCycle) {
+					tnsPrior = tns;
+					tns = getOneFrom(getValues(svmi, tns));
+					edgesToRemove += < tns, tnsPrior >;
+					//println("INFO: tn = <tn>, tns = <tns>");
+					if (tns in seenBefore) {
+						noCycle = false;
+					}
+					seenBefore += tns;
+				}
+			}
+			
+			// If we did not find a cycle, we found a node that is a contributor.
+			if (noCycle) {
+				nodeProvider += ( tn : tns );
+				addItems(aaInfo.abstractStore, tn, {sameAs(tns)});
+			} else {
+				keysToRemove += seenBefore;
+			}
+		}
+		
+		if (size(keysToRemove) > 0 && size(nodeProvider) > 0) {
+			aflow = asRelation(svm);
+
+			if (size(keysToRemove) > 0) {
+				collapsing = true;
+			
+				println("INFO: Removing edges with cycles, plus dependent nodes, for <size(keysToRemove)> nodes");
+				aflow = { < s, t > | < s, t > <- aflow, s notin keysToRemove, t notin keysToRemove };
+			}
+			
+			if (size(edgesToRemove) > 0) {
+				println("INFO: Removing unneeded edges");
+				aflow = { < s , t > | st:<s,t> <- aflow, st notin edgesToRemove };
+			}
+			
+			if (size(nodeProvider) > 0) {			
+				println("INFO: Replacing sources of transit nodes with transit sources");
+				aflow = { < (s in nodeProvider) ? nodeProvider[s] : s , t > | < s, t > <- aflow };
+			}
+						
+			println("INFO: Cleaning up aflow relations");
+			deleteSetValuedMap(svm); 
+			svm = createFromRelation(aflow);
+		}
+		
+		deleteSetValuedMap(svmi);
+	}
+		
+	println("INFO: Done, preparing to propagate");
 	
 	// Now, propagate the constraints, using a worklist.
-	set[NamePath] worklist = af<0>;
+	set[NamePath] worklist = getKeys(svm);
 	int iters = 0;
 	while (!isEmpty(worklist)) {
 		source = getOneFrom(worklist); 
@@ -1357,19 +1436,15 @@ public AAInfo contextInsensitivePropagation(AAInfo aaInfo) {
 				sourceObjectClasses = { cn | objectVal(cn,_) <- getItems(aaInfo.abstractStore, source) };
 				if (!isEmpty(sourceObjectClasses - triggeredClasses[source])) {
 					triggeredClasses = triggeredClasses + { < source, cn > | cn <- sourceObjectClasses };
-					for ( < np, cn > <- callNames[source] ) processCall(np, cn);
+					for ( < np, cn > <- callNames[source] ) processCall(np, cn); 
 				}
 			}
 			
 			// Propagate to each target; if this changes the target, add the target to the worklist
 			// so we can propagate from that as well...
-			for (target <- af[source]) {
-				< modifiedStore, wasModified > = mergeNodes(aaInfo.abstractStore, source, target);
-				if (wasModified) {
-					aaInfo.abstractStore = modifiedStore;
+			for (target <- getValues(svm, source))
+				if (mergeNodes(aaInfo.abstractStore, source, target))
 					worklist = worklist + target;
-				}
-			}
 		}
 	}
 	

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: php
-Bundle-SymbolicName: php
+Bundle-Name: PHPAnalysis
+Bundle-SymbolicName: PHPAnalysis
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.imp.pdb.values,
  rascal
