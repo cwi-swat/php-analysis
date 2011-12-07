@@ -50,8 +50,8 @@ public anno set[Type] node@types;
 // which includes the types of the receiver, result, and actual parameters.
 //
 public data Template 
-	= template(Owner owner, str name, list[str] params, map[str,node] defaults, list[node] body)
-	| template(Owner owner, str name, list[str] params, map[str,node] defaults, list[node] body, Type receiverType, Type receiverTypeVar, Type resultTypeVar, list[Type] actualTypes, list[Type] formalTypeVars)
+	= template(NamePath path, list[str] params, map[str,node] defaults, list[node] body)
+	| template(NamePath path, list[str] params, map[str,node] defaults, list[node] body, Type receiverType, Type receiverTypeVar, Type resultTypeVar, list[Type] actualTypes, list[Type] formalTypeVars)
 	;
 
 //
@@ -60,8 +60,8 @@ public data Template
 // a field access.
 // 
 public data FieldTemplate
-	= fieldTemplate(Owner owner, str name, node fieldDefault)
-	| fieldTemplate(Owner owner, str name, node fieldDefault, Type receiverType)
+	= fieldTemplate(NamePath path, node fieldDefault)
+	| fieldTemplate(NamePath path, node fieldDefault, Type receiverType)
 	;
 
 //
