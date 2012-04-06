@@ -8,4 +8,4 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::util::Option
 
-public data Option[&T] = Some(&T item) | None();
+public data Option[&T] = some(&T item) | none();

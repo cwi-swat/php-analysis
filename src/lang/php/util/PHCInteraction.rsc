@@ -15,14 +15,26 @@ import String;
 import Set;
 
 import lang::php::util::NodeInfo;
+import lang::php::ast::AbstractSyntax;
 
 loc phpLoc = |file:///Users/mhills/local/bin/phc|;
 map[str,str] env = ( "PATH" : "/usr/local/bin:/usr/local/sbin:/Users/mhills/local/bin:/usr/bin:/bin:/usr/sbin:/sbin");
 loc workingDir = |file:///Users/mhills/Projects/phpsa/ast2rascal|;
 
-public node loadPHPFile(loc l) {
+public Script loadPHPFileAsAst(loc l) {
 	println("Loading PHP file <l>");
-	PID pid = createProcess("./runit", ["<l.path>"], env, workingDir);
+	PID pid = createProcess("./ast2rascal", ["<l.path>"], env, workingDir);
+	str phcOutput = "";
+	while (! endsWith(phcOutput, "***DONE***") ) phcOutput = phcOutput + readFrom(pid);
+	phcOutput = substring(phcOutput,0,size(phcOutput)-10);
+	Script res = readTextValueString(#Script, phcOutput);
+	killProcess(pid);
+	return res;
+}
+
+public node loadPHPFileAsNode(loc l) {
+	println("Loading PHP file <l>");
+	PID pid = createProcess("./mir2rascal", ["<l.path>"], env, workingDir);
 	str phcOutput = "";
 	while (! endsWith(phcOutput, "***DONE***") ) phcOutput = phcOutput + readFrom(pid);
 	phcOutput = substring(phcOutput,0,size(phcOutput)-10);
