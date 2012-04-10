@@ -6,16 +6,16 @@ import ValueIO;
 import String;
 import Set;
 import Exception;
-
+import lang::php::util::Corpus;
 import lang::php::ast::AbstractSyntax;
 
 public Script loadPHPFile(loc l) {
 	println("Loading PHP file <l>");
-	PID pid = createProcess("/usr/bin/php", ["/Users/mhills/Projects/phpsa/PHP-Parser/lib/Rascal/AST2Rascal.php", "<l.path>"], |file:///Users/mhills/Projects/phpsa/PHP-Parser/lib/Rascal|);
+	PID pid = createProcess("/usr/bin/php", ["/ufs/hills/project/phpsa/PHP-Parser/lib/Rascal/AST2Rascal.php", "<l.path>"], |file:///ufs/hills/project/phpsa/PHP-Parser/lib/Rascal|);
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
 	Script res = script([exprstmt(scalar(string("Could not parse file: <phcErr>")))]);
-	if (trim(phcErr) == "") res = readTextValueString(#Script, phcOutput);
+	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) res = readTextValueString(#Script, phcOutput);
 	killProcess(pid);
 	return res;
 }
@@ -40,4 +40,30 @@ public map[loc,Script] loadPHPFiles(loc l) {
 	for (d <- dirEntries) phpNodes = phpNodes + loadPHPFiles(d);
 	
 	return phpNodes;
+}
+
+public rel[str product, str version, loc fileloc, Script scr] loadCorpus() {
+
+	rel[str product, str version, loc fileloc, Script scr] corpusItems = { };
+	
+	for (product <- getProducts()) {
+		for (version <- getVersions(product)) {
+			loc l = getCorpusItem(product,version);
+			files = loadPHPFiles(l);
+			for (fl <- files<0>) corpusItems += < product, version, fl, files[fl] >;
+		}
+	}	
+	return corpusItems;
+}
+
+public rel[str product, str version, loc fileloc, Script scr] loadProduct(str product) {
+
+	rel[str product, str version, loc fileloc, Script scr] corpusItems = { };
+	
+	for (version <- getVersions(product)) {
+		loc l = getCorpusItem(product,version);
+		files = loadPHPFiles(l);
+		for (fl <- files<0>) corpusItems += < product, version, fl, files[fl] >;
+	}
+	return corpusItems;
 }
