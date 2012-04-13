@@ -116,6 +116,35 @@ public map[str,int] featureCounts(Corpus corpus, str product, str version) {
 
 }
 
+public tuple[map[str,int] featureCounts, map[str,int] exprCounts, map[str,int] stmtCounts] gatherCounts(Corpus corpus, str product, str version) {
+	fc = featureCounts(corpus, product, version);
+	sc = stmtCounts(corpus, product, version);
+	ec = exprCounts(corpus, product, version);
+	return < fc, ec, sc >;
+}
+
+public map[tuple[str product, str version], tuple[map[str,int] featureCounts, map[str,int] exprCounts, map[str,int] stmtCounts]] gatherAllCounts() {
+	map[tuple[str product, str version], tuple[map[str,int] featureCounts, map[str,int] exprCounts, map[str,int] stmtCounts]] res = ( );
+	for (p <- getProducts(), v <- getVersions(p)) {
+		c = loadProduct(p,v);
+		res[<p,v>] = gatherCounts(c,p,v);
+	}
+	for (p <- getPlugins(), v <- getPluginVersions(p)) {
+		c = loadPlugin(p,v);
+		res[<p,v>] = gatherCounts(c,p,v);
+	}
+	return res;
+}
+
+public map[tuple[str product, str version], tuple[map[str,int] featureCounts, map[str,int] exprCounts, map[str,int] stmtCounts]] gatherMWCounts() {
+	map[tuple[str product, str version], tuple[map[str,int] featureCounts, map[str,int] exprCounts, map[str,int] stmtCounts]] res = ( );
+	for (v <- getMWVersions()) {
+		c = loadMWVersion(v);
+		res[<"MediaWiki",v>] = gatherCounts(c,"MediaWiki",v);
+	}
+	return res;
+}
+
 // Gather statement counts
 public map[str,int] stmtCounts(Corpus corpus, str product, str version) {
 	map[str,int] counts = ( );

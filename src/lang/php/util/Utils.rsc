@@ -86,3 +86,12 @@ public rel[str product, str version, loc fileloc, Script scr] loadPlugin(str pro
 	for (fl <- files<0>) corpusItems += < product, version, fl, files[fl] >;
 	return corpusItems;
 }
+
+public rel[str product, str version, loc fileloc, Script scr] loadMWVersion(str version) {
+	rel[str product, str version, loc fileloc, Script scr] corpusItems = { };
+
+	loc l = getMWVersion(version);
+	files = loadPHPFiles(l);
+	for (fl <- files<0>) corpusItems += < "MediaWiki", version, fl, files[fl] >;
+	return corpusItems;
+}
