@@ -1,3 +1,11 @@
+@license{
+  Copyright (c) 2009-2011 CWI
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+}
+@contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::util::Corpus
 
 import String;
@@ -91,3 +99,14 @@ public set[str] getPluginVersions(str plugin) {
 }
 
 public set[str] getMWVersions() = mwversions;
+
+public bool compareMWVersion(str v1, str v2) {
+	if(/<a1:\d+>[.]<b1:\d+>[.]<c1:\d+>/ := v1) {
+		if(/<a2:\d+>[.]<b2:\d+>[.]<c2:\d+>/ := v2) {
+			if (toInt(a1) < toInt(a2)) return true;
+			if (toInt(a1) == toInt(a2) && toInt(b1) < toInt(b2)) return true;
+			if (toInt(a1) == toInt(a2) && toInt(b1) == toInt(b2) && toInt(c1) <= toInt(c2)) return true;
+			return false;
+		} 
+	} 
+}
