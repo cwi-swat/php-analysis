@@ -11,12 +11,12 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::util::Config;
 
 public Script loadPHPFile(loc l) {
-	println("Loading PHP file <l>");
+	//println("Loading PHP file <l>");
 	loc rgenLoc = projroot + "PHP-Parser/lib/Rascal/AST2Rascal.php";
 	PID pid = createProcess(phploc.path, [rgenLoc.path, "<l.path>"], projroot + "PHP-Parser/lib/Rascal");
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
-	Script res = script([exprstmt(scalar(string("Could not parse file: <phcErr>")))]);
+	Script res = script([exprstmt(scalar(string("Could not parse file <l.path>: <phcErr>")))]);
 	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) res = readTextValueString(#Script, phcOutput);
 	killProcess(pid);
 	return res;

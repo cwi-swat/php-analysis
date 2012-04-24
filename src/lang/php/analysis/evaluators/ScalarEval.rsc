@@ -14,6 +14,7 @@ import List;
 import String;
 import Exception;
 
+@doc{Eval magic constants, e.g. __DIR__, where we can.}
 public Script evalMagicConstants(Script scr, loc l) {
 	// TODO: Add the rest of the cases when we have the proper context (e.g.,
 	// we do not know what class we are in, so we cannot add support for the
@@ -32,6 +33,7 @@ public Script evalMagicConstants(Script scr, loc l) {
 	return scr2;
 }
 
+@doc{Perform any operations we can perform just using the static information in the system, e.g., 1+2, but not 1+b.}
 public Script evalOps(Script scr) {
 	scr2 = bottom-up visit(scr) {
 		case e:binaryOperation(scalar(string(s1)),scalar(string(s2)),concat()) =>
@@ -40,6 +42,7 @@ public Script evalOps(Script scr) {
 	return scr2;
 }
 
+@doc{Evaluate the PHP dirname function, given a string literal argument.}
 public Script evalDirname(Script scr) {
 	scr2 = visit(scr) {
 		case c:call(name(name("dirname")),[actualParameter(scalar(string(s1)),false)]) : {
@@ -132,6 +135,7 @@ public Script evalConsts(rel[loc fileloc, Script scr] corpus, loc l, map[str, Ex
 	return scr2;
 }
 
+@doc{Perform all scalar evaluations above.}
 public rel[str product, str version, loc fileloc, Script scr] evalAllScalars(rel[str product, str version, loc fileloc, Script scr] corpus, str p, str v) {
 	solve(corpus) {
 		corpus = { <p,v,l,evalOps(evalDirname(evalMagicConstants(s,l)))> | <p,v,l,s> <- corpus };
@@ -146,6 +150,14 @@ public rel[str product, str version, loc fileloc, Script scr] evalAllScalars(rel
 		// the defining script.
 		rel[str,Expr] constRel = { < cn, e > | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e:scalar(sv),false)]) := corpus[p,v,_] };
 		map[str,Expr] constMap = ( s : e | <s,e> <- constRel, size(constRel[s]) == 1 ); 
+		
+		// Add in some predefined constants as well. These are from the Directories extension.
+		// TODO: We should factor these out somehow.
+		constMap["DIRECTORY_SEPARATOR"] = scalar(string("/"));
+		constMap["PATH_SEPARATOR"] = scalar(string(":"));
+		constMap["SCANDIR_SORT_ASCENDING"] = scalar(integer(0));
+		constMap["SCANDIR_SORT_DESCENDING"] = scalar(integer(0));
+		constMap["SCANDIR_SORT_NONE"] = scalar(integer(1));
 
 		corpus = { <p,v,l,evalConsts(corpus<2,3>,l,constMap)> | <p,v,l,s> <- corpus };
 	}			
