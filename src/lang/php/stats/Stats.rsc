@@ -89,11 +89,11 @@ public list[Expr] fetchPropertyFetchVVNames(Script scr) = [ f | f:propertyFetch(
 public FetchResult gatherPropertyFetchesWithVarNames(Corpus corpus, str product, str version) = gatherExprStats(corpus, product, version, fetchPropertyFetchVVNames);
 
 // Gather information on static property fetches where the static class and/or the static property name is given as a variable-variable
-public list[Expr] fetchStaticPropertyUses(Script scr) = [ m | /m:fetchStaticProperty(_,_) := scr ];
-public list[Expr] fetchStaticPropertyVVName(Script scr) = [ m | m:fetchStaticProperty(_,expr(_)) <- fetchStaticPropertyUses(scr) ];
-public list[Expr] fetchStaticPropertyVVTarget(Script scr) = [ m | m:fetchStaticProperty(expr(_),_) <- fetchStaticPropertyUses(scr) ];
-public FetchResult gatherStaticPropertyVVNames(Corpus corpus, str product, str version) = gatherExprStats(corpus, product, version, fetchStaticPropertyVVName);
-public FetchResult gatherStaticPropertyVVTargets(Corpus corpus, str product, str version) = gatherExprStats(corpus, product, version, fetchStaticPropertyVVTarget);
+public list[Expr] staticPropertyFetchUses(Script scr) = [ m | /m:staticPropertyFetch(_,_) := scr ];
+public list[Expr] staticPropertyFetchVVName(Script scr) = [ m | m:staticPropertyFetch(_,expr(_)) <- staticPropertyFetchUses(scr) ];
+public list[Expr] staticPropertyFetchVVTarget(Script scr) = [ m | m:staticPropertyFetch(expr(_),_) <- staticPropertyFetchUses(scr) ];
+public FetchResult gatherStaticPropertyVVNames(Corpus corpus, str product, str version) = gatherExprStats(corpus, product, version, staticPropertyFetchVVName);
+public FetchResult gatherStaticPropertyVVTargets(Corpus corpus, str product, str version) = gatherExprStats(corpus, product, version, staticPropertyFetchVVTarget);
 
 // Gather variable-variable uses
 public list[Expr] fetchVarUses(Script scr) = [ v | /v:var(_) := scr ];
@@ -120,6 +120,7 @@ public map[str,int] featureCounts(Corpus corpus, str product, str version) {
 	counts["fetches of static properties with variable targets"] = getCount(gatherStaticPropertyVVTargets(corpus, product, version));
 	counts["uses of variable-variables (including the above)"] = getCount(gatherVarVarUses(corpus, product, version));
 	
+	// to add: 1) break with expression; 2) ref array; 3) ref params; 4) non-constant const; 5) var-args calls
 	return counts;
 
 }
@@ -199,7 +200,6 @@ public str getExprKey(refAssign(_,_)) = "ref assign";
 public str getExprKey(binaryOperation(_,_,Op op)) = "binary operation: <getOpKey(op)>";
 public str getExprKey(unaryOperation(_,Op op)) = "unary operation: <getOpKey(op)>";
 public str getExprKey(new(_,_)) = "new";
-public str getExprKey(classConst(_)) = "class const";
 public str getExprKey(cast(CastType ct,_)) = "cast to <getCastTypeKey(ct)>";
 public str getExprKey(clone(_)) = "clone";
 public str getExprKey(closure(_,_,_,_,_)) = "closure";
@@ -217,8 +217,8 @@ public str getExprKey(isSet(_)) = "isSet";
 public str getExprKey(print(_)) = "print";
 public str getExprKey(propertyFetch(_,_)) = "property fetch";
 public str getExprKey(shellExec(_)) = "shell exec";
-public str getExprKey(ternary(_,_,_)) = "exit";
-public str getExprKey(fetchStaticProperty(_,_)) = "fetch static property";
+public str getExprKey(ternary(_,_,_)) = "ternary";
+public str getExprKey(staticPropertyFetch(_,_)) = "fetch static property";
 public str getExprKey(scalar(_)) = "scalar";
 public str getExprKey(var(_)) = "var";
 

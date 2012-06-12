@@ -43,7 +43,6 @@ public data Expr
 	| binaryOperation(Expr left, Expr right, Op operation)
 	| unaryOperation(Expr operand, Op operation)
 	| new(NameOrExpr className, list[ActualParameter] parameters)
-	| classConst(Name name)
 	| cast(CastType castType, Expr expr)
 	| clone(Expr expr)
 	| closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static)
@@ -62,7 +61,7 @@ public data Expr
 	| propertyFetch(Expr target, NameOrExpr propertyName)
 	| shellExec(list[Expr] parts)
 	| ternary(Expr cond, OptionExpr ifBranch, Expr elseBranch)
-	| fetchStaticProperty(NameOrExpr className, NameOrExpr propertyName)
+	| staticPropertyFetch(NameOrExpr className, NameOrExpr propertyName)
 	| scalar(Scalar scalarVal)
 	| var(NameOrExpr varName)	
 	;
@@ -140,7 +139,7 @@ public data Use = use(Name importName, OptionName asName);
 
 public data ClassItem 
 	= property(set[Modifier] modifiers, list[Property] prop)
-	| const(list[Const] consts)
+	| constCI(list[Const] consts)
 	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body)
 	| traitUse(list[Name] traits, list[Adaptation] adaptations)
 	;
@@ -164,7 +163,7 @@ public data InterfaceDef = interface(str interfaceName,
 									list[Name] extends, 
 									list[ClassItem] members);
 									
-public data TraitDef = trait(str trainName, list[ClassItem] members);
+public data TraitDef = trait(str traitName, list[ClassItem] members);
 
 public data StaticVar = staticVar(str name, OptionExpr defaultValue);
 
