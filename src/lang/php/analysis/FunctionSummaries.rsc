@@ -8,6 +8,8 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::analysis::FunctionSummaries
 
+
+
 alias ParamTriple = tuple[str paramType, bool isRef, str paramName, bool notRequired];
 alias Params = list[ParamTriple];
 alias SummarySig = tuple[str retType, bool isRef, Params params];

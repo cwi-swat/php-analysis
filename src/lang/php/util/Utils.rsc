@@ -11,13 +11,18 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::util::Config;
 
 public Script loadPHPFile(loc l) {
-	//println("Loading PHP file <l>");
-	loc rgenLoc = projroot + "PHP-Parser/lib/Rascal/AST2Rascal.php";
-	PID pid = createProcess(phploc.path, [rgenLoc.path, "<l.path>"], projroot + "PHP-Parser/lib/Rascal");
+	println("Loading PHP file <l>");
+	loc rgenLoc = |file:///export/scratch1/hills/PHP-Parser/lib/Rascal/AST2Rascal.php|;
+	PID pid = createProcess(phploc.path, [rgenLoc.path, "<l.path>"], |file:///export/scratch1/hills/PHP-Parser/lib/Rascal|);
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
 	Script res = script([exprstmt(scalar(string("Could not parse file <l.path>: <phcErr>")))]);
-	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) res = readTextValueString(#Script, phcOutput);
+	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
+		if (trim(phcOutput) == "")
+			res = errscript("Parser failed in unknown way");
+		else
+			res = readTextValueString(#Script, phcOutput);
+	}
 	killProcess(pid);
 	return res;
 }
@@ -94,4 +99,39 @@ public rel[str product, str version, loc fileloc, Script scr] loadMWVersion(str 
 	files = loadPHPFiles(l);
 	for (fl <- files<0>) corpusItems += < "MediaWiki", version, fl, files[fl] >;
 	return corpusItems;
+}
+
+public void buildBinaries(str product, str version) {
+	loc parsedDir = |file:///export/scratch1/hills/parsed|;
+	loc l = getCorpusItem(product,version);
+	println("Parsing <product>-<version>");
+	files = loadPHPFiles(l);
+	loc binLoc = parsedDir + "<product>-<version>.pt";
+	writeBinaryValueFile(binLoc, files);
+}
+
+public void buildBinaries(str product) {
+	for (version <- getVersions(product))
+		buildBinaries(product, version);
+}
+
+public void buildBinaries() {
+	for (product <- getProducts(), version <- getVersions(product))
+		buildBinaries(product, version);
+}
+
+public map[loc,Script] loadBinary(str product, str version) {
+	loc parsedDir = |file:///export/scratch1/hills/parsed|;
+	parsedItem = parsedDir + "<product>-<version>.pt";
+	return readBinaryValueFile(#map[loc,Script],parsedItem);
+}
+
+public void writeStats(str product, str version, map[str,int] fc, map[str,int] sc, map[str,int] ec) {
+	loc statsDir = |file:///export/scratch1/hills/stats|;
+	loc fcLoc = statsDir + "<product>-<version>.fc";
+	loc scLoc = statsDir +  "<product>-<version>.sc";
+	loc ecLoc = statsDir +  "<product>-<version>.ec";
+	writeBinaryValueFile(fcLoc, fc);
+	writeBinaryValueFile(scLoc, sc);
+	writeBinaryValueFile(ecLoc, ec);
 }

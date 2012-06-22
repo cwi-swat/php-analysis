@@ -1,5 +1,5 @@
 @license{
-  Copyright (c) 2009-2011 CWI
+  Copyright (c) 2009-2012 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -167,7 +167,7 @@ public data TraitDef = trait(str traitName, list[ClassItem] members);
 
 public data StaticVar = staticVar(str name, OptionExpr defaultValue);
 
-public data Script = script(list[Stmt] body);
+public data Script = script(list[Stmt] body) | errscript(str err);
 
 public anno loc ActualParameter@at;
 public anno loc Const@at;

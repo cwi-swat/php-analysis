@@ -19,22 +19,15 @@ public data RuntimeException
 	| productNotFound(str product)
 	;
 	 
-private loc corpusRoot = projroot + "corpus";
+private loc corpusRoot = |file:///export/scratch1/hills/corpus|;
 private loc extraCorpusRoot = projroot + "corpus-extra";
 private loc pluginRoot = corpusRoot + "WordPressPlugins";
 
-private rel[str,str] versions = { < "Drupal", "6.25" >, < "Drupal", "7.12" >, 
-								  < "Gallery", "2.3.1" >, < "Gallery", "3.0.2" >,
-                                  < "Joomla", "1.5.26" >, < "Joomla", "2.5.4" >, 
-                                  < "Kohana", "3.2" >, 
-                                  < "MediaWiki", "1.6.12" >, < "MediaWiki", "1.18.2" >, 
-                                  < "osCommerce", "2.3.1" >, 
-                                  < "phpBB", "3" >,
-                                  < "phpMyAdmin", "2.11.11.3-english"> , < "phpMyAdmin", "3.5.0-english" >,
-                                  < "SilverStripe", "2.4.7" >,
-                                  < "SquirrelMail", "1.4.22" >,
-                                  < "Symfony", "2.0.12" >,
-                                  < "WordPress", "3.1.4" >, < "WordPress", "3.3.1" > };
+private set[str] products() = { l.file | l <- corpusRoot.ls, isDirectory(l) };
+					   
+private rel[str,str] versions() = { < p, v> | p <- products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-]-<v:.+>/ := l.file };
+
+private set[str] versions(str p) = { v | p in products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-]-<v:.+>/ := l.file };
 
 private rel[str,str] plugins = { < "Akismet", "2.5.5" >, < "All-In-One-SEO-Pack","1.6.14.2" >,
 								 < "BCMS", "a1" >, < "BSocial", "1.0-trunk" >,
@@ -50,8 +43,8 @@ private set[str] mwversions = { "1.7.1", "1.7.3", "1.8.2", "1.8.4", "1.8.5", "1.
 								"1.17.0", "1.17.1", "1.17.2", "1.17.3", "1.18.0", "1.18.1", "1.6.12", "1.18.2"};
 
 public loc getCorpusItem(str product, str version) {
-	if (product in versions<0>) {
-		if (version in versions[product]) {
+	if (product in products()) {
+		if (version in versions(product)) {
 			loc productRoot = corpusRoot + product + "<toLowerCase(product)>-<version>";
 			if (exists(productRoot)) return productRoot;
 			throw productNotFound(product, version, productRoot);
@@ -82,13 +75,13 @@ public loc getMWVersion(str version) {
 	throw versionNotFound("MediaWiki", version);
 }
 
-public set[str] getProducts() = versions<0>;
+public set[str] getProducts() = products();
 
 public set[str] getPlugins() = plugins<0>;
 
 public set[str] getVersions(str product) {
-	if (product in versions<0>)
-		return versions[product];
+	if (product in products())
+		return versions(product);
 	throw productNotFound(product);
 }
 
