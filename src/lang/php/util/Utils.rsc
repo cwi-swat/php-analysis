@@ -5,6 +5,7 @@ import IO;
 import ValueIO;
 import String;
 import Set;
+import List;
 import Exception;
 import lang::php::util::Corpus;
 import lang::php::ast::AbstractSyntax;
@@ -102,7 +103,7 @@ public rel[str product, str version, loc fileloc, Script scr] loadMWVersion(str 
 }
 
 public void buildBinaries(str product, str version) {
-	loc parsedDir = |file:///export/scratch1/hills/parsed|;
+	loc parsedDir = |file:///Users/mhills/Projects/phpsa/parsed|;
 	loc l = getCorpusItem(product,version);
 	println("Parsing <product>-<version>");
 	files = loadPHPFiles(l);
@@ -121,17 +122,45 @@ public void buildBinaries() {
 }
 
 public map[loc,Script] loadBinary(str product, str version) {
-	loc parsedDir = |file:///export/scratch1/hills/parsed|;
+	loc parsedDir = |file:///Users/mhills/Projects/phpsa/parsed|;
 	parsedItem = parsedDir + "<product>-<version>.pt";
 	return readBinaryValueFile(#map[loc,Script],parsedItem);
 }
 
 public void writeStats(str product, str version, map[str,int] fc, map[str,int] sc, map[str,int] ec) {
-	loc statsDir = |file:///export/scratch1/hills/stats|;
+	loc statsDir = |file:///Users/mhills/Projects/phpsa/stats|;
 	loc fcLoc = statsDir + "<product>-<version>.fc";
 	loc scLoc = statsDir +  "<product>-<version>.sc";
 	loc ecLoc = statsDir +  "<product>-<version>.ec";
 	writeBinaryValueFile(fcLoc, fc);
 	writeBinaryValueFile(scLoc, sc);
 	writeBinaryValueFile(ecLoc, ec);
+}
+
+public tuple[map[str,int] fc, map[str,int] sc, map[str,int] ec] getStats(str product, str version) {
+	loc statsDir = |file:///Users/mhills/Projects/phpsa/stats|;
+	loc fcLoc = statsDir + "<product>-<version>.fc";
+	loc scLoc = statsDir +  "<product>-<version>.sc";
+	loc ecLoc = statsDir +  "<product>-<version>.ec";
+	return < readBinaryValueFile(#map[str,int],fcLoc), readBinaryValueFile(#map[str,int],scLoc), readBinaryValueFile(#map[str,int],ecLoc) >;
+}
+
+public map[tuple[str,str],tuple[map[str,int] fc, map[str,int] sc, map[str,int] ec]] getStats(str product) {
+	return ( < product, v > : getStats(product,v) | v <- getVersions(product) );
+}
+
+public map[tuple[str,str],tuple[map[str,int] fc, map[str,int] sc, map[str,int] ec]] getStats() {
+	return ( < product, v > : getStats(product,v) | product <- getProducts(), v <- getVersions(product) );
+}
+
+public list[tuple[str p, str v, map[str,int] fc, map[str,int] sc, map[str,int] ec]] getSortedStats() {
+	list[tuple[str p, str v, map[str,int] fc, map[str,int] sc, map[str,int] ec]] res = [ ];
+	
+	sm = getStats();
+	pvset = sm<0>;
+
+	for (p <- sort(toList(pvset<0>)), v <- sort(toList(pvset[p]),compareVersion))
+		res += < p, v, sm[<p,v>].fc, sm[<p,v>].sc, sm[<p,v>].ec >;
+	
+	return res;
 }

@@ -19,7 +19,7 @@ public data RuntimeException
 	| productNotFound(str product)
 	;
 	 
-private loc corpusRoot = |file:///export/scratch1/hills/corpus|;
+private loc corpusRoot = |file:///Users/mhills/Projects/phpsa/corpus|;
 private loc extraCorpusRoot = projroot + "corpus-extra";
 private loc pluginRoot = corpusRoot + "WordPressPlugins";
 
@@ -27,7 +27,9 @@ private set[str] products() = { l.file | l <- corpusRoot.ls, isDirectory(l) };
 					   
 private rel[str,str] versions() = { < p, v> | p <- products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-]-<v:.+>/ := l.file };
 
-private set[str] versions(str p) = { v | p in products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-]-<v:.+>/ := l.file };
+//private set[str] versions(str p) = { v | p in products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-]-<v:.+>/ := l.file };
+
+private set[str] versions(str p) = { v | p in products(), l <- |file:///Users/mhills/Projects/phpsa/parsed|.ls, isFile(l), /<pe:[^\-]+>-<v:.+>\.pt/ := l.file, pe == p };
 
 private rel[str,str] plugins = { < "Akismet", "2.5.5" >, < "All-In-One-SEO-Pack","1.6.14.2" >,
 								 < "BCMS", "a1" >, < "BSocial", "1.0-trunk" >,
@@ -93,13 +95,26 @@ public set[str] getPluginVersions(str plugin) {
 
 public set[str] getMWVersions() = mwversions;
 
-public bool compareMWVersion(str v1, str v2) {
+public bool compareVersion(str v1, str v2) {
+	v1a = 0; v1b = 0; v1c = 0;
+	v2a = 0; v2b = 0; v2c = 0;
+	
 	if(/<a1:\d+>[.]<b1:\d+>[.]<c1:\d+>/ := v1) {
-		if(/<a2:\d+>[.]<b2:\d+>[.]<c2:\d+>/ := v2) {
-			if (toInt(a1) < toInt(a2)) return true;
-			if (toInt(a1) == toInt(a2) && toInt(b1) < toInt(b2)) return true;
-			if (toInt(a1) == toInt(a2) && toInt(b1) == toInt(b2) && toInt(c1) <= toInt(c2)) return true;
-			return false;
-		} 
-	} 
+		v1a = toInt(a1); v1b = toInt(b1); v1c = toInt(c1);
+	} else if(/<a1:\d+>[.]<b1:\d+>/ := v1) {
+		v1a = toInt(a1); v1b = toInt(b1);
+	}
+	
+	if(/<a1:\d+>[.]<b1:\d+>[.]<c1:\d+>/ := v2) {
+		v2a = toInt(a1); v2b = toInt(b1); v2c = toInt(c1);
+	} else if(/<a1:\d+>[.]<b1:\d+>/ := v2) {
+		v2a = toInt(a1); v2b = toInt(b1);
+	}
+	
+	println("Found: <v1a>.<v1b>.<v1c> and <v2a>.<v2b>.<v2c>");
+	
+	if (v1a < v2a) return true;
+	if (v1a == v2a && v1b < v2b) return true;
+	if (v1a == v2a && v1b == v2b && v1c < v2c) return true;
+	return false;
 }

@@ -331,4 +331,5 @@ public void buildStats() {
 	for (product <- getProducts(), version <- getVersions(product))
 		buildStats(product, version);
 }
+
 									

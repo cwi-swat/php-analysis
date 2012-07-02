@@ -16,7 +16,7 @@ import Set;
 import String;
 import IO;
 
-public void prepareStats(map[tuple[str product, str version], tuple[map[str,int] featureCounts, map[str,int] exprCounts, map[str,int] stmtCounts]] infoMap) {
+public void prepareStats(list[tuple[str p, str v, map[str,int] fc, map[str,int] sc, map[str,int] ec]] stats) {
 	oftr = featureOrder();
 	oexp = exprKeyOrder();
 	ostmt = stmtKeyOrder();
@@ -25,20 +25,13 @@ public void prepareStats(map[tuple[str product, str version], tuple[map[str,int]
 	list[str] exprFile = ["product,version,<intercalate(",",oexp)>"];
 	list[str] stmtFile = ["product,version,<intercalate(",",ostmt)>"];
 	
-	lookupPairs = [ < p,v > | p <- getProducts(), v <- getVersions(p) ] +
-	              [ < p,v > | p <- getPlugins(), v <- getPluginVersions(p) ];
-	              
-	for (< p, v > <- lookupPairs) {
-		info = infoMap[<p,v>];
-		finfo = info.featureCounts;
-		einfo = info.exprCounts;
-		sinfo = info.stmtCounts;
-		list[int] fCounts = [ finfo[f] | f <- oftr ];
-		list[int] einfoCounts = [ (e in einfo) ? einfo[e] : 0 | e <- oexp ];
-		list[int] sinfoCounts = [ (s in sinfo) ? sinfo[s] : 0 | s <- ostmt ];
-		fFile += "<p>,<v>,<intercalate(",",fCounts)>";
-		exprFile += "<p>,<v>,<intercalate(",",einfoCounts)>";
-		stmtFile += "<p>,<v>,<intercalate(",",sinfoCounts)>";
+	for (i <- stats) {
+		list[int] fCounts = [ i.fc[f] | f <- oftr ];
+		list[int] einfoCounts = [ (e in i.ec) ? i.ec[e] : 0 | e <- oexp ];
+		list[int] sinfoCounts = [ (s in i.sc) ? i.sc[s] : 0 | s <- ostmt ];
+		fFile += "<i.p>,<i.v>,<intercalate(",",fCounts)>";
+		exprFile += "<i.p>,<i.v>,<intercalate(",",einfoCounts)>";
+		stmtFile += "<i.p>,<i.v>,<intercalate(",",sinfoCounts)>";
 	}
 	
 	writeFile(|file:///tmp/features.csv|, intercalate("\n",fFile));
@@ -46,31 +39,3 @@ public void prepareStats(map[tuple[str product, str version], tuple[map[str,int]
 	writeFile(|file:///tmp/stmts.csv|, intercalate("\n",stmtFile));
 }
 
-public void prepareStatsMW(map[tuple[str product, str version], tuple[map[str,int] featureCounts, map[str,int] exprCounts, map[str,int] stmtCounts]] mwinfo) {
-	sortedMWVersions = List::sort(toList(getMWVersions()),compareMWVersion);
-
-	oftr = featureOrder();
-	oexp = exprKeyOrder();
-	ostmt = stmtKeyOrder();
-
-	list[str] fFile = ["version,<intercalate(",",oftr)>"];
-	list[str] exprFile = ["version,<intercalate(",",oexp)>"];
-	list[str] stmtFile = ["version,<intercalate(",",ostmt)>"];
-	
-	for (v <- sortedMWVersions) {
-		info = mwinfo[<"MediaWiki",v>];
-		finfo = info.featureCounts;
-		einfo = info.exprCounts;
-		sinfo = info.stmtCounts;
-		list[int] fCounts = [ finfo[f] | f <- oftr ];
-		list[int] einfoCounts = [ (e in einfo) ? einfo[e] : 0 | e <- oexp ];
-		list[int] sinfoCounts = [ (s in sinfo) ? sinfo[s] : 0 | s <- ostmt ];
-		fFile += "<v>,<intercalate(",",fCounts)>";
-		exprFile += "<v>,<intercalate(",",einfoCounts)>";
-		stmtFile += "<v>,<intercalate(",",sinfoCounts)>";
-	}
-	
-	writeFile(|file:///tmp/mwfeatures.csv|, intercalate("\n",fFile));
-	writeFile(|file:///tmp/mwexprs.csv|, intercalate("\n",exprFile));
-	writeFile(|file:///tmp/mwstmts.csv|, intercalate("\n",stmtFile));
-}
