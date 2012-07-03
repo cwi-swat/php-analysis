@@ -19,17 +19,14 @@ public data RuntimeException
 	| productNotFound(str product)
 	;
 	 
-private loc corpusRoot = |file:///Users/mhills/Projects/phpsa/corpus|;
 private loc extraCorpusRoot = projroot + "corpus-extra";
 private loc pluginRoot = corpusRoot + "WordPressPlugins";
 
 private set[str] products() = { l.file | l <- corpusRoot.ls, isDirectory(l) };
 					   
-private rel[str,str] versions() = { < p, v> | p <- products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-]-<v:.+>/ := l.file };
+private rel[str,str] versions() = { < p, v> | p <- products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-_][-_]<v:.+>/ := l.file };
 
-//private set[str] versions(str p) = { v | p in products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-]-<v:.+>/ := l.file };
-
-private set[str] versions(str p) = { v | p in products(), l <- |file:///Users/mhills/Projects/phpsa/parsed|.ls, isFile(l), /<pe:[^\-]+>-<v:.+>\.pt/ := l.file, pe == p };
+private set[str] versions(str p) = { v | p in products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-_][-_]<v:.+>/ := l.file };
 
 private rel[str,str] plugins = { < "Akismet", "2.5.5" >, < "All-In-One-SEO-Pack","1.6.14.2" >,
 								 < "BCMS", "a1" >, < "BSocial", "1.0-trunk" >,
@@ -48,6 +45,8 @@ public loc getCorpusItem(str product, str version) {
 	if (product in products()) {
 		if (version in versions(product)) {
 			loc productRoot = corpusRoot + product + "<toLowerCase(product)>-<version>";
+			if (exists(productRoot)) return productRoot;
+			productRoot = corpusRoot + product + "<toLowerCase(product)>_<version>";
 			if (exists(productRoot)) return productRoot;
 			throw productNotFound(product, version, productRoot);
 		}

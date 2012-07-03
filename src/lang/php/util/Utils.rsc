@@ -12,9 +12,8 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::util::Config;
 
 public Script loadPHPFile(loc l) {
-	println("Loading PHP file <l>");
-	loc rgenLoc = |file:///export/scratch1/hills/PHP-Parser/lib/Rascal/AST2Rascal.php|;
-	PID pid = createProcess(phploc.path, [rgenLoc.path, "<l.path>"], |file:///export/scratch1/hills/PHP-Parser/lib/Rascal|);
+	//println("Loading PHP file <l>");
+	PID pid = createProcess(phploc.path, [rgenLoc.path, "<l.path>"], rgenCwd);
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
 	Script res = script([exprstmt(scalar(string("Could not parse file <l.path>: <phcErr>")))]);
@@ -84,26 +83,7 @@ public rel[str product, str version, loc fileloc, Script scr] loadProduct(str pr
 	return corpusItems;
 }
 
-public rel[str product, str version, loc fileloc, Script scr] loadPlugin(str product, str version) {
-	rel[str product, str version, loc fileloc, Script scr] corpusItems = { };
-
-	loc l = getPlugin(product,version);
-	files = loadPHPFiles(l);
-	for (fl <- files<0>) corpusItems += < product, version, fl, files[fl] >;
-	return corpusItems;
-}
-
-public rel[str product, str version, loc fileloc, Script scr] loadMWVersion(str version) {
-	rel[str product, str version, loc fileloc, Script scr] corpusItems = { };
-
-	loc l = getMWVersion(version);
-	files = loadPHPFiles(l);
-	for (fl <- files<0>) corpusItems += < "MediaWiki", version, fl, files[fl] >;
-	return corpusItems;
-}
-
 public void buildBinaries(str product, str version) {
-	loc parsedDir = |file:///Users/mhills/Projects/phpsa/parsed|;
 	loc l = getCorpusItem(product,version);
 	println("Parsing <product>-<version>");
 	files = loadPHPFiles(l);
@@ -122,13 +102,11 @@ public void buildBinaries() {
 }
 
 public map[loc,Script] loadBinary(str product, str version) {
-	loc parsedDir = |file:///Users/mhills/Projects/phpsa/parsed|;
 	parsedItem = parsedDir + "<product>-<version>.pt";
 	return readBinaryValueFile(#map[loc,Script],parsedItem);
 }
 
 public void writeStats(str product, str version, map[str,int] fc, map[str,int] sc, map[str,int] ec) {
-	loc statsDir = |file:///Users/mhills/Projects/phpsa/stats|;
 	loc fcLoc = statsDir + "<product>-<version>.fc";
 	loc scLoc = statsDir +  "<product>-<version>.sc";
 	loc ecLoc = statsDir +  "<product>-<version>.ec";
@@ -138,7 +116,6 @@ public void writeStats(str product, str version, map[str,int] fc, map[str,int] s
 }
 
 public tuple[map[str,int] fc, map[str,int] sc, map[str,int] ec] getStats(str product, str version) {
-	loc statsDir = |file:///Users/mhills/Projects/phpsa/stats|;
 	loc fcLoc = statsDir + "<product>-<version>.fc";
 	loc scLoc = statsDir +  "<product>-<version>.sc";
 	loc ecLoc = statsDir +  "<product>-<version>.ec";
