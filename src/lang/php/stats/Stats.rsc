@@ -15,8 +15,8 @@ import lang::php::util::Utils;
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Corpus;
 
-public bool containsVV(Expr e) = size({ v | /v:var(Expr ev) := e }) > 0;
-public bool containsVV(someExpr(Expr e)) = size({ v | /v:var(Expr ev) := e }) > 0;
+public bool containsVV(Expr e) = size({ v | /v:var(expr(Expr ev)) := e }) > 0;
+public bool containsVV(someExpr(Expr e)) = size({ v | /v:var(expr(Expr ev)) := e }) > 0;
 public bool containsVV(noExpr()) = false;
 
 public rel[loc fileloc, Expr call] gatherExprStats(map[loc fileloc, Script scr] scripts, list[Expr](Script) f) {
@@ -48,7 +48,7 @@ public list[Expr] fetchRefAssignUses(Script scr) = [ a | /a:refAssign(_,_) := sc
 public list[Expr] fetchRefAssignUsesVVTarget(Script scr) = [ a | a:refAssign(Expr t,_) <- fetchRefAssignUses(scr), containsVV(t) ];
 public rel[loc fileloc, Expr call] gatherVVRefAssigns(map[loc fileloc, Script scr] scripts) = gatherExprStats(scripts, fetchRefAssignUsesVVTarget);
  
-@doc{Gather information on assignments where the assignment target contains a variable-variable}
+@doc{Gather information on object creations with variable class names}
 public list[Expr] fetchNewUses(Script scr) = [ f | /f:new(_,_) := scr ];
 public list[Expr] fetchNewUsesVVClass(Script scr) = [ f | f:new(expr(_),_) <- fetchNewUses(scr) ];
 public rel[loc fileloc, Expr call] gatherVVNews(map[loc fileloc, Script scr] scripts) = gatherExprStats(scripts, fetchNewUsesVVClass);
@@ -92,6 +92,22 @@ public list[Expr] fetchVarUses(Script scr) = [ v | /v:var(_) := scr ];
 public list[Expr] fetchVarUsesVV(Script scr) = [ v | v:var(expr(_)) <- fetchVarUses(scr) ];
 public rel[loc fileloc, Expr call] gatherVarVarUses(map[loc fileloc, Script scr] scripts) = gatherExprStats(scripts, fetchVarUsesVV);
 
+@doc{Magic methods that implement overloads}
+public list[ClassItem] fetchOverloadedSet(map[loc fileloc, Script scr] scripts) = [ x | l <- scripts<0>, /x:method("__set",_,_,_,_) := scripts[l] ];
+public list[ClassItem] fetchOverloadedGet(map[loc fileloc, Script scr] scripts) = [ x | l <- scripts<0>, /x:method("__get",_,_,_,_) := scripts[l] ];
+public list[ClassItem] fetchOverloadedIsSet(map[loc fileloc, Script scr] scripts) = [ x | l <- scripts<0>, /x:method("__isset",_,_,_,_) := scripts[l] ];
+public list[ClassItem] fetchOverloadedUnset(map[loc fileloc, Script scr] scripts) = [ x | l <- scripts<0>, /x:method("__unset",_,_,_,_) := scripts[l] ];
+public list[ClassItem] fetchOverloadedCall(map[loc fileloc, Script scr] scripts) = [ x | l <- scripts<0>, /x:method("__call",_,_,_,_) := scripts[l] ];
+public list[ClassItem] fetchOverloadedCallStatic(map[loc fileloc, Script scr] scripts) = [ x | l <- scripts<0>, /x:method("__callStatic",_,_,_,_) := scripts[l] ];
+
+@doc{Support for var-args functions}
+public list[Expr] fetchVACalls(Script scr) = [ v | /v:call(name(name(fn)),_) := scr, fn in {"func_get_args","func_get_arg","func_num_args"} ];
+public rel[loc fileloc, Expr call] getVACallUses(map[loc fileloc, Script scr] scripts) = gatherExprStats(scripts, fetchVACalls);
+
+@doc{Break/continue with non-literal arguments}
+public list[Stmt] fetchVarBreak(map[loc fileloc, Script scr] scripts) = [ x | l <- scripts<0>, /x:\break(someExpr(e)) := scripts[l], scalar(_) !:= e ];
+public list[Stmt] fetchVarContinue(map[loc fileloc, Script scr] scripts) = [ x | l <- scripts<0>, /x:\continue(someExpr(e)) := scripts[l], scalar(_) !:= e ];
+
 public map[str,int] featureCounts(map[loc fileloc, Script scr] scripts) {
 	map[str,int] counts = ( );
 	
@@ -110,8 +126,17 @@ public map[str,int] featureCounts(map[loc fileloc, Script scr] scripts) {
 	counts["fetches of static properties with variable names"] = size(gatherStaticPropertyVVNames(scripts));
 	counts["fetches of static properties with variable targets"] = size(gatherStaticPropertyVVTargets(scripts));
 	counts["uses of variable-variables (including the above)"] = size(gatherVarVarUses(scripts));
-	
-	// to add: 1) break with expression; 2) ref array; 3) ref params; 4) non-constant const; 5) var-args calls
+	counts["definitions of overloads: set"] = size(fetchOverloadedSet(scripts));
+	counts["definitions of overloads: get"] = size(fetchOverloadedGet(scripts));
+	counts["definitions of overloads: isset"] = size(fetchOverloadedIsSet(scripts));
+	counts["definitions of overloads: unset"] = size(fetchOverloadedUnset(scripts));
+	counts["definitions of overloads: call"] = size(fetchOverloadedCall(scripts));
+	counts["definitions of overloads: callStatic"] = size(fetchOverloadedCallStatic(scripts));
+	counts["var-args support functions"] = size(getVACallUses(scripts));
+	counts["break with non-literal argument"] = size(fetchVarBreak(scripts));
+	counts["continue with non-literal argument"] = size(fetchVarContinue(scripts));
+			
+	// to add: 2) ref array; 3) ref params; 5) functions with var-args parameters
 	return counts;
 
 }
@@ -312,6 +337,25 @@ public list[str] featureOrder() = [ "class consts with variable class name",
 									"fetches of static properties with variable names",
 									"fetches of static properties with variable targets",
 									"uses of variable-variables (including the above)"];
+
+public void gatherFeatureCountsFromBinary(str product, str version) {
+	b = loadBinary(product, version);
+	writeFeatureCounts(product, version, featureCounts(b));
+}
+
+public void buildFeatureCounts(str product, str version) {
+	gatherFeatureCountsFromBinary(product, version);
+}
+
+public void buildFeatureCounts(str product) {
+	for (version <- getVersions(product))
+		buildFeatureCounts(product,version);
+}
+
+public void buildFeatureCounts() {
+	for (product <- getProducts(), version <- getVersions(product))
+		buildFeatureCounts(product,version);
+}
 
 public void gatherStatsFromBinary(str product, str version) {
 	b = loadBinary(product, version);

@@ -106,6 +106,12 @@ public map[loc,Script] loadBinary(str product, str version) {
 	return readBinaryValueFile(#map[loc,Script],parsedItem);
 }
 
+public void writeFeatureCounts(str product, str version, map[str,int] fc) {
+	println("Writing counts for <product>-<version>");
+	loc fcLoc = statsDir + "<product>-<version>.fc";
+	writeBinaryValueFile(fcLoc, fc);
+}
+
 public void writeStats(str product, str version, map[str,int] fc, map[str,int] sc, map[str,int] ec) {
 	loc fcLoc = statsDir + "<product>-<version>.fc";
 	loc scLoc = statsDir +  "<product>-<version>.sc";
