@@ -336,7 +336,16 @@ public list[str] featureOrder() = [ "class consts with variable class name",
 									"fetches of properties with variable names",
 									"fetches of static properties with variable names",
 									"fetches of static properties with variable targets",
-									"uses of variable-variables (including the above)"];
+									"uses of variable-variables (including the above)",
+									"definitions of overloads: set",
+									"definitions of overloads: get",
+									"definitions of overloads: isset",
+									"definitions of overloads: unset",
+									"definitions of overloads: call",
+									"definitions of overloads: callStatic",
+									"var-args support functions",
+									"break with non-literal argument",
+									"continue with non-literal argument"];
 
 public void gatherFeatureCountsFromBinary(str product, str version) {
 	b = loadBinary(product, version);
