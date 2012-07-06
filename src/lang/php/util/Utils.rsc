@@ -196,3 +196,13 @@ public map[str Product, str Version] getLatestPHP5Versions() {
 	versions = loadVersionsCSV();
 	return ( p : last(v5l)[0] | p <- versions<0>, v5l := sort([ <v,d> | <v,d,pv,_> <- versions[p], "5" == pv[0] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[1] < t2[1]; }), !isEmpty(v5l) );
 }
+
+public str getPHPVersion(str product, str version) {
+	versions = loadVersionsCSV();
+	return getOneFrom(versions[product,version,_]<0>);
+}
+
+public str getReleaseDate(str product, str version) {
+	versions = loadVersionsCSV();
+	return getOneFrom(versions[product,version]<0>);
+}
