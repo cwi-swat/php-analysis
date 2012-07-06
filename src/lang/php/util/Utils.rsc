@@ -181,3 +181,18 @@ public rel[str Product,str Version,int Count] loadCountsCSV() {
 	rel[str Product,str Version,int Count] res = readCSV(#rel[str Product,str Version,int Count],|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|);
 	return res;
 }
+
+public map[str Product, str Version] getLatestVersions() {
+	versions = loadVersionsCSV();
+	return ( p : last(sort(toList(versions[p]<2,3>), bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[0] < t2[0]; }))[0] | p <- versions<0> );
+}
+
+public map[str Product, str Version] getLatestPHP4Versions() {
+	versions = loadVersionsCSV();
+	return ( p : last(v4l)[0] | p <- versions<0>, v4l := sort([ <v,d> | <v,d,pv,_> <- versions[p], "4" == pv[0] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[1] < t2[1]; }), !isEmpty(v4l) );
+}
+
+public map[str Product, str Version] getLatestPHP5Versions() {
+	versions = loadVersionsCSV();
+	return ( p : last(v5l)[0] | p <- versions<0>, v5l := sort([ <v,d> | <v,d,pv,_> <- versions[p], "5" == pv[0] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[1] < t2[1]; }), !isEmpty(v5l) );
+}
