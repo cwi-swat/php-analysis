@@ -8,7 +8,7 @@ import Stmts = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv?fu
 
 /* Brief log of observations and questions:
  - CVS resource did not work with field names that are Rascal reserved keywords (fixed).
- - tuple concatenation does not preserve field names.
+ - tuple concatenation does not preserve field names [This happens when there are duplicate fieldnames, but which?]
  - How to conveniently handle tuples and their type? I would like to have (for instance)
     list[str] fieldsOf(tuple t);
    but we cannot type this since we have to explicitly specify the element types of the tuple :-(
@@ -27,6 +27,8 @@ alias ProductFeaturesRel = set[ProductFeaturesType];
 
 int firstFeature = indexOf(featureNames, "array");
 int lastFeature = indexOf(featureNames, "whiledef");
+
+void header(str h) = println("\n**** <h> ****\n");
 
 /* Products ordered according to the total number of fdifferent eatures they use
    Result: 
@@ -50,28 +52,12 @@ void numberOfUsedFeatures(ProductFeaturesRel features){
    used = [<f.product, f.version, getUsedFeatures(f)> | ProductFeaturesType f <- features];
    
    used = sort(used, bool (&T a, &T b) { return a[2] > b[2]; });
-   println("numberOfUsedFeatures");
+   header("Number of different features used per product");
    for( u <- used)
      println(u);
 }
 
-/*  Determine features that are not used
-unusedFeatures 12: {"assignwithoperationbooleanor","label","casttounset","classconst","goto","const","haltcompiler","traitdef",
-                    "assignwithoperationlogicalor","assignwithoperationlogicalxor","assignwithoperationbooleanand","assignwithoperationlogicaland"}
-*/
-
-void unusedFeatures(ProductFeaturesRel features){
-    used = {};
-    for(ProductFeaturesType f <- features){
-        for(int i <- [firstFeature .. lastFeature])
-           if(f[i] > 0)
-              used += featureNames[i];
-    }          
-    unused = toSet(featureNames) - used - {"product", "version"};
-    println("unusedFeatures <size(unused)>: <unused>");
-}
-
-/* Most popular features:
+/* Frequency of features:
 {"scalar"}: 71728784
 {"var"}: 37562609
 {"expressionstatementchainrule"}: 16025660
@@ -85,9 +71,11 @@ void unusedFeatures(ProductFeaturesRel features){
 {"if"}: 3309811
 {"binaryoperationconcat"}: 3196996
 ...
+{"casttounset","classconst","assignwithoperationlogicalor","assignwithoperationbooleanor","traitdef","label","assignwithoperationlogicalxor","const","goto","assignwithoperationbooleanand","assignwithoperationlogicaland","haltcompiler"}: 0
+
 */
 
-void mostPopularFeatures(ProductFeaturesRel features){
+void frequencyOfFeatures(ProductFeaturesRel features){
     freq = ();
     for(ProductFeaturesType f <- features){
         for(int i <- [firstFeature .. lastFeature]){
@@ -97,10 +85,60 @@ void mostPopularFeatures(ProductFeaturesRel features){
     }          
     sortedFreq = reverse(sort(toList(range(freq))));
     ifreq = invert(toRel(freq));
-    println("mostPopularFeatures:");
+    header("Frequency of usage of features across all products");
     for(n <- sortedFreq){
        println("<ifreq[n]>: <n>");
     }
+}
+
+/*
+   Feature usage decrease (of at least 10%) between consecutive versions of a product
+   
+ZendFramework: decreased usage between versions 1.0.0 and 1.0.1: [<"assignwithoperationmul",17,14>,<"binaryoperationbitwisexor",3,2>,<"binaryoperationrightshift",52,40>,<"casttofloat",25,19>,<"casttoobject",11,9>,<"exit",8,7>,<"print",19,6>,<"exit",8,7>,<"global",9,6>,<"inlineHTML",59,43>,<"static",15,12>]
+ZendFramework: decreased usage between versions 1.9.7 and 1.9.8: [<"binaryoperationbitwiseand",306,269>,<"binaryoperationrightshift",105,92>,<"exit",34,30>,<"print",147,122>,<"exit",34,30>,<"functiondef",271,233>,<"global",36,23>]
+CodeIgniter: decreased usage between versions 1.0b and 1.1b: [<"global",22,19>]
+CodeIgniter: decreased usage between versions 2.0.3 and 2.1.2: [<"static",17,15>]
+WordPress: decreased usage between versions 3.3.2 and 3.4: [<"exit",483,319>,<"exit",483,319>]
+Joomla: decreased usage between versions 1.5.26 and 2.5.4: [<"fetcharraydim",13864,10642>,<"assignwithoperationbitwiseor",16,8>,<"assignwithoperationdiv",2,1>,<"assignwithoperationminus",29,22>,<"assignwithoperationmod",3,1>,<"assignwithoperationmul",17,6>,<"listassign",142,46>,<"refassign",2668,177>,<"binaryoperationbitwiseor",59,51>,<"binaryoperationdiv",186,100>,<"binaryoperationminus",670,411>,<"binaryoperationmul",321,145>,<"binaryoperationplus",825,478>,<"binaryoperationrightshift",69,48>,<"binaryoperationleftshift",59,53>,<"binaryoperationgeq",164,128>,<"binaryoperationlogicaland",173,102>,<"binaryoperationnotequal",1289,824>,<"binaryoperationnotidentical",445,395>,<"binaryoperationlt",849,523>,<"binaryoperationleq",120,80>,<"unaryoperationbitwisenot",1,0>,<"unaryoperationpostinc",709,340>,<"unaryoperationunaryminus",467,268>,<"suppress",883,553>,<"eval",18,7>,<"call",15426,13271>,<"include",537,354>,<"print",26,0>,<"break",1401,894>,<"for",550,274>,<"functiondef",456,111>,<"global",456,4>,<"static",135,121>,<"switch",345,223>,<"whiledef",222,142>]
+Joomla: decreased usage between versions 1.5.26 and 2.5.4: [<"fetcharraydim",13864,10642>,<"assignwithoperationbitwiseor",16,8>,<"assignwithoperationdiv",2,1>,<"assignwithoperationminus",29,22>,<"assignwithoperationmod",3,1>,<"assignwithoperationmul",17,6>,<"listassign",142,46>,<"refassign",2668,177>,<"binaryoperationbitwiseor",59,51>,<"binaryoperationdiv",186,100>,<"binaryoperationminus",670,411>,<"binaryoperationmul",321,145>,<"binaryoperationplus",825,478>,<"binaryoperationrightshift",69,48>,<"binaryoperationleftshift",59,53>,<"binaryoperationgeq",164,128>,<"binaryoperationlogicaland",173,102>,<"binaryoperationnotequal",1289,824>,<"binaryoperationnotidentical",445,395>,<"binaryoperationlt",849,523>,<"binaryoperationleq",120,80>,<"unaryoperationbitwisenot",1,0>,<"unaryoperationpostinc",709,340>,<"unaryoperationunaryminus",467,268>,<"suppress",883,553>,<"eval",18,7>,<"call",15426,13271>,<"include",537,354>,<"print",26,0>,<"break",1401,894>,<"for",550,274>,<"functiondef",456,111>,<"global",456,4>,<"static",135,121>,<"switch",345,223>,<"whiledef",222,142>]
+Drupal: decreased usage between versions 4.0.0 and 4.1.0: [<"suppress",3,2>,<"eval",6,5>]
+Moodle: decreased usage between versions 2.2.3 and 2.3: [<"refassign",1183,737>,<"binaryoperationbitwiseand",511,435>,<"binaryoperationlt",2815,2358>]
+Smarty: decreased usage between versions 2.6.26 and 3.0.9: [<"assignwithoperationbitwiseand",1,0>,<"assignwithoperationbitwiseor",1,0>,<"refassign",15,6>,<"binaryoperationbitwiseand",1,0>,<"binaryoperationgt",28,22>,<"binaryoperationlogicaland",2,1>,<"unaryoperationbitwisenot",1,0>,<"unaryoperationpredec",2,1>,<"casttofloat",3,1>,<"empty",101,90>,<"suppress",45,17>,<"include",73,24>,<"break",131,92>,<"for",36,29>,<"functiondef",76,49>]
+phpMyAdmin: decreased usage between versions 2.11.11.3-english and 3.5.0-english: [<"binaryoperationbitwiseor",16,12>,<"binaryoperationrightshift",115,97>,<"binaryoperationleftshift",11,8>,<"binaryoperationgeq",204,78>,<"binaryoperationlogicaland",45,14>,<"binaryoperationlogicalor",36,9>,<"suppress",213,188>,<"do",3,2>]
+phpMyAdmin: decreased usage between versions 2.11.11.3-english and 3.5.0-english: [<"binaryoperationbitwiseor",16,12>,<"binaryoperationrightshift",115,97>,<"binaryoperationleftshift",11,8>,<"binaryoperationgeq",204,78>,<"binaryoperationlogicaland",45,14>,<"binaryoperationlogicalor",36,9>,<"suppress",213,188>,<"do",3,2>]
+PEAR: decreased usage between versions 0.9 and 1.0: [<"binaryoperationmod",3,2>]
+CakePHP: decreased usage between versions 2.1.4-0 and 2.2.0-0: [<"binaryoperationgt",233,178>]
+
+Conclusion: features never die, with one exception:
+Joomla: unaryoperationbitwisenot disappeared from 1.5.26 to 2.5.4
+*/
+
+void decreasingUsagePerProduct(ProductFeaturesRel features){
+    list[tuple[str, int, int]] decreased(ProductFeaturesType tp1, ProductFeaturesType tp2){
+      return
+        for(int i <- [firstFeature .. lastFeature]){
+            n1 = tp1[i]; n2 = tp2[i];
+            if(n1 > n2 && (n1 - n2) * 10 > n1)
+               append <featureNames[i], n1, n2>;
+        };
+    }
+    
+   products = { f.product | f <- features };
+   
+   header("Decreasing usage of features across versions of same product");
+   for(p <- products){
+      versions = [f | f <- features, f.product == p];
+      versions = sort(versions, bool(ProductFeaturesType a, ProductFeaturesType b){ return a.version < b.version; });
+      
+      if(size(versions) >= 2){
+	      for(int i <- [0, size(versions)-2]){
+	          d = decreased(versions[i], versions[i+1]);
+	          if(!isEmpty(d)){
+	             println("<p>: decreased usage between versions <versions[i].version> and <versions[i+1].version>: <d>");
+	          }
+	      }
+      }
+   }
 }
 
 public void main(){
@@ -111,8 +149,8 @@ public void main(){
    ProductFeaturesRel features = {   e + s  | e <- exprs, {s} := stmts[e.product,e.version] };
    
    numberOfUsedFeatures(features);
-   unusedFeatures(features);
-   mostPopularFeatures(features);
+   frequencyOfFeatures(features);
+   decreasingUsagePerProduct(features);
 }
 
 
