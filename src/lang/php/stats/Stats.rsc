@@ -317,8 +317,7 @@ public list[str] uOpOrder() = [ "boolean not", "bitwise not", "post dec", "pre d
 
 public list[str] opKeyAssnOrder() = [ "bitwise and", "bitwise or", "bitwise xor", 
 									  "concat", "div", "minus", "mod", "mul", "plus", 
-									  "right shift", "left shift", "boolean and", 
-									  "boolean or", "logical and", "logical or", "logical xor"];					
+									  "right shift", "left shift" ];					
 
 public list[str] castTypeOrder() = [ "int", "bool", "float", "string", "array", "object", "unset" ];
 

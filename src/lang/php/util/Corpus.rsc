@@ -19,14 +19,29 @@ public data RuntimeException
 	| productNotFound(str product)
 	;
 	 
-private loc extraCorpusRoot = projroot + "corpus-extra";
+private loc extraCorpusRoot = baseLoc + "corpus-extra";
 private loc pluginRoot = corpusRoot + "WordPressPlugins";
 
-private set[str] products() = { l.file | l <- corpusRoot.ls, isDirectory(l) };
+private set[str] products() {
+	if (useBinaries)
+		return { pn | l <- parsedDir.ls, "pt" == l.extension, /<pn:[^\-]+>-.*/ := l.file };
+	else
+		return { l.file | l <- corpusRoot.ls, isDirectory(l) };
+}
 					   
-private rel[str,str] versions() = { < p, v> | p <- products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-_][-_]<v:.+>/ := l.file };
+private rel[str,str] versions() {
+	if (useBinaries)
+		return { < pn, vn > | l <- parsedDir.ls, "pt" == l.extension, /<pn:[^\-]+>-<vn:.+>[.]pt/ := l.file };
+	else
+		return { < p, v> | p <- products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-_][-_]<v:.+>/ := l.file };
+}
 
-private set[str] versions(str p) = { v | p in products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-_][-_]<v:.+>/ := l.file };
+private set[str] versions(str p) {
+	if (useBinaries)
+		return { vn | l <- parsedDir.ls, "pt" == l.extension, /<pn:[^\-]+>-<vn:.+>[.]pt/ := l.file, p == pn };
+	else
+		return { v | p in products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-_][-_]<v:.+>/ := l.file };
+}
 
 private rel[str,str] plugins = { < "Akismet", "2.5.5" >, < "All-In-One-SEO-Pack","1.6.14.2" >,
 								 < "BCMS", "a1" >, < "BSocial", "1.0-trunk" >,
