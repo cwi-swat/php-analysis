@@ -105,6 +105,7 @@ public void buildBinaries() {
 
 public map[loc,Script] loadBinary(str product, str version) {
 	parsedItem = parsedDir + "<product>-<version>.pt";
+	println("Loading binary: <parsedItem>");
 	return readBinaryValueFile(#map[loc,Script],parsedItem);
 }
 
@@ -184,7 +185,7 @@ public rel[str Product,str Version,int Count] loadCountsCSV() {
 
 public map[str Product, str Version] getLatestVersions() {
 	versions = loadVersionsCSV();
-	return ( p : last(sort(toList(versions[p]<2,3>), bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[0] < t2[0]; }))[0] | p <- versions<0> );
+	return ( p : last(vl)[0] | p <- versions<0>, vl := sort([ <v,d> | <v,d,pv,_> <- versions[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[1] < t2[1]; }) );
 }
 
 public map[str Product, str Version] getLatestPHP4Versions() {
@@ -205,4 +206,9 @@ public str getPHPVersion(str product, str version) {
 public str getReleaseDate(str product, str version) {
 	versions = loadVersionsCSV();
 	return getOneFrom(versions[product,version]<0>);
+}
+
+public map[tuple[str product, str version], map[loc l, Script scr]] getLatestTrees() {
+	lv = getLatestVersions();
+	return ( <p,lv[p]> : loadBinary(p,lv[p]) | p <- lv<0> );
 }
