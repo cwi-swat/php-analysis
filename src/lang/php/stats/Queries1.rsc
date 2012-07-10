@@ -5,6 +5,7 @@ import lang::csv::IO;
 import lang::php::util::Utils;
 import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=csvExprs|;
 import Stmts = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv?funname=csvStmts|;
+//import Simlarities = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/similarities.csv?funname=csvSimilarities|;
 
 /* Brief log of observations and questions:
  - CVS resource did not work with field names that are Rascal reserved keywords (fixed).
@@ -20,17 +21,17 @@ import Stmts = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv?fu
 list[str] featureNames = ["product", "version", "array", "fetcharraydim", "fetchclassconst", "assign", "assignwithoperationbitwiseand", "assignwithoperationbitwiseor", "assignwithoperationbitwisexor", "assignwithoperationconcat", "assignwithoperationdiv", "assignwithoperationminus", "assignwithoperationmod", "assignwithoperationmul", "assignwithoperationplus", "assignwithoperationrightshift", "assignwithoperationleftshift", "assignwithoperationbooleanand", "assignwithoperationbooleanor", "assignwithoperationlogicaland", "assignwithoperationlogicalor", "assignwithoperationlogicalxor", "listassign", "refassign", "binaryoperationbitwiseand", "binaryoperationbitwiseor", "binaryoperationbitwisexor", "binaryoperationconcat", "binaryoperationdiv", "binaryoperationminus", "binaryoperationmod", "binaryoperationmul", "binaryoperationplus", "binaryoperationrightshift", "binaryoperationleftshift", "binaryoperationbooleanand", "binaryoperationbooleanor", "binaryoperationgt", "binaryoperationgeq", "binaryoperationlogicaland", "binaryoperationlogicalor", "binaryoperationlogicalxor", "binaryoperationnotequal", "binaryoperationnotidentical", "binaryoperationlt", "binaryoperationleq", "binaryoperationequal", "binaryoperationidentical", "unaryoperationbooleannot", "unaryoperationbitwisenot", "unaryoperationpostdec", "unaryoperationpredec", "unaryoperationpostinc", "unaryoperationpreinc", "unaryoperationunaryplus", "unaryoperationunaryminus", "new", "classconst", "casttoint", "casttobool", "casttofloat", "casttostring", "casttoarray", "casttoobject", "casttounset", "clone", "closure", "fetchconst", "empty", "suppress", "eval", "exit", "call", "methodcall", "staticcall", "include", "instanceOf", "isSet", "print", "propertyfetch", "shellexec", "exit", "fetchstaticproperty", "scalar", "var",
  "break", "classdef", "const", "continue", "declare", "do", "echo", "expressionstatementchainrule", "for", "foreach", "functiondef", "global", "goto", "haltcompiler", "if", "inlineHTML", "interfacedef", "traitdef", "label", "namespace", "return", "static", "switch", "throw", "trycatch", "unset", "use", "whiledef"];
 
-alias ProductFeaturesType = tuple[str \product, str \version, int \array, int \fetcharraydim, int \fetchclassconst, int \assign, int \assignwithoperationbitwiseand, int \assignwithoperationbitwiseor, int \assignwithoperationbitwisexor, int \assignwithoperationconcat, int \assignwithoperationdiv, int \assignwithoperationminus, int \assignwithoperationmod, int \assignwithoperationmul, int \assignwithoperationplus, int \assignwithoperationrightshift, int \assignwithoperationleftshift, int \assignwithoperationbooleanand, int \assignwithoperationbooleanor, int \assignwithoperationlogicaland, int \assignwithoperationlogicalor, int \assignwithoperationlogicalxor, int \listassign, int \refassign, int \binaryoperationbitwiseand, int \binaryoperationbitwiseor, int \binaryoperationbitwisexor, int \binaryoperationconcat, int \binaryoperationdiv, int \binaryoperationminus, int \binaryoperationmod, int \binaryoperationmul, int \binaryoperationplus, int \binaryoperationrightshift, int \binaryoperationleftshift, int \binaryoperationbooleanand, int \binaryoperationbooleanor, int \binaryoperationgt, int \binaryoperationgeq, int \binaryoperationlogicaland, int \binaryoperationlogicalor, int \binaryoperationlogicalxor, int \binaryoperationnotequal, int \binaryoperationnotidentical, int \binaryoperationlt, int \binaryoperationleq, int \binaryoperationequal, int \binaryoperationidentical, int \unaryoperationbooleannot, int \unaryoperationbitwisenot, int \unaryoperationpostdec, int \unaryoperationpredec, int \unaryoperationpostinc, int \unaryoperationpreinc, int \unaryoperationunaryplus, int \unaryoperationunaryminus, int \new, int \classconst, int \casttoint, int \casttobool, int \casttofloat, int \casttostring, int \casttoarray, int \casttoobject, int \casttounset, int \clone, int \closure, int \fetchconst, int \empty, int \suppress, int \eval, int \exit, int \call, int \methodcall, int \staticcall, int \include, int \instanceOf, int \isSet, int \print, int \propertyfetch, int \shellexec, int \exit, int \fetchstaticproperty, int \scalar, int \var,
+alias ProductFeatures = tuple[str \product, str \version, int \array, int \fetcharraydim, int \fetchclassconst, int \assign, int \assignwithoperationbitwiseand, int \assignwithoperationbitwiseor, int \assignwithoperationbitwisexor, int \assignwithoperationconcat, int \assignwithoperationdiv, int \assignwithoperationminus, int \assignwithoperationmod, int \assignwithoperationmul, int \assignwithoperationplus, int \assignwithoperationrightshift, int \assignwithoperationleftshift, int \assignwithoperationbooleanand, int \assignwithoperationbooleanor, int \assignwithoperationlogicaland, int \assignwithoperationlogicalor, int \assignwithoperationlogicalxor, int \listassign, int \refassign, int \binaryoperationbitwiseand, int \binaryoperationbitwiseor, int \binaryoperationbitwisexor, int \binaryoperationconcat, int \binaryoperationdiv, int \binaryoperationminus, int \binaryoperationmod, int \binaryoperationmul, int \binaryoperationplus, int \binaryoperationrightshift, int \binaryoperationleftshift, int \binaryoperationbooleanand, int \binaryoperationbooleanor, int \binaryoperationgt, int \binaryoperationgeq, int \binaryoperationlogicaland, int \binaryoperationlogicalor, int \binaryoperationlogicalxor, int \binaryoperationnotequal, int \binaryoperationnotidentical, int \binaryoperationlt, int \binaryoperationleq, int \binaryoperationequal, int \binaryoperationidentical, int \unaryoperationbooleannot, int \unaryoperationbitwisenot, int \unaryoperationpostdec, int \unaryoperationpredec, int \unaryoperationpostinc, int \unaryoperationpreinc, int \unaryoperationunaryplus, int \unaryoperationunaryminus, int \new, int \classconst, int \casttoint, int \casttobool, int \casttofloat, int \casttostring, int \casttoarray, int \casttoobject, int \casttounset, int \clone, int \closure, int \fetchconst, int \empty, int \suppress, int \eval, int \exit, int \call, int \methodcall, int \staticcall, int \include, int \instanceOf, int \isSet, int \print, int \propertyfetch, int \shellexec, int \exit, int \fetchstaticproperty, int \scalar, int \var,
  int \break, int \classdef, int \const, int \continue, int \declare, int \do, int \echo, int \expressionstatementchainrule, int \for, int \foreach, int \functiondef, int \global, int \goto, int \haltcompiler, int \if, int \inlineHTML, int \interfacedef, int \traitdef, int \label, int \namespace, int \return, int \static, int \switch, int \throw, int \trycatch, int \unset, int \use, int \whiledef];
 
-alias ProductFeaturesRel = set[ProductFeaturesType];
+alias ProductFeaturesRel = set[ProductFeatures];
 
 int firstFeature = indexOf(featureNames, "array");
 int lastFeature = indexOf(featureNames, "whiledef");
 
 void header(str h) = println("\n**** <h> ****\n");
 
-/* Products ordered according to the total number of fdifferent eatures they use
+/* Products ordered according to the total number of different features they use
    Result: 
 <"Moodle","2.3",98>
 <"Moodle","2.2.3",98>
@@ -42,14 +43,14 @@ Conclusion: no system uses all features
 */
 void numberOfUsedFeatures(ProductFeaturesRel features){
 	// Count the number of different features that is used by a product
-	int getUsedFeatures(ProductFeaturesType tp){
+	int getUsedFeatures(ProductFeatures tp){
   		n = 0;
   		for(i <- [firstFeature .. lastFeature])
   	 	   if(tp[i] > 0)
    	   		   n += 1;
  	 	return n;
 	}
-   used = [<f.product, f.version, getUsedFeatures(f)> | ProductFeaturesType f <- features];
+   used = [<f.product, f.version, getUsedFeatures(f)> | ProductFeatures f <- features];
    
    used = sort(used, bool (&T a, &T b) { return a[2] > b[2]; });
    header("Number of different features used per product");
@@ -77,7 +78,7 @@ void numberOfUsedFeatures(ProductFeaturesRel features){
 
 void frequencyOfFeatures(ProductFeaturesRel features){
     freq = ();
-    for(ProductFeaturesType f <- features){
+    for(ProductFeatures f <- features){
         for(int i <- [firstFeature .. lastFeature]){
            name = featureNames[i];
            freq[name] ? 0 += f[i];
@@ -89,6 +90,28 @@ void frequencyOfFeatures(ProductFeaturesRel features){
     for(n <- sortedFreq){
        println("<ifreq[n]>: <n>");
     }
+}
+
+/*
+ Common features of products and versions: 38
+
+{"break","unaryoperationunaryminus","suppress","binaryoperationbooleanand","whiledef","switch","binaryoperationgt","return",
+ "assign","binaryoperationequal","scalar","assignwithoperationplus","binaryoperationminus","unset","fetchconst","include",
+ "var","unaryoperationpostinc","assignwithoperationconcat","new","binaryoperationplus","call","if","binaryoperationconcat",
+ "array","isSet","binaryoperationlt","empty","binaryoperationgeq","listassign","binaryoperationdiv","foreach","for",
+ "fetcharraydim","binaryoperationnotequal","expressionstatementchainrule","propertyfetch","unaryoperationbooleannot"}
+*/
+
+
+void commonFeatures(ProductFeaturesRel features){
+    common = {};
+    for(int i <- [firstFeature .. lastFeature]){
+        if(all(f <- features, f[i] > 0)){
+           common += featureNames[i];
+        }   
+    }
+    header("Common features: <size(common)>");
+    println(common); 
 }
 
 /*
@@ -114,7 +137,7 @@ Joomla: unaryoperationbitwisenot disappeared from 1.5.26 to 2.5.4
 */
 
 void decreasingUsagePerProduct(ProductFeaturesRel features){
-    list[tuple[str, int, int]] decreased(ProductFeaturesType tp1, ProductFeaturesType tp2){
+    list[tuple[str, int, int]] decreased(ProductFeatures tp1, ProductFeatures tp2){
       return
         for(int i <- [firstFeature .. lastFeature]){
             n1 = tp1[i]; n2 = tp2[i];
@@ -128,7 +151,7 @@ void decreasingUsagePerProduct(ProductFeaturesRel features){
    header("Decreasing usage of features across versions of same product");
    for(p <- products){
       versions = [f | f <- features, f.product == p];
-      versions = sort(versions, bool(ProductFeaturesType a, ProductFeaturesType b){ return a.version < b.version; });
+      versions = sort(versions, bool(ProductFeatures a, ProductFeatures b){ return a.version < b.version; });
       
       if(size(versions) >= 2){
 	      for(int i <- [0, size(versions)-2]){
@@ -141,6 +164,28 @@ void decreasingUsagePerProduct(ProductFeaturesRel features){
    }
 }
 
+int featureDistance(ProductFeatures p1, ProductFeatures p2) =
+    (0 | it + (((p1[i] == 0 && p2[i] == 0) || (p1[i] > 0 && p2[i] > 0)) ? 0 : 1) | int i <- [firstFeature .. lastFeature]);
+    
+void genUsageSimilarity(ProductFeaturesRel features){
+    list[tuple[str product1, str version1, str product2, str version2, int distance]] res = [];
+    featuresList = toList(features);
+    for(int i <- [0 .. size(featuresList) -2]){
+        f1 = featuresList[i];
+        for(int j <- [i + 1 .. size(featuresList) -1]){
+           println("<i>,<j>");
+           f2 = featuresList[j];
+           res += <f1.product, f1.version, f2.product, f2.version, featureDistance(f1, f2)>;    
+        }
+    }
+    res = sort(res, bool(tuple[str product1, str version1, str product2, str version2, int distance] a, 
+                         tuple[str product1, str version1, str product2, str version2, int distance] b) { return a.distance < b.distance;});
+    
+    
+    simLines = [ "product1,version1,product2,version2,distance" ] + [ "<r.product1>,<r.version1>,<r.product2>,<r.version2>,<r.distance>" | r <- res ];
+	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/similarity.csv|, intercalate("\n",simLines));
+}
+
 public void main(){
    exprs = csvExprs();
    stmts = csvStmts();
@@ -150,7 +195,9 @@ public void main(){
    
    numberOfUsedFeatures(features);
    frequencyOfFeatures(features);
+   commonFeatures(features);
    decreasingUsagePerProduct(features);
+   //genUsageSimilarity(features);
 }
 
 
