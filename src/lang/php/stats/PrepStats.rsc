@@ -34,8 +34,8 @@ public void prepareStats(list[tuple[str p, str v, map[str,int] fc, map[str,int] 
 		stmtFile += "<i.p>,<i.v>,<intercalate(",",sinfoCounts)>";
 	}
 	
-	writeFile(|file:///tmp/features.csv|, intercalate("\n",fFile));
-	writeFile(|file:///tmp/exprs.csv|, intercalate("\n",exprFile));
-	writeFile(|file:///tmp/stmts.csv|, intercalate("\n",stmtFile));
+	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/features.csv|, intercalate("\n",fFile));
+	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv|, intercalate("\n",exprFile));
+	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv|, intercalate("\n",stmtFile));
 }
 
