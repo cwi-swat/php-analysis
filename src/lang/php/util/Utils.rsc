@@ -151,24 +151,27 @@ public list[tuple[str p, str v, map[str,int] fc, map[str,int] sc, map[str,int] e
 	return res;
 }
 
-public int loadCount(str product, str version) {
+public tuple[int lineCount, int fileCount] loadCounts(str product, str version) {
 	countItem = countsDir + "<toLowerCase(product)>-<version>";
 	if (!exists(countItem))
 		countItem = countsDir + "<toLowerCase(product)>_<version>";
 	if (!exists(countItem))
 		throw "Could not find counts file for <product>-<version>";
 	lines = readFileLines(countItem);
-	if(l <- lines, /PHP\s+\d+\s+\d+\s+\d+\s+<phploc:\d+>/ := l) return toInt(phploc); 
+	if(l <- lines, /PHP\s+<phpfiles:\d+>\s+\d+\s+\d+\s+<phploc:\d+>/ := l) return < toInt(phploc), toInt(phpfiles) >; 
 	throw "Could not find PHP LOC counts for <product>-<version>";
 }
 
-public list[tuple[str p, str v, int count]] getSortedCounts() {
-	return [ <p,v,loadCount(p,v)> | p <- sort(toList(getProducts())), v <- sort(toList(getVersions(p)),compareVersion) ];	
+public int loadCount(str product, str version) = loadCounts(product,version).lineCount;
+public int loadFileCount(str product, str version) = loadCounts(product,version).fileCount;
+
+public list[tuple[str p, str v, int count, int fileCount]] getSortedCounts() {
+	return [ <p,v,lc,fc> | p <- sort(toList(getProducts())), v <- sort(toList(getVersions(p)),compareVersion), <lc,fc> := loadCounts(p,v) ];	
 }
 
 public void writeSortedCounts() {
 	sc = getSortedCounts();
-	scLines = [ "Product,Version,LoC" ] + [ "<i.p>,<i.v>,<i.count>" | i <- sc ];
+	scLines = [ "Product,Version,LoC,Files" ] + [ "<i.p>,<i.v>,<i.count>,<i.fileCount>" | i <- sc ];
 	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|, intercalate("\n",scLines));
 }
 
@@ -178,8 +181,8 @@ public rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Co
 	//return { <r.Product,r.Version,parseDate(r.ReleaseDate,"yyyy-MM-dd"),r.RequiredPHPVersion,r.Comments> | r <-res };  
 }
 
-public rel[str Product,str Version,int Count] loadCountsCSV() {
-	rel[str Product,str Version,int Count] res = readCSV(#rel[str Product,str Version,int Count],|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|);
+public rel[str Product,str Version,int Count,int FileCount] loadCountsCSV() {
+	rel[str Product,str Version,int Count,int FileCount] res = readCSV(#rel[str Product,str Version,int Count,int fileCount],|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|);
 	return res;
 }
 
