@@ -125,8 +125,6 @@ public bool compareVersion(str v1, str v2) {
 		v2a = toInt(a1); v2b = toInt(b1);
 	}
 	
-	println("Found: <v1a>.<v1b>.<v1c> and <v2a>.<v2b>.<v2c>");
-	
 	if (v1a < v2a) return true;
 	if (v1a == v2a && v1b < v2b) return true;
 	if (v1a == v2a && v1b == v2b && v1c < v2c) return true;

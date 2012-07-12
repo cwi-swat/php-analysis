@@ -186,20 +186,42 @@ public rel[str Product,str Version,int Count,int FileCount] loadCountsCSV() {
 	return res;
 }
 
-public map[str Product, str Version] getLatestVersions() {
+public map[str Product, str Version] getLatestVersionsByDate() {
 	versions = loadVersionsCSV();
 	return ( p : last(vl)[0] | p <- versions<0>, vl := sort([ <v,d> | <v,d,pv,_> <- versions[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[1] < t2[1]; }) );
 }
 
-public map[str Product, str Version] getLatestPHP4Versions() {
+public map[str Product, str Version] getLatestPHP4VersionsByDate() {
 	versions = loadVersionsCSV();
 	return ( p : last(v4l)[0] | p <- versions<0>, v4l := sort([ <v,d> | <v,d,pv,_> <- versions[p], "4" == pv[0] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[1] < t2[1]; }), !isEmpty(v4l) );
 }
 
-public map[str Product, str Version] getLatestPHP5Versions() {
+public map[str Product, str Version] getLatestPHP5VersionsByDate() {
 	versions = loadVersionsCSV();
 	return ( p : last(v5l)[0] | p <- versions<0>, v5l := sort([ <v,d> | <v,d,pv,_> <- versions[p], "5" == pv[0] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[1] < t2[1]; }), !isEmpty(v5l) );
 }
+
+public map[str Product, str Version] getLatestVersionsByVersionNumber() {
+	versions = loadVersionsCSV();
+	return ( p : last(vl)[0] | p <- versions<0>, vl := sort([ <v,d> | <v,d,pv,_> <- versions[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }) );
+}
+
+public map[str Product, str Version] getLatestPHP4VersionsByVersionNumber() {
+	versions = loadVersionsCSV();
+	return ( p : last(v4l)[0] | p <- versions<0>, v4l := sort([ <v,d> | <v,d,pv,_> <- versions[p], "4" == pv[0] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0], t2[0]); }), !isEmpty(v4l) );
+}
+
+public map[str Product, str Version] getLatestPHP5VersionsByVersionNumber() {
+	versions = loadVersionsCSV();
+	return ( p : last(v5l)[0] | p <- versions<0>, v5l := sort([ <v,d> | <v,d,pv,_> <- versions[p], "5" == pv[0] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }), !isEmpty(v5l) );
+}
+
+public map[str Product, str Version] getLatestVersions() = getLatestVersionsByDate();
+
+public map[str Product, str Version] getLatestPHP4Versions() = getLatestPHP4VersionsByDate();
+
+public map[str Product, str Version] getLatestPHP5Versions() = getLatestPHP5VersionsByDate();
+
 
 public str getPHPVersion(str product, str version) {
 	versions = loadVersionsCSV();
