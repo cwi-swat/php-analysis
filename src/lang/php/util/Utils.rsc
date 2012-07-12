@@ -216,11 +216,11 @@ public map[str Product, str Version] getLatestPHP5VersionsByVersionNumber() {
 	return ( p : last(v5l)[0] | p <- versions<0>, v5l := sort([ <v,d> | <v,d,pv,_> <- versions[p], "5" == pv[0] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }), !isEmpty(v5l) );
 }
 
-public map[str Product, str Version] getLatestVersions() = getLatestVersionsByDate();
+public map[str Product, str Version] getLatestVersions() = getLatestVersionsByVersionNumber();
 
-public map[str Product, str Version] getLatestPHP4Versions() = getLatestPHP4VersionsByDate();
+public map[str Product, str Version] getLatestPHP4Versions() = getLatestPHP4VersionsByVersionNumber();
 
-public map[str Product, str Version] getLatestPHP5Versions() = getLatestPHP5VersionsByDate();
+public map[str Product, str Version] getLatestPHP5Versions() = getLatestPHP5VersionsByVersionNumber();
 
 
 public str getPHPVersion(str product, str version) {
