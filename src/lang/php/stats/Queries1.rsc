@@ -7,6 +7,11 @@ import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?fu
 import Stmts = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv?funname=csvStmts|;
 //import Simlarities = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/similarities.csv?funname=csvSimilarities|;
 
+import ValueIO;
+import analysis::formalconcepts::FCA;
+import vis::Figure;
+import vis::Render;
+
 /* Brief log of observations and questions:
  - CVS resource did not work with field names that are Rascal reserved keywords (fixed).
  - tuple concatenation does not preserve field names [This happens when there are duplicate fieldnames, but which?]
@@ -17,6 +22,9 @@ import Stmts = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv?fu
    Here we do all this manually.
 */
 
+/*
+  WARNING: Mark has removed some fields, so this declaration should be updated.
+*/
 
 list[str] featureNames = ["product", "version", "array", "fetcharraydim", "fetchclassconst", "assign", "assignwithoperationbitwiseand", "assignwithoperationbitwiseor", "assignwithoperationbitwisexor", "assignwithoperationconcat", "assignwithoperationdiv", "assignwithoperationminus", "assignwithoperationmod", "assignwithoperationmul", "assignwithoperationplus", "assignwithoperationrightshift", "assignwithoperationleftshift", "assignwithoperationbooleanand", "assignwithoperationbooleanor", "assignwithoperationlogicaland", "assignwithoperationlogicalor", "assignwithoperationlogicalxor", "listassign", "refassign", "binaryoperationbitwiseand", "binaryoperationbitwiseor", "binaryoperationbitwisexor", "binaryoperationconcat", "binaryoperationdiv", "binaryoperationminus", "binaryoperationmod", "binaryoperationmul", "binaryoperationplus", "binaryoperationrightshift", "binaryoperationleftshift", "binaryoperationbooleanand", "binaryoperationbooleanor", "binaryoperationgt", "binaryoperationgeq", "binaryoperationlogicaland", "binaryoperationlogicalor", "binaryoperationlogicalxor", "binaryoperationnotequal", "binaryoperationnotidentical", "binaryoperationlt", "binaryoperationleq", "binaryoperationequal", "binaryoperationidentical", "unaryoperationbooleannot", "unaryoperationbitwisenot", "unaryoperationpostdec", "unaryoperationpredec", "unaryoperationpostinc", "unaryoperationpreinc", "unaryoperationunaryplus", "unaryoperationunaryminus", "new", "classconst", "casttoint", "casttobool", "casttofloat", "casttostring", "casttoarray", "casttoobject", "casttounset", "clone", "closure", "fetchconst", "empty", "suppress", "eval", "exit", "call", "methodcall", "staticcall", "include", "instanceOf", "isSet", "print", "propertyfetch", "shellexec", "exit", "fetchstaticproperty", "scalar", "var",
  "break", "classdef", "const", "continue", "declare", "do", "echo", "expressionstatementchainrule", "for", "foreach", "functiondef", "global", "goto", "haltcompiler", "if", "inlineHTML", "interfacedef", "traitdef", "label", "namespace", "return", "static", "switch", "throw", "trycatch", "unset", "use", "whiledef"];
@@ -92,6 +100,22 @@ void frequencyOfFeatures(ProductFeaturesRel features){
     }
 }
 
+void numberOfProductsUsingFeature(ProductFeaturesRel features){
+    freq = ();
+    for(ProductFeatures f <- features){
+        for(int i <- [firstFeature .. lastFeature]){
+           name = featureNames[i];
+           freq[name] ? 0 += f[i] > 0 ? 1 : 0;
+        }   
+    }          
+    sortedFreq = reverse(sort(toList(range(freq))));
+    ifreq = invert(toRel(freq));
+    header("Number of products that use a feature");
+    for(n <- sortedFreq){
+       println("<ifreq[n]>: <n>");
+    }
+}
+
 /*
  Common features of products and versions: 38
 
@@ -112,6 +136,28 @@ void commonFeatures(ProductFeaturesRel features){
     }
     header("Common features: <size(common)>");
     println(common); 
+}
+
+/*
+ Normalize by replacing all features with a non-zero count by 1.
+*/
+
+ProductFeatures normalize(ProductFeatures f){
+    for(int i <- [firstFeature .. lastFeature]){
+        if(f[i] > 0)
+        	f[i] = 1;
+    }
+    return f;
+}
+
+/*
+  How many different feature combinations are in use?
+  Answer: 94
+  
+*/
+void numberOfDifferentProductFeatures(ProductFeaturesRel features){
+     normalizedFeatures = {normalize(f) | f <- features};
+     header("Number of different ProductFeatures: <size(normalizedFeatures[_,_])>");
 }
 
 /*
@@ -173,7 +219,7 @@ void genUsageSimilarity(ProductFeaturesRel features){
     for(int i <- [0 .. size(featuresList) -2]){
         f1 = featuresList[i];
         for(int j <- [i + 1 .. size(featuresList) -1]){
-           println("<i>,<j>");
+           //println("<i>,<j>");
            f2 = featuresList[j];
            res += <f1.product, f1.version, f2.product, f2.version, featureDistance(f1, f2)>;    
         }
@@ -186,6 +232,61 @@ void genUsageSimilarity(ProductFeaturesRel features){
 	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/similarity.csv|, intercalate("\n",simLines));
 }
 
+/*
+  Make a concept lattice
+*/
+
+FormalContext[str,str] convert(ProductFeaturesRel features) =
+	{ <"<f.product>-<f.version>", featureNames[i]> | f <- features, int i <- [firstFeature .. lastFeature], f[i] > 0 };
+
+void makeConcepts(ProductFeaturesRel features){
+  writeTextValueFile(|project://PHPAnalysis/src/lang/php/extract/csvs/fca-latest.txt|, fca(convert(features)));
+}
+
+public void analyzeConcepts(){
+  lattice = readTextValueFile(#ConceptLattice[str,str], |project://PHPAnalysis/src/lang/php/extract/csvs/fca-latest.txt|);
+  for(c <- top(lattice)){
+     println(c[0]);
+  }
+  
+   for(c <- bottom(lattice)){
+     println(c[0]);
+  }
+}
+
+Figure mkNode(Concept[str,str] c, str n){
+  return box(text(intercalate("\n", toList(c[0]))), id(n));
+}
+
+public void drawConcepts(){
+   lattice = readTextValueFile(#ConceptLattice[str,str], |project://PHPAnalysis/src/lang/php/extract/csvs/fca-latest.txt|);
+   n = 0;
+   objects = ();
+   nodes = [];
+   edges = [];
+   for(<c1, c2> <- lattice){
+       id1 = id2 = "0";
+       if(objects[c1[0]]?)
+          id1 = objects[c1[0]];
+       else {
+          id1 = "<n>";
+          objects[c1[0]] = id1;
+          n += 1;
+       }
+       
+       if(objects[c2[0]]?)
+          id2 = objects[c2[0]];
+       else {
+          id2 = "<n>";
+          objects[c2[0]] = id2;
+          n += 1;
+       }
+       nodes += [mkNode(c1, id1), mkNode(c2, id2)];
+       edges += edge(id1, id2);
+   }
+   render(graph(nodes, edges, hint("spring"), size(1000), std(gap(50))));
+}
+
 public void main(){
    exprs = csvExprs();
    stmts = csvStmts();
@@ -193,11 +294,28 @@ public void main(){
    // Combine exprs and stmts into a single relation
    ProductFeaturesRel features = {   e + s  | e <- exprs, {s} := stmts[e.product,e.version] };
    
+   // If desired, filter:
+   
+   latest = getLatestVersions();
+   println(latest);
+   
+   ft = {};
+   for(f <- features){
+       if(latest[f.product] == f.version)
+       	ft += f;
+   }
+   println(ft);
+   features = ft;
+   
+   header("Number of products and versions: <size(features)>");
    numberOfUsedFeatures(features);
+   numberOfProductsUsingFeature(features);
    frequencyOfFeatures(features);
    commonFeatures(features);
-   decreasingUsagePerProduct(features);
+   numberOfDifferentProductFeatures(features);
+   //decreasingUsagePerProduct(features);
    //genUsageSimilarity(features);
+   makeConcepts(features);
 }
 
 
