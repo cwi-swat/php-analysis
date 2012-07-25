@@ -30,13 +30,25 @@ anno int Expr@includeId;
 
 data FNBits = lit(str s) | fnBit();
 
-public rel[str product, str version, loc fileloc, Script scr] resolveIncludes(rel[str product, str version, loc fileloc, Script scr] corpus, str p, str v) {
-	return { < p, v, l, resolveIncludes(corpus<2>,s) > | < p,v,l,s> <- corpus };
+// This function just calls the next function on each script in the map. The bulk of
+// what happens is done in the function below.
+public map[loc fileloc, Script scr] matchIncludes(map[loc fileloc, Script scr] scripts) {
+	return ( l : matchIncludes(scripts<0>,scripts[l]) | l <- scripts );
 }
 
-@doc{Perform light-weight constant propagation and evaluation to attempt to resolve any
-     expressions used in includes.}
-public Script resolveIncludes(set[loc] possibleIncludes, Script scr) {
+// Attempt to resolve includes in the file by first building a pattern, based on the
+// literal and variable parts of the file name, and then trying to find which files
+// could match. We resolve if we only get one hit. Otherwise, we don't resolve, but
+// we could at least reduce the number of possibilities to a more reasonable number.
+//
+//
+// NOTE: The assumption in this code is that other steps to try to simplify the
+// include have already been taken, e.g., constant substitution or algebraic
+// simplification of string concatenations.
+//
+// TODO: Add code to do the latter. For now, if we don't resolve this, we just
+// leave it alone.
+public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 	list[FNBits] flattenExpr(Expr e) {
 		if (binaryOperation(l,r,concat()) := e) {
 			return flattenExpr(l) + flattenExpr(r);
@@ -84,42 +96,34 @@ public Script resolveIncludes(set[loc] possibleIncludes, Script scr) {
 	return scr;
 }
 
-public rel[str,str,loc,Expr] solveAndGather() {
-	rel[str,str,loc,Expr] res = { };
-	
-	for (p <- getProducts(), v <- getVersions(p)) {
-		println("Loading <p> version <v>");
-		prod = loadProduct(p,v);
-		println("Unresolved includes: <size(gatherIncludesWithVarPaths(prod,p,v))>");
-		println("Solving scalars");
-		prod2 = evalAllScalars(prod,p,v);
-		println("Unresolved includes: <size(gatherIncludesWithVarPaths(prod2,p,v))>");
-		println("Resolving includes using path pattern matching");
-		prod3 = resolveIncludes(prod2,p,v);
-		println("Unresolved includes: <size(gatherIncludesWithVarPaths(prod3,p,v))>");
-		res += gatherIncludesWithVarPaths(prod3,p,v);
-	}
-	
-	return res;
+public map[loc fileloc, Script scr] resolveIncludes(map[loc fileloc, Script scr] scripts) {
+	println("Unresolved includes: <size(gatherIncludesWithVarPaths(scripts))>");
+	println("Solving scalars");
+	scripts2 = evalAllScalars(scripts);
+	println("Unresolved includes: <size(gatherIncludesWithVarPaths(scripts2))>");
+	println("Resolving includes using path pattern matching");
+	scripts3 = matchIncludes(scripts2);
+	println("Unresolved includes: <size(gatherIncludesWithVarPaths(scripts3))>");
+	return scripts3;
 }
 
 data IncludeGraphNode = igNode(str fileName, loc fileLoc);
 data IncludeGraphEdge = igEdge(IncludeGraphNode source, IncludeGraphNode target, Expr includeExpr);
 data IncludeGraph = igGraph(set[IncludeGraphNode] nodes, set[IncludeGraphEdge] edges);
 
-public IncludeGraph extractIncludeGraph(rel[loc fileloc, Script scr] corpus, str productRoot) {
+public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, str productRoot) {
 	int sizeToRemove = size(productRoot);
-	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- corpus<0> );
+	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- scripts );
 	loc unk = |file:///unknown|;
 	nodeMap[unk] = igNode("UNCOMPUTABLE",unk);
 	set[IncludeGraphEdge] edgeSet = { };
 	
-	for (<l,s> <- corpus) {
-		includes = fetchIncludeUses(s);
+	for (l <- scripts) {
+		includes = fetchIncludeUses(scripts[l]);
 		for (iexp:include(e,itype) <- includes) {
 			if (scalar(string(sp)) := e) {
 				try {
-					iloc = calculateLoc(corpus<0>,l,sp);
+					iloc = calculateLoc(scripts<0>,l,sp);
 					edgeSet += igEdge(nodeMap[l],nodeMap[iloc],iexp);					
 				} catch UnavailableLoc(_) : {
 					edgeSet += igEdge(nodeMap[l],nodeMap[unk],iexp);
@@ -133,30 +137,13 @@ public IncludeGraph extractIncludeGraph(rel[loc fileloc, Script scr] corpus, str
 	return igGraph(nodeMap<1>,edgeSet);
 }
 
-public IncludeGraph computeGraph(rel[str product, str version, loc fileloc, Script scr] prod, str p, str v) {
+public IncludeGraph computeGraph(map[loc fileloc, Script scr] prod, loc l) {
 	println("Solving scalars");
-	prod2 = evalAllScalars(prod,p,v);
+	prod2 = evalAllScalars(prod);
 	println("Resolving includes using path pattern matching");
-	prod3 = resolveIncludes(prod2,p,v);
+	prod3 = matchIncludes(prod2);
 	println("Extracting include graph");
-	return extractIncludeGraph(prod3<2,3>,getCorpusItem(p,v).path);
-}
-
-public rel[str,str,IncludeGraph] computeGraphs() {
-	rel[str,str,IncludeGraph] res = { };
-	
-	for (p <- getProducts(), v <- getVersions(p)) {
-		println("Loading <p> version <v>");
-		prod = loadProduct(p,v);
-		println("Solving scalars");
-		prod2 = evalAllScalars(prod,p,v);
-		println("Resolving includes using path pattern matching");
-		prod3 = resolveIncludes(prod2,p,v);
-		println("Extracting include graph");
-		res += < p, v, extractIncludeGraph(prod3<2,3>,getCorpusItem(p,v).path) >;
-	}
-	
-	return res;
+	return extractIncludeGraph(prod3,l);
 }
 
 public void renderIncludeGraph(IncludeGraph ig) {
@@ -177,16 +164,8 @@ public void renderIncludeGraphAsDot(IncludeGraph ig, str product, str version, l
 	writeFile(writeTo,dotGraph);
 }
 
-public Graph[str] collapseToGraph(rel[str,str,IncludeGraph] graphs, str product, str version) {
-	return collapseToGraph(getOneFrom(graphs[product,version]));
-}
-
 public Graph[str] collapseToGraph(IncludeGraph ig) {
 	return { < fn1, fn2 > | igEdge(igNode(fn1,_),igNode(fn2,_),_) <- ig.edges };
-}
-
-public rel[str name, int direct, int indirect] calculateOutflow(rel[str,str,IncludeGraph] graphs, str product, str version) {
-	return calculateOutflow(getOneFrom(graphs[product,version]));
 }
 
 public rel[str name, int direct, int indirect] calculateOutflow(IncludeGraph ig) {
@@ -198,10 +177,6 @@ public rel[str name, int direct, int indirect] calculateOutflow(IncludeGraph ig)
 		res += < fn, direct, indirect >;
 	}
 	return res;
-}
-
-public rel[str name, int direct, int indirect] calculateInflow(rel[str,str,IncludeGraph] graphs, str product, str version) {
-	return calculateInflow(getOneFrom(graphs[product,version]));
 }
 
 public rel[str name, int direct, int indirect] calculateInflow(IncludeGraph ig) {
@@ -224,10 +199,6 @@ public real listMedian(list[int] l) = ls[size(l)/2] * 1.0 when size(l) % 2 == 1 
 data InOutStats = ios(real meanDirectInflow, real meanIndirectInflow, real meanDirectOutflow, real meanIndirectOutflow,
 					  real medianDirectInflow, real medianIndirectInflow, real medianDirectOutflow, real medianIndirectOutflow);
 					  
-public InOutStats calculateStats(rel[str,str,IncludeGraph] graphs, str product, str version) {
-	return calculateStats(getOneFrom(graphs[product,version]));
-}
-
 public InOutStats calculateStats(IncludeGraph ig) {
 	real round2(real r) = round(r*100)/100.0;
 	
@@ -245,10 +216,6 @@ public InOutStats calculateStats(IncludeGraph ig) {
 	           round2(listMedian(directOutflow)), round2(listMedian(indirectOutflow)));
 }
 
-public map[int,int] directOutflowDist(rel[str,str,IncludeGraph] graphs, str product, str version) {
-	return directOutflowDist(getOneFrom(graphs[product,version]));
-}
-
 public map[int,int] directOutflowDist(IncludeGraph ig) {
 	map[int,int] res = ( );
 	g = collapseToGraph(ig);
@@ -259,10 +226,6 @@ public map[int,int] directOutflowDist(IncludeGraph ig) {
 	return res;
 }
 
-public map[int,int] indirectOutflowDist(rel[str,str,IncludeGraph] graphs, str product, str version) {
-	return indirectOutflowDist(getOneFrom(graphs[product,version]));
-}
-
 public map[int,int] indirectOutflowDist(IncludeGraph ig) {	
 	map[int,int] res = ( );
 	g = collapseToGraph(ig);
@@ -271,10 +234,6 @@ public map[int,int] indirectOutflowDist(IncludeGraph ig) {
 		if (edgeCount in res) res[edgeCount] += 1; else res[edgeCount] = 1;
 	}
 	return res;
-}
-
-public int directOutflowUnknownCount(rel[str,str,IncludeGraph] graphs, str product, str version) {
-	return directOutflowUnknownCount(getOneFrom(graphs[product,version]));
 }
 
 public int directOutflowUnknownCount(IncludeGraph ig) {

@@ -78,11 +78,11 @@ public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, str path) {
 }
 
 @doc{Get constant definitions from the script at location l, including definitions from other scripts this script includes.}
-public map[str,Expr] getConstants(rel[loc fileloc, Script scr] corpus, loc l) = getConstants(corpus,{},l);
+public map[str,Expr] getConstants(map[loc fileloc, Script scr] scripts, loc l) = getConstants(scripts,{},l);
 
 @doc{Get constant definitions from the script at location l, including definitions from other scripts this script includes. The
      set includeLocs ensures we do not loop; if we have already processed the location in this set, we just return immediately.}
-public map[str,Expr] getConstants(rel[loc fileloc, Script scr] corpus, set[loc] includedLocs, loc l) {
+public map[str,Expr] getConstants(map[loc fileloc, Script scr] scripts, set[loc] includedLocs, loc l) {
 	rel[str,Expr] resRel = { };
 	
 	// First, check to make sure we don't loop. Then, throw the current loc in so we don't later. Note: this 
@@ -91,7 +91,7 @@ public map[str,Expr] getConstants(rel[loc fileloc, Script scr] corpus, set[loc] 
 	includedLocs += l;
 	
 	// This just gets back the current script we are working on
-	s = getOneFrom(corpus[l]);
+	s = scripts[l];
 	
 	// Then, grab back all includes which only have a string as the path, as we can figure
 	// these out statically.
@@ -103,8 +103,8 @@ public map[str,Expr] getConstants(rel[loc fileloc, Script scr] corpus, set[loc] 
 	// have a unique definition.
 	for (pth <- scalarIncs) {
 		try {
-			includeLoc = calculateLoc(corpus<0>, l, pth);
-			resMap = getConstants(corpus, includedLocs, includeLoc);
+			includeLoc = calculateLoc(scripts<0>, l, pth);
+			resMap = getConstants(scripts, includedLocs, includeLoc);
 			for (rk <- resMap<0>) resRel += < rk, resMap[rk] >;
 		} catch UnavailableLoc(ul) : {
 			;
@@ -121,9 +121,9 @@ public map[str,Expr] getConstants(rel[loc fileloc, Script scr] corpus, set[loc] 
 
 @doc{Evaluate any constants, replacing them with their assigned value in cases where this assigned value
      is itself a literal.}
-public Script evalConsts(rel[loc fileloc, Script scr] corpus, loc l, map[str, Expr] constMap) {
-	map[str,Expr] constsInScript = getConstants(corpus, l);
-	Script scr = getOneFrom(corpus[l]);  
+public Script evalConsts(map[loc fileloc, Script scr] scripts, loc l, map[str, Expr] constMap) {
+	map[str,Expr] constsInScript = getConstants(scripts, l);
+	Script scr = scripts[l];  
 	scr2 = visit(scr) {
 		case c:fetchConst(name(s)) : {
 			if (s in constsInScript)
@@ -136,9 +136,9 @@ public Script evalConsts(rel[loc fileloc, Script scr] corpus, loc l, map[str, Ex
 }
 
 @doc{Perform all scalar evaluations above.}
-public rel[str product, str version, loc fileloc, Script scr] evalAllScalars(rel[str product, str version, loc fileloc, Script scr] corpus, str p, str v) {
-	solve(corpus) {
-		corpus = { <p,v,l,evalOps(evalDirname(evalMagicConstants(s,l)))> | <p,v,l,s> <- corpus };
+public map[loc fileloc, Script scr] evalAllScalars(map[loc fileloc, Script scr] scripts) {
+	solve(scripts) {
+		scripts = ( l : evalOps(evalDirname(evalMagicConstants(scripts[l],l))) | l <- scripts );
 
 		// This is in the solve because it can change on each iteration. This is all the constants that are
 		// defined just once in the system. This is used as a "backup" to the more detailed analysis above,
@@ -148,7 +148,7 @@ public rel[str product, str version, loc fileloc, Script scr] evalAllScalars(rel
 		// NOTE: This could give a wrong result, in the sense that we would have a constant that would actually,
 		// at runtime, be an error, for instance if the programmer uses the constant without actually importing
 		// the defining script.
-		rel[str,Expr] constRel = { < cn, e > | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e:scalar(sv),false)]) := corpus[p,v,_] };
+		rel[str,Expr] constRel = { < cn, e > | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e:scalar(sv),false)]) := scripts<1> };
 		map[str,Expr] constMap = ( s : e | <s,e> <- constRel, size(constRel[s]) == 1 ); 
 		
 		// Add in some predefined constants as well. These are from the Directories extension.
@@ -159,7 +159,7 @@ public rel[str product, str version, loc fileloc, Script scr] evalAllScalars(rel
 		constMap["SCANDIR_SORT_DESCENDING"] = scalar(integer(0));
 		constMap["SCANDIR_SORT_NONE"] = scalar(integer(1));
 
-		corpus = { <p,v,l,evalConsts(corpus<2,3>,l,constMap)> | <p,v,l,s> <- corpus };
+		scripts = ( l : evalConsts(scripts,l,constMap) | l <- scripts );
 	}			
-	return corpus;
+	return scripts;
 }

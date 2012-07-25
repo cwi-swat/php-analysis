@@ -1,0 +1,499 @@
+ID,Product,Path,Line,Derivable Names,Assigns Through,Made Global,Uses literal pattern,Uses foreach,Uses switch,Uses conditional,Derivable with annotations,Notes
+1,CakePHP,lib/Cake/Console/Command/ConsoleShell.php,350,N,Y,N,,,,,,Unsets variables imported into scope. Non-derivable but local.
+2,CakePHP,lib/Cake/Console/Command/Task/ControllerTask.php,231,Y,N,N,,X,,,,Maps var-var to literal keys in array defined directly above. This is a read.
+3,CakePHP,lib/Cake/Console/Command/Task/ControllerTask.php,233,Y,N,N,,X,,,,Same as above. This is a read.
+4,CakePHP,lib/Cake/Console/Command/Task/ControllerTask.php,234,Y,N,N,,X,,,,Maps var-var to literal keys that were the values in the previous array. This is a read.
+5,CakePHP,lib/Cake/Model/Datasource/DboSource.php,1771,Y,N,N,,X,,,,"One of three literals in the surrounding array, mapping to local vars."
+6,CakePHP,lib/Cake/Model/Datasource/DboSource.php,1772,Y,Y,N,,X,,,,Assigns string back into var-var-based array (one of the three literals).
+7,CakePHP,lib/Cake/Model/Datasource/DboSource.php,1772,Y,N,N,,X,,,,Read of the var-var.
+8,CakePHP,lib/Cake/Model/Datasource/DboSource.php,1774,Y,Y,N,,X,,,,Assigns empty string into var-var-based array (one of the three literals).
+9,CakePHP,lib/Cake/View/Helper/FormHelper.php,2239,Y,Y,N,,X,,,,"Name computed based on literals defined in array, part of a foreach."
+10,CakePHP,lib/Cake/View/Helper/FormHelper.php,2240,Y,Y,N,,X,,,,"Name computed based on literals defined in array, part of a foreach."
+11,CakePHP,lib/Cake/View/Helper/FormHelper.php,2250,Y,Y,N,,X,,,,"Name computed based on literals defined in array, part of a foreach."
+12,CakePHP,lib/Cake/View/Helper/FormHelper.php,2251,Y,Y,N,,X,,,,"Name computed based on literals defined in array, part of a foreach."
+13,CakePHP,lib/Cake/View/Helper/FormHelper.php,2258,Y,Y,N,,X,,,,"Name computed based on literals defined in array, part of a foreach."
+14,CakePHP,lib/Cake/View/Helper/PaginatorHelper.php,468,Y,Y,N,,X,,,,Literals defined as keys in an array provide the var-var values.
+15,CakePHP,lib/Cake/Model/Datasource/Database/Postgres.php,877,Y,N,N,,X,,,,One of two literals defined in an array in the foreach.
+16,CakePHP,lib/Cake/Model/Datasource/Database/Postgres.php,878,Y,Y,N,,X,,,,One of two literals defined in an array in the foreach.
+17,CakePHP,lib/Cake/Model/Datasource/Database/Postgres.php,878,Y,N,N,,X,,,,One of two literals defined in an array in the foreach.
+18,CakePHP,lib/Cake/Model/Datasource/Database/Sqlserver.php,531,Y,N,N,,X,,,,One of two literals defined in an array in the foreach.
+19,CakePHP,lib/Cake/Model/Datasource/Database/Sqlserver.php,532,Y,Y,N,,X,,,,One of two literals defined in an array in the foreach.
+20,CakePHP,lib/Cake/Model/Datasource/Database/Sqlserver.php,532,Y,N,N,,X,,,,One of two literals defined in an array in the foreach.
+21,CodeIgniter,system/core/Input.php,255,Y,Y,N,,X,,,,Names given directly in array in foreach loop.
+22,CodeIgniter,system/core/Input.php,581,N,N,Y,,,,,,"Names are stored in superglobal arrays. This maps the name to the related global. Note: This is related to register_globals, and now should be effective a no-op (or else it does the wrong thing). Legacy."
+23,CodeIgniter,system/core/Input.php,582,N,Y,N,,,,,,"This sets the global mapped above to NULL. Note: This is related to register_globals, and now should be effective a no-op (or else it does the wrong thing). Legacy."
+24,CodeIgniter,system/core/Input.php,591,N,N,Y,,,,,,"Names are stored in superglobal arrays. This maps the name to the related global. Note: This is related to register_globals, and now should be effective a no-op (or else it does the wrong thing). Legacy."
+25,CodeIgniter,system/core/Input.php,592,N,Y,N,,,,,,"This sets the global mapped above to NULL. Note: This is related to register_globals, and now should be effective a no-op (or else it does the wrong thing). Legacy."
+26,CodeIgniter,system/core/Loader.php,746,Y,Y,N,,X,,,,Names given directly in array in foreach loop.
+27,CodeIgniter,system/libraries/Trackback.php,76,Y,Y,N,,X,X,,,Names given directly in array in foreach loop. Specific name given in case.
+28,CodeIgniter,system/libraries/Trackback.php,78,Y,Y,N,,X,X,,,Names given directly in array in foreach loop. Specific name given in case.
+29,CodeIgniter,system/libraries/Trackback.php,80,Y,Y,N,,X,X,,,Names given directly in array in foreach loop. Specific name given in case.
+30,CodeIgniter,system/libraries/Trackback.php,82,Y,Y,N,,X,X,,,Names given directly in array in foreach loop.
+31,CodeIgniter,system/libraries/Trackback.php,91,Y,Y,N,,X,,X,,Names given directly in array in foreach loop. Specific name given in condition.
+32,CodeIgniter,system/libraries/Trackback.php,91,Y,N,N,,X,,X,,Names given directly in array in foreach loop. Specific name given in condition.
+33,CodeIgniter,system/libraries/Trackback.php,95,Y,Y,N,,X,,X,,Names given directly in array in foreach loop. Specific name given in condition.
+34,CodeIgniter,system/libraries/Trackback.php,95,Y,N,N,,X,,X,,Names given directly in array in foreach loop. Specific name given in condition.
+35,CodeIgniter,system/libraries/Trackback.php,99,Y,Y,N,,X,,X,,Names given directly in array in foreach loop. Specific name given in condition.
+36,CodeIgniter,system/libraries/Trackback.php,99,Y,N,N,,X,,X,,Names given directly in array in foreach loop. Specific name given in condition.
+37,CodeIgniter,system/helpers/captcha_helper.php,50,Y,N,N,,X,,,,Names given directly in array in foreach loop.
+38,CodeIgniter,system/helpers/captcha_helper.php,50,Y,N,N,,X,,,,Names given directly in array in foreach loop.
+39,CodeIgniter,system/helpers/captcha_helper.php,52,Y,Y,N,,X,,,,Names given directly in array in foreach loop.
+40,CodeIgniter,system/helpers/captcha_helper.php,57,Y,Y,N,,X,,,,Names given directly in array in foreach loop.
+41,Drupal,includes/common.inc,7162,Y,Y,N,,X,,,,Names given directly in array in foreach expression that surrounds the use and assignment.
+42,Gallery,system/core/Kohana.php,185,N,N,Y,,,,,,"Maps elements of $GLOBALS to vv in turn, creating an alias using the global keyword. Related to register globals."
+43,Gallery,system/core/Kohana.php,186,N,Y,N,,,,,,Sets this mapped variable to null. Related to register_globals.
+44,Gallery,system/core/Kohana.php,189,N,N,N,,,,,,Clears out global entry. Related to register_globals.
+45,Gallery,system/helpers/cookie.php,37,Y,N,N,,X,,,,Names given directly in array in foreach loop. This is a read of the variable.
+46,Gallery,system/helpers/cookie.php,39,Y,Y,N,,X,,,,Names given directly in array in foreach loop. This is an assignment.
+47,Gallery,system/helpers/date.php,328,N,N,N,,,,,,"Check to see if var is set. Takes a comma-separated list of possible var names, but these all appear to be local names (fact that it comes from outside makes it non-local though)."
+48,Gallery,system/helpers/date.php,331,N,N,N,,,,,,"Read of the value. For how names are provided, see prior item."
+49,Joomla,libraries/joomla/cache/controller/callback.php,83,N,N,Y,,,,,,"Used as part of a callback mechanism, mapping to a global. A code comment says this will go away in the future."
+50,Joomla,libraries/joomla/cache/controller/callback.php,84,N,N,N,,,,,,"Used as part of a callback mechanism, mapping to a global. A code comment says this will go away in the future."
+51,Kohana,modules/codebench/classes/bench/datespan.php,96,N,N,N,,,,,,"Check to see if var is set. Takes a comma-separated list of possible var names, but these all appear to be local names (fact that it comes from outside makes it non-local though)."
+52,Kohana,modules/codebench/classes/bench/datespan.php,99,N,N,N,,,,,,"Read of the value. For how names are provided, see prior item."
+53,Kohana,modules/unittest/classes/kohana/unittest/helpers.php,110,Y,N,Y,,,,X,,Maps one of superglobal names using global statement.
+54,Kohana,modules/unittest/classes/kohana/unittest/helpers.php,114,Y,N,N,,,,X,,Reads superglobal value through var-var.
+55,Kohana,modules/unittest/classes/kohana/unittest/helpers.php,118,Y,Y,N,,,,X,,Assigns new value to superglobal through var-var.
+56,Kohana,modules/userguide/vendor/markdown/markdown.php,1222,Y,Y,N,,,,X,,"Either strong or em, set above in the code."
+57,Kohana,modules/userguide/vendor/markdown/markdown.php,1236,Y,Y,N,,,,X,,"Either strong or em, set above in the code."
+58,MediaWiki,includes/Sanitizer.php,417,Y,Y,N,,X,,,,The possible values of the var-var are string literals in an array just before the foreach loop that sets these. This is the assignment.
+59,MediaWiki,includes/Sanitizer.php,417,Y,N,N,,X,,,,The possible values of the var-var are string literals in an array just before the foreach loop that sets these. This is the read.
+60,MediaWiki,includes/specials/SpecialVersion.php,699,?,?,?,,,,,,Used in some stupid intentionally obfuscated function called showEasterEgg. ‘nuff said.
+61,MediaWiki,includes/job/UploadFromUrlJob.php,151,N,Y,N,,,,,,Actually looks like a bug...
+62,MediaWiki,extensions/Vector/Vector.hooks.php,167,N,N,Y,,,,,,Configuration values: the config array contains strings that name global vars. This is the global statement that aliases using the var-var value.
+63,MediaWiki,extensions/Vector/Vector.hooks.php,168,N,N,N,,,,,,Configuration values: the config array contains strings that name global vars. This read the var-var.
+64,MediaWiki,extensions/WikiEditor/WikiEditor.hooks.php,282,N,N,Y,,,,,,Configuration values: the config array contains strings that name global vars. This is the global statement that aliases using the var-var value.
+65,MediaWiki,extensions/WikiEditor/WikiEditor.hooks.php,283,N,N,N,,,,,,Configuration values: the config array contains strings that name global vars. This read the var-var.
+66,MediaWiki,maintenance/importImages.php,279,Y,Y,N,,,,X,,"Used to increment one of a small set of flags. These flags are set as strings in the logic above, and are the only possible values."
+67,MediaWiki,maintenance/importImages.php,296,Y,N,N,,X,,,,Used to display the flags in a foreach loop. The options are given immediately above as an array.
+68,MediaWiki,maintenance/importImages.php,297,Y,N,N,,X,,,,Used to display the flags in a foreach loop. The options are given immediately above as an array.
+69,Moodle,admin/user.php,177,N,Y,N,,,,,,Based on a mix of literals and the result of a function call.
+70,Moodle,admin/user.php,252,N,Y,N,,,,,,Based on the result of a function call.
+71,Moodle,course/search.php,65,Y,N,N,,X,,,,Based on literals given in an array and bound in a foreach loop.
+72,Moodle,course/search.php,66,Y,N,N,,X,,,,Based on literals given in an array and bound in a foreach loop.
+73,Moodle,grade/lib.php,2241,N,N,N,,,,,X,"Based on an input parameter. An annotation would be useful here, since the comment states that this has two possible values."
+74,Moodle,grade/report/grader/lib.php,593,Y,N,N,,,,X,,Based on two string literals and a conditional.
+75,Moodle,lib/accesslib.php,2366,N,N,N,,,,,,Based on an input parameter; reflective over plugin names.
+76,Moodle,lib/accesslib.php,2370,N,N,N,,,,,,Based on an input parameter; reflective over plugin names.
+77,Moodle,lib/adodb/drivers/adodb-mssql.inc.php,1012,N,N,N,,,,,,Based on contents of field. Used here in an is_array check. Not sure why a var-var is used here. May be a bug.
+78,Moodle,lib/adodb/drivers/adodb-mssql.inc.php,1014,N,Y,N,,,,,,Based on contents of field. Used here as source in foreach. May be a bug.
+79,Moodle,lib/datalib.php,1885,N,Y,N,,,,,,Based on input parameter. Looks like a bug: this is supposed to be a datetime.
+80,Moodle,lib/deprecatedlib.php,2323,N,N,N,,,,,,Based on result of a call. Looks like a bug.
+81,Moodle,lib/htmlpurifier/HTMLPurifier/ChildDef/Table.php,103,Y,N,N,,,X,,,Derivable based on case tag (but this may be challenging). Given as a string literal.
+82,Moodle,lib/htmlpurifier/HTMLPurifier/ChildDef/Table.php,104,Y,Y,N,,,X,,,Derivable based on case tag (but this may be challenging). Given as a string literal.
+83,Moodle,lib/markdown.php,1236,Y,Y,N,,,,X,,"Either strong or em, set above in the code."
+84,Moodle,lib/markdown.php,1250,Y,Y,N,,,,X,,"Either strong or em, set above in the code."
+85,Moodle,lib/portfoliolib.php,1015,Y,Y,N,,X,,,,Based on literals given in an array and bound in a foreach loop.
+86,Moodle,lib/portfoliolib.php,1017,Y,Y,N,,X,,,,Based on literals given in an array and bound in a foreach loop.
+87,Moodle,lib/sessionlib.php,382,N,Y,N,,,,,,Based on value held in an object.
+88,Moodle,lib/xhprof/xhprof_html/index.php,66,Y,N,N,,X,,,,Based on literals given in an array. Need to show that call does not modify it.
+89,Moodle,mod/feedback/item/captcha/print_captcha.php,102,Y,N,N,X,,,,,Based on a literal appended with either 1 or 2 (chosen randomly).
+90,Moodle,mod/feedback/item/captcha/print_captcha.php,102,Y,N,N,X,,,,,Based on a literal appended with either 1 or 2 (chosen randomly).
+91,Moodle,mod/feedback/item/captcha/print_captcha.php,103,Y,N,N,X,,,,,Based on a literal appended with either 1 or 2 (chosen randomly).
+92,Moodle,mod/feedback/item/captcha/print_captcha.php,103,Y,N,N,X,,,,,Based on a literal appended with either 1 or 2 (chosen randomly).
+93,Moodle,mod/feedback/item/captcha/print_captcha.php,104,Y,N,N,X,,,,,Based on a literal appended with either 1 or 2 (chosen randomly).
+94,Moodle,mod/feedback/item/captcha/print_captcha.php,104,Y,N,N,X,,,,,Based on a literal appended with either 1 or 2 (chosen randomly).
+95,Moodle,mod/quiz/report/grading/report.php,74,Y,N,N,,X,,,,Based on literals given in an array which is then used in a foreach loop.
+96,Moodle,mod/quiz/report/grading/report.php,75,Y,N,N,,X,,,,Based on literals given in an array which is then used in a foreach loop.
+97,Moodle,mod/survey/report.php,105,Y,N,N,,,X,,,"Based on string literal, given in case labels, prepended with ‘str’."
+98,Moodle,report/completion/index.php,248,Y,N,N,,,,X,,Based on two string literals and a conditional.
+99,Moodle,report/completion/index.php,248,Y,N,N,,,,X,,Based on two string literals and a conditional.
+100,Moodle,report/completion/index.php,253,Y,N,N,,X,,,,Based on literals given in an array which is then used in a foreach loop; each literal is prepended with 'si'.
+101,Moodle,report/completion/index.php,261,Y,N,N,,X,,,,Based on literals given in an array which is then used in a foreach loop; each literal is prepended with 'si'.
+102,Moodle,report/progress/index.php,198,Y,N,N,,,,X,,Based on two string literals and a conditional.
+103,Moodle,report/progress/index.php,198,Y,N,N,,,,X,,Based on two string literals and a conditional.
+104,Moodle,report/progress/index.php,203,Y,N,N,,X,,,,Based on literals given in an array which is then used in a foreach loop; each literal is prepended with 'si'.
+105,Moodle,report/progress/index.php,211,Y,N,N,,X,,,,Based on literals given in an array which is then used in a foreach loop; each literal is prepended with 'si'.
+106,PEAR,PEAR/PackageFile/Generator/v1.php,727,Y,N,N,,X,,,,Var name value given as literals in array before a foreach loop.
+107,SilverStripe,sapphire/core/ManifestBuilder.php,150,N,N,Y,,,,,,Global var name held in array; this uses global statement to bring it into scope.
+108,SilverStripe,sapphire/core/ManifestBuilder.php,151,N,Y,N,,,,,,Global var name held in array; this sets it.
+109,SilverStripe,sapphire/dev/TestMailer.php,74,Y,N,N,,X,,,,Var name value given as literals in array before a foreach loop.
+110,Smarty,libs/plugins/block.textformat.php,56,Y,Y,N,,,X,,,Var-var name given in case label immediately before this.
+111,Smarty,libs/plugins/block.textformat.php,62,Y,Y,N,,,X,,,Var-var name given in case label immediately before this.
+112,Smarty,libs/plugins/block.textformat.php,66,Y,Y,N,,,X,,,Var-var name given in case label immediately before this.
+113,Smarty,libs/plugins/function.html_checkboxes.php,65,Y,Y,N,,,X,,,Var-var name given in case label immediately before this.
+114,Smarty,libs/plugins/function.html_checkboxes.php,71,Y,Y,N,,,X,,,Var-var name given in case label immediately before this.
+115,Smarty,libs/plugins/function.html_checkboxes.php,75,Y,Y,N,,,X,,,Var-var name given in case label immediately before this.
+116,Smarty,libs/plugins/function.html_checkboxes.php,80,Y,Y,N,,,X,,,Var-var name given in case label immediately before this.
+117,Smarty,libs/plugins/function.html_image.php,58,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+118,Smarty,libs/plugins/function.html_image.php,63,Y,Y,N,,,X,,,Var-var name given in case label immediately before this.
+119,Smarty,libs/plugins/function.html_options.php,55,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+120,Smarty,libs/plugins/function.html_options.php,64,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+121,Smarty,libs/plugins/function.html_radios.php,64,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+122,Smarty,libs/plugins/function.html_radios.php,85,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+123,Smarty,libs/plugins/function.html_radios.php,89,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+124,Smarty,libs/plugins/function.html_radios.php,94,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+125,Smarty,libs/plugins/function.html_select_date.php,126,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+126,Smarty,libs/plugins/function.html_select_date.php,158,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+127,Smarty,libs/plugins/function.html_select_date.php,166,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+128,Smarty,libs/plugins/function.html_select_date.php,186,Y,Y,N,,X,,,,Var-var name is derivable by literals and symbolic evaluation.
+129,Smarty,libs/plugins/function.html_select_date.php,195,Y,Y,N,,X,,,,Var-var name is derivable by literals and symbolic evaluation.
+130,Smarty,libs/plugins/function.html_select_date.php,218,Y,N,N,,X,,,,Var-var name is derivable by literals and symbolic evaluation.
+131,Smarty,libs/plugins/function.html_select_date.php,220,Y,Y,N,,X,,,,Var-var name is derivable by literals and symbolic evaluation.
+132,Smarty,libs/plugins/function.html_select_date.php,222,Y,Y,N,,X,,,,Var-var name is derivable by literals and symbolic evaluation.
+133,Smarty,libs/plugins/function.html_select_date.php,224,Y,Y,N,,X,,,,Var-var name is derivable by literals and symbolic evaluation.
+134,Smarty,libs/plugins/function.html_select_date.php,226,Y,Y,N,,X,,,,Var-var name is derivable by literals and symbolic evaluation.
+135,Smarty,libs/plugins/function.html_select_date.php,226,Y,N,N,,X,,,,Var-var name is derivable by literals and symbolic evaluation.
+136,Smarty,libs/plugins/function.html_select_time.php,120,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+137,Smarty,libs/plugins/function.html_select_time.php,128,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+138,Smarty,libs/plugins/function.html_select_time.php,138,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+139,Smarty,libs/plugins/function.html_select_time.php,156,Y,Y,N,,X,,,,Var-var name is derivable by literals and symbolic evaluation.
+140,Smarty,libs/plugins/function.html_select_time.php,169,Y,Y,N,,X,,,,Var-var name is derivable by literals and symbolic evaluation.
+141,Smarty,libs/plugins/function.html_select_time.php,355,Y,N,N,,X,,,,Var-var name is from an array of literals included in the foreach.
+142,Smarty,libs/plugins/function.html_select_time.php,359,Y,N,N,,X,,,,Var-var name is from an array of literals included in the foreach.
+143,Smarty,libs/plugins/function.html_table.php,73,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+144,Smarty,libs/plugins/function.html_table.php,91,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+145,Smarty,libs/plugins/function.html_table.php,100,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+146,Smarty,libs/plugins/function.html_table.php,106,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+147,Smarty,libs/plugins/function.mailto.php,85,Y,Y,N,,,X,,,Var-var name given in case labels immediately before this.
+148,Smarty,libs/sysplugins/smarty_internal_data.php,314,N,N,N,,,,,,"Names comes from outside. However, used in something like a no-op."
+149,Smarty,libs/sysplugins/smarty_internal_data.php,338,N,N,N,,,,,,"Names comes from outside. However, used in something like a no-op."
+150,SquirrelMail,src/compose.php,137,Y,Y,N,,X,,,,"Names from an array, used in a foreach."
+151,SquirrelMail,src/compose.php,315,Y,Y,N,,X,,,,"Names from an array, used in a foreach."
+152,SquirrelMail,src/compose.php,316,Y,N,N,,X,,,,"Names from an array, used in a foreach."
+153,SquirrelMail,plugins/info/options.php,51,Y,Y,N,X,,,,,Names are literals with a number in [0..9] appended.
+154,SquirrelMail,plugins/info/options.php,53,Y,Y,N,X,,,,,Names are literals with a number in [0..9] appended.
+155,SquirrelMail,plugins/translate/options.php,76,N,N,Y,,,,,,Names comes in as a parameter.
+156,SquirrelMail,plugins/translate/options.php,79,N,N,N,,,,,,Names comes in as a parameter.
+157,SquirrelMail,plugins/info/options.php,107,Y,N,N,X,,,,,Values based on contents of an array given above in the code.
+158,SquirrelMail,plugins/info/options.php,142,Y,N,N,,X,,,X,"Derivable, but could be hard because of changes to the array in the code (could require a more sophisticated dataflow analysis, annotations could help)."
+159,SquirrelMail,plugins/info/options.php,161,Y,N,N,,X,,,X,"Derivable, but could be hard because of changes to the array in the code (could require a more sophisticated dataflow analysis, annotations could help)."
+160,SquirrelMail,plugins/info/options.php,162,Y,N,N,,X,,,X,"Derivable, but could be hard because of changes to the array in the code (could require a more sophisticated dataflow analysis, annotations could help)."
+161,SquirrelMail,src/options_highlight.php,340,Y,Y,N,X,,,,,Names are literals with a number in [0..13] appended.
+162,SquirrelMail,functions/strings.php,661,N,N,Y,,,,,,Value comes in as elements of an array passed as a parameter. Marked obsolete.
+163,SquirrelMail,functions/strings.php,662,N,N,N,,,,,,Value comes in as elements of an array passed as a parameter. Marked obsolete.
+164,SquirrelMail,functions/strings.php,663,N,N,N,,,,,,Value comes in as elements of an array passed as a parameter. Marked obsolete.
+165,SquirrelMail,functions/strings.php,664,N,Y,N,,,,,,Value comes in as elements of an array passed as a parameter. Marked obsolete.
+166,SquirrelMail,functions/strings.php,667,N,Y,N,,,,,,Value comes in as elements of an array passed as a parameter. Marked obsolete.
+167,SquirrelMail,functions/strings.php,671,N,N,N,,,,,,Value comes in as elements of an array passed as a parameter. Marked obsolete.
+168,SquirrelMail,functions/strings.php,680,N,N,Y,,,,,,Value comes in as elements of an array passed as a parameter.
+169,SquirrelMail,functions/strings.php,681,N,N,N,,,,,,Value comes in as elements of an array passed as a parameter.
+170,SquirrelMail,functions/strings.php,682,N,N,N,,,,,,Value comes in as elements of an array passed as a parameter.
+171,SquirrelMail,functions/strings.php,685,N,Y,N,,,,,,Value comes in as elements of an array passed as a parameter.
+172,SquirrelMail,functions/strings.php,687,N,Y,N,,,,,,Value comes in as elements of an array passed as a parameter.
+173,SquirrelMail,functions/strings.php,691,N,N,N,,,,,,Value comes in as elements of an array passed as a parameter.
+174,WordPress,wp-includes/comment.php,337,Y,Y,N,,X,,,,"Value based on contents of array, used in a foreach."
+175,WordPress,wp-admin/includes/dashboard.php,920,Y,N,N,,X,,,,"Value based on contents of array, used in a foreach."
+176,WordPress,wp-admin/includes/dashboard.php,920,Y,N,N,,X,,,,"Value based on contents of array, used in a foreach."
+177,WordPress,wp-admin/includes/dashboard.php,923,Y,N,N,,X,,,,"Value based on contents of array, used in a foreach."
+178,WordPress,wp-admin/includes/dashboard.php,980,Y,N,N,,X,,,,"Value based on contents of array, used in a foreach."
+179,WordPress,wp-admin/includes/dashboard.php,981,Y,Y,N,,X,,,,"Value based on contents of array, used in a foreach."
+180,WordPress,wp-includes/default-widgets.php,956,Y,N,N,,X,,,,"Value based on contents of array, used in a foreach."
+181,WordPress,wp-admin/link-parse-opml.php,53,N,Y,N,,,,,,Based on value in a global.
+182,WordPress,wp-includes/link-template.php,2037,Y,Y,N,,X,,,,Value based on contents of array given directly in a foreach.
+183,WordPress,wp-includes/link-template.php,2037,Y,N,N,,X,,,,Value based on contents of array given directly in a foreach.
+184,WordPress,wp-includes/link-template.php,2038,Y,Y,N,,X,,,,Value based on contents of array given directly in a foreach.
+185,WordPress,wp-includes/link-template.php,2038,Y,N,N,,X,,,,Value based on contents of array given directly in a foreach.
+186,WordPress,wp-admin/includes/menu.php,48,Y,N,N,,X,,,,"Value based on contents of an array of literals (with 1 element!), using in a foreach"
+187,WordPress,wp-admin/includes/menu.php,51,Y,Y,N,,X,,,,"Value based on contents of an array of literals (with 1 element!), using in a foreach"
+188,WordPress,wp-admin/includes/menu.php,57,Y,N,N,,X,,,,"Value based on contents of an array of literals (with 1 element!), using in a foreach"
+189,WordPress,wp-admin/includes/menu.php,58,Y,Y,N,,X,,,,"Value based on contents of an array of literals (with 1 element!), using in a foreach"
+190,WordPress,wp-admin/includes/misc.php,244,N,N,Y,,,,,,Values come in a function parameter array; this makes it global
+191,WordPress,wp-admin/includes/misc.php,248,N,Y,N,,,,,,Values come in a function parameter array
+192,WordPress,wp-admin/includes/misc.php,250,N,Y,N,,,,,,Values come in a function parameter array
+193,WordPress,wp-admin/includes/misc.php,252,N,Y,N,,,,,,Values come in a function parameter array
+194,WordPress,wp-includes/pluggable.php,1355,Y,Y,N,,X,,,,Values based on contents of an array given in the foreach loop.
+195,WordPress,wp-includes/pluggable.php,1356,Y,N,N,,X,,,,Values based on contents of an array given in the foreach loop.
+196,WordPress,wp-includes/pluggable.php,1357,Y,Y,N,,X,,,,Values based on contents of an array given in the foreach loop.
+197,WordPress,wp-includes/pluggable.php,1358,Y,N,N,,X,,,,Values based on contents of an array given in the foreach loop.
+198,WordPress,wp-includes/pluggable.php,1359,Y,Y,N,,X,,,,Values based on contents of an array given in the foreach loop.
+199,WordPress,wp-includes/pluggable.php,1360,Y,N,N,,X,,,,Values based on contents of an array given in the foreach loop.
+200,WordPress,wp-includes/query.php,2577,N,Y,N,,,,,,Based on all variables in scope (from what I can tell)
+201,WordPress,wp-includes/query.php,2596,N,Y,N,,,,,,Based on all variables in scope (from what I can tell)
+202,WordPress,wp-admin/setup-config.php,164,Y,Y,N,,X,,,,Values based on contents of an array given in the foreach loop.
+203,WordPress,wp-includes/taxonomy.php,1370,Y,Y,N,,X,,,,Values based on contents of an array given above in the code.
+204,WordPress,wp-admin/includes/template.php,630,Y,N,N,,X,,,,Values based on contents of an array given in the foreach loop.
+205,WordPress,wp-admin/includes/template.php,632,Y,N,N,,X,,,,Values based on contents of an array given in the foreach loop.
+206,WordPress,wp-admin/user-new.php,307,Y,N,N,,X,,,,Values based on contents of an array given in the foreach loop and string concatenation.
+207,WordPress,wp-admin/user-new.php,308,Y,Y,N,,X,,,,Values based on contents of an array given in the foreach loop and string concatenation.
+208,WordPress,wp-admin/user-new.php,310,Y,Y,N,,X,,,,Values based on contents of an array given in the foreach loop and string concatenation.
+209,WordPress,wp-includes/user.php,1359,N,N,N,,,,,,Based on return value of a function call.
+210,WordPress,wp-includes/user.php,1360,N,N,N,,,,,,Based on return value of a function call.
+211,ZendFramework,library/Zend/Auth/Adapter/Digest.php,80,Y,N,N,,X,,,,"Names given directly above as literals in array, reference parameters to the method."
+212,ZendFramework,library/Zend/Auth/Adapter/Digest.php,82,Y,N,N,,X,,,,"Names given directly above as literals in array, reference parameters to the method."
+213,ZendFramework,tests/Zend/View/Helper/FormCheckboxTest.php,200,Y,N,N,,X,,,,Names given directly above as literals in array.
+214,ZendFramework,library/Zend/Ldap.php,941,Y,Y,N,,,X,,,Names given in cases as literals.
+215,ZendFramework,library/Zend/Ldap.php,953,Y,Y,N,,,X,,,Names given in cases as literals.
+216,ZendFramework,library/Zend/Serializer/Adapter/PythonPickle.php,998,?,?,?,,,,,,Appears to be a bug.
+217,ZendFramework,library/Zend/Serializer/Adapter/PythonPickle.php,1078,?,?,?,,,,,,Appears to be a bug.
+218,osCommerce,catalog/admin/action_recorder.php,40,N,Y,N,,,,,,"Reflective over information on files to create classes, non-literal."
+219,osCommerce,catalog/admin/action_recorder.php,52,N,Y,N,,,,,,Reflective over module names.
+220,osCommerce,catalog/admin/action_recorder.php,52,N,Y,N,,,,,,Reflective over module names.
+221,osCommerce,catalog/admin/action_recorder.php,63,N,N,N,,,,,,Based on HTTP request var.
+222,osCommerce,catalog/admin/action_recorder.php,64,N,N,N,,,,,,Based on HTTP request var.
+223,osCommerce,catalog/admin/action_recorder.php,71,N,N,N,,,,,,Based on HTTP request var.
+224,osCommerce,catalog/admin/action_recorder.php,72,N,N,N,,,,,,Based on HTTP request var.
+225,osCommerce,catalog/admin/action_recorder.php,146,N,N,N,,,,,,Reflective over module names.
+226,osCommerce,catalog/admin/action_recorder.php,147,N,N,N,,,,,,Reflective over module names.
+227,osCommerce,catalog/admin/action_recorder.php,177,N,N,N,,,,,,Based on HTTP request var.
+228,osCommerce,catalog/ext/modules/payment/sage_pay/checkout.php,52,N,N,N,,,,,,Apparently from outside the file.
+229,osCommerce,catalog/ext/modules/payment/sage_pay/checkout.php,52,N,N,N,,,,,,Apparently from outside the file.
+230,osCommerce,catalog/ext/modules/payment/sage_pay/checkout.php,52,N,N,N,,,,,,Apparently from outside the file.
+231,osCommerce,catalog/ext/modules/payment/moneybookers/checkout.php,52,N,N,N,,,,,,Apparently from outside the file (same code as above).
+232,osCommerce,catalog/ext/modules/payment/moneybookers/checkout.php,52,N,N,N,,,,,,Apparently from outside the file (same code as above).
+233,osCommerce,catalog/ext/modules/payment/moneybookers/checkout.php,52,N,N,N,,,,,,Apparently from outside the file (same code as above).
+234,osCommerce,catalog/checkout_confirmation.php,55,N,N,N,,,,,,Based on HTTP post var
+235,osCommerce,catalog/checkout_confirmation.php,55,N,N,N,,,,,,Based on HTTP post var
+236,osCommerce,catalog/checkout_confirmation.php,55,N,N,N,,,,,,Based on HTTP post var
+237,osCommerce,catalog/checkout_confirmation.php,96,N,N,N,,,,,,Based on HTTP post var
+238,osCommerce,catalog/checkout_confirmation.php,97,N,N,N,,,,,,Based on HTTP post var
+239,osCommerce,catalog/checkout_payment.php,130,N,N,N,,,,,,Based on HTTP get var.
+240,osCommerce,catalog/checkout_payment.php,130,N,N,N,,,,,,Based on HTTP get var.
+241,osCommerce,catalog/checkout_process.php,71,N,N,N,,,,,,Apparently from outside the file (same code as above).
+242,osCommerce,catalog/checkout_process.php,71,N,N,N,,,,,,Apparently from outside the file (same code as above).
+243,osCommerce,catalog/checkout_process.php,71,N,N,N,,,,,,Apparently from outside the file (same code as above).
+244,osCommerce,catalog/checkout_process.php,269,N,N,N,,,,,,Apparently from outside the file (same code as above).
+245,osCommerce,catalog/checkout_process.php,272,N,N,N,,,,,,Apparently from outside the file (same code as above).
+246,osCommerce,catalog/checkout_shipping.php,111,N,N,N,,,,,,Based on HTTP post var.
+247,osCommerce,catalog/includes/modules/payment/chronopay.php,333,N,N,Y,,,,,,Based on value in another global.
+248,osCommerce,catalog/includes/modules/payment/chronopay.php,469,N,N,N,,,,,,Based on value in another global.
+249,osCommerce,catalog/includes/modules/payment/chronopay.php,472,N,N,N,,,,,,Based on value in another global.
+250,osCommerce,catalog/admin/configuration.php,63,N,N,N,,,,,,Based on configuration information.
+251,osCommerce,catalog/admin/configuration.php,65,N,Y,N,,,,,,Based on configuration information.
+252,osCommerce,catalog/admin/configuration.php,67,N,N,N,,,,,,Based on configuration information.
+253,osCommerce,catalog/includes/functions/database.php,14,N,N,Y,,,,,,Global based on function parameter.
+254,osCommerce,catalog/admin/includes/functions/database.php,14,N,N,Y,,,,,,Global based on function parameter.
+255,osCommerce,catalog/install/includes/functions/database.php,14,N,N,Y,,,,,,Global based on function parameter.
+256,osCommerce,catalog/admin/includes/functions/database.php,17,N,Y,N,,,,,,Global based on function parameter.
+257,osCommerce,catalog/includes/functions/database.php,17,N,Y,N,,,,,,Global based on function parameter.
+258,osCommerce,catalog/includes/functions/database.php,19,N,Y,N,,,,,,Global based on function parameter.
+259,osCommerce,catalog/admin/includes/functions/database.php,19,N,Y,N,,,,,,Global based on function parameter.
+260,osCommerce,catalog/includes/functions/database.php,22,N,N,N,,,,,,Global based on function parameter.
+261,osCommerce,catalog/admin/includes/functions/database.php,22,N,N,N,,,,,,Global based on function parameter.
+262,osCommerce,catalog/install/includes/functions/database.php,23,N,Y,N,,,,,,Global based on function parameter.
+263,osCommerce,catalog/includes/functions/database.php,24,N,N,N,,,,,,Global based on function parameter.
+264,osCommerce,catalog/admin/includes/functions/database.php,24,N,N,N,,,,,,Global based on function parameter.
+265,osCommerce,catalog/install/includes/functions/database.php,25,N,N,N,,,,,,Global based on function parameter.
+266,osCommerce,catalog/admin/includes/functions/database.php,28,N,N,Y,,,,,,Global based on function parameter.
+267,osCommerce,catalog/includes/functions/database.php,28,N,N,Y,,,,,,Global based on function parameter.
+268,osCommerce,catalog/includes/functions/database.php,30,N,N,N,,,,,,Global based on function parameter.
+269,osCommerce,catalog/admin/includes/functions/database.php,30,N,N,N,,,,,,Global based on function parameter.
+270,osCommerce,catalog/install/includes/functions/database.php,33,N,N,Y,,,,,,Global based on function parameter.
+271,osCommerce,catalog/install/includes/functions/database.php,35,N,N,N,,,,,,Global based on function parameter.
+272,osCommerce,catalog/includes/functions/database.php,38,N,N,Y,,,,,,Global based on function parameter.
+273,osCommerce,catalog/admin/includes/functions/database.php,38,N,N,Y,,,,,,Global based on function parameter.
+274,osCommerce,catalog/includes/functions/database.php,44,N,N,N,,,,,,Global based on function parameter.
+275,osCommerce,catalog/admin/includes/functions/database.php,45,N,N,N,,,,,,Global based on function parameter.
+276,osCommerce,catalog/includes/functions/database.php,111,N,N,Y,,,,,,Global based on function parameter.
+277,osCommerce,catalog/includes/functions/database.php,113,N,N,N,,,,,,Global based on function parameter.
+278,osCommerce,catalog/admin/includes/functions/database.php,115,N,N,Y,,,,,,Global based on function parameter.
+279,osCommerce,catalog/admin/includes/functions/database.php,117,N,N,N,,,,,,Global based on function parameter.
+280,osCommerce,catalog/includes/functions/database.php,129,N,N,Y,,,,,,Global based on function parameter.
+281,osCommerce,catalog/includes/functions/database.php,132,N,N,N,,,,,,Global based on function parameter.
+282,osCommerce,catalog/admin/includes/functions/database.php,133,N,N,Y,,,,,,Global based on function parameter.
+283,osCommerce,catalog/admin/includes/functions/database.php,136,N,N,N,,,,,,Global based on function parameter.
+284,osCommerce,catalog/ext/modules/payment/paypal/express.php,452,N,N,N,,,,,,Based on external module information.
+285,osCommerce,catalog/ext/modules/payment/paypal/express_payflow.php,185,N,N,N,,,,,,Based on external module information.
+286,osCommerce,catalog/includes/modules/payment/inpay.php,380,N,N,Y,,,,,,Based on value in another global.
+287,osCommerce,catalog/includes/modules/payment/inpay.php,531,N,N,N,,,,,,Based on value in another global.
+288,osCommerce,catalog/includes/modules/payment/inpay.php,535,N,N,N,,,,,,Based on value in another global.
+289,osCommerce,catalog/admin/modules.php,258,N,N,N,,,,,,Based on an external object.
+290,osCommerce,catalog/admin/modules.php,258,N,N,N,,,,,,Based on an external object.
+291,osCommerce,catalog/admin/modules.php,260,N,Y,N,,,,,,Based on an external object.
+292,osCommerce,catalog/admin/modules.php,262,N,N,N,,,,,,Based on an external object.
+293,osCommerce,catalog/includes/modules/payment/moneybookers.php,353,N,N,Y,,,,,,Based on value in another global.
+294,osCommerce,catalog/includes/modules/payment/moneybookers.php,502,N,N,N,,,,,,Based on value in another global.
+295,osCommerce,catalog/includes/modules/payment/moneybookers.php,505,N,N,N,,,,,,Based on value in another global.
+296,osCommerce,catalog/includes/modules/payment/paypal_standard.php,393,N,N,Y,,,,,,Based on value in another global.
+297,osCommerce,catalog/includes/modules/payment/paypal_standard.php,529,N,N,N,,,,,,Based on value in another global.
+298,osCommerce,catalog/includes/modules/payment/paypal_standard.php,532,N,N,N,,,,,,Based on value in another global.
+299,osCommerce,catalog/ext/modules/payment/inpay/pb_handler.php,311,N,N,N,,,,,,Apparently from outside the file (same code as above).
+300,osCommerce,catalog/ext/modules/payment/inpay/pb_handler.php,315,N,N,N,,,,,,Apparently from outside the file (same code as above).
+301,osCommerce,catalog/includes/modules/payment/rbsworldpay_hosted.php,318,N,N,Y,,,,,,Based on value in another global.
+302,osCommerce,catalog/includes/modules/payment/rbsworldpay_hosted.php,470,N,N,N,,,,,,Based on value in another global.
+303,osCommerce,catalog/includes/modules/payment/rbsworldpay_hosted.php,473,N,N,N,,,,,,Based on value in another global.
+304,osCommerce,catalog/includes/modules/payment/sofortueberweisung_direct.php,343,N,N,Y,,,,,,Based on value in another global.
+305,osCommerce,catalog/includes/modules/payment/sofortueberweisung_direct.php,500,N,N,N,,,,,,Based on value in another global.
+306,osCommerce,catalog/includes/modules/payment/sofortueberweisung_direct.php,503,N,N,N,,,,,,Based on value in another global.
+307,phpBB,includes/acp/acp_language.php,662,Y,N,N,,X,,,,"Var-var names based on string literals from array in foreach, appended with ‘_files’"
+308,phpBB,includes/acp/acp_language.php,669,Y,N,N,,X,,,,"Var-var names based on string literals from array in foreach, appended with ‘_files’"
+309,phpBB,includes/acp/acp_profile.php,566,N,N,N,,X,,,,"Var-var names are in array, so derivable, but would have to show this array is not modified during function call (actually in 2-dimensional array, with other parts modified)."
+310,phpBB,includes/acp/acp_styles.php,2609,Y,Y,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
+311,phpBB,includes/acp/acp_styles.php,2613,Y,Y,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
+312,phpBB,includes/acp/acp_styles.php,2960,Y,N,N,,X,,,,"Var-var names are keys in an array, prepended with a prefix."
+313,phpBB,includes/acp/acp_styles.php,2960,Y,N,N,,X,,,,"Var-var names are keys in an array, prepended with a prefix."
+314,phpBB,includes/acp/acp_styles.php,3016,Y,Y,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
+315,phpBB,includes/acp/acp_styles.php,3016,Y,N,N,,X,,,,"Var-var names are keys in an array, prepended with a prefix."
+316,phpBB,includes/acp/acp_styles.php,3016,Y,N,N,,X,,,,"Var-var names are keys in an array, prepended with a prefix."
+317,phpBB,includes/acp/acp_styles.php,3017,Y,Y,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
+318,phpBB,includes/acp/acp_styles.php,3017,Y,N,N,,X,,,,"Var-var names are keys in an array, prepended with a prefix."
+319,phpBB,includes/acp/acp_styles.php,3017,Y,N,N,,X,,,,"Var-var names are keys in an array, prepended with a prefix."
+320,phpBB,includes/acp/acp_styles.php,3179,Y,Y,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
+321,phpBB,includes/acp/acp_styles.php,3183,Y,Y,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
+322,phpBB,includes/acp/acp_styles.php,3342,Y,N,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
+323,phpBB,includes/acp/acp_styles.php,3342,Y,N,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
+324,phpBB,includes/acp/acp_styles.php,3342,Y,N,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
+325,phpBB,includes/acp/acp_styles.php,3342,Y,N,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
+326,phpBB,includes/acp/acp_users.php,1619,Y,Y,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+327,phpBB,includes/acp/acp_users.php,1620,Y,N,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+328,phpBB,includes/acp/acp_users.php,1623,Y,Y,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+329,phpBB,includes/acp/acp_users.php,1625,Y,Y,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+330,phpBB,includes/acp/acp_users.php,1627,Y,Y,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+331,phpBB,includes/acp/acp_users.php,1628,Y,N,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+332,phpBB,includes/acp/acp_users.php,1631,Y,Y,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+333,phpBB,includes/acp/acp_users.php,1633,Y,Y,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+334,phpBB,includes/acp/acp_users.php,1635,Y,Y,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+335,phpBB,includes/acp/acp_users.php,1639,Y,Y,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+336,phpBB,includes/acp/acp_users.php,1641,Y,Y,N,,X,,,,"Var-var names are given in an array just before the foreach loop, with a prefix."
+337,phpBB,includes/bbcode.php,92,N,Y,N,,,,,,"Var-var names are keys in an array, but this array is built using code."
+338,phpBB,includes/bbcode.php,93,N,Y,N,,,,,,"Var-var names are keys in an array, but this array is built using code."
+339,phpBB,includes/functions.php,4207,Y,Y,N,,X,,,,Var-var names are given in an array processed in a foreach loop.
+340,phpBB,includes/functions.php,4211,Y,Y,N,,X,,,,Var-var names are given in an array processed in a foreach loop.
+341,phpBB,includes/functions.php,4215,Y,Y,N,,X,,,,Var-var names are given in an array processed in a foreach loop.
+342,phpBB,includes/functions_content.php,77,Y,N,N,,X,,,,Var-var names are given in an array processed in a foreach loop.
+343,phpBB,includes/functions_content.php,86,Y,Y,N,,X,,,,Var-var names are given in an array processed in a foreach loop.
+344,phpBB,includes/functions_content.php,91,Y,Y,N,,X,,,,Var-var names are given in an array processed in a foreach loop.
+345,phpBB,includes/functions_messenger.php,490,N,N,N,,,,,,"Var-var names are keys in an array, but this array is built using code."
+346,phpBB,includes/functions_messenger.php,490,N,N,N,,,,,,"Var-var names are keys in an array, but this array is built using code."
+347,phpBB,includes/functions_privmsgs.php,1103,N,Y,N,,,,,,"Var-var names are computed, based on an input parameter."
+348,phpBB,includes/functions_privmsgs.php,1109,N,N,N,,,,,,"Var-var names are computed, based on an input parameter."
+349,phpBB,includes/functions_privmsgs.php,1111,N,N,N,,,,,,"Var-var names are computed, based on an input parameter."
+350,phpBB,includes/functions_privmsgs.php,1141,N,Y,N,,,,,,"Var-var names are computed, based on an input parameter."
+351,phpBB,includes/functions_privmsgs.php,1343,N,Y,N,,,,,,"Var-var names are computed, based on an input parameter."
+352,phpBB,includes/functions_template.php,116,N,N,Y,,,,,,"Var-var name is an input parameter, made global."
+353,phpBB,includes/functions_user.php,44,Y,N,N,,,,X,,Var-var name based on one of two choices in a conditional.
+354,phpBB,includes/functions_user.php,44,Y,N,N,,,,X,,Var-var name based on one of two choices in a conditional.
+355,phpBB,includes/functions_user.php,46,Y,Y,N,,,,X,,Var-var name based on one of two choices in a conditional.
+356,phpBB,includes/functions_user.php,46,Y,N,N,,,,X,,Var-var name based on one of two choices in a conditional.
+357,phpBB,includes/functions_user.php,49,Y,N,N,,,,X,,Var-var name based on one of two choices in a conditional.
+358,phpBB,includes/functions_user.php,49,Y,N,N,,,,X,,Var-var name based on one of two choices in a conditional.
+359,phpBB,includes/functions_user.php,50,Y,Y,N,,,,X,,Var-var name based on one of two choices in a conditional.
+360,phpBB,install/install_convert.php,569,N,N,N,,,,,,"Var-var name based on array in property, but no guarantee this has not been changed."
+361,phpBB,includes/message_parser.php,1141,Y,N,N,,X,,,,"Var-var name based on literals in array used in foreach, concatenated with string literals."
+362,phpBB,includes/ucp/ucp_groups.php,336,Y,N,N,,,,X,,"Var-var name based on results of conditional, 3 possible literal choices."
+363,phpBB,includes/ucp/ucp_pm_compose.php,961,Y,Y,N,,X,,,,"Var-var name based on 2 literals in an array, used in a foreach."
+364,phpBB,includes/ucp/ucp_pm_compose.php,973,N,N,N,,,,,,Var-var name based on request variable.
+365,phpBB,includes/ucp/ucp_pm_compose.php,987,N,N,N,,,,,,Var-var name based on request variable.
+366,phpBB,includes/ucp/ucp_pm_compose.php,988,N,N,N,,,,,,Var-var name based on request variable.
+367,phpBB,includes/ucp/ucp_pm_compose.php,988,N,N,N,,,,,,Var-var name based on request variable.
+368,phpBB,includes/ucp/ucp_pm_compose.php,995,N,N,N,,,,,,Var-var name based on request variable.
+369,phpBB,includes/ucp/ucp_pm_compose.php,995,N,N,N,,,,,,Var-var name based on request variable.
+370,phpBB,includes/ucp/ucp_pm_compose.php,996,N,N,N,,,,,,Var-var name based on request variable.
+371,phpBB,includes/ucp/ucp_pm_compose.php,996,N,N,N,,,,,,Var-var name based on request variable.
+372,phpBB,includes/ucp/ucp_pm_viewfolder.php,143,Y,N,N,,,,X,,Possible values given in conditional in first part of and clause.
+373,phpBB,includes/ucp/ucp_pm_viewfolder.php,143,Y,N,N,,,,X,,Possible values given in conditional in first part of and clause.
+374,phpBB,includes/ucp/ucp_prefs.php,250,Y,Y,N,,,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+375,phpBB,includes/ucp/ucp_prefs.php,251,Y,N,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+376,phpBB,includes/ucp/ucp_prefs.php,254,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+377,phpBB,includes/ucp/ucp_prefs.php,256,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+378,phpBB,includes/ucp/ucp_prefs.php,258,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+379,phpBB,includes/ucp/ucp_prefs.php,259,Y,N,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+380,phpBB,includes/ucp/ucp_prefs.php,262,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+381,phpBB,includes/ucp/ucp_prefs.php,264,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+382,phpBB,includes/ucp/ucp_prefs.php,266,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+383,phpBB,includes/ucp/ucp_prefs.php,270,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+384,phpBB,includes/ucp/ucp_prefs.php,272,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+385,phpBB,viewonline.php,355,Y,N,N,,X,,,,Possible var-var names given in array above foreach.
+386,phpBB,viewonline.php,358,Y,Y,N,,X,,,,Possible var-var names given in array above foreach.
+387,phpBB,viewonline.php,362,Y,Y,N,,X,,,,Possible var-var names given in array above foreach.
+388,phpBB,viewonline.php,366,Y,Y,N,,X,,,,Possible var-var names given in array above foreach.
+389,phpMyAdmin,libraries/Table.class.php,260,N,Y,N,,,,,,Var-var names based on method call; function has comment stating it is unused.
+390,phpMyAdmin,libraries/schema/User_Schema.class.php,840,Y,N,Y,X,,,,,"All var-var names of the form ‘c_table_’#, maps to global"
+391,phpMyAdmin,libraries/schema/User_Schema.class.php,841,Y,Y,N,X,,,,,"All var-var names of the form ‘c_table_’#, maps to global"
+392,phpMyAdmin,libraries/common.inc.php,203,N,Y,N,,,,,,Var-var names based on all vars in scope
+393,phpMyAdmin,libraries/database_interface.lib.php,523,N,Y,N,,,,,,Var-var name given through a function parameter.
+394,phpMyAdmin,libraries/database_interface.lib.php,527,N,Y,N,,,,,,Var-var name given through a function parameter.
+395,phpMyAdmin,libraries/database_interface.lib.php,532,N,N,N,,,,,,Var-var name given through a function parameter.
+396,phpMyAdmin,libraries/database_interface.lib.php,534,N,N,N,,,,,,Var-var name given through a function parameter.
+397,phpMyAdmin,libraries/database_interface.lib.php,538,N,N,N,,,,,,Var-var name given through a function parameter.
+398,phpMyAdmin,db_qbe.php,500,Y,N,N,X,,,,,"Names are all of the form Or#, where # is a natural number."
+399,phpMyAdmin,db_qbe.php,501,Y,Y,N,X,,,,,"Names are all of the form Or#, where # is a natural number."
+400,phpMyAdmin,db_qbe.php,503,Y,N,N,X,,,,,"Names are all of the form Or#, where # is a natural number."
+401,phpMyAdmin,db_qbe.php,503,Y,N,N,X,,,,,"Names are all of the form Or#, where # is a natural number."
+402,phpMyAdmin,db_qbe.php,504,Y,N,N,X,,,,,"Names are all of the form Or#, where # is a natural number."
+403,phpMyAdmin,db_qbe.php,513,Y,N,N,X,,,,,"Names are all of the form Or#, where # is a natural number."
+404,phpMyAdmin,db_qbe.php,513,Y,N,N,X,,,,,"Names are all of the form Or#, where # is a natural number."
+405,phpMyAdmin,db_qbe.php,514,Y,N,N,X,,,,,"Names are all of the form curOr#, where # is a natural number."
+406,phpMyAdmin,db_qbe.php,514,Y,N,N,X,,,,,"Names are all of the form Or#, where # is a natural number."
+407,phpMyAdmin,db_qbe.php,902,Y,N,N,X,,,,,"Names are all of the form curOr#, where # is a natural number."
+408,phpMyAdmin,db_qbe.php,905,Y,N,N,X,,,,,"Names are all of the form curOr#, where # is a natural number."
+409,phpMyAdmin,db_qbe.php,908,Y,N,N,X,,,,,"Names are all of the form curOr#, where # is a natural number."
+410,phpMyAdmin,libraries/grab_globals.lib.php,93,N,Y,N,,,,,,Named based on computation over contents of a global variable.
+411,phpMyAdmin,libraries/grab_globals.lib.php,94,N,Y,N,,,,,,Named based on computation over contents of a global variable.
+412,phpMyAdmin,libraries/grab_globals.lib.php,110,Y,Y,N,,X,,,,Named given in array as string literal before foreach.
+413,phpMyAdmin,libraries/grab_globals.lib.php,112,Y,N,N,,X,,,,Named given in array as string literal before foreach.
+414,phpMyAdmin,libraries/grab_globals.lib.php,112,Y,N,N,,X,,,,Named given in array as string literal before foreach.
+415,phpMyAdmin,libraries/grab_globals.lib.php,113,Y,Y,N,,X,,,,Named given in array as string literal before foreach.
+416,phpMyAdmin,libraries/replication.inc.php,101,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
+417,phpMyAdmin,libraries/replication.inc.php,102,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
+418,phpMyAdmin,libraries/replication.inc.php,105,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
+419,phpMyAdmin,libraries/replication.inc.php,108,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
+420,phpMyAdmin,libraries/replication.inc.php,110,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
+421,phpMyAdmin,libraries/replication.inc.php,111,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
+422,phpMyAdmin,libraries/replication.inc.php,113,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
+423,phpMyAdmin,libraries/replication.inc.php,114,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
+424,phpMyAdmin,libraries/replication.inc.php,116,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
+425,phpMyAdmin,libraries/replication.inc.php,117,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
+426,phpMyAdmin,libraries/replication.inc.php,119,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
+427,phpMyAdmin,libraries/replication.inc.php,120,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
+428,phpMyAdmin,libraries/replication.inc.php,122,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
+429,phpMyAdmin,libraries/replication.inc.php,123,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
+430,phpMyAdmin,libraries/replication.inc.php,125,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
+431,phpMyAdmin,libraries/replication.inc.php,126,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
+432,phpMyAdmin,libraries/replication.inc.php,128,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
+433,phpMyAdmin,libraries/replication.inc.php,129,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
+434,phpMyAdmin,libraries/replication.inc.php,131,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
+435,phpMyAdmin,libraries/replication.inc.php,132,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
+436,phpMyAdmin,libraries/replication_gui.lib.php,90,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+437,phpMyAdmin,libraries/replication_gui.lib.php,91,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+438,phpMyAdmin,libraries/replication_gui.lib.php,92,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+439,phpMyAdmin,libraries/replication_gui.lib.php,93,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+440,phpMyAdmin,libraries/replication_gui.lib.php,94,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+441,phpMyAdmin,libraries/replication_gui.lib.php,125,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+442,phpMyAdmin,libraries/replication_gui.lib.php,134,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+443,phpMyAdmin,libraries/replication_gui.lib.php,135,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+444,phpMyAdmin,libraries/replication_gui.lib.php,135,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+445,phpMyAdmin,libraries/replication_gui.lib.php,139,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+446,phpMyAdmin,libraries/replication_gui.lib.php,140,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+447,phpMyAdmin,libraries/replication_gui.lib.php,140,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+448,phpMyAdmin,libraries/replication_gui.lib.php,146,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ‘master’ or ‘slave’.
+449,phpMyAdmin,server_databases.php,189,N,N,N,,,,,X,Name based on values in a global array.
+450,phpMyAdmin,server_databases.php,248,N,N,N,,,,,X,Name based on values in a global array.
+451,phpMyAdmin,server_status.php,1089,N,N,N,,,,,X,Name based on values in a global array.
+452,phpMyAdmin,server_synchronize.php,57,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+453,phpMyAdmin,server_synchronize.php,58,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+454,phpMyAdmin,server_synchronize.php,59,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+455,phpMyAdmin,server_synchronize.php,60,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+456,phpMyAdmin,server_synchronize.php,61,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+457,phpMyAdmin,server_synchronize.php,62,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+458,phpMyAdmin,server_synchronize.php,63,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+459,phpMyAdmin,server_synchronize.php,65,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+460,phpMyAdmin,server_synchronize.php,66,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+461,phpMyAdmin,server_synchronize.php,67,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+462,phpMyAdmin,server_synchronize.php,68,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+463,phpMyAdmin,server_synchronize.php,72,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+464,phpMyAdmin,server_synchronize.php,72,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+465,phpMyAdmin,server_synchronize.php,73,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+466,phpMyAdmin,server_synchronize.php,73,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+467,phpMyAdmin,server_synchronize.php,75,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+468,phpMyAdmin,server_synchronize.php,75,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+469,phpMyAdmin,server_synchronize.php,76,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+470,phpMyAdmin,server_synchronize.php,77,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+471,phpMyAdmin,server_synchronize.php,78,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+472,phpMyAdmin,server_synchronize.php,80,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+473,phpMyAdmin,server_synchronize.php,80,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+474,phpMyAdmin,server_synchronize.php,84,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+475,phpMyAdmin,server_synchronize.php,84,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+476,phpMyAdmin,server_synchronize.php,85,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+477,phpMyAdmin,server_synchronize.php,86,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+478,phpMyAdmin,server_synchronize.php,113,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+479,phpMyAdmin,server_synchronize.php,114,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+480,phpMyAdmin,server_synchronize.php,114,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+481,phpMyAdmin,server_synchronize.php,115,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+482,phpMyAdmin,server_synchronize.php,115,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+483,phpMyAdmin,server_synchronize.php,117,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+484,phpMyAdmin,server_synchronize.php,119,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+485,phpMyAdmin,server_synchronize.php,119,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+486,phpMyAdmin,server_synchronize.php,119,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+487,phpMyAdmin,server_synchronize.php,120,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+488,phpMyAdmin,server_synchronize.php,120,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+489,phpMyAdmin,server_synchronize.php,121,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+490,phpMyAdmin,server_synchronize.php,121,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+491,phpMyAdmin,server_synchronize.php,526,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+492,phpMyAdmin,server_synchronize.php,527,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+493,phpMyAdmin,server_synchronize.php,527,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+494,phpMyAdmin,server_synchronize.php,528,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+495,phpMyAdmin,server_synchronize.php,528,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+496,phpMyAdmin,server_synchronize.php,530,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
+497,phpMyAdmin,server_synchronize.php,533,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
+498,phpMyAdmin,libraries/tbl_info.inc.php,101,N,Y,N,,,,,,Name based on values in an global array.

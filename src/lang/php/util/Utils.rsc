@@ -237,3 +237,8 @@ public map[tuple[str product, str version], map[loc l, Script scr]] getLatestTre
 	lv = getLatestVersions();
 	return ( <p,lv[p]> : loadBinary(p,lv[p]) | p <- lv<0> );
 }
+
+public rel[str Product,str PlainText,str Description] loadProductInfoCSV() {
+	rel[str Product,str PlainText,str Description] res = readCSV(#rel[str Product,str PlainText,str Description],|project://PHPAnalysis/src/lang/php/extract/csvs/ProductInfo.csv|);
+	return res;
+}
