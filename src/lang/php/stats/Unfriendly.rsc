@@ -9,7 +9,10 @@ import String;
 import Set;
 import Real;
 import IO;
+import ValueIO;
 import stat::Inference;
+import lang::php::analysis::evaluators::ScalarEval;
+import lang::php::analysis::includes::IncludeCP;
 
 import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
 
@@ -227,14 +230,27 @@ public map[str p, real gc] resultsToGini(list[tuple[str p, str v, QueryResult qr
 	return gcmap;
 }
 
-public void includesAnalysis() {
+public map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits] includesAnalysis() {
 	lv = getLatestVersions();
+	res = ( );
 	for (p <- lv) {
-		println("RESOLVING FOR <p>:<lv[p]>");
-		// First, just see how many includes we have that are not constants
-		pt = loadBinary(p,lv[p]);
-		
-		// Now, try to resolve the includes
-		ptres = resolveIncludes(pt);
+		scripts = loadBinary(p,lv[p]);
+		unresolved = gatherIncludesWithVarPaths(scripts);
+		scripts2 = evalAllScalars(scripts);
+		afterEval = gatherIncludesWithVarPaths(scripts2);
+		scripts3 = matchIncludes(scripts);
+		afterMatch = gatherIncludesWithVarPaths(scripts3);
+		scripts4 = matchIncludes(scripts2);
+		afterBoth = gatherIncludesWithVarPaths(scripts4);
+		res[<p,lv[p]>] = < unresolved, afterEval, afterMatch, afterBoth >;		
 	}
+	return res;
+}
+
+public void saveForLater(map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits] res) {
+	writeBinaryValueFile(|file:///export/scratch1/hills/temp/includes.bin|, res);
+}
+
+public map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits] reload() {
+	return readBinaryValueFile(#map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits], |file:///export/scratch1/hills/temp/includes.bin|); 
 }

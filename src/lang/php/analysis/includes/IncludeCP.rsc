@@ -101,10 +101,13 @@ public map[loc fileloc, Script scr] resolveIncludes(map[loc fileloc, Script scr]
 	println("Solving scalars");
 	scripts2 = evalAllScalars(scripts);
 	println("Unresolved includes: <size(gatherIncludesWithVarPaths(scripts2))>");
-	println("Resolving includes using path pattern matching");
-	scripts3 = matchIncludes(scripts2);
+	println("Resolving includes on original using path pattern matching");
+	scripts3 = matchIncludes(scripts);
 	println("Unresolved includes: <size(gatherIncludesWithVarPaths(scripts3))>");
-	return scripts3;
+	println("Resolving includes using path pattern matching");
+	scripts4 = matchIncludes(scripts2);
+	println("Unresolved includes: <size(gatherIncludesWithVarPaths(scripts4))>");
+	return scripts4;
 }
 
 data IncludeGraphNode = igNode(str fileName, loc fileLoc);
