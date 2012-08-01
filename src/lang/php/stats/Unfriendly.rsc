@@ -611,10 +611,10 @@ public str squiglies(HistInfo hi) {
 
 public str squigly(rel[str, int] counts) {
   ds = distribution(counts);
-  return "\\addplot+ [eeg] coordinates {
-          '<for (ev <- ds, ev != 0) {>
-          ' (<ev>,<ds[ev]>)
-          '<}>};
+  s = sum((ds - (0:0))<1>) * 1.0;
+  return "\\addplot+ [eeg] coordinates { (0,0)
+          '<for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev] / s>) <}>
+          '(<s>,0)};
           ";
 }
 
