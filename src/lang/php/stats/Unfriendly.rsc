@@ -10,6 +10,7 @@ import Set;
 import Real;
 import IO;
 import ValueIO;
+import Map;
 import stat::Inference;
 import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::analysis::includes::IncludeCP;
@@ -201,14 +202,18 @@ public str createSubfloat(list[tuple[str p, str v, QueryResult qr]] qrlist, str 
 	str productLine(str p) {
 		< lineCount, fileCount > = getOneFrom(ci[p,lv[p]]);
 		featureFileCount = size(pr[p]);
-		return "<p> & <fileCount> & <featureFileCount> & < round((featureFileCount*1.0)/fileCount*10000)/100.0 > & <pc[p]> & < (featureFileCount <= 1) ? "X" : "<round(gmap[p] * 100.0)/100.0>" > \\\\ \\hline";
+		return "<p> & <fileCount> & <featureFileCount> & < round((featureFileCount*1.0)/fileCount*10000)/100.0 > & & <pc[p]> & < (featureFileCount <= 1) ? "X" : "<round(gmap[p] * 100.0)/100.0>" > \\\\";
 	}
 		
 	res = "\\subfloat[<caption>]{
-		  '\\begin{tabular}{|l|r|r|r|r|r|} \\hline 
-		  'Product & \\multicolumn{3}{|c|}{Files}       & \\multicolumn{2}{|c|}{Features} \\\\
-		  '        & Total & Hits & \\% & Total & Gini  \\\\ \\hline \\hline <for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '\\centering
+		  '\\ra{1.0}
+		  '\\begin{tabular}{@{}lrrrcrr@{}} \\toprule 
+		  'Product & \\multicolumn{3}{c}{Files} & \\phantom{abc}  & \\multicolumn{2}{c}{Features} \\\\
+		  '        \\cmidrule{2-4} \\cmidrule{6-7}
+		  '        & Total & Hits & \\% & & Total & Gini  \\\\ \\midrule <for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '  <productLine(p)> <}>
+		  '\\bottomrule
 		  '\\end{tabular}
 		  '\\label{<label>}
 		  '}";
@@ -216,12 +221,12 @@ public str createSubfloat(list[tuple[str p, str v, QueryResult qr]] qrlist, str 
 	return res;
 }
 
-public str showFileInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses, 
-							   list[tuple[str p, str v, QueryResult qr]] vvcalls,
-							   list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-							   list[tuple[str p, str v, QueryResult qr]] vvnews,
-							   list[tuple[str p, str v, QueryResult qr]] vvprops,
-							   list[tuple[str p, str v, QueryResult qr]] vvall) {
+public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses, 
+				 		   	 list[tuple[str p, str v, QueryResult qr]] vvcalls,
+							 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
+							 list[tuple[str p, str v, QueryResult qr]] vvnews,
+							 list[tuple[str p, str v, QueryResult qr]] vvprops,
+							 list[tuple[str p, str v, QueryResult qr]] vvall) {
 	res = "\\begin{table*}
 		  '  \\centering
 		  '  <createSubfloat(vvuses,"Variable Variables","tbl-vvuses")>
@@ -299,7 +304,7 @@ public void generateTableFiles(list[tuple[str p, str v, QueryResult qr]] vvuses,
 							   list[tuple[str p, str v, QueryResult qr]] vvsprops,
 							   list[tuple[str p, str v, QueryResult qr]] vvsptargets
 							   ) {
-	res = showFileInfoAsLatex(vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets);
+	res = showVVInfoAsLatex(vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets);
 	writeFile(|file:///ufs/hills/Documents/Papers/2012/php-icse12/vvstats.tex|, res);
 }
 
@@ -353,7 +358,9 @@ public map[str p, real gc] resultsToGini(list[tuple[str p, str v, QueryResult qr
 	return gcmap;
 }
 
-public map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits] includesAnalysis() {
+alias ICLists = map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits];
+
+public ICLists includesAnalysis() {
 	lv = getLatestVersions();
 	res = ( );
 	for (p <- lv) {
@@ -370,15 +377,17 @@ public map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unr
 	return res;
 }
 
-public void saveForLater(map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits] res) {
+public void saveForLater(ICLists res) {
 	writeBinaryValueFile(|file:///export/scratch1/hills/temp/includes.bin|, res);
 }
 
-public map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits] reload() {
-	return readBinaryValueFile(#map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits], |file:///export/scratch1/hills/temp/includes.bin|); 
+public ICLists reload() {
+	return readBinaryValueFile(#ICLists, |file:///export/scratch1/hills/temp/includes.bin|); 
 }
 
-public map[tuple[str p, str v] pv, tuple[tuple[int hc,int fc,real gc] unresolved, tuple[int hc,int fc,real gc] afterEval, tuple[int hc, int fc,real gc] afterMatch, tuple[int hc,int fc,real gc] afterBoth] counts] calculateIncludeCounts(map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits] res) {
+alias ICResult = map[tuple[str p, str v] pv, tuple[tuple[int hc,int fc,real gc] unresolved, tuple[int hc,int fc,real gc] afterEval, tuple[int hc, int fc,real gc] afterMatch, tuple[int hc,int fc,real gc] afterBoth] counts];
+
+public ICResult calculateIncludeCounts(ICLists res) {
 	counts = ( );
 	
 	tuple[int hc, int fc, real gc] calc(list[tuple[loc fileloc, Expr call]] hits) {
@@ -403,31 +412,172 @@ public map[tuple[str p, str v] pv, tuple[tuple[int hc,int fc,real gc] unresolved
 	return counts;
 }
 
-public void saveIncludeCountsForLater(map[tuple[str p, str v] pv, tuple[tuple[int hc,int fc,real gc] unresolved, tuple[int hc,int fc,real gc] afterEval, tuple[int hc, int fc,real gc] afterMatch, tuple[int hc,int fc,real gc] afterBoth] counts] res) {
+public void saveIncludeCountsForLater(ICResult res) {
 	writeBinaryValueFile(|file:///export/scratch1/hills/temp/includeCounts.bin|, res);
 }
 
-public map[tuple[str p, str v] pv, tuple[tuple[int hc,int fc,real gc] unresolved, tuple[int hc,int fc,real gc] afterEval, tuple[int hc, int fc,real gc] afterMatch, tuple[int hc,int fc,real gc] afterBoth] counts] reloadIncludeCounts() {
-	return readBinaryValueFile(#map[tuple[str p, str v] pv, tuple[tuple[int hc,int fc,real gc] unresolved, tuple[int hc,int fc,real gc] afterEval, tuple[int hc, int fc,real gc] afterMatch, tuple[int hc,int fc,real gc] afterBoth] counts], |file:///export/scratch1/hills/temp/includeCounts.bin|); 
+public ICResult reloadIncludeCounts() {
+	return readBinaryValueFile(#ICResult, |file:///export/scratch1/hills/temp/includeCounts.bin|); 
 }
 
-public str generateIncludeCountsTable(map[tuple[str p, str v] pv, tuple[tuple[int hc,int fc,real gc] unresolved, tuple[int hc,int fc,real gc] afterEval, tuple[int hc, int fc,real gc] afterMatch, tuple[int hc,int fc,real gc] afterBoth] counts] counts) {
+public str generateIncludeCountsTable(ICResult counts) {
 	lv = getLatestVersions();
 	ci = loadCountsCSV();
-
+	ec = expressionCounts();
+	includesPerProduct = ( <p,lv[p]> : getOneFrom((ec<product,version,include>)[p,lv[p]]) | p <- lv );
+		
 	str productLine(str p) {
-		< lineCount, fileCount > = getOneFrom(ci[p,lv[p]]);
-		return "<p> & <fileCount> & <featureFileCount> & < round((featureFileCount*1.0)/fileCount*10000)/100.0 > & <pc[p]> & < (featureFileCount <= 1) ? "X" : "<round(gmap[p] * 100.0)/100.0>" > \\\\ \\hline";
+		v = lv[p];
+		< lineCount, fileCount > = getOneFrom(ci[p,v]);
+		return "<p> & <fileCount> & <includesPerProduct[<p,v>]> & <counts[<p,v>].unresolved.hc> & <counts[<p,v>].afterEval.hc> & <counts[<p,v>].afterMatch.hc> & <counts[<p,v>].afterBoth.hc> & <round((1.0 * counts[<p,v>].unresolved.hc - counts[<p,v>].afterBoth.hc) / counts[<p,v>].unresolved.hc * 10000.0) / 100.0> &  <counts[<p,v>].afterBoth.fc> & <counts[<p,v>].afterBoth.gc> \\\\";
 	}
 		
 	res = "\\begin{table*}
 		  '  \\centering
-		  '  \\begin{tabular}{|l|r|r|r|r|r|} \\hline
-		  '  Product & Files & Includes & NL & AS & AM & AB & AB Files & Gini \\\\ \\hline \\hline<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '  \\ra{1.2}
+		  '  \\begin{tabular}{@{}lrrrrrrrrr@{}} \\toprule
+		  '  Product & Files & Includes & NL & AS & AM & AB & Resolved\\% & AB Files & Gini \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '    <productLine(p)> <}>
+		  '  \\bottomrule
 		  '  \\end{tabular}
-		  '  \\caption{PHP Non-Literal Include\\label{table-includes}}
+		  '  \\caption{PHP Non-Literal Includes\\label{table-includes}}
 		  '\\end{table*}
 		  '";
 	return res;	
 }
+
+alias MMResult = map[tuple[str p, str v], tuple[list[ClassItem] sets, list[ClassItem] gets, list[ClassItem] isSets, list[ClassItem] unsets, list[ClassItem] calls, list[ClassItem] staticCalls]];
+
+public MMResult magicMethodUses() {
+	lv = getLatestVersions();
+	res = ( );
+	for (p <- lv) {
+		pt = loadBinary(p,lv[p]);
+		sets = fetchOverloadedSet(pt);
+		gets = fetchOverloadedGet(pt);
+		isSets = fetchOverloadedIsSet(pt);
+		unsets = fetchOverloadedUnset(pt);
+		calls = fetchOverloadedCall(pt);
+		staticCalls = fetchOverloadedCallStatic(pt);
+		res[<p,lv[p]>] = < sets, gets, isSets, unsets, calls, staticCalls >;
+	}
+	return res;
+}
+
+public str magicMethodCounts(MMResult res) {
+	lv = getLatestVersions();
+	ci = loadCountsCSV();
+	
+	str productLine(str p) {
+		v = lv[p];
+		< lineCount, fileCount > = getOneFrom(ci[p,v]);
+
+		setsSize = size(res[<p,lv[p]>].sets);
+		getsSize = size(res[<p,lv[p]>].gets);
+		isSetsSize = size(res[<p,lv[p]>].isSets);
+		unsetsSize = size(res[<p,lv[p]>].unsets);
+		callsSize = size(res[<p,lv[p]>].calls);
+		staticCallsSize = size(res[<p,lv[p]>].staticCalls);
+		allMM = res[<p,lv[p]>].sets + res[<p,lv[p]>].gets + res[<p,lv[p]>].isSets + res[<p,lv[p]>].unsets + res[<p,lv[p]>].calls + res[<p,lv[p]>].staticCalls;
+		hits = ( );
+		for (citem <- allMM) {
+			hitloc = citem@at.path;
+			if (hitloc in hits)
+				hits[hitloc] += 1;
+			else
+				hits[hitloc] = 1;
+		}
+		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
+
+		return "<p> & <fileCount> & <size(hits<0>)> && <setsSize> & <getsSize> & <isSetsSize> & <unsetsSize> & <callsSize> & <staticCallsSize> & <(size(hits) > 1) ? round(giniC*1000.0)/1000.0 : "X"> \\\\";
+	}
+		
+	tbl = "\\begin{table*}
+		  '  \\centering
+		  '  \\ra{1.2}
+		  '  \\begin{tabular}{@{}lrrcrrrrrrr@{}} \\toprule
+		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{abc} & \\multicolumn{6}{c}{Overloading Feature} & Gini \\\\
+		  '  \\cmidrule{2-3} \\cmidrule{5-10}
+		  '          & Total & w/Overload && Set & Get & Is Set & Unset & Call & Static Call &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '    <productLine(p)> <}>
+		  '  \\bottomrule
+		  '  \\end{tabular}
+		  '  \\caption{PHP Overloading (Magic Methods)\\label{table-magic}}
+		  '\\end{table*}
+		  '";
+	return tbl;	
+	
+}
+
+alias HistInfo = rel[str p, str file, int variableVariables, int variableCalls, int variableMethodCalls, int variableNews, 
+                     int variableProperties, int variableClassConsts, int variableStaticCalls, int variableStaticTargets,
+                     int variableStaticProperties, int variableStaticPropertyTargets];
+                     
+public HistInfo calculateHistData(list[tuple[str p, str v, QueryResult qr]] vvuses, 
+								  list[tuple[str p, str v, QueryResult qr]] vvcalls,
+								  list[tuple[str p, str v, QueryResult qr]] vvmcalls,
+								  list[tuple[str p, str v, QueryResult qr]] vvnews,
+								  list[tuple[str p, str v, QueryResult qr]] vvprops,
+								  list[tuple[str p, str v, QueryResult qr]] vvcconsts,
+								  list[tuple[str p, str v, QueryResult qr]] vvscalls,
+								  list[tuple[str p, str v, QueryResult qr]] vvstargets,
+								  list[tuple[str p, str v, QueryResult qr]] vvsprops,
+								  list[tuple[str p, str v, QueryResult qr]] vvsptargets) 
+{
+	rel[str p, str file] lstFiles(list[tuple[str p, str v, QueryResult qr]] vv) = { < p, qr.l.path > | <p,_,qr> <- vv };
+	rel[str p, str file] allHits = lstFiles(vvuses) + lstFiles(vvcalls) + lstFiles(vvmcalls) + lstFiles(vvnews) +
+								   lstFiles(vvprops) + lstFiles(vvcconsts) + lstFiles(vvscalls) + lstFiles(vvstargets) +
+								   lstFiles(vvsprops) + lstFiles(vvsptargets);
+
+	lv = getLatestVersions();
+	rel[str p, str file] allOthers = { };
+	for (p <- lv) {
+		pt = loadBinary(p,lv[p]);
+		allOthers = allOthers + { < p, f.path > | f <- pt, <p,f.path> notin allHits }; 
+		println("For <p>, <size(allHits[p])> hits and <size(allOthers[p])> others");
+	}
+	
+	list[QueryResult] pvQueries(list[tuple[str p, str v, QueryResult qr]] vv, str p, str v, str file) = [ qr | <p,v,qr> <- vv, file := qr.l.path ];
+	 									
+	HistInfo res = { < p, file, 
+	  size(pvQueries(vvuses, p, lv[p], file)), 
+	  size(pvQueries(vvcalls, p, lv[p], file)),
+	  size(pvQueries(vvmcalls, p, lv[p], file)), 
+	  size(pvQueries(vvnews, p, lv[p], file)),
+	  size(pvQueries(vvprops, p, lv[p], file)), 
+	  size(pvQueries(vvcconsts, p, lv[p], file)),
+	  size(pvQueries(vvscalls, p, lv[p], file)), 
+	  size(pvQueries(vvstargets, p, lv[p], file)),
+	  size(pvQueries(vvsprops, p, lv[p], file)), 
+	  size(pvQueries(vvsptargets, p, lv[p], file)) > | < p, file > <- allHits } + (allOthers join {<0,0,0,0,0,0,0,0,0,0>});
+	
+	return res;
+}
+
+public void writeHistInfo(loc l, HistInfo h) {
+	writeBinaryValueFile(l, h);
+}
+
+public HistInfo readHistInfo(loc l) {
+	return readBinaryValueFile(#HistInfo, l);
+}
+
+alias HistInfo = rel[str p, str file, int variableVariables, int variableCalls, int variableMethodCalls, int variableNews, 
+                     int variableProperties, int variableClassConsts, int variableStaticCalls, int variableStaticTargets,
+                     int variableStaticProperties, int variableStaticPropertyTargets];
+
+public void writeHistInfoCSV(HistInfo h) {
+	lv = getLatestVersions();
+	println("Building histogram data map");
+	hm = ( <p,f> : <i1,i2,i3,i4,i5,i6,i7,i8,i9,i10> | <p,f,i1,i2,i3,i4,i5,i6,i7,i8,i9,i10> <- h );
+	println("Map built");
+	
+	str s = "p,file,variableVariables,variableCalls,variableMethodCalls,variableNews,variableProperties,variableClassConsts,variableStaticCalls,variableStaticTargets,variableStaticProperties,variableStaticPropertyTargets<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); }), f <- sort(toList((h<0,1>)[p])), <i1,i2,i3,i4,i5,i6,i7,i8,i9,i10> := hm[<p,f>]) {>
+		    '<p>,<f>,<i1>,<i2>,<i3>,<i4>,<i5>,<i6>,<i7>,<i8>,<i9>,<i10><}>
+		    '\n";
+		    
+	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/VarFeatures.csv|, s);
+}
+
+
+
