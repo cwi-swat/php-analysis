@@ -8,6 +8,7 @@ import List;
 import String;
 import Set;
 import Real;
+import Relation;
 import IO;
 import ValueIO;
 import Map;
@@ -577,6 +578,44 @@ public void writeHistInfoCSV(HistInfo h) {
 		    '\n";
 		    
 	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/VarFeatures.csv|, s);
+}
+
+public str squiglies(HistInfo hi) {
+   return "\\newcounter{plotOffset}	
+          '\\setcounter{plotOffset}{1}% counters do not like floating point, so we have to divide it inside pgf
+          '\\pgfplotsset{
+          '  eeg/.style={
+		  '    y filter/.code={\\pgfmathparse{\\pgfmathresult+(\\value{plotOffset}/10)}},
+		  '    execute at begin plot={\\addtocounter{plotOffset}{5}}, % shift next plot 0.5 higher
+		  '    no markers
+          '  }
+          '}
+          '
+          '\\begin{tikzpicture}
+          '\\begin{axis}[axis y line=none, axis x line*=middle, y=1cm] % y defines the height between 0.0 and 1.0         
+          '<squigly(hi<1,2>)>
+          '<squigly(hi<1,3>)>
+          '<squigly(hi<1,4>)>
+          '<squigly(hi<1,5>)>
+          '<squigly(hi<1,6>)>
+          '<squigly(hi<1,7>)>
+          '<squigly(hi<1,8>)>
+          '<squigly(hi<1,9>)>
+          '<squigly(hi<1,10>)>
+          '<squigly(hi<1,11>)>          
+	      '\\end{axis}
+          '\\end{tikzpicture}
+          ";
+  
+}
+
+public str squigly(rel[str, int] counts) {
+  ds = distribution(counts);
+  return "\\addplot+ [eeg] coordinates {
+          '<for (ev <- ds, ev != 0) {>
+          ' (<ev>,<ds[ev]>)
+          '<}>};
+          ";
 }
 
 
