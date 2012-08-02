@@ -582,19 +582,19 @@ public void writeHistInfoCSV(HistInfo h) {
 
 public str squiglies(HistInfo hi) {
    labels = [l | /label(l,_) := #HistInfo];
-   return "
-          '\\begin{tikzpicture}
+   return "\\begin{tikzpicture}
           '\\begin{groupplot}[group style={group size=2 by 5},height=4cm,width=\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
           '<squigly(hi<1,2>, labels[2])>
           '<squigly(hi<1,3>, labels[3])>
           '<squigly(hi<1,4>, labels[4])>
           '<squigly(hi<1,5>, labels[5])>
           '<squigly(hi<1,6>, labels[6])>
-          '<squigly(hi<1,7>, labels[7])>
-          '<squigly(hi<1,8>, labels[8])>
-          '<squigly(hi<1,9>, labels[9])>
-          '<squigly(hi<1,10>, labels[10])>
-          '<squigly(hi<1,11>, labels[11])>
+          '\\nextgroupplot [legend entries={<labels[7]><for (i <- [8..11]) {>, {<labels[i]>}<}>},legend style={nodes right, xshift=0.3cm, yshift=0.5cm}, legend pos=north east]
+          '<labeledSquigly(hi<1,7>, labels[7])>
+          '<labeledSquigly(hi<1,8>, labels[8])>
+          '<labeledSquigly(hi<1,9>, labels[9])>
+          '<labeledSquigly(hi<1,10>, labels[10])>
+          '\\addplot+ [smooth] coordinates { (0,0) (10,0)};
 	      '\\end{groupplot}
           '\\end{tikzpicture}
           ";
@@ -608,6 +608,15 @@ public str squigly(rel[str, int] counts, str label) {
   perc = round(perc * 10000.0) / 100.0;
   return "\\nextgroupplot [title={<label> (<perc> \\%)},title style={yshift=-1cm}]
          '\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
+         ";
+}
+
+public str labeledSquigly(rel[str, int] counts, str label) {
+  ds = distribution(counts);
+  s = sum([ ds[n] | n <- ds ]) * 1.0;
+  perc = (s - ds[0]) / s;
+  perc = round(perc * 10000.0) / 100.0;
+  return "\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
          ";
 }
 
