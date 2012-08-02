@@ -581,41 +581,32 @@ public void writeHistInfoCSV(HistInfo h) {
 }
 
 public str squiglies(HistInfo hi) {
-   return "\\newcounter{plotOffset}	
-          '\\setcounter{plotOffset}{1}% counters do not like floating point, so we have to divide it inside pgf
-          '\\pgfplotsset{
-          '  eeg/.style={
-		  '    y filter/.code={\\pgfmathparse{\\pgfmathresult+(\\value{plotOffset}/10)}},
-		  '    execute at begin plot={\\addtocounter{plotOffset}{5}}, % shift next plot 0.5 higher
-		  '    no markers
-          '  }
-          '}
-          '
+   labels = [l | /label(l,_) := #HistInfo];
+   return "
           '\\begin{tikzpicture}
-          '\\begin{axis}[axis y line=none, axis x line*=middle, y=1cm] % y defines the height between 0.0 and 1.0         
-          '<squigly(hi<1,2>)>
-          '<squigly(hi<1,3>)>
-          '<squigly(hi<1,4>)>
-          '<squigly(hi<1,5>)>
-          '<squigly(hi<1,6>)>
-          '<squigly(hi<1,7>)>
-          '<squigly(hi<1,8>)>
-          '<squigly(hi<1,9>)>
-          '<squigly(hi<1,10>)>
-          '<squigly(hi<1,11>)>          
-	      '\\end{axis}
+          '\\begin{groupplot}[group style={group size=2 by 5},height=4cm,width=\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
+          '<squigly(hi<1,2>, labels[2])>
+          '<squigly(hi<1,3>, labels[3])>
+          '<squigly(hi<1,4>, labels[4])>
+          '<squigly(hi<1,5>, labels[5])>
+          '<squigly(hi<1,6>, labels[6])>
+          '<squigly(hi<1,7>, labels[7])>
+          '<squigly(hi<1,8>, labels[8])>
+          '<squigly(hi<1,9>, labels[9])>
+          '<squigly(hi<1,10>, labels[10])>
+          '<squigly(hi<1,11>, labels[11])>
+	      '\\end{groupplot}
           '\\end{tikzpicture}
           ";
   
 }
 
-public str squigly(rel[str, int] counts) {
+public str squigly(rel[str, int] counts, str label) {
   ds = distribution(counts);
-  s = sum((ds - (0:0))<1>) * 1.0;
-  return "\\addplot+ [eeg] coordinates { (0,0)
-          '<for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev] / s>) <}>
-          '(<s>,0)};
-          ";
+//  s = sum((ds - (0:0))<1>) * 1.0;
+  return "\\nextgroupplot [title=<label>,title style={yshift=-1cm}]
+         '\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
+         ";
 }
 
 
