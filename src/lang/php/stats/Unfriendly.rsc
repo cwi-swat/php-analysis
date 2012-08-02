@@ -603,8 +603,10 @@ public str squiglies(HistInfo hi) {
 
 public str squigly(rel[str, int] counts, str label) {
   ds = distribution(counts);
-//  s = sum((ds - (0:0))<1>) * 1.0;
-  return "\\nextgroupplot [title=<label>,title style={yshift=-1cm}]
+  s = sum(ds<1>) * 1.0;
+  perc = (s - ds[0]) / s;
+  perc = round(perc * 10000.0) / 10000.0;
+  return "\\nextgroupplot [title={<label> (<perc> \\%)},title style={yshift=-1cm}]
          '\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
          ";
 }
