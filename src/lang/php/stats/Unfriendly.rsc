@@ -594,7 +594,7 @@ public str squiglies(HistInfo hi) {
           '<labeledSquigly(hi<1,8>, labels[8])>
           '<labeledSquigly(hi<1,9>, labels[9])>
           '<labeledSquigly(hi<1,10>, labels[10])>
-          '\\addplot+ [smooth] coordinates { (0,0) (10,0)};
+          '\\addplot+ [smooth] coordinates { (1,0) (10,0)};
 	      '\\end{groupplot}
           '\\end{tikzpicture}
           ";
@@ -606,7 +606,7 @@ public str squigly(rel[str, int] counts, str label) {
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
-  return "\\nextgroupplot [title={<label> (<perc> \\%)},title style={yshift=-1cm}]
+  return "\\nextgroupplot [title={<label> (<perc>\\%)},title style={yshift=-1cm}]
          '\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
          ";
 }
