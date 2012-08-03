@@ -620,5 +620,22 @@ public str labeledSquigly(rel[str, int] counts, str label) {
          ";
 }
 
+public void featureCountsPerFile() {
+	map[str p, str v] lv = getLatestVersions();
+	list[str] keyOrder = stmtKeyOrder() + exprKeyOrder();
+	str fileHeader = "product,version,file,<intercalate(",",["\\<rascalFriendlyKey(i)>" | i <- keyOrder ])>\n";
+	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv|, fileHeader);
+	
+	for (product <- lv) {
+		productAst = loadBinary(product,lv[product]);
+		map[str file, map[str feature, int count] counts] counts = stmtAndExprCountsByFile(productAst);
+		list[str] featureFile = [ ];
+		for (file <- counts) {
+			list[int] infoCounts = [ (f in counts[file]) ? counts[file][f] : 0 | f <- keyOrder ];
+			featureFile += "<product>,<lv[product]>,<file>,<intercalate(",",infoCounts)>";
+		}
+		appendToFile(|project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv|, intercalate("\n",featureFile) + "\n");	
+	}
 
+}
 

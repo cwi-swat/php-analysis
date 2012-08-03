@@ -158,6 +158,31 @@ public map[str,int] stmtCounts(map[loc fileloc, Script scr] scripts) {
 	return counts;
 }
 
+public map[str file, map[str feature, int count] counts] stmtAndExprCountsByFile(map[loc fileloc, Script scr] scripts) {
+	map[str file, map[str feature, int count] counts] fileCounts = ( );
+	for (l <- scripts<0>, s <- scripts[l]) {
+		map[str feature, int count] counts = ( );
+		visit(s) {
+			case Stmt stmt : {
+				stmtKey = getStmtKey(stmt);
+				if (stmtKey in counts)
+					counts[stmtKey] += 1;
+				else
+					counts[stmtKey] = 1;
+			}
+			case Expr expr : {
+				exprKey = getExprKey(expr);
+				if (exprKey in counts)
+					counts[exprKey] += 1;
+				else
+					counts[exprKey] = 1;
+			}
+		}
+		fileCounts[l.path] = counts;
+	} 
+	return fileCounts;
+}
+
 @doc{Gather expression counts}
 public map[str,int] exprCounts(map[loc fileloc, Script scr] scripts) {
 	map[str,int] counts = ( );
@@ -345,6 +370,17 @@ public list[str] featureOrder() = [ "class consts with variable class name",
 									"var-args support functions",
 									"break with non-literal argument",
 									"continue with non-literal argument"];
+
+public str rascalFriendlyKey(str k) {
+	while (/<pre:.*>[\(]<c:[a-zA-Z]><post:.*>/ := k) k = pre + toUpperCase(c) + post;
+	while (/<pre:.*>[\)]<c:[a-zA-Z]><post:.*>/ := k) k = pre + toUpperCase(c) + post;
+	while (/<pre:.*>[\)]<post:.*>/ := k) k = pre + post;
+	while (/<pre:.*>[ ]<c:[a-zA-Z]><post:.*>/ := k) k = pre + toUpperCase(c) + post;
+	while (/<pre:.*>[\/]<c:[a-zA-Z]><post:.*>/ := k) k = pre + toUpperCase(c) + post;
+	while (/<pre:.*>[:]<c:[a-zA-Z]><post:.*>/ := k) k = pre + toUpperCase(c) + post;
+	while (/<pre:.*>[-]<c:[a-zA-Z]><post:.*>/ := k) k = pre + toUpperCase(c) + post;
+	return k;
+}
 
 public void gatherFeatureCountsFromBinary(str product, str version) {
 	b = loadBinary(product, version);
