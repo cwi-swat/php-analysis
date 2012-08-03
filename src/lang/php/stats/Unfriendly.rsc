@@ -15,10 +15,12 @@ import Map;
 import stat::Inference;
 import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::analysis::includes::IncludeCP;
+import lang::rascal::types::AbstractType;
 
 import lang::csv::IO;
 import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
 import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
+import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -611,6 +613,15 @@ public str squigly(rel[str, int] counts, str label) {
          ";
 }
 
+public str squigly2(rel[str, int] counts, str label) {
+  ds = distribution(counts);
+  s = sum([ ds[n] | n <- ds ]) * 1.0;
+  perc = (s - ds[0]) / s;
+  perc = round(perc * 10000.0) / 100.0;
+  return "\\addplot+ [only marks,title={<label> (<perc>\\%)},title style={yshift=-1cm}] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
+         ";
+}
+
 public str labeledSquigly(rel[str, int] counts, str label) {
   ds = distribution(counts);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
@@ -638,4 +649,43 @@ public void featureCountsPerFile() {
 	}
 
 }
+
+alias FMap = map[str file, tuple[int \break, int \classDef, int \const, int \continue, int \declare, int \do, int \echo, int \expressionStatementChainRule, int \for, int \foreach, int \functionDef, int \global, int \goto, int \haltCompiler, int \if, int \inlineHTML, int \interfaceDef, int \traitDef, int \label, int \namespace, int \return, int \static, int \switch, int \throw, int \tryCatch, int \unset, int \use, int \whileDef, int \array, int \fetchArrayDim, int \fetchClassConst, int \assign, int \assignWithOperationBitwiseAnd, int \assignWithOperationBitwiseOr, int \assignWithOperationBitwiseXor, int \assignWithOperationConcat, int \assignWithOperationDiv, int \assignWithOperationMinus, int \assignWithOperationMod, int \assignWithOperationMul, int \assignWithOperationPlus, int \assignWithOperationRightShift, int \assignWithOperationLeftShift, int \listAssign, int \refAssign, int \binaryOperationBitwiseAnd, int \binaryOperationBitwiseOr, int \binaryOperationBitwiseXor, int \binaryOperationConcat, int \binaryOperationDiv, int \binaryOperationMinus, int \binaryOperationMod, int \binaryOperationMul, int \binaryOperationPlus, int \binaryOperationRightShift, int \binaryOperationLeftShift, int \binaryOperationBooleanAnd, int \binaryOperationBooleanOr, int \binaryOperationGt, int \binaryOperationGeq, int \binaryOperationLogicalAnd, int \binaryOperationLogicalOr, int \binaryOperationLogicalXor, int \binaryOperationNotEqual, int \binaryOperationNotIdentical, int \binaryOperationLt, int \binaryOperationLeq, int \binaryOperationEqual, int \binaryOperationIdentical, int \unaryOperationBooleanNot, int \unaryOperationBitwiseNot, int \unaryOperationPostDec, int \unaryOperationPreDec, int \unaryOperationPostInc, int \unaryOperationPreInc, int \unaryOperationUnaryPlus, int \unaryOperationUnaryMinus, int \new, int \classConst, int \castToInt, int \castToBool, int \castToFloat, int \castToString, int \castToArray, int \castToObject, int \castToUnset, int \clone, int \closure, int \fetchConst, int \empty, int \suppress, int \eval, int \exit, int \call, int \methodCall, int \staticCall, int \include, int \instanceOf, int \isSet, int \print, int \propertyFetch, int \shellExec, int \exit, int \fetchStaticProperty, int \scalar, int \var] counts];
+
+public str generalFeatureSquiglies(FMap featsMap) {
+   labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
+  //labels = ["break","classDef","const","continue","declare","do","echo","expressionStatementChainRule","for","foreach","functionDef","global","goto","haltCompiler","if","inlineHTML","interfaceDef","traitDef","label","namespace","return","static","switch","throw","tryCatch","unset","use","whileDef","array","fetchArrayDim","fetchClassConst","assign","assignWithOperationBitwiseAnd","assignWithOperationBitwiseOr","assignWithOperationBitwiseXor","assignWithOperationConcat","assignWithOperationDiv","assignWithOperationMinus","assignWithOperationMod","assignWithOperationMul","assignWithOperationPlus","assignWithOperationRightShift","assignWithOperationLeftShift","listAssign","refAssign","binaryOperationBitwiseAnd","binaryOperationBitwiseOr","binaryOperationBitwiseXor","binaryOperationConcat","binaryOperationDiv","binaryOperationMinus","binaryOperationMod","binaryOperationMul","binaryOperationPlus","binaryOperationRightShift","binaryOperationLeftShift","binaryOperationBooleanAnd","binaryOperationBooleanOr","binaryOperationGt","binaryOperationGeq","binaryOperationLogicalAnd","binaryOperationLogicalOr","binaryOperationLogicalXor","binaryOperationNotEqual","binaryOperationNotIdentical","binaryOperationLt","binaryOperationLeq","binaryOperationEqual","binaryOperationIdentical","unaryOperationBooleanNot","unaryOperationBitwiseNot","unaryOperationPostDec","unaryOperationPreDec","unaryOperationPostInc","unaryOperationPreInc","unaryOperationUnaryPlus","unaryOperationUnaryMinus","new","classConst","castToInt","castToBool","castToFloat","castToString","castToArray","castToObject","castToUnset","clone","closure","fetchConst","empty","suppress","eval","exit","call","methodCall","staticCall","include","instanceOf","isSet","print","propertyFetch","shellExec","exit","fetchStaticProperty","scalar","var","counts"];
+//  feats = getFeats();
+//  println("Building feats map");
+//  featsMap = ( f : getOneFrom(feats[_,_,f]) | f <- feats<2> );
+//  println("Done");
+
+  groups = ("binary operators" : [ l | str l:/^binaryOp.*/ <- labels ] )
+         + ("unary operators" : [l | str l:/^unaryOp.*/ <- labels ])
+         + ("control flow" : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","whileDef","exit","suppress"])
+         + ("assignment operators" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign"])
+         + ("casts" : [l | str l:/^cast.*/ <- labels])
+         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const"])
+         + ("allocation" : ["array","new","scalar"])
+         + ("other" : ["print","echo","inlineHTML","use","unset","isSet","empty","clone","eval", "shellExec","instanceOf","include","closure"])
+         + ("lookups" : ["fetchArrayDim","fetchClassConst","var","classConst","fetchConst","propertyFetch","fetchStaticProperty"])
+         + ("invocations" : ["call","methodCall","staticCall"])
+         ;
+//  indices = [ indexOf(l, labels) | l <- binOps];
+//  binOpsMap = { <f, (0 | it + featsMap[f][i] | i <- indices)> | f <- featsMap};
+  
+  return 
+  "<for (g <- groups) { 
+      indices = [ indexOf(labels, l) | l <- groups[g]];>
+  '\\begin{tikzpicture}
+  '\\begin{loglogaxis}[height=3cm,width=.8\\columnwidth,xmin=1,axis x line=bottom, axis y line=left,cycle list = {black,black!80,black!60,black!40,black!20,black!10},legend entries={<intercalate(",",groups[g])>}, legend pos=outer north east]
+  '<for (int i <- indices) {>
+  '<squigly2({ < file, featsMap[file][i] > | file <- featsMap }, labels[i])>
+  '<}>\\end{loglogaxis}
+  '\\end{tikzpicture}        
+  '<}>
+  ";
+  
+}
+
 
