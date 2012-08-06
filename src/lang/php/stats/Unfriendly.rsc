@@ -16,6 +16,7 @@ import stat::Inference;
 import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::analysis::includes::IncludeCP;
 import lang::rascal::types::AbstractType;
+import util::Math;
 
 import lang::csv::IO;
 import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
@@ -618,7 +619,7 @@ public str squigly2(rel[str, int] counts, str label) {
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
-  return "\\addplot+ [only marks,title={<label> (<perc>\\%)},title style={yshift=-1cm}] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
+  return "\\addplot+ [only marks] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
          ";
 }
 
@@ -678,14 +679,17 @@ public str generalFeatureSquiglies(FMap featsMap) {
   "<for (g <- groups) { 
       indices = [ indexOf(labels, l) | l <- groups[g]];>
   '\\begin{tikzpicture}
-  '\\begin{loglogaxis}[height=3cm,width=.8\\columnwidth,xmin=1,axis x line=bottom, axis y line=left,cycle list = {black,black!80,black!60,black!40,black!20,black!10},legend entries={<intercalate(",",groups[g])>}, legend pos=outer north east]
+  '\\selectcolormodel{gray}
+  '\\begin{loglogaxis}[height=.7\\columnwidth,width=.7\\columnwidth,xmin=1,axis x line=bottom, axis y line=left,legend entries={<intercalate(",",[shortLabel(la) | la <- groups[g]])>}, legend pos=outer north east, cycle list name=exotic, legend columns=<min(3, (size(groups[g]) / 8) + 1)>, legend style={xshift=-.25\\columnwidth}]
   '<for (int i <- indices) {>
-  '<squigly2({ < file, featsMap[file][i] > | file <- featsMap }, labels[i])>
+  '<squigly2({ < file, featsMap[file][i] > | file <- featsMap }, shortLabel(labels[i]))>
   '<}>\\end{loglogaxis}
   '\\end{tikzpicture}        
   '<}>
   ";
   
 }
+
+str shortLabel(str l) = visit(l) {case /.*Operation<rest:.*>/ => rest };
 
 
