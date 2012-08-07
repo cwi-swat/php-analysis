@@ -22,6 +22,7 @@ import lang::csv::IO;
 import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
 import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
 import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
+import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -619,8 +620,13 @@ public str squigly2(rel[str, int] counts, str label) {
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
-  return "\\addplot+ [only marks] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
-         ";
+  if ((ds - (0:0)) == ()) {
+    return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
+  }
+  else {
+    return "\\addplot+ [only marks] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>}; \\label{<label>}
+           ";
+  }
 }
 
 public str labeledSquigly(rel[str, int] counts, str label) {
@@ -652,6 +658,13 @@ public void featureCountsPerFile() {
 }
 
 alias FMap = map[str file, tuple[int \break, int \classDef, int \const, int \continue, int \declare, int \do, int \echo, int \expressionStatementChainRule, int \for, int \foreach, int \functionDef, int \global, int \goto, int \haltCompiler, int \if, int \inlineHTML, int \interfaceDef, int \traitDef, int \label, int \namespace, int \return, int \static, int \switch, int \throw, int \tryCatch, int \unset, int \use, int \whileDef, int \array, int \fetchArrayDim, int \fetchClassConst, int \assign, int \assignWithOperationBitwiseAnd, int \assignWithOperationBitwiseOr, int \assignWithOperationBitwiseXor, int \assignWithOperationConcat, int \assignWithOperationDiv, int \assignWithOperationMinus, int \assignWithOperationMod, int \assignWithOperationMul, int \assignWithOperationPlus, int \assignWithOperationRightShift, int \assignWithOperationLeftShift, int \listAssign, int \refAssign, int \binaryOperationBitwiseAnd, int \binaryOperationBitwiseOr, int \binaryOperationBitwiseXor, int \binaryOperationConcat, int \binaryOperationDiv, int \binaryOperationMinus, int \binaryOperationMod, int \binaryOperationMul, int \binaryOperationPlus, int \binaryOperationRightShift, int \binaryOperationLeftShift, int \binaryOperationBooleanAnd, int \binaryOperationBooleanOr, int \binaryOperationGt, int \binaryOperationGeq, int \binaryOperationLogicalAnd, int \binaryOperationLogicalOr, int \binaryOperationLogicalXor, int \binaryOperationNotEqual, int \binaryOperationNotIdentical, int \binaryOperationLt, int \binaryOperationLeq, int \binaryOperationEqual, int \binaryOperationIdentical, int \unaryOperationBooleanNot, int \unaryOperationBitwiseNot, int \unaryOperationPostDec, int \unaryOperationPreDec, int \unaryOperationPostInc, int \unaryOperationPreInc, int \unaryOperationUnaryPlus, int \unaryOperationUnaryMinus, int \new, int \classConst, int \castToInt, int \castToBool, int \castToFloat, int \castToString, int \castToArray, int \castToObject, int \castToUnset, int \clone, int \closure, int \fetchConst, int \empty, int \suppress, int \eval, int \exit, int \call, int \methodCall, int \staticCall, int \include, int \instanceOf, int \isSet, int \print, int \propertyFetch, int \shellExec, int \exit, int \fetchStaticProperty, int \scalar, int \var] counts];
+public void writeFeatsMap(FMap m) {
+  writeBinaryValueFile(|tmp:///featsmap.bin|, m);
+}
+
+public FMap readFeatsMap() {
+  return readBinaryValueFile(#FMap, |tmp:///featsmap.bin|);
+}
 
 public str generalFeatureSquiglies(FMap featsMap) {
    labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
@@ -661,35 +674,74 @@ public str generalFeatureSquiglies(FMap featsMap) {
 //  featsMap = ( f : getOneFrom(feats[_,_,f]) | f <- feats<2> );
 //  println("Done");
 
-  groups = ("binary operators" : [ l | str l:/^binaryOp.*/ <- labels ] )
+  groups = ("binary operators" : [ l | str l:/^binaryOp.*/ <- labels ])
          + ("unary operators" : [l | str l:/^unaryOp.*/ <- labels ])
-         + ("control flow" : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","whileDef","exit","suppress"])
+         + ("control flow" : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","whileDef","exit","suppress","label"])
          + ("assignment operators" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign"])
-         + ("casts" : [l | str l:/^cast.*/ <- labels])
-         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const"])
-         + ("allocation" : ["array","new","scalar"])
+         + ("definitions and invocations" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const"] + ["call","methodCall","staticCall"])
+         + ("casts" : ["array","new","scalar"] + [l | str l:/^cast.*/ <- labels])
          + ("other" : ["print","echo","inlineHTML","use","unset","isSet","empty","clone","eval", "shellExec","instanceOf","include","closure"])
          + ("lookups" : ["fetchArrayDim","fetchClassConst","var","classConst","fetchConst","propertyFetch","fetchStaticProperty"])
-         + ("invocations" : ["call","methodCall","staticCall"])
+        
          ;
 //  indices = [ indexOf(l, labels) | l <- binOps];
 //  binOpsMap = { <f, (0 | it + featsMap[f][i] | i <- indices)> | f <- featsMap};
-  
+  int counter = 0;
   return 
-  "<for (g <- groups) { 
-      indices = [ indexOf(labels, l) | l <- groups[g]];>
+  "\\begin{figure*}[t]
+  '\\centering
+  '\\textbf{PHP feature count per file histograms}\\
+  '<for (g <- groups) { counter += 1; 
+      indices = [ indexOf(labels, l) | l <- groups[g]];>\\subfloat[<g>]{    
   '\\begin{tikzpicture}
-  '\\selectcolormodel{gray}
-  '\\begin{loglogaxis}[height=.7\\columnwidth,width=.7\\columnwidth,xmin=1,axis x line=bottom, axis y line=left,legend entries={<intercalate(",",[shortLabel(la) | la <- groups[g]])>}, legend pos=outer north east, cycle list name=exotic, legend columns=<min(3, (size(groups[g]) / 8) + 1)>, legend style={xshift=-.25\\columnwidth}]
-  '<for (int i <- indices) {>
-  '<squigly2({ < file, featsMap[file][i] > | file <- featsMap }, shortLabel(labels[i]))>
+  '\\begin{loglogaxis}[grid=both, height=.6\\columnwidth,width=.6\\columnwidth,xmin=1,axis x line=bottom, axis y line=left,legend cell align=left, legend entries={<intercalate(",",[shortLabel(labels[ind]) | ind <- indices])>}, legend pos=outer north east, cycle list name=exotic, legend columns=<min(3, (size(groups[g]) / 8) + 1)>]
+  '<for (int i <- indices) {><squigly2({ < file, featsMap[file][i] > | file <- featsMap }, shortLabel(labels[i]))>
   '<}>\\end{loglogaxis}
-  '\\end{tikzpicture}        
+  '\\end{tikzpicture}
+  '}<if (counter % 2 == 0) {>
+  '\\qquad<}>        
   '<}>
+  '\\caption{What features does an arbitrary PHP file use? These histograms show the distribution of language feature usage over PHP files, excluding the 0 frequency. Every dot shows how many times (x-axis, logarithmic) one file contained that many uses of a specific feature (y-axis, logarithmic).\\label{Figure:FeatureDistributions}. Features that occur nowhere in the corpus have no tick mark in the legends either.} 
+  '\\end{figure*}
   ";
   
 }
 
-str shortLabel(str l) = visit(l) {case /.*Operation<rest:.*>/ => rest };
+public str shortLabel(str l) {
+  switch (l) { 
+    case /^.*Operation<rest:.*>/ : return shortLabel(rest);
+    case /^whileDef/ : return  "while" ;
+    case /^castTo<rest:.*>/ : return  "to<shortLabel(rest)>";
+    case /^Bitwise<rest:.*>/ : return  "Bit<shortLabel(rest)>";
+    case /^Left<rest:.*>/ : return  "L<rest>";
+    case /^Right<rest:.*>/ : return  "R<rest>";
+    case /^Boolean<rest:.*>/ : return  "Bool<rest>";
+    case /^Logical<rest:.*>/ : return  "Log<rest>";
+    case "NotIdentical" : return "NotId";
+    default: return l;
+  }
+}
 
+public str fileSizesHistogram(getLinesType ls) {
+  ds = distribution(ls<file,phplines>);
+  
+  return "\\begin{figure}
+         '\\subfloat[Linear scale]{
+         '\\begin{tikzpicture}
+         '\\begin{axis}[grid=both, height=.5\\columnwidth,width=.5\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
+         '\\addplot [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
+         '\\end{axis}
+         '\\end{tikzpicture}
+         '}
+         '\\subfloat[Log scale]{
+         '\\begin{tikzpicture}
+         '\\begin{loglogaxis}[grid=both, height=.5\\columnwidth,width=.5\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
+         '\\addplot [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
+         '\\end{loglogaxis}
+         '\\end{tikzpicture}
+         '}
+         '\\caption{PHP file sizes histogram\\label{Figure:FileSizeHistogram}}
+         '\\end{figure}
+         ";
+}
 
