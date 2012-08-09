@@ -666,13 +666,14 @@ public FMap readFeatsMap() {
   return readBinaryValueFile(#FMap, |tmp:///featsmap.bin|);
 }
 
-public str generalFeatureSquiglies(FMap featsMap) {
+public str generalFeatureSquiglies(FMap featsMap, getLinesType ls) {
    labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
   //labels = ["break","classDef","const","continue","declare","do","echo","expressionStatementChainRule","for","foreach","functionDef","global","goto","haltCompiler","if","inlineHTML","interfaceDef","traitDef","label","namespace","return","static","switch","throw","tryCatch","unset","use","whileDef","array","fetchArrayDim","fetchClassConst","assign","assignWithOperationBitwiseAnd","assignWithOperationBitwiseOr","assignWithOperationBitwiseXor","assignWithOperationConcat","assignWithOperationDiv","assignWithOperationMinus","assignWithOperationMod","assignWithOperationMul","assignWithOperationPlus","assignWithOperationRightShift","assignWithOperationLeftShift","listAssign","refAssign","binaryOperationBitwiseAnd","binaryOperationBitwiseOr","binaryOperationBitwiseXor","binaryOperationConcat","binaryOperationDiv","binaryOperationMinus","binaryOperationMod","binaryOperationMul","binaryOperationPlus","binaryOperationRightShift","binaryOperationLeftShift","binaryOperationBooleanAnd","binaryOperationBooleanOr","binaryOperationGt","binaryOperationGeq","binaryOperationLogicalAnd","binaryOperationLogicalOr","binaryOperationLogicalXor","binaryOperationNotEqual","binaryOperationNotIdentical","binaryOperationLt","binaryOperationLeq","binaryOperationEqual","binaryOperationIdentical","unaryOperationBooleanNot","unaryOperationBitwiseNot","unaryOperationPostDec","unaryOperationPreDec","unaryOperationPostInc","unaryOperationPreInc","unaryOperationUnaryPlus","unaryOperationUnaryMinus","new","classConst","castToInt","castToBool","castToFloat","castToString","castToArray","castToObject","castToUnset","clone","closure","fetchConst","empty","suppress","eval","exit","call","methodCall","staticCall","include","instanceOf","isSet","print","propertyFetch","shellExec","exit","fetchStaticProperty","scalar","var","counts"];
 //  feats = getFeats();
 //  println("Building feats map");
 //  featsMap = ( f : getOneFrom(feats[_,_,f]) | f <- feats<2> );
 //  println("Done");
+  lls = (t.file:t.phplines | t <- ls);
 
   groups = ("binary operators" : [ l | str l:/^binaryOp.*/ <- labels ])
          + ("unary operators" : [l | str l:/^unaryOp.*/ <- labels ])
@@ -694,9 +695,9 @@ public str generalFeatureSquiglies(FMap featsMap) {
   '<for (g <- groups) { counter += 1; 
       indices = [ indexOf(labels, l) | l <- groups[g]];>\\subfloat[<g>]{    
   '\\begin{tikzpicture}
-  '\\begin{loglogaxis}[grid=both, height=.6\\columnwidth,width=.6\\columnwidth,xmin=1,axis x line=bottom, axis y line=left,legend cell align=left, legend entries={<intercalate(",",[shortLabel(labels[ind]) | ind <- indices])>}, legend pos=outer north east, cycle list name=exotic, legend columns=<min(3, (size(groups[g]) / 8) + 1)>]
-  '<for (int i <- indices) {><squigly2({ < file, featsMap[file][i] > | file <- featsMap }, shortLabel(labels[i]))>
-  '<}>\\end{loglogaxis}
+  '\\begin{semilogyaxis}[grid=both, height=.6\\columnwidth,width=.6\\columnwidth,xmin=1,axis x line=bottom, axis y line=left,legend cell align=left, legend entries={<intercalate(",",[shortLabel(labels[ind]) | ind <- indices])>}, legend pos=outer north east, cycle list name=exotic, legend columns=<min(3, (size(groups[g]) / 8) + 1)>]
+  '<for (int i <- indices) {><squigly2({ < file,toInt((featsMap[file][i] * 1.0 / s) * 100)> | file <- featsMap, int s := lls[file], s != 0}, shortLabel(labels[i]))>
+  '<}>\\end{semilogyaxis}
   '\\end{tikzpicture}
   '}<if (counter % 2 == 0) {>
   '\\qquad<}>        
@@ -724,6 +725,7 @@ public str shortLabel(str l) {
 
 public str fileSizesHistogram(getLinesType ls) {
   ds = distribution(ls<file,phplines>);
+  cds = cumulative(ds);
   
   return "\\begin{figure}
          '\\subfloat[Linear scale]{
@@ -736,12 +738,26 @@ public str fileSizesHistogram(getLinesType ls) {
          '\\subfloat[Log scale]{
          '\\begin{tikzpicture}
          '\\begin{loglogaxis}[grid=both, height=.5\\columnwidth,width=.5\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
-         '\\addplot [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
+         '\\addplot+ [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
+         '\\addplot+ [only marks] coordinates {<for(x <- cds) {>(<x>,<cds[x]>) <}>};
          '\\end{loglogaxis}
          '\\end{tikzpicture}
          '}
          '\\caption{PHP file sizes histogram\\label{Figure:FileSizeHistogram}}
          '\\end{figure}
          ";
+}
+
+public map[int,int] cumulative(map[int bucket,int frequency] dist) {
+  buckets = sort([*dist<bucket>]);
+  cur = 0;
+  result = ();
+  
+  for (b <- buckets) {
+    cur += dist[b];
+    result[b] = cur;
+  }
+  
+  return result;
 }
 
