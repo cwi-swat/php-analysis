@@ -19,10 +19,10 @@ import lang::rascal::types::AbstractType;
 import util::Math;
 
 import lang::csv::IO;
-import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
-import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
-import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
-import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
+import VVU;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
+import Exprs;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
+import Feats;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
+import Sizes;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -747,16 +747,83 @@ public str fileSizesHistogram(getLinesType ls) {
          ";
 }
 
-public data FeatureNode = featureNode(set[str] features);
+public data FeatureNode = featureNode(set[str] features) | synthNode(set[str] features);
 public anno set[str] FeatureNode@files;
-public anno int FeatureNode@fileCount;
+public anno set[str] FeatureNode@transFiles;
+public anno real FeatureNode@percent;
 
-public void calculateFeatureLattice() {
+alias FeatureLattice = rel[FeatureNode,FeatureNode];
+
+public FeatureLattice buildFeatureLattice(map[int,set[FeatureNode]] nodesBySize, FeatureNode bottomNode, int totalFiles) {
+	rel[FeatureNode,FeatureNode] lattice = { };
+	map[FeatureNode,set[FeatureNode]] coveredBy = ( n : { } | i <- nodesBySize, n <- nodesBySize[i] );
+	map[FeatureNode,set[FeatureNode]] covers = ( n : { } | i <- nodesBySize, n <- nodesBySize[i] );
+	map[FeatureNode,set[str]] transFiles = ( bottomNode : bottomNode@files );
+	
+	set[int] possibleIndices = nodesBySize<0>;
+	list[int] insertionOrder = sort(toList(possibleIndices));
+	for (i <- insertionOrder, i > 0) {
+		println("Adding nodes for layer <i>");
+		for (n <- nodesBySize[i]) {
+			set[FeatureNode] children = { };
+			set[FeatureNode] covered = { };
+			for (ci <- reverse([0..i-1]), ci in possibleIndices) {
+				set[FeatureNode] newChildren = { cn | cn <- nodesBySize[ci], cn notin covered, cn.features < n.features }; // , isEmpty(coveredBy[cn] & children) };
+				covered = covered + { *covers[cn] | cn <- newChildren };
+				children = children + newChildren; 
+			}
+			if (isEmpty(children)) children = { bottomNode };
+			lattice += { < child, n > | child <- children };
+			for (child <- children) coveredBy[child] = coveredBy[child] + n;
+			covers[n] = children;
+			transFiles[n] = { *(child@files) | child <- children };
+		}
+		println("Added <size(nodesBySize[i])> nodes");
+		
+		//println("Synthesizing missing nodes for layer <i>");
+		//allChildren = { *(nodesBySize[j]) | j <- [0..i-1] };
+		//directChildren = nodesBySize[i-1];
+		//possibleNodes = { *(dc.features) | dc <- directChildren };
+		//addedCounter = 0;
+		//for (dc <- directChildren, pn <- (possibleNodes - dc.features), featureNode(dc.features+pn) notin nodesBySize[i]) {
+		//	// Synthesize the node and add it to the bookkeeping structures
+		//	synthNode = featureNode(dc.features + pn)[@files={}];
+		//	coveredBy[synthNode] = { };
+		//	covers[synthNode] = { };
+		//	nodesBySize[i] = nodesBySize[i] + synthNode;
+		//	addedCounter += 1;
+		//	
+		//	// As with the above, insert it into the lattice and set up the covering relation properly
+		//	set[FeatureNode] children = { };
+		//	set[FeatureNode] covered = { };
+		//	for (ci <- reverse([0..i-1]), ci in possibleIndices) {
+		//		set[FeatureNode] newChildren = { cn | cn <- nodesBySize[ci], cn notin covered, cn.features < synthNode.features }; // , isEmpty(coveredBy[cn] & children) };
+		//		covered = covered + { *covers[cn] | cn <- newChildren };
+		//		children = children + newChildren; 
+		//	}
+		//	if (isEmpty(children)) children = { bottomNode };
+		//	lattice += { < child, synthNode > | child <- children };
+		//	for (child <- children) coveredBy[child] = coveredBy[child] + synthNode;
+		//	covers[synthNode] = children;
+		//}
+		//println("Synthesized <addedCounter> nodes");
+	}
+	
+	println("Annotating lattice");
+	lattice = visit(lattice) {
+		case FeatureNode fn => (fn[@transFiles=transFiles[fn]])[@percent=size(transFiles[fn])*100.0/totalFiles]
+	}
+	return lattice;
+}
+
+public FMap getFMap() {
 	feats = getFeats();
-	fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
-
 	FMap fmap = ( l : getOneFrom(feats[_,_,l]) | l <- feats<2> );
+	return fmap;
+}
 
+public FeatureLattice calculateFeatureLattice(FMap fmap) {
+	fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
 	indexes = ( i : fieldNames[i] | i <- index(fieldNames) );
 
 	perFile = ( l : { } | l <- fmap );	
@@ -774,18 +841,44 @@ public void calculateFeatureLattice() {
 	FeatureNode topNode = (featureNode(toSet(fieldNames)) notin nodes) ? featureNode(toSet(fieldNames))[@files={}] : getOneFrom({ i | i <- nodes, size(i.features) == size(fieldNames)});
 	if (bottomNode notin nodes) nodes = nodes + bottomNode;
 	if (topNode notin nodes) nodes = nodes + topNode;
-	set[FeatureNode] rootNodes = { i | i <- nodes, size(i.features) == 1 };
 	
-	//nodeList = toList(nodes);
-	//nodeList = sort(nodeList, bool(FeatureNode a, FeatureNode b) { return size(a.features) <= size(b.features); });
-	map[int,set[FeatureNode]] nodesBySize = ( n : { } | n <- {size2files<0>+0+size(fieldNames)} );
+	map[int,set[FeatureNode]] nodesBySize = ( n : { } | n <- (size2files<0>+0+size(fieldNames)) );
 	for (n <- nodes) nodesBySize[size(n.features)] = nodesBySize[size(n.features)] + n;
+	
+	FeatureLattice lattice = buildFeatureLattice(nodesBySize);
+	return lattice;
+}
+
+public FeatureLattice calculateTransitiveFiles(FeatureLattice lattice, FeatureNode top, int totalFiles) {
+	flipped = invert(lattice);
+	map[FeatureNode,set[str]] transFiles = ( );
 	 
-	rel[FeatureNode,FeatureNode] lattice = { < i, j > | i <- nodes, j <- nodes, i.features < j.features };
-	rel[FeatureNode,FeatureNode] covering = lattice;
-	solve(covering) {
-		covering = { < i, j > | < i, j > <- covering, size({ k | k <- covering[i], <k,j> in covering }) == 0 };
+	void childFiles(FeatureNode current) {
+		if (current in transFiles) return;
+		
+		children = flipped[current];
+		if (size(children) == 0) {
+			transFiles[current] = current@files;
+			if (size(transFiles)%50 == 0) println("transFiles now has <size(transFiles)> elements");
+		} else {
+			for (child <- children) childFiles(child);
+			transFiles[current] = current@files + { *transFiles[child] | child <- children };
+			if (size(transFiles)%50 == 0) println("transFiles now has <size(transFiles)> elements");
+			return;
+		}
 	}
+	
+	println("Computing transitive files for children");
+	childFiles(top);
+	
+	println("Annotating lattice");
+	lattice = visit(lattice) {
+		case FeatureNode fn => (fn[@transFiles=transFiles[fn]])[@percent=size(transFiles[fn])*100.0/totalFiles]
+	}
+	return lattice;
+}
+
+public list[FeatureNode] minimumFeaturesForPercent(FeatureLattice lattice, FeatureNode bottom, int filesNeeded) {
 	
 	
 }
