@@ -670,7 +670,8 @@ public void featureCountsPerFile() {
 
 }
 
-alias FMap = map[str file, tuple[int \break, int \classDef, int \const, int \continue, int \declare, int \do, int \echo, int \expressionStatementChainRule, int \for, int \foreach, int \functionDef, int \global, int \goto, int \haltCompiler, int \if, int \inlineHTML, int \interfaceDef, int \traitDef, int \label, int \namespace, int \return, int \static, int \switch, int \throw, int \tryCatch, int \unset, int \use, int \whileDef, int \array, int \fetchArrayDim, int \fetchClassConst, int \assign, int \assignWithOperationBitwiseAnd, int \assignWithOperationBitwiseOr, int \assignWithOperationBitwiseXor, int \assignWithOperationConcat, int \assignWithOperationDiv, int \assignWithOperationMinus, int \assignWithOperationMod, int \assignWithOperationMul, int \assignWithOperationPlus, int \assignWithOperationRightShift, int \assignWithOperationLeftShift, int \listAssign, int \refAssign, int \binaryOperationBitwiseAnd, int \binaryOperationBitwiseOr, int \binaryOperationBitwiseXor, int \binaryOperationConcat, int \binaryOperationDiv, int \binaryOperationMinus, int \binaryOperationMod, int \binaryOperationMul, int \binaryOperationPlus, int \binaryOperationRightShift, int \binaryOperationLeftShift, int \binaryOperationBooleanAnd, int \binaryOperationBooleanOr, int \binaryOperationGt, int \binaryOperationGeq, int \binaryOperationLogicalAnd, int \binaryOperationLogicalOr, int \binaryOperationLogicalXor, int \binaryOperationNotEqual, int \binaryOperationNotIdentical, int \binaryOperationLt, int \binaryOperationLeq, int \binaryOperationEqual, int \binaryOperationIdentical, int \unaryOperationBooleanNot, int \unaryOperationBitwiseNot, int \unaryOperationPostDec, int \unaryOperationPreDec, int \unaryOperationPostInc, int \unaryOperationPreInc, int \unaryOperationUnaryPlus, int \unaryOperationUnaryMinus, int \new, int \classConst, int \castToInt, int \castToBool, int \castToFloat, int \castToString, int \castToArray, int \castToObject, int \castToUnset, int \clone, int \closure, int \fetchConst, int \empty, int \suppress, int \eval, int \exit, int \call, int \methodCall, int \staticCall, int \include, int \instanceOf, int \isSet, int \print, int \propertyFetch, int \shellExec, int \exit, int \fetchStaticProperty, int \scalar, int \var] counts];
+alias FMap = map[str file, tuple[int \break, int \classDef, int \const, int \continue, int \declare, int \do, int \echo, int \expressionStatementChainRule, int \for, int \foreach, int \functionDef, int \global, int \goto, int \haltCompiler, int \if, int \inlineHTML, int \interfaceDef, int \traitDef, int \label, int \namespace, int \return, int \static, int \switch, int \throw, int \tryCatch, int \unset, int \use, int \while, int \array, int \fetchArrayDim, int \fetchClassConst, int \assign, int \assignWithOperationBitwiseAnd, int \assignWithOperationBitwiseOr, int \assignWithOperationBitwiseXor, int \assignWithOperationConcat, int \assignWithOperationDiv, int \assignWithOperationMinus, int \assignWithOperationMod, int \assignWithOperationMul, int \assignWithOperationPlus, int \assignWithOperationRightShift, int \assignWithOperationLeftShift, int \listAssign, int \refAssign, int \binaryOperationBitwiseAnd, int \binaryOperationBitwiseOr, int \binaryOperationBitwiseXor, int \binaryOperationConcat, int \binaryOperationDiv, int \binaryOperationMinus, int \binaryOperationMod, int \binaryOperationMul, int \binaryOperationPlus, int \binaryOperationRightShift, int \binaryOperationLeftShift, int \binaryOperationBooleanAnd, int \binaryOperationBooleanOr, int \binaryOperationGt, int \binaryOperationGeq, int \binaryOperationLogicalAnd, int \binaryOperationLogicalOr, int \binaryOperationLogicalXor, int \binaryOperationNotEqual, int \binaryOperationNotIdentical, int \binaryOperationLt, int \binaryOperationLeq, int \binaryOperationEqual, int \binaryOperationIdentical, int \unaryOperationBooleanNot, int \unaryOperationBitwiseNot, int \unaryOperationPostDec, int \unaryOperationPreDec, int \unaryOperationPostInc, int \unaryOperationPreInc, int \unaryOperationUnaryPlus, int \unaryOperationUnaryMinus, int \new, int \castToInt, int \castToBool, int \castToFloat, int \castToString, int \castToArray, int \castToObject, int \castToUnset, int \clone, int \closure, int \fetchConst, int \empty, int \suppress, int \eval, int \exit, int \call, int \methodCall, int \staticCall, int \include, int \instanceOf, int \isSet, int \print, int \propertyFetch, int \shellExec, int \ternary, int \fetchStaticProperty, int \scalar, int \var] counts];
+
 public void writeFeatsMap(FMap m) {
   writeBinaryValueFile(|tmp:///featsmap.bin|, m);
 }
@@ -678,6 +679,7 @@ public void writeFeatsMap(FMap m) {
 public FMap readFeatsMap() {
   return readBinaryValueFile(#FMap, |tmp:///featsmap.bin|);
 }
+
 
 public str generalFeatureSquiglies(FMap featsMap) {
    labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
@@ -811,3 +813,45 @@ public int main() {
   return 1;
 }
 
+public data FeatureNode = featureNode(set[str] features);
+public anno set[str] FeatureNode@files;
+public anno int FeatureNode@fileCount;
+
+public void calculateFeatureLattice() {
+	feats = getFeats();
+	fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
+
+	FMap fmap = ( l : getOneFrom(feats[_,_,l]) | l <- feats<2> );
+
+	indexes = ( i : fieldNames[i] | i <- index(fieldNames) );
+
+	perFile = ( l : { } | l <- fmap );	
+	for (l <- fmap, i <- indexes) if (int n := fmap[l][i], n > 0) perFile[l] = perFile[l] + indexes[i];
+	
+	sizesPerFile = ( l : size(perFile[l]) | l <- perFile );
+	size2files = ( n : { } | n <- sizesPerFile<1> );
+	for (l <- sizesPerFile) size2files[sizesPerFile[l]] = size2files[sizesPerFile[l]] + l;
+	
+	featuresToFiles = ( i : { } | i <- perFile<1>);
+	for (l <- perFile) featuresToFiles[perFile[l]] = featuresToFiles[perFile[l]] + l;
+	
+	set[FeatureNode] nodes = { featureNode(i)[@files=featuresToFiles[i]] | i <- featuresToFiles };
+	FeatureNode bottomNode = (featureNode({}) notin nodes) ? featureNode({})[@files={}] : getOneFrom({ i | i <- nodes, size(i.features) == 0});
+	FeatureNode topNode = (featureNode(toSet(fieldNames)) notin nodes) ? featureNode(toSet(fieldNames))[@files={}] : getOneFrom({ i | i <- nodes, size(i.features) == size(fieldNames)});
+	if (bottomNode notin nodes) nodes = nodes + bottomNode;
+	if (topNode notin nodes) nodes = nodes + topNode;
+	set[FeatureNode] rootNodes = { i | i <- nodes, size(i.features) == 1 };
+	
+	//nodeList = toList(nodes);
+	//nodeList = sort(nodeList, bool(FeatureNode a, FeatureNode b) { return size(a.features) <= size(b.features); });
+	map[int,set[FeatureNode]] nodesBySize = ( n : { } | n <- {size2files<0>+0+size(fieldNames)} );
+	for (n <- nodes) nodesBySize[size(n.features)] = nodesBySize[size(n.features)] + n;
+	 
+	rel[FeatureNode,FeatureNode] lattice = { < i, j > | i <- nodes, j <- nodes, i.features < j.features };
+	rel[FeatureNode,FeatureNode] covering = lattice;
+	solve(covering) {
+		covering = { < i, j > | < i, j > <- covering, size({ k | k <- covering[i], <k,j> in covering }) == 0 };
+	}
+	
+	
+}

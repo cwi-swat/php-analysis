@@ -232,6 +232,20 @@ public str getExprKey(staticPropertyFetch(_,_)) = "fetch static property";
 public str getExprKey(scalar(_)) = "scalar";
 public str getExprKey(var(_)) = "var";
 
+public list[str] exprKeyOrder() {
+	return [ "array", "fetch array dim", "fetch class const", "assign" ] +
+		   [ "assign with operation: <op>" | op <- opKeyAssnOrder() ] +
+		   [ "list assign", "ref assign" ] +
+		   [ "binary operation: <op>" | op <- binOpOrder() ] +
+		   [ "unary operation: <op>" | op <- uOpOrder() ] +
+		   [ "new" ] +
+		   [ "cast to <ct>" | ct <- castTypeOrder() ] +
+		   [ "clone", "closure", "fetch const", "empty", "suppress", "eval", "exit",
+		     "call", "method call", "static call", "include", "instanceOf", "isSet",
+		     "print", "property fetch", "shell exec", "ternary", "fetch static property",
+		     "scalar", "var" ];
+}
+
 public str getOpKey(bitwiseAnd()) = "bitwise and";
 public str getOpKey(bitwiseOr()) = "bitwise or";
 public str getOpKey(bitwiseXor()) = "bitwise xor";
@@ -265,6 +279,27 @@ public str getOpKey(unaryMinus()) = "unary minus";
 public str getOpKey(equal()) = "equal";
 public str getOpKey(identical()) = "identical";
 
+public list[str] opKeyOrder() = [ "bitwise and", "bitwise or", "bitwise xor", "concat", "div",
+								"minus", "mod", "mul", "plus", "right shift", "left shift",
+								"boolean and", "boolean or", "boolean not", "bitwise not",
+								"gt", "geq", "logical and", "logical or", "logical xor",
+								"not equal", "not identical", "post dec", "pre dec",
+								"post inc", "pre inc", "lt", "leq", "unary plus",
+								"unary minus", "equal", "identical" ];
+								
+public list[str] binOpOrder() = [ "bitwise and", "bitwise or", "bitwise xor", "concat", "div",
+							   	  "minus", "mod", "mul", "plus", "right shift", "left shift",
+								  "boolean and", "boolean or", "gt", "geq", "logical and", 
+								  "logical or", "logical xor", "not equal", "not identical", 
+								  "lt", "leq", "equal", "identical" ];
+
+public list[str] uOpOrder() = [ "boolean not", "bitwise not", "post dec", "pre dec",
+								"post inc", "pre inc", "unary plus", "unary minus" ];
+
+public list[str] opKeyAssnOrder() = [ "bitwise and", "bitwise or", "bitwise xor", 
+									  "concat", "div", "minus", "mod", "mul", "plus", 
+									  "right shift", "left shift" ];					
+
 public str getCastTypeKey(\int()) = "int";
 public str getCastTypeKey(\bool()) = "bool";
 public str getCastTypeKey(CastType::float()) = "float";
@@ -272,6 +307,8 @@ public str getCastTypeKey(CastType::string()) = "string";
 public str getCastTypeKey(CastType::array()) = "array";
 public str getCastTypeKey(object()) = "object";
 public str getCastTypeKey(CastType::unset()) = "unset";
+
+public list[str] castTypeOrder() = [ "int", "bool", "float", "string", "array", "object", "unset" ];
 
 public str getStmtKey(\break(_)) = "break";
 public str getStmtKey(classDef(_)) = "class def";
@@ -300,52 +337,15 @@ public str getStmtKey(\throw(_)) = "throw";
 public str getStmtKey(tryCatch(_,_)) = "try/catch";
 public str getStmtKey(Stmt::unset(_)) = "unset";
 public str getStmtKey(Stmt::use(_)) = "use";
-public str getStmtKey(\while(_,_)) = "while def";
+public str getStmtKey(\while(_,_)) = "while";
 
 public list[str] stmtKeyOrder() = [ "break", "class def", "const", "continue", "declare", "do",
 								    "echo", "expression statement (chain rule)", "for", "foreach",
 								    "function def", "global", "goto", "halt compiler", "if",
 								    "inline HTML", "interface def", "trait def", "label",
 								    "namespace", "return", "static", "switch", "throw",
-								    "try/catch", "unset", "use", "while def" ];
-
-public list[str] exprKeyOrder() {
-	return [ "array", "fetch array dim", "fetch class const", "assign" ] +
-		   [ "assign with operation: <op>" | op <- opKeyAssnOrder() ] +
-		   [ "list assign", "ref assign" ] +
-		   [ "binary operation: <op>" | op <- binOpOrder() ] +
-		   [ "unary operation: <op>" | op <- uOpOrder() ] +
-		   [ "new", "class const" ] +
-		   [ "cast to <ct>" | ct <- castTypeOrder() ] +
-		   [ "clone", "closure", "fetch const", "empty", "suppress", "eval", "exit",
-		     "call", "method call", "static call", "include", "instanceOf", "isSet",
-		     "print", "property fetch", "shell exec", "exit", "fetch static property",
-		     "scalar", "var" ];
-}
+								    "try/catch", "unset", "use", "while" ];
 								  								  
-public list[str] opKeyOrder() = [ "bitwise and", "bitwise or", "bitwise xor", "concat", "div",
-								"minus", "mod", "mul", "plus", "right shift", "left shift",
-								"boolean and", "boolean or", "boolean not", "bitwise not",
-								"gt", "geq", "logical and", "logical or", "logical xor",
-								"not equal", "not identical", "post dec", "pre dec",
-								"post inc", "pre inc", "lt", "leq", "unary plus",
-								"unary minus", "equal", "identical" ];
-								
-public list[str] binOpOrder() = [ "bitwise and", "bitwise or", "bitwise xor", "concat", "div",
-							   	  "minus", "mod", "mul", "plus", "right shift", "left shift",
-								  "boolean and", "boolean or", "gt", "geq", "logical and", 
-								  "logical or", "logical xor", "not equal", "not identical", 
-								  "lt", "leq", "equal", "identical" ];
-
-public list[str] uOpOrder() = [ "boolean not", "bitwise not", "post dec", "pre dec",
-								"post inc", "pre inc", "unary plus", "unary minus" ];
-
-public list[str] opKeyAssnOrder() = [ "bitwise and", "bitwise or", "bitwise xor", 
-									  "concat", "div", "minus", "mod", "mul", "plus", 
-									  "right shift", "left shift" ];					
-
-public list[str] castTypeOrder() = [ "int", "bool", "float", "string", "array", "object", "unset" ];
-
 public list[str] featureOrder() = [ "class consts with variable class name",
 									"assignments into variable-variables",
 									"assignments w/ops into variable-variables",
