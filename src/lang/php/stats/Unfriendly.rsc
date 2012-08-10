@@ -621,10 +621,10 @@ public str squigly2(rel[str, int] counts, str label) {
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
   if ((ds - (0:0)) == ()) {
-    return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
+    return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>} \\addlegendentry{<label>}";
   }
   else {
-    return "\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]) /*, ev != 0 */) {>(<ev>,<ds[ev]>) <}>}; \\label{<label>}
+    return "\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]) /*, ev != 0 */) {>(<ev>,<ds[ev]>) <}>};  \\addlegendentry{<label>} \\label{<label>}
            ";
   }
 }
@@ -632,13 +632,12 @@ public str squigly2(rel[str, int] counts, str label) {
 public str squigly3(rel[str, int] counts, str label) {
   ds = distribution(counts);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
-  perc = (s - ds[0]) / s;
-  perc = round(perc * 10000.0) / 100.0;
+  
   if ((ds - (0:0)) == ()) {
     return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
   }
   else {
-    return "\\addplot+  coordinates { <for (ev <- [0,5..100] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>}; \\label{<label>}
+    return "\\addplot+  coordinates { <for (ev <- [0,5..100] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<label>} \\label{<label>}
            ";
   }
 }
@@ -689,16 +688,17 @@ public str generalFeatureSquiglies(FMap featsMap) {
 //  println("Done");
   //lls = (t.file:t.phplines | t <- ls);
 
-  groups = ("binary ops" : [ l | str l:/^binaryOp.*/ <- labels ])
-         + ("unary ops" : [l | str l:/^unaryOp.*/ <- labels ])
-         + ("control flow" : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","whileDef","exit","suppress","label"])
-         + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign"])
-         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const"])
-         + ("invocations" : ["call","methodCall","staticCall"])
-         + ("casts" : ["array","new","scalar"] + [l | str l:/^cast.*/ <- labels])
-         + ("print" : ["print","echo","inlineHTML" ])
-         + ("other" : ["use","unset","isSet","empty","clone","eval", "shellExec","instanceOf","include","closure"])
-         + ("lookups" : ["fetchArrayDim","fetchClassConst","var","classConst","fetchConst","propertyFetch","fetchStaticProperty"])
+  groups = ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
+         + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
+         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label"])
+         + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign", "unset"])
+         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure"])
+         + ("invocations" : ["call","methodCall","staticCall", "eval", "shellExec"])
+         + ("allocations" : ["array","new","scalar", "clone"]) 
+         + ("casts"       : [l | str l:/^cast.*/ <- labels])
+         + ("print"       : ["print","echo","inlineHTML" ])
+         + ("predicates"  : ["isSet","empty","instanceOf"])
+         + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","classConst","fetchConst","propertyFetch","fetchStaticProperty"])
          ;
          
    groupLabels = sort([*groups<0>]);
@@ -707,12 +707,12 @@ public str generalFeatureSquiglies(FMap featsMap) {
 //  binOpsMap = { <f, (0 | it + featsMap[f][i] | i <- indices)> | f <- featsMap};
   int counter = 0;
   return 
-  "\\begin{figure}[t]
+/*  "\\begin{figure}[t]
   '\\centering
   '\\begin{tikzpicture}
-  '\\begin{loglogaxis}[grid=both, height=.5\\columnwidth,width=\\columnwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left, legend entries={<intercalate(",",groupLabels)>}, legend style={yshift=2cm}, cycle list name=exotic, legend columns=3]
+  '\\begin{loglogaxis}[grid=both, height=.5\\columnwidth,width=\\columnwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left, legend style={yshift=2cm}, cycle list name=exotic, legend columns=3]
   '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
-  '<squigly2({<file,sum({featsMap[file][i] | i <- indices })> | file <- featsMap}, g)>
+  '<squigly2({<file,sum([featsMap[file][i] | i <- indices ])> | file <- featsMap}, g)>
   '<}>\\end{loglogaxis}
   '\\end{tikzpicture}
   '\\end{figure}
@@ -720,19 +720,20 @@ public str generalFeatureSquiglies(FMap featsMap) {
   '\\begin{figure}[t]
   '\\centering
   '\\begin{tikzpicture}
-  '\\begin{axis}[grid=both, height=.5\\columnwidth,width=\\columnwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left, legend entries={<intercalate(",",groupLabels)>},cycle list name=exotic, legend columns=2]
+  '\\begin{axis}[grid=both, height=.5\\columnwidth,width=\\columnwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=2]
   '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
-  '<squigly3({<file,toInt(((sum({featsMap[file][i] | i <- indices }) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum({e | e <- featsMap[file]}), s != 0}, g)>
+  '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
   '<}>\\end{axis}
   '\\end{tikzpicture} 
   '\\end{figure}
-  '
+  ' */
+  "
   '\\begin{figure*}[t]
   '\\centering
   '\\begin{tikzpicture}
-  '\\begin{semilogyaxis}[grid=both, height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left, legend entries={<intercalate(",",groupLabels)>},cycle list name=exotic, legend columns=2]
+  '\\begin{semilogyaxis}[grid=both, ylabel={Frequency}, xlabel={Feature ratio (specific feature / total feature * 100\\%)} height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=2]
   '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
-  '<squigly3({<file,toInt(((sum({featsMap[file][i] | i <- indices }) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum({e | e <- featsMap[file]}), s != 0}, g)>
+  '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
   '<}>\\end{semilogyaxis}
   '\\end{tikzpicture} 
   '\\end{figure*}
