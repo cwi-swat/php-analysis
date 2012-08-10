@@ -624,7 +624,21 @@ public str squigly2(rel[str, int] counts, str label) {
     return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
   }
   else {
-    return "\\addplot+ [only marks] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>}; \\label{<label>}
+    return "\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]) /*, ev != 0 */) {>(<ev>,<ds[ev]>) <}>}; \\label{<label>}
+           ";
+  }
+}
+
+public str squigly3(rel[str, int] counts, str label) {
+  ds = distribution(counts);
+  s = sum([ ds[n] | n <- ds ]) * 1.0;
+  perc = (s - ds[0]) / s;
+  perc = round(perc * 10000.0) / 100.0;
+  if ((ds - (0:0)) == ()) {
+    return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
+  }
+  else {
+    return "\\addplot+  coordinates { <for (ev <- [0,5..100] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>}; \\label{<label>}
            ";
   }
 }
@@ -666,43 +680,61 @@ public FMap readFeatsMap() {
   return readBinaryValueFile(#FMap, |tmp:///featsmap.bin|);
 }
 
-public str generalFeatureSquiglies(FMap featsMap, getLinesType ls) {
+public str generalFeatureSquiglies(FMap featsMap) {
    labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
   //labels = ["break","classDef","const","continue","declare","do","echo","expressionStatementChainRule","for","foreach","functionDef","global","goto","haltCompiler","if","inlineHTML","interfaceDef","traitDef","label","namespace","return","static","switch","throw","tryCatch","unset","use","whileDef","array","fetchArrayDim","fetchClassConst","assign","assignWithOperationBitwiseAnd","assignWithOperationBitwiseOr","assignWithOperationBitwiseXor","assignWithOperationConcat","assignWithOperationDiv","assignWithOperationMinus","assignWithOperationMod","assignWithOperationMul","assignWithOperationPlus","assignWithOperationRightShift","assignWithOperationLeftShift","listAssign","refAssign","binaryOperationBitwiseAnd","binaryOperationBitwiseOr","binaryOperationBitwiseXor","binaryOperationConcat","binaryOperationDiv","binaryOperationMinus","binaryOperationMod","binaryOperationMul","binaryOperationPlus","binaryOperationRightShift","binaryOperationLeftShift","binaryOperationBooleanAnd","binaryOperationBooleanOr","binaryOperationGt","binaryOperationGeq","binaryOperationLogicalAnd","binaryOperationLogicalOr","binaryOperationLogicalXor","binaryOperationNotEqual","binaryOperationNotIdentical","binaryOperationLt","binaryOperationLeq","binaryOperationEqual","binaryOperationIdentical","unaryOperationBooleanNot","unaryOperationBitwiseNot","unaryOperationPostDec","unaryOperationPreDec","unaryOperationPostInc","unaryOperationPreInc","unaryOperationUnaryPlus","unaryOperationUnaryMinus","new","classConst","castToInt","castToBool","castToFloat","castToString","castToArray","castToObject","castToUnset","clone","closure","fetchConst","empty","suppress","eval","exit","call","methodCall","staticCall","include","instanceOf","isSet","print","propertyFetch","shellExec","exit","fetchStaticProperty","scalar","var","counts"];
 //  feats = getFeats();
 //  println("Building feats map");
 //  featsMap = ( f : getOneFrom(feats[_,_,f]) | f <- feats<2> );
 //  println("Done");
-  lls = (t.file:t.phplines | t <- ls);
+  //lls = (t.file:t.phplines | t <- ls);
 
-  groups = ("binary operators" : [ l | str l:/^binaryOp.*/ <- labels ])
-         + ("unary operators" : [l | str l:/^unaryOp.*/ <- labels ])
+  groups = ("binary ops" : [ l | str l:/^binaryOp.*/ <- labels ])
+         + ("unary ops" : [l | str l:/^unaryOp.*/ <- labels ])
          + ("control flow" : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","whileDef","exit","suppress","label"])
-         + ("assignment operators" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign"])
-         + ("definitions and invocations" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const"] + ["call","methodCall","staticCall"])
+         + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign"])
+         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const"])
+         + ("invocations" : ["call","methodCall","staticCall"])
          + ("casts" : ["array","new","scalar"] + [l | str l:/^cast.*/ <- labels])
-         + ("other" : ["print","echo","inlineHTML","use","unset","isSet","empty","clone","eval", "shellExec","instanceOf","include","closure"])
+         + ("print" : ["print","echo","inlineHTML" ])
+         + ("other" : ["use","unset","isSet","empty","clone","eval", "shellExec","instanceOf","include","closure"])
          + ("lookups" : ["fetchArrayDim","fetchClassConst","var","classConst","fetchConst","propertyFetch","fetchStaticProperty"])
-        
          ;
+         
+   groupLabels = sort([*groups<0>]);
+         
 //  indices = [ indexOf(l, labels) | l <- binOps];
 //  binOpsMap = { <f, (0 | it + featsMap[f][i] | i <- indices)> | f <- featsMap};
   int counter = 0;
   return 
-  "\\begin{figure*}[t]
+  "\\begin{figure}[t]
   '\\centering
-  '\\textbf{PHP feature count per file histograms}\\
-  '<for (g <- groups) { counter += 1; 
-      indices = [ indexOf(labels, l) | l <- groups[g]];>\\subfloat[<g>]{    
   '\\begin{tikzpicture}
-  '\\begin{semilogyaxis}[grid=both, height=.6\\columnwidth,width=.6\\columnwidth,xmin=1,axis x line=bottom, axis y line=left,legend cell align=left, legend entries={<intercalate(",",[shortLabel(labels[ind]) | ind <- indices])>}, legend pos=outer north east, cycle list name=exotic, legend columns=<min(3, (size(groups[g]) / 8) + 1)>]
-  '<for (int i <- indices) {><squigly2({ < file,toInt((featsMap[file][i] * 1.0 / s) * 100)> | file <- featsMap, int s := lls[file], s != 0}, shortLabel(labels[i]))>
-  '<}>\\end{semilogyaxis}
+  '\\begin{loglogaxis}[grid=both, height=.5\\columnwidth,width=\\columnwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left, legend entries={<intercalate(",",groupLabels)>}, legend style={yshift=2cm}, cycle list name=exotic, legend columns=3]
+  '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
+  '<squigly2({<file,sum({featsMap[file][i] | i <- indices })> | file <- featsMap}, g)>
+  '<}>\\end{loglogaxis}
   '\\end{tikzpicture}
-  '}<if (counter % 2 == 0) {>
-  '\\qquad<}>        
-  '<}>
-  '\\caption{What features does an arbitrary PHP file use? These histograms show the distribution of language feature usage over PHP files, excluding the 0 frequency. Every dot shows how many times (x-axis, logarithmic) one file contained that many uses of a specific feature (y-axis, logarithmic).\\label{Figure:FeatureDistributions}. Features that occur nowhere in the corpus have no tick mark in the legends either.} 
+  '\\end{figure}
+  '
+  '\\begin{figure}[t]
+  '\\centering
+  '\\begin{tikzpicture}
+  '\\begin{axis}[grid=both, height=.5\\columnwidth,width=\\columnwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left, legend entries={<intercalate(",",groupLabels)>},cycle list name=exotic, legend columns=2]
+  '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
+  '<squigly3({<file,toInt(((sum({featsMap[file][i] | i <- indices }) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum({e | e <- featsMap[file]}), s != 0}, g)>
+  '<}>\\end{axis}
+  '\\end{tikzpicture} 
+  '\\end{figure}
+  '
+  '\\begin{figure*}[t]
+  '\\centering
+  '\\begin{tikzpicture}
+  '\\begin{semilogyaxis}[grid=both, height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left, legend entries={<intercalate(",",groupLabels)>},cycle list name=exotic, legend columns=2]
+  '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
+  '<squigly3({<file,toInt(((sum({featsMap[file][i] | i <- indices }) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum({e | e <- featsMap[file]}), s != 0}, g)>
+  '<}>\\end{semilogyaxis}
+  '\\end{tikzpicture} 
   '\\end{figure*}
   ";
   
@@ -732,6 +764,7 @@ public str fileSizesHistogram(getLinesType ls) {
          '\\begin{tikzpicture}
          '\\begin{axis}[grid=both, height=.5\\columnwidth,width=.5\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
          '\\addplot [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
+         '\\draw [black, ultra thick] (axis cs:1000,0) -- node [label={98\\%}] (axis cs:1000,19000);
          '\\end{axis}
          '\\end{tikzpicture}
          '}
@@ -749,7 +782,8 @@ public str fileSizesHistogram(getLinesType ls) {
 }
 
 public map[int,int] cumulative(map[int bucket,int frequency] dist) {
-  buckets = sort([*dist<bucket>]);
+  buckets = sort([*dist<0>]);
+  m = max(dist<1>);
   cur = 0;
   result = ();
   
@@ -759,5 +793,20 @@ public map[int,int] cumulative(map[int bucket,int frequency] dist) {
   }
   
   return result;
+}
+
+public tuple[int threshold, int after] almostAll(map[int bucket, int cumulativeFrequency] dist) {
+  m = max(dist<1>);
+  th = 0.98 * m;
+  
+  for (b <- sort([*dist<0>])) {
+    if (dist[b] >= th) {
+      return <b, m - dist[b]>;
+    }
+  } 
+}
+
+public int main() {
+  return 1;
 }
 
