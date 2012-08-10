@@ -177,6 +177,13 @@ public map[str file, map[str feature, int count] counts] stmtAndExprCountsByFile
 				else
 					counts[exprKey] = 1;
 			}
+			case ClassItem citem : {
+				ciKey = getClassItemKey(citem);
+				if (ciKey in counts)
+					counts[ciKey] += 1;
+				else
+					counts[ciKey] = 1;				
+			}
 		}
 		fileCounts[l.path] = counts;
 	} 
@@ -345,7 +352,14 @@ public list[str] stmtKeyOrder() = [ "break", "class def", "const", "continue", "
 								    "inline HTML", "interface def", "trait def", "label",
 								    "namespace", "return", "static", "switch", "throw",
 								    "try/catch", "unset", "use", "while" ];
-								  								  
+								    
+public str getClassItemKey(ClassItem::property(set[Modifier] modifiers, list[Property] prop)) = "propertyDef";
+public str getClassItemKey(ClassItem::constCI(list[Const] consts)) = "classConstDef";
+public str getClassItemKey(ClassItem::method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body)) = "methodDef";
+public str getClassItemKey(ClassItem::traitUse(list[Name] traits, list[Adaptation] adaptations)) = "traitUse";
+								    
+public list[str] classItemKeyOrder() = ["propertyDef","classConstDef","methodDef","traitUse"];
+
 public list[str] featureOrder() = [ "class consts with variable class name",
 									"assignments into variable-variables",
 									"assignments w/ops into variable-variables",
