@@ -19,10 +19,10 @@ import lang::rascal::types::AbstractType;
 import util::Math;
 
 import lang::csv::IO;
-import VVU;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
-import Exprs;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
-import Feats;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
-import Sizes;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
+import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
+import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
+import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
+import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -633,6 +633,10 @@ public str squigly3(rel[str, int] counts, str label) {
   ds = distribution(counts);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   
+  for (<y,50> <- counts) {
+    println("<label> at 50% in <y>");
+  }
+  
   if ((ds - (0:0)) == ()) {
     return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
   }
@@ -733,12 +737,12 @@ public str generalFeatureSquiglies(FMap featsMap) {
   '\\begin{figure*}[t]
   '\\centering
   '\\begin{tikzpicture}
-  '\\begin{semilogyaxis}[grid=both, ylabel={Frequency}, xlabel={Feature ratio per file (\\%)},height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=2]
+  '\\begin{semilogyaxis}[grid=both, ylabel={Frequency (log)}, xlabel={Feature ratio per file (\\%)},height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=2]
   '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
   '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
   '<}>\\end{semilogyaxis}
-  '\\caption{What features to expect in a given PHP file? This histogram shows, for each feature group, how many times it covers a certain percentage of the total number of features.\\label{Figure:FeatureHistograms}}
-  '\\end{tikzpicture} 
+  '\\end{tikzpicture}
+  '\\caption{What features to expect in a given PHP file? This histogram shows, for each feature group, how many times it covers a certain percentage of the total number of features. Lines between dots are guidelines for the eye only.\\label{Figure:FeatureHistograms}} 
   '\\end{figure*}
   ";
   
