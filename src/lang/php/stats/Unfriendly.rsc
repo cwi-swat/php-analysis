@@ -692,7 +692,7 @@ public str generalFeatureSquiglies(FMap featsMap) {
 
   groups = ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
          + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
-         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label"])
+         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label","ternary","suppress","haltCompiler"])
          + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign", "unset"])
          + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure"])
          + ("invocations" : ["call","methodCall","staticCall", "eval", "shellExec"])
@@ -700,7 +700,7 @@ public str generalFeatureSquiglies(FMap featsMap) {
          + ("casts"       : [l | str l:/^cast.*/ <- labels])
          + ("print"       : ["print","echo","inlineHTML" ])
          + ("predicates"  : ["isSet","empty","instanceOf"])
-         + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","classConst","fetchConst","propertyFetch","fetchStaticProperty"])
+         + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","fetchConst","propertyFetch","fetchStaticProperty"])
          ;
          
    groupLabels = sort([*groups<0>]);
@@ -733,10 +733,11 @@ public str generalFeatureSquiglies(FMap featsMap) {
   '\\begin{figure*}[t]
   '\\centering
   '\\begin{tikzpicture}
-  '\\begin{semilogyaxis}[grid=both, ylabel={Frequency}, xlabel={Feature ratio (specific feature / total feature * 100\\%)} height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=2]
+  '\\begin{semilogyaxis}[grid=both, ylabel={Frequency}, xlabel={Feature ratio per file (\\%)},height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=2]
   '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
   '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
   '<}>\\end{semilogyaxis}
+  '\\caption{What features to expect in a given PHP file? This histogram shows, for each feature group, how many times it covers a certain percentage of the total number of features.\\label{Figure:FeatureHistograms}}
   '\\end{tikzpicture} 
   '\\end{figure*}
   ";
