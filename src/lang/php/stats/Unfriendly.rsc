@@ -657,7 +657,7 @@ public str labeledSquigly(rel[str, int] counts, str label) {
 
 public void featureCountsPerFile() {
 	map[str p, str v] lv = getLatestVersions();
-	list[str] keyOrder = stmtKeyOrder() + exprKeyOrder();
+	list[str] keyOrder = stmtKeyOrder() + exprKeyOrder() + classItemKeyOrder();
 	str fileHeader = "product,version,file,<intercalate(",",["\\<rascalFriendlyKey(i)>" | i <- keyOrder ])>\n";
 	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv|, fileHeader);
 	
@@ -953,3 +953,74 @@ public list[FeatureNode] minimumFeaturesForPercent(FeatureLattice lattice, Featu
 	
 	
 }
+
+public void checkGroups() {
+  labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
+  groups = ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
+         + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
+         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label"])
+         + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign", "unset"])
+         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure"])
+         + ("invocations" : ["call","methodCall","staticCall", "eval", "shellExec"])
+         + ("allocations" : ["array","new","scalar", "clone"]) 
+         + ("casts"       : [l | str l:/^cast.*/ <- labels])
+         + ("print"       : ["print","echo","inlineHTML" ])
+         + ("predicates"  : ["isSet","empty","instanceOf"])
+         + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","classConst","fetchConst","propertyFetch","fetchStaticProperty"])
+         ;
+  keys = [rascalFriendlyKey(k) | k <- (exprKeyOrder()+stmtKeyOrder())];
+  missing = toSet(keys) - {*g|g<-groups<1>};
+  extra = {*g|g<-groups<1>} - toSet(keys);
+  for (m <- missing) println("Missing: <m>");
+  for (e <- extra) println("Extra: <e>");          
+}
+
+public tuple[set[FeatureNode],set[str],int] calculatePercents(FMap fmap, FeatureLattice lattice) {
+	// Basic info we need for use below
+	fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
+	indexes = ( i : fieldNames[i] | i <- index(fieldNames) );
+	labelIndex = ( fieldNames[i] : i | i <- index(fieldNames) );
+
+	// map from feature to the number of files that implement that feature
+	featureFileCount = ( n : size({l|l<-fmap<0>,fmap[l][n]>0}) | n <- index(fieldNames) );
+	
+	// total number of files
+	totalFileCount = size(fmap<0>);
+	
+	// map from feature to the percent of files that implement that feature
+	featureFilePercent = ( n : featureFileCount[n]*100.0/totalFileCount | n <- featureFileCount );
+	
+	// features needed for a given percent -- if we aim for 20%, for instance, any feature occuring
+	// in 80% or more of the files must be in this; we get both the IDs and the labels
+	neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..100] );
+	neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor );
+	
+	targetPercent = 50; // need to do this for others later, just get it working for now
+	
+	// Based on the percent, how many files (at least) do we need?
+	threshold = round(totalFileCount * (targetPercent / 100.0));
+	
+	// Provisional solution
+	nodes = carrier(lattice);
+	solution = { n | n <- nodes, n.features < neededForLabels[targetPercent] };
+	solutionLabels = neededForLabels[targetPercent];
+	
+	// How many have we found so far? This is the number of files covered by the solution
+	found = size({ *(n@transFiles) | n <- solution});
+	
+	// Which features are left?
+	remainingFeatures = toSet(fieldNames) - solutionLabels;
+	
+	// List of features to try -- just sort them by coverage amount
+	featuresToTry = reverse(sort(toList(remainingFeatures),bool(str a, str b) { return featureFilePercent[labelIndex[a]] <= featureFilePercent[labelIndex[b]]; })); 
+
+	for (feature <- featuresToTry) {
+		solutionLabels += feature;
+		solution = { n | n <- nodes, n.features < solutionLabels };
+		found = size({ *(n@transFiles) | n <- solution});
+		if (found > threshold) break;
+	}
+
+	return < solution, solutionLabels, found >;
+}
+
