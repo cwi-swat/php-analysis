@@ -633,10 +633,6 @@ public str squigly3(rel[str, int] counts, str label) {
   ds = distribution(counts);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   
-  for (<y,50> <- counts) {
-    println("<label> at 50% in <y>");
-  }
-  
   if ((ds - (0:0)) == ()) {
     return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
   }
@@ -685,8 +681,8 @@ public FMap readFeatsMap() {
 }
 
 
-public str generalFeatureSquiglies(FMap featsMap) {
-   labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
+public map[str,list[str]] getFeatureGroups() {
+ labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
   //labels = ["break","classDef","const","continue","declare","do","echo","expressionStatementChainRule","for","foreach","functionDef","global","goto","haltCompiler","if","inlineHTML","interfaceDef","traitDef","label","namespace","return","static","switch","throw","tryCatch","unset","use","whileDef","array","fetchArrayDim","fetchClassConst","assign","assignWithOperationBitwiseAnd","assignWithOperationBitwiseOr","assignWithOperationBitwiseXor","assignWithOperationConcat","assignWithOperationDiv","assignWithOperationMinus","assignWithOperationMod","assignWithOperationMul","assignWithOperationPlus","assignWithOperationRightShift","assignWithOperationLeftShift","listAssign","refAssign","binaryOperationBitwiseAnd","binaryOperationBitwiseOr","binaryOperationBitwiseXor","binaryOperationConcat","binaryOperationDiv","binaryOperationMinus","binaryOperationMod","binaryOperationMul","binaryOperationPlus","binaryOperationRightShift","binaryOperationLeftShift","binaryOperationBooleanAnd","binaryOperationBooleanOr","binaryOperationGt","binaryOperationGeq","binaryOperationLogicalAnd","binaryOperationLogicalOr","binaryOperationLogicalXor","binaryOperationNotEqual","binaryOperationNotIdentical","binaryOperationLt","binaryOperationLeq","binaryOperationEqual","binaryOperationIdentical","unaryOperationBooleanNot","unaryOperationBitwiseNot","unaryOperationPostDec","unaryOperationPreDec","unaryOperationPostInc","unaryOperationPreInc","unaryOperationUnaryPlus","unaryOperationUnaryMinus","new","classConst","castToInt","castToBool","castToFloat","castToString","castToArray","castToObject","castToUnset","clone","closure","fetchConst","empty","suppress","eval","exit","call","methodCall","staticCall","include","instanceOf","isSet","print","propertyFetch","shellExec","exit","fetchStaticProperty","scalar","var","counts"];
 //  feats = getFeats();
 //  println("Building feats map");
@@ -694,18 +690,34 @@ public str generalFeatureSquiglies(FMap featsMap) {
 //  println("Done");
   //lls = (t.file:t.phplines | t <- ls);
 
-  groups = ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
+ return  ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
          + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
          + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label","ternary","suppress","haltCompiler"])
          + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign", "unset"])
-         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure"])
+         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure","methodDef","classConstDef","propertyDef"])
          + ("invocations" : ["call","methodCall","staticCall", "eval", "shellExec"])
          + ("allocations" : ["array","new","scalar", "clone"]) 
          + ("casts"       : [l | str l:/^cast.*/ <- labels])
          + ("print"       : ["print","echo","inlineHTML" ])
          + ("predicates"  : ["isSet","empty","instanceOf"])
-         + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","fetchConst","propertyFetch","fetchStaticProperty"])
-         ;
+         + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","fetchConst","propertyFetch","fetchStaticProperty","traitUse"]);
+}
+
+public list[str] getFeatureLabels() = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
+
+public void checkGroups() {
+  labels = getFeatureLabels();
+  groups = getFeatureGroups();
+  //keys = [rascalFriendlyKey(k) | k <- (exprKeyOrder()+stmtKeyOrder())];
+  missing = {*labels} - {*groups[g] | g <- groups};
+  extra = {*groups[g] | g <- groups} - {*labels};
+  for (m <- missing) println("Missing: <m>");
+  for (e <- extra) println("Extra: <e>");          
+}
+
+public str generalFeatureSquiglies(FMap featsMap) {
+   labels = getFeatureLabels();
+   groups = getFeatureGroups();
          
    groupLabels = sort([*groups<0>]);
          
@@ -949,6 +961,7 @@ public FeatureLattice calculateTransitiveFiles(FeatureLattice lattice, FeatureNo
 	return lattice;
 }
 
+<<<<<<< HEAD
 public void checkGroups() {
   labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
   groups = ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
@@ -969,6 +982,14 @@ public void checkGroups() {
   for (m <- missing) println("Missing: <m>");
   for (e <- extra) println("Extra: <e>");          
 }
+=======
+public list[FeatureNode] minimumFeaturesForPercent(FeatureLattice lattice, FeatureNode bottom, int filesNeeded) {
+	
+	
+}
+
+
+>>>>>>> eb1bc1983d0d5393c0e6ce7016f0226d785c4de7
 
 public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap, FeatureLattice lattice) {
 	// Basic info we need for use below
