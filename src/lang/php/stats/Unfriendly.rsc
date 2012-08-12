@@ -19,10 +19,10 @@ import lang::rascal::types::AbstractType;
 import util::Math;
 
 import lang::csv::IO;
-import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
-import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
-import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
-import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
+import VVU ;//= |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
+import Exprs ;//= |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
+import Feats ;//= |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
+import Sizes ;//= |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -782,15 +782,15 @@ public str fileSizesHistogram(getLinesType ls) {
   return "\\begin{figure}
          '\\subfloat[Linear scale]{
          '\\begin{tikzpicture}
-         '\\begin{axis}[grid=both, height=.5\\columnwidth,width=.5\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
+         '\\begin{axis}[ylabel={Frequency},xlabel={LOC},grid=both, height=.5\\columnwidth,width=.45\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
          '\\addplot [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
-         '\\draw [black, ultra thick] (axis cs:1000,0) -- node [label={98\\%}] (axis cs:1000,19000);
          '\\end{axis}
          '\\end{tikzpicture}
          '}
+         '\\hfill
          '\\subfloat[Log scale]{
          '\\begin{tikzpicture}
-         '\\begin{loglogaxis}[grid=both, height=.5\\columnwidth,width=.5\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
+         '\\begin{loglogaxis}[xlabel={LOC \\& cumulative LOC},grid=both, height=.5\\columnwidth,width=.45\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
          '\\addplot+ [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
          '\\addplot+ [only marks] coordinates {<for(x <- cds) {>(<x>,<cds[x]>) <}>};
          '\\end{loglogaxis}
