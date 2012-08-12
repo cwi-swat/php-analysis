@@ -637,7 +637,7 @@ public str squigly3(rel[str, int] counts, str label) {
     return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
   }
   else {
-    return "\\addplot+  coordinates { <for (ev <- [0,5..100] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<label>} \\label{<label>}
+    return "\\addplot+ [mark=<substring(label, 0, 1)>] coordinates { <for (ev <- [0,5..100] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<label>} \\label{<label>}
            ";
   }
 }
@@ -703,6 +703,17 @@ public map[str,list[str]] getFeatureGroups() {
          + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","fetchConst","propertyFetch","fetchStaticProperty","traitUse"]);
 }
 
+public str groupsTable() {
+  gg = getFeatureGroups();
+  
+  return "\\begin{table*}
+         '\\begin{tabularx}{\\textwidth}{lX}
+         '<for (g <- sort([*gg<0>])) {>\\textbf{<g>} & <intercalate(", ", sort([shortLabel(n) | n <- gg[g]]))> \\\\
+         '<}>\\end{tabularx}
+         '\\caption{Logical groups of PHP features used to aggregrate usage data\\label{Table:FeatureGroups}}
+         '\\end{table*}";
+}
+
 public list[str] getFeatureLabels() = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
 
 public void checkGroups() {
@@ -745,12 +756,14 @@ public str generalFeatureSquiglies(FMap featsMap) {
   '\\end{tikzpicture} 
   '\\end{figure}
   ' */
-  "
+  //"\\pgfplotscreateplotcyclelist{featuregroups}{{},<for (g <- groups) { counter +=1; ><if (counter != 1) {>, <}>{mark=<substring(g,0,1)>}<}>}
+  "<for (g <- groups) {>\\pgfdeclareplotmark{<substring(g,0,1)>}{\\pgfpathmoveto{\\pgfpoint{1em}{1em}}\\pgftext{<substring(g,0,1)>}}
+  '<}>
   '\\begin{figure*}[t]
   '\\centering
   '\\begin{tikzpicture}
   '\\begin{semilogyaxis}[grid=both, ylabel={Frequency (log)}, xlabel={Feature ratio per file (\\%)},height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=2]
-  '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
+  '<for (g <- sort([*groups<0>])) { indices = [ indexOf(labels, l) | l <- groups[g]];>
   '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
   '<}>\\end{semilogyaxis}
   '\\end{tikzpicture}
@@ -961,35 +974,10 @@ public FeatureLattice calculateTransitiveFiles(FeatureLattice lattice, FeatureNo
 	return lattice;
 }
 
-<<<<<<< HEAD
-public void checkGroups() {
-  labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
-  groups = ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
-         + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
-         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label"])
-         + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign", "unset"])
-         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure"])
-         + ("invocations" : ["call","methodCall","staticCall", "eval", "shellExec"])
-         + ("allocations" : ["array","new","scalar", "clone"]) 
-         + ("casts"       : [l | str l:/^cast.*/ <- labels])
-         + ("print"       : ["print","echo","inlineHTML" ])
-         + ("predicates"  : ["isSet","empty","instanceOf"])
-         + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","classConst","fetchConst","propertyFetch","fetchStaticProperty"])
-         ;
-  keys = [rascalFriendlyKey(k) | k <- (exprKeyOrder()+stmtKeyOrder())];
-  missing = toSet(keys) - {*g|g<-groups<1>};
-  extra = {*g|g<-groups<1>} - toSet(keys);
-  for (m <- missing) println("Missing: <m>");
-  for (e <- extra) println("Extra: <e>");          
-}
-=======
 public list[FeatureNode] minimumFeaturesForPercent(FeatureLattice lattice, FeatureNode bottom, int filesNeeded) {
 	
 	
 }
-
-
->>>>>>> eb1bc1983d0d5393c0e6ce7016f0226d785c4de7
 
 public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap, FeatureLattice lattice) {
 	// Basic info we need for use below
