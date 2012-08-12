@@ -670,7 +670,7 @@ public void featureCountsPerFile() {
 
 }
 
-alias FMap = map[str file, tuple[int \break,int classDef,int const,int \continue,int declare,int do,int echo,int expressionStatementChainRule,int \for,int foreach,int functionDef,int global,int goto,int haltCompiler,int \if,int inlineHTML,int interfaceDef,int traitDef,int label,int namespace,int \return,int static,int \switch,int \throw,int tryCatch,int unset,int use,int \while,int array,int fetchArrayDim,int fetchClassConst,int assign,int assignWithOperationBitwiseAnd,int assignWithOperationBitwiseOr,int assignWithOperationBitwiseXor,int assignWithOperationConcat,int assignWithOperationDiv,int assignWithOperationMinus,int assignWithOperationMod,int assignWithOperationMul,int assignWithOperationPlus,int assignWithOperationRightShift,int assignWithOperationLeftShift,int listAssign,int refAssign,int binaryOperationBitwiseAnd,int binaryOperationBitwiseOr,int binaryOperationBitwiseXor,int binaryOperationConcat,int binaryOperationDiv,int binaryOperationMinus,int binaryOperationMod,int binaryOperationMul,int binaryOperationPlus,int binaryOperationRightShift,int binaryOperationLeftShift,int binaryOperationBooleanAnd,int binaryOperationBooleanOr,int binaryOperationGt,int binaryOperationGeq,int binaryOperationLogicalAnd,int binaryOperationLogicalOr,int binaryOperationLogicalXor,int binaryOperationNotEqual,int binaryOperationNotIdentical,int binaryOperationLt,int binaryOperationLeq,int binaryOperationEqual,int binaryOperationIdentical,int unaryOperationBooleanNot,int unaryOperationBitwiseNot,int unaryOperationPostDec,int unaryOperationPreDec,int unaryOperationPostInc,int unaryOperationPreInc,int unaryOperationUnaryPlus,int unaryOperationUnaryMinus,int new,int castToInt,int castToBool,int castToFloat,int castToString,int castToArray,int castToObject,int castToUnset,int clone,int closure,int fetchConst,int empty,int suppress,int eval,int exit,int call,int methodCall,int staticCall,int include,int instanceOf,int isSet,int print,int propertyFetch,int shellExec,int ternary,int fetchStaticProperty,int scalar,int var,int propertyDef,int classConstDef,int methodDef,int traitUse] counts];
+alias FMap = map[str file, tuple[int \break, int \classDef, int \const, int \continue, int \declare, int \do, int \echo, int \expressionStatementChainRule, int \for, int \foreach, int \functionDef, int \global, int \goto, int \haltCompiler, int \if, int \inlineHTML, int \interfaceDef, int \traitDef, int \label, int \namespace, int \return, int \static, int \switch, int \throw, int \tryCatch, int \unset, int \use, int \while, int \array, int \fetchArrayDim, int \fetchClassConst, int \assign, int \assignWithOperationBitwiseAnd, int \assignWithOperationBitwiseOr, int \assignWithOperationBitwiseXor, int \assignWithOperationConcat, int \assignWithOperationDiv, int \assignWithOperationMinus, int \assignWithOperationMod, int \assignWithOperationMul, int \assignWithOperationPlus, int \assignWithOperationRightShift, int \assignWithOperationLeftShift, int \listAssign, int \refAssign, int \binaryOperationBitwiseAnd, int \binaryOperationBitwiseOr, int \binaryOperationBitwiseXor, int \binaryOperationConcat, int \binaryOperationDiv, int \binaryOperationMinus, int \binaryOperationMod, int \binaryOperationMul, int \binaryOperationPlus, int \binaryOperationRightShift, int \binaryOperationLeftShift, int \binaryOperationBooleanAnd, int \binaryOperationBooleanOr, int \binaryOperationGt, int \binaryOperationGeq, int \binaryOperationLogicalAnd, int \binaryOperationLogicalOr, int \binaryOperationLogicalXor, int \binaryOperationNotEqual, int \binaryOperationNotIdentical, int \binaryOperationLt, int \binaryOperationLeq, int \binaryOperationEqual, int \binaryOperationIdentical, int \unaryOperationBooleanNot, int \unaryOperationBitwiseNot, int \unaryOperationPostDec, int \unaryOperationPreDec, int \unaryOperationPostInc, int \unaryOperationPreInc, int \unaryOperationUnaryPlus, int \unaryOperationUnaryMinus, int \new, int \castToInt, int \castToBool, int \castToFloat, int \castToString, int \castToArray, int \castToObject, int \castToUnset, int \clone, int \closure, int \fetchConst, int \empty, int \suppress, int \eval, int \exit, int \call, int \methodCall, int \staticCall, int \include, int \instanceOf, int \isSet, int \print, int \propertyFetch, int \shellExec, int \ternary, int \fetchStaticProperty, int \scalar, int \var, int \propertyDef, int \classConstDef, int \methodDef, int \traitUse] counts];
 
 public void writeFeatsMap(FMap m) {
   writeBinaryValueFile(|tmp:///featsmap.bin|, m);
@@ -961,14 +961,37 @@ public FeatureLattice calculateTransitiveFiles(FeatureLattice lattice, FeatureNo
 	return lattice;
 }
 
+<<<<<<< HEAD
+public void checkGroups() {
+  labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
+  groups = ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
+         + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
+         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label"])
+         + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign", "unset"])
+         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure"])
+         + ("invocations" : ["call","methodCall","staticCall", "eval", "shellExec"])
+         + ("allocations" : ["array","new","scalar", "clone"]) 
+         + ("casts"       : [l | str l:/^cast.*/ <- labels])
+         + ("print"       : ["print","echo","inlineHTML" ])
+         + ("predicates"  : ["isSet","empty","instanceOf"])
+         + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","classConst","fetchConst","propertyFetch","fetchStaticProperty"])
+         ;
+  keys = [rascalFriendlyKey(k) | k <- (exprKeyOrder()+stmtKeyOrder())];
+  missing = toSet(keys) - {*g|g<-groups<1>};
+  extra = {*g|g<-groups<1>} - toSet(keys);
+  for (m <- missing) println("Missing: <m>");
+  for (e <- extra) println("Extra: <e>");          
+}
+=======
 public list[FeatureNode] minimumFeaturesForPercent(FeatureLattice lattice, FeatureNode bottom, int filesNeeded) {
 	
 	
 }
 
 
+>>>>>>> eb1bc1983d0d5393c0e6ce7016f0226d785c4de7
 
-public tuple[set[FeatureNode],set[str],int] calculatePercents(FMap fmap, FeatureLattice lattice) {
+public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap, FeatureLattice lattice) {
 	// Basic info we need for use below
 	fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
 	indexes = ( i : fieldNames[i] | i <- index(fieldNames) );
