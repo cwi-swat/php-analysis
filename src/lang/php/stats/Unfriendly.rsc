@@ -637,7 +637,7 @@ public str squigly3(rel[str, int] counts, str label) {
     return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
   }
   else {
-    return "\\addplot+ [mark=<substring(label, 0, 1)>] coordinates { <for (ev <- [0,5..100] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<label>} \\label{<label>}
+    return "\\addplot+ [mark=<substring(label, 0, 1)>] coordinates { <for (ev <- [5,10..100] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<label>} \\label{<label>}
            ";
   }
 }
