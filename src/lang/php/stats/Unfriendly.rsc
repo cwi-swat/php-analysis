@@ -588,23 +588,25 @@ public str squiglies(HistInfo hi) {
    labels = [l | /label(l,_) := #HistInfo];
    return "\\begin{figure*}[t]
           '\\begin{tikzpicture}
-          '\\begin{loglogaxis}[legend cell align=left]
-          '<squigly(hi<1,2>, labels[2])>
-          '<squigly(hi<1,3>, labels[3])>
-          '<squigly(hi<1,4>, labels[4])>
-          '<squigly(hi<1,5>, labels[5])>
-          '<squigly(hi<1,6>, labels[6])>
+          '\\begin{loglogaxis}[legend cell align=left,ylabel={Frequency (log)},xlabel={``Variable feature\'\' occurences per file (log)},cycle list name=exotic]
+          '<squiglyRound(hi<1,2>, labels[2])>
+          '<squiglyRound(hi<1,3>, labels[3])>
+          '<squiglyRound(hi<1,4>, labels[4])>
+          '<squiglyRound(hi<1,5>, labels[5])>
+          '<squiglyRound(hi<1,6>, labels[6])>
           '\\end{loglogaxis}
           '\\end{tikzpicture}
+          '\\hfill
           '\\begin{tikzpicture}
-          '\\begin{axis}[legend cell align=left]
+          '\\begin{axis}[legend cell align=left,ylabel={Frequency},xlabel={``Variable feature\'\' occurences per file},cycle list name=exotic]
           '<squigly(hi<1,7>, labels[7])>
           '<squigly(hi<1,8>, labels[8])>
           '<squigly(hi<1,9>, labels[9])>
           '<squigly(hi<1,10>, labels[10])>
-          '\\addplot+ [smooth] coordinates { (1,0) (10,0)};
+          '<squigly(hi<1,11>, labels[11])>
 	      '\\end{axis}
           '\\end{tikzpicture}
+          '\\caption{How ``variable features\'\' are distributed over the corpus. Lines are guidelines for the eye only. Percentages show how many files contain at least one of these features. The histograms show how many files contain how many of which variable feature.\\label{Figure:VariableFeatureHistograms}}
           '\\end{figure*}
           ";
   
@@ -615,8 +617,18 @@ public str squigly(rel[str, int] counts, str label) {
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
-  return "\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
-         '\\addlegendentry{<label> (<perc>\\%)}
+  return "\\addplot+ coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
+         '\\addlegendentry{<shortLabel(label)> (<perc>\\%)}
+         ";
+}
+
+public str squiglyRound(rel[str, int] counts, str label) {
+  ds = distribution(counts);
+  s = sum([ ds[n] | n <- ds ]) * 1.0;
+  perc = (s - ds[0]) / s;
+  perc = round(perc * 10000.0) / 100.0;
+  return "\\addplot+ coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<toInt(round(ds[ev] / 5.0) * 5)>) <}>};
+         '\\addlegendentry{<shortLabel(label)> (<perc>\\%)}
          ";
 }
 
@@ -788,6 +800,7 @@ public str shortLabel(str l) {
     case /^Right<rest:.*>/ : return  "R<rest>";
     case /^Boolean<rest:.*>/ : return  "Bool<rest>";
     case /^Logical<rest:.*>/ : return  "Log<rest>";
+    case /^variable<rest:.*>/ : return shortLabel(rest);
     case "NotIdentical" : return "NotId";
     default: return l;
   }
