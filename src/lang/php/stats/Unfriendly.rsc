@@ -586,21 +586,26 @@ public void writeHistInfoCSV(HistInfo h) {
 
 public str squiglies(HistInfo hi) {
    labels = [l | /label(l,_) := #HistInfo];
-   return "\\begin{tikzpicture}
-          '\\begin{groupplot}[group style={group size=2 by 5},height=4cm,width=\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
+   return "\\begin{figure*}[t]
+          '\\begin{tikzpicture}
+          '\\begin{loglogaxis}[legend cell align=left]
           '<squigly(hi<1,2>, labels[2])>
           '<squigly(hi<1,3>, labels[3])>
           '<squigly(hi<1,4>, labels[4])>
           '<squigly(hi<1,5>, labels[5])>
           '<squigly(hi<1,6>, labels[6])>
-          '\\nextgroupplot [legend entries={<labels[7]><for (i <- [8..11]) {>, {<labels[i]>}<}>},legend style={nodes right, xshift=0.3cm, yshift=0.5cm}, legend pos=north east]
-          '<labeledSquigly(hi<1,7>, labels[7])>
-          '<labeledSquigly(hi<1,8>, labels[8])>
-          '<labeledSquigly(hi<1,9>, labels[9])>
-          '<labeledSquigly(hi<1,10>, labels[10])>
-          '\\addplot+ [smooth] coordinates { (1,0) (10,0)};
-	      '\\end{groupplot}
+          '\\end{loglogaxis}
           '\\end{tikzpicture}
+          '\\begin{tikzpicture}
+          '\\begin{axis}[legend cell align=left]
+          '<squigly(hi<1,7>, labels[7])>
+          '<squigly(hi<1,8>, labels[8])>
+          '<squigly(hi<1,9>, labels[9])>
+          '<squigly(hi<1,10>, labels[10])>
+          '\\addplot+ [smooth] coordinates { (1,0) (10,0)};
+	      '\\end{axis}
+          '\\end{tikzpicture}
+          '\\end{figure*}
           ";
   
 }
@@ -610,8 +615,8 @@ public str squigly(rel[str, int] counts, str label) {
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
-  return "\\nextgroupplot [title={<label> (<perc>\\%)},title style={yshift=-1cm}]
-         '\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
+  return "\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
+         '\\addlegendentry{<label> (<perc>\\%)}
          ";
 }
 
@@ -767,7 +772,7 @@ public str generalFeatureSquiglies(FMap featsMap) {
   '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
   '<}>\\end{semilogyaxis}
   '\\end{tikzpicture}
-  '\\caption{What features to expect in a given PHP file? This histogram shows, for each feature group, how many times it covers a certain percentage of the total number of features. Lines between dots are guidelines for the eye only.\\label{Figure:FeatureHistograms}} 
+  '\\caption{What features to expect in a given PHP file? This histogram shows, for each feature group, how many times it covers a certain percentage of the total number of features per file. Lines between dots are guidelines for the eye only.\\label{Figure:FeatureHistograms}} 
   '\\end{figure*}
   ";
   
