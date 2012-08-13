@@ -372,7 +372,7 @@ ID,Product,Path,Line,Derivable Names,Assigns Through,Made Global,Uses literal pa
 371,phpBB,includes/ucp/ucp_pm_compose.php,996,N,N,N,,,,,,Var-var name based on request variable.
 372,phpBB,includes/ucp/ucp_pm_viewfolder.php,143,Y,N,N,,,,X,,Possible values given in conditional in first part of and clause.
 373,phpBB,includes/ucp/ucp_pm_viewfolder.php,143,Y,N,N,,,,X,,Possible values given in conditional in first part of and clause.
-374,phpBB,includes/ucp/ucp_prefs.php,250,Y,Y,N,,,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
+374,phpBB,includes/ucp/ucp_prefs.php,250,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
 375,phpBB,includes/ucp/ucp_prefs.php,251,Y,N,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
 376,phpBB,includes/ucp/ucp_prefs.php,254,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
 377,phpBB,includes/ucp/ucp_prefs.php,256,Y,Y,N,,X,,,,"Possible values given in array as literals before foreach loop, with string concatenation."
