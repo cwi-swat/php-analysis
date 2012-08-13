@@ -23,6 +23,7 @@ import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv
 import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
 import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
 import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
+import Versions = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -928,7 +929,7 @@ public FeatureLattice calculateFeatureLattice(FMap fmap) {
 	map[int,set[FeatureNode]] nodesBySize = ( n : { } | n <- (size2files<0>+0+size(fieldNames)) );
 	for (n <- nodes) nodesBySize[size(n.features)] = nodesBySize[size(n.features)] + n;
 	
-	FeatureLattice lattice = buildFeatureLattice(nodesBySize);
+	FeatureLattice lattice = buildFeatureLattice(nodesBySize, bottomNode, size(fmap<0>));
 	return lattice;
 }
 
@@ -961,7 +962,6 @@ public FeatureLattice calculateTransitiveFiles(FeatureLattice lattice, FeatureNo
 	return lattice;
 }
 
-<<<<<<< HEAD
 public void checkGroups() {
   labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
   groups = ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
@@ -982,16 +982,9 @@ public void checkGroups() {
   for (m <- missing) println("Missing: <m>");
   for (e <- extra) println("Extra: <e>");          
 }
-=======
-public list[FeatureNode] minimumFeaturesForPercent(FeatureLattice lattice, FeatureNode bottom, int filesNeeded) {
-	
-	
-}
 
-
->>>>>>> eb1bc1983d0d5393c0e6ce7016f0226d785c4de7
-
-public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap, FeatureLattice lattice) {
+public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap, FeatureLattice lattice, int targetPercent) {
+	println("Calculating coverage needed for <targetPercent>%");
 	// Basic info we need for use below
 	fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
 	indexes = ( i : fieldNames[i] | i <- index(fieldNames) );
@@ -1011,8 +1004,6 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..100] );
 	neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor );
 	
-	targetPercent = 50; // need to do this for others later, just get it working for now
-	
 	// Based on the percent, how many files (at least) do we need?
 	threshold = round(totalFileCount * (targetPercent / 100.0));
 	
@@ -1030,7 +1021,7 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	// List of features to try -- just sort them by coverage amount
 	featuresToTry = reverse(sort(toList(remainingFeatures),bool(str a, str b) { return featureFilePercent[labelIndex[a]] <= featureFilePercent[labelIndex[b]]; })); 
 
-	for (feature <- featuresToTry) {
+	for (feature <- featuresToTry, featureFileCount[labelIndex[feature]] > 0) {
 		solutionLabels += feature;
 		solution = { n | n <- nodes, n.features < solutionLabels };
 		found = size({ *(n@transFiles) | n <- solution});
@@ -1040,3 +1031,77 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	return < solution, solutionLabels, found >;
 }
 
+public map[int,set[str]] featuresForPercents(FMap fmap, FeatureLattice lattice, list[int] percents) {
+	return ( p : features | p <- percents, < nodes, features, files > := minimumFeaturesForPercent(fmap,lattice,p) );
+}
+
+public map[int,set[str]] featuresForAllPercents(FMap fmap, FeatureLattice lattice) {
+	return featuresForPercents(fmap, lattice, [1..100]);
+}
+
+public void saveCoverageMap(map[int,set[str]] coverageMap) {
+	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/coverageMap.bin|, coverageMap);
+}
+
+public map[int,set[str]] loadCoverageMap() {
+	return readBinaryValueFile(#map[int,set[str]], |project://PHPAnalysis/src/lang/php/serialized/coverageMap.bin|);
+}
+
+public str coverageGraph(map[int,set[str]] coverageMap) {
+  
+  angles = ( n : 90 | n <- coverageMap<0> ); angles[95] = 0; angles[100] = 90;
+  position = ( n : "right" | n <- coverageMap<0> ); position[95] = "left"; position[100] = "left";
+  
+  return "\\begin{figure}
+  		 '\\centering
+         '\\begin{tikzpicture}
+         '\\begin{axis}[grid=both, height=\\columnwidth,width=\\columnwidth,xmin=0,xmax=105,ymin=0,ymax=109,axis x line=bottom, axis y line=left,ylabel=Implemented Features,xlabel=Percent of Files Covered]
+         '\\addplot [color=blue,only marks,mark=*] coordinates {<for(n <- sort(toList(coverageMap<0>)),n%5==0) {>(<n>,<size(coverageMap[n])>) <}>};
+         '\\addplot [color=blue] coordinates {<for(n <- sort(toList(coverageMap<0>))) {>(<n>,<size(coverageMap[n])>) <}>};
+         '<for(n<-sort(toList(coverageMap<0>)),n%5==0){>\\node[coordinate,pin={[color=black,rotate=<angles[n]>]<position[n]>:<size(coverageMap[n])>}] at (axis cs:<n>,<size(coverageMap[n])>) { };<}>
+         '\\end{axis}
+         '\\end{tikzpicture}
+         '\\caption{Features Needed for File Coverage. Numbers given for each 5\\% increment. 109 Features Total. \\label{Figure:FileCoverageGraph}}
+         '\\end{figure}
+         ";
+}
+
+public str vvUsagePatternsTable() {
+	vvUses = varVarUses();
+	map[str,int] templateCounts = ( p : size({n|<n,p,path,line,"Y",at,mg,lpat,feach,sw,cond,der,notes> <- vvUses,(lpat=="X"||feach=="X"||sw=="X"||cond=="X")}) | p <- vvUses<1> );
+	map[str,int] reflectiveCounts = ( p : size({n|<n,p,path,line,drv,at,mg,lpat,feach,sw,cond,der,notes> <- vvUses, drv != "Y"}) | p <- vvUses<1> );
+	map[str,int] totalCounts = ( p : size({n| <n,p,_,_,_,_,_,_,_,_,_,_,_> <- vvUses}) | p <- vvUses<1> );
+	
+	templateTotal = ( 0 | it + templateCounts[p] | p <- templateCounts<0> );
+	overallTotal = ( 0 | it + totalCounts[p] | p <- totalCounts<0> );
+	templateAverage = round(templateTotal*10000.0/overallTotal)/100.0;
+
+	lv = getLatestVersions();
+	ver = getVersions();
+	php4Products = { p | p <- lv, <_,phpv,_> <- ver[p,lv[p]], "4" := phpv[0] };
+
+	templateTotalPHP5 = ( 0 | it + templateCounts[p] | p <- templateCounts<0>, p notin php4Products );
+	overallTotalPHP5 = ( 0 | it + totalCounts[p] | p <- totalCounts<0>, p notin php4Products );
+	templateAveragePHP5 = round(templateTotalPHP5*10000.0/overallTotalPHP5)/100.0;
+	  	
+	str productLine(str p) {
+		return "<p> & <templateCounts[p]> & <reflectiveCounts[p]> & <totalCounts[p]> \\\\";
+	}
+		
+	res = "\\begin{table}
+		  '  \\centering
+		  '  \\ra{1.1}
+		  '  \\begin{tabular}{@{}lrrr@{}} \\toprule
+		  '  Product & \\multicolumn{3}{c}{Variable-Variable Uses} \\\\
+		  '  \\cmidrule{2-4}
+		  '          & Derivable Names & Other & Total \\\\ \\midrule<for (p <- sort(toList(totalCounts<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '    <productLine(p)> <}>
+		  '  \\bottomrule
+		  '  \\end{tabular}
+		  '  \\parbox{.8\\columnwidth}{Across all systems, <templateAverage>\\% of the uses have derivable names. In those systems that use PHP5, <templateAveragePHP5>\\% of the uses have derivable names.}
+		  '  \\caption{Derivability of Variable-Variable Name Assignments.\\label{table-varvar-patterns}}
+		  '\\end{table}
+		  '";
+		  
+	return res;	
+}
