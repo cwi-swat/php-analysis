@@ -587,21 +587,28 @@ public void writeHistInfoCSV(HistInfo h) {
 
 public str squiglies(HistInfo hi) {
    labels = [l | /label(l,_) := #HistInfo];
-   return "\\begin{tikzpicture}
-          '\\begin{groupplot}[group style={group size=2 by 5},height=4cm,width=\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
-          '<squigly(hi<1,2>, labels[2])>
-          '<squigly(hi<1,3>, labels[3])>
-          '<squigly(hi<1,4>, labels[4])>
-          '<squigly(hi<1,5>, labels[5])>
-          '<squigly(hi<1,6>, labels[6])>
-          '\\nextgroupplot [legend entries={<labels[7]><for (i <- [8..11]) {>, {<labels[i]>}<}>},legend style={nodes right, xshift=0.3cm, yshift=0.5cm}, legend pos=north east]
-          '<labeledSquigly(hi<1,7>, labels[7])>
-          '<labeledSquigly(hi<1,8>, labels[8])>
-          '<labeledSquigly(hi<1,9>, labels[9])>
-          '<labeledSquigly(hi<1,10>, labels[10])>
-          '\\addplot+ [smooth] coordinates { (1,0) (10,0)};
-	      '\\end{groupplot}
+   return "\\begin{figure*}[t]
+          '\\begin{tikzpicture}
+          '\\begin{loglogaxis}[legend cell align=left,ylabel={Frequency (log)},xlabel={``Variable feature\'\' occurences per file (log)},cycle list name=exotic]
+          '<squiglyRound(hi<1,2>, labels[2])>
+          '<squiglyRound(hi<1,3>, labels[3])>
+          '<squiglyRound(hi<1,4>, labels[4])>
+          '<squiglyRound(hi<1,5>, labels[5])>
+          '<squiglyRound(hi<1,6>, labels[6])>
+          '\\end{loglogaxis}
           '\\end{tikzpicture}
+          '\\hfill
+          '\\begin{tikzpicture}
+          '\\begin{axis}[legend cell align=left,ylabel={Frequency},xlabel={``Variable feature\'\' occurences per file},cycle list name=exotic]
+          '<squigly(hi<1,7>, labels[7])>
+          '<squigly(hi<1,8>, labels[8])>
+          '<squigly(hi<1,9>, labels[9])>
+          '<squigly(hi<1,10>, labels[10])>
+          '<squigly(hi<1,11>, labels[11])>
+	      '\\end{axis}
+          '\\end{tikzpicture}
+          '\\caption{How ``variable features\'\' are distributed over the corpus. Lines are guidelines for the eye only. Percentages show how many files contain at least one of these features. The histograms show how many files contain how many of which variable feature.\\label{Figure:VariableFeatureHistograms}}
+          '\\end{figure*}
           ";
   
 }
@@ -611,8 +618,18 @@ public str squigly(rel[str, int] counts, str label) {
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
-  return "\\nextgroupplot [title={<label> (<perc>\\%)},title style={yshift=-1cm}]
-         '\\addplot+ [smooth] coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
+  return "\\addplot+ coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<ds[ev]>) <}>};
+         '\\addlegendentry{<shortLabel(label)> (<perc>\\%)}
+         ";
+}
+
+public str squiglyRound(rel[str, int] counts, str label) {
+  ds = distribution(counts);
+  s = sum([ ds[n] | n <- ds ]) * 1.0;
+  perc = (s - ds[0]) / s;
+  perc = round(perc * 10000.0) / 100.0;
+  return "\\addplot+ coordinates { <for (ev <- sort([*ds<0>]), ev != 0) {>(<ev>,<toInt(round(ds[ev] / 5.0) * 5)>) <}>};
+         '\\addlegendentry{<shortLabel(label)> (<perc>\\%)}
          ";
 }
 
@@ -638,7 +655,7 @@ public str squigly3(rel[str, int] counts, str label) {
     return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
   }
   else {
-    return "\\addplot+  coordinates { <for (ev <- [0,5..100] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<label>} \\label{<label>}
+    return "\\addplot+ [mark=<substring(label, 0, 1)>] coordinates { <for (ev <- [5,10..100] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<label>} \\label{<label>}
            ";
   }
 }
@@ -704,6 +721,17 @@ public map[str,list[str]] getFeatureGroups() {
          + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","fetchConst","propertyFetch","fetchStaticProperty","traitUse"]);
 }
 
+public str groupsTable() {
+  gg = getFeatureGroups();
+  
+  return "\\begin{table*}
+         '\\begin{tabularx}{\\textwidth}{lX}
+         '<for (g <- sort([*gg<0>])) {>\\textbf{<g>} & <intercalate(", ", sort([shortLabel(n) | n <- gg[g]]))> \\\\
+         '<}>\\end{tabularx}
+         '\\caption{Logical groups of PHP features used to aggregrate usage data\\label{Table:FeatureGroups}}
+         '\\end{table*}";
+}
+
 public list[str] getFeatureLabels() = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
 
 public void checkGroups() {
@@ -746,16 +774,18 @@ public str generalFeatureSquiglies(FMap featsMap) {
   '\\end{tikzpicture} 
   '\\end{figure}
   ' */
-  "
+  //"\\pgfplotscreateplotcyclelist{featuregroups}{{},<for (g <- groups) { counter +=1; ><if (counter != 1) {>, <}>{mark=<substring(g,0,1)>}<}>}
+  "<for (g <- groups) {>\\pgfdeclareplotmark{<substring(g,0,1)>}{\\pgfpathmoveto{\\pgfpoint{1em}{1em}}\\pgftext{<substring(g,0,1)>}}
+  '<}>
   '\\begin{figure*}[t]
   '\\centering
   '\\begin{tikzpicture}
   '\\begin{semilogyaxis}[grid=both, ylabel={Frequency (log)}, xlabel={Feature ratio per file (\\%)},height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=2]
-  '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
+  '<for (g <- sort([*groups<0>])) { indices = [ indexOf(labels, l) | l <- groups[g]];>
   '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
   '<}>\\end{semilogyaxis}
   '\\end{tikzpicture}
-  '\\caption{What features to expect in a given PHP file? This histogram shows, for each feature group, how many times it covers a certain percentage of the total number of features. Lines between dots are guidelines for the eye only.\\label{Figure:FeatureHistograms}} 
+  '\\caption{What features to expect in a given PHP file? This histogram shows, for each feature group, how many times it covers a certain percentage of the total number of features per file. Lines between dots are guidelines for the eye only.\\label{Figure:FeatureHistograms}} 
   '\\end{figure*}
   ";
   
@@ -771,6 +801,7 @@ public str shortLabel(str l) {
     case /^Right<rest:.*>/ : return  "R<rest>";
     case /^Boolean<rest:.*>/ : return  "Bool<rest>";
     case /^Logical<rest:.*>/ : return  "Log<rest>";
+    case /^variable<rest:.*>/ : return shortLabel(rest);
     case "NotIdentical" : return "NotId";
     default: return l;
   }
@@ -783,15 +814,15 @@ public str fileSizesHistogram(getLinesType ls) {
   return "\\begin{figure}
          '\\subfloat[Linear scale]{
          '\\begin{tikzpicture}
-         '\\begin{axis}[grid=both, height=.5\\columnwidth,width=.5\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
+         '\\begin{axis}[ylabel={Frequency},xlabel={LOC},grid=both, height=.5\\columnwidth,width=.45\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
          '\\addplot [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
-         '\\draw [black, ultra thick] (axis cs:1000,0) -- node [label={98\\%}] (axis cs:1000,19000);
          '\\end{axis}
          '\\end{tikzpicture}
          '}
+         '\\hfill
          '\\subfloat[Log scale]{
          '\\begin{tikzpicture}
-         '\\begin{loglogaxis}[grid=both, height=.5\\columnwidth,width=.5\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
+         '\\begin{loglogaxis}[xlabel={LOC \\& cumulative LOC},grid=both, height=.5\\columnwidth,width=.45\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
          '\\addplot+ [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
          '\\addplot+ [only marks] coordinates {<for(x <- cds) {>(<x>,<cds[x]>) <}>};
          '\\end{loglogaxis}
@@ -985,6 +1016,7 @@ public void checkGroups() {
 
 public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap, FeatureLattice lattice, int targetPercent) {
 	println("Calculating coverage needed for <targetPercent>%");
+
 	// Basic info we need for use below
 	fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
 	indexes = ( i : fieldNames[i] | i <- index(fieldNames) );
