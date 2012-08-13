@@ -15,16 +15,17 @@ import lang::csv::IO;
 
 public Script loadPHPFile(loc l) {
 	//println("Loading PHP file <l>");
-	PID pid = createProcess(phploc.path, [rgenLoc.path, "<l.path>"], rgenCwd);
+	PID pid = createProcess(phploc.path, ["-d memory_limit=512M", rgenLoc.path, "<l.path>"], rgenCwd);
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
-	Script res = script([exprstmt(scalar(string("Could not parse file <l.path>: <phcErr>")))]);
+	Script res = errscript("Could not parse file <l.path>: <phcErr>");
 	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
 		if (trim(phcOutput) == "")
 			res = errscript("Parser failed in unknown way");
 		else
 			res = readTextValueString(#Script, phcOutput);
 	}
+	if (errscript(_) := res) println("Found error in file <l.path>");
 	killProcess(pid);
 	return res;
 }
@@ -101,6 +102,12 @@ public void buildBinaries(str product) {
 public void buildBinaries() {
 	for (product <- getProducts(), version <- getVersions(product))
 		buildBinaries(product, version);
+}
+
+public void buildNewestBinaries() {
+	lv = getLatestVersions();
+	for (product <- lv)
+		buildBinaries(product, lv[product]);
 }
 
 public map[loc,Script] loadBinary(str product, str version) {
