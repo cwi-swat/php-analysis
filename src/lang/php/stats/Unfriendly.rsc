@@ -19,11 +19,11 @@ import lang::rascal::types::AbstractType;
 import util::Math;
 
 import lang::csv::IO;
-import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
-import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
-import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
-import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
-import Versions = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
+import VVU;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
+import Exprs;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
+import Feats;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
+import Sizes;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
+import Versions;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -304,26 +304,65 @@ public str createSubfloat(list[tuple[str p, str v, QueryResult qr]] qrlist, str 
 	return res;
 }
 
+//public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses, 
+//				 		   	 list[tuple[str p, str v, QueryResult qr]] vvcalls,
+//							 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
+//							 list[tuple[str p, str v, QueryResult qr]] vvnews,
+//							 list[tuple[str p, str v, QueryResult qr]] vvprops,
+//							 list[tuple[str p, str v, QueryResult qr]] vvall) {
+//	res = "\\begin{table*}
+//		  '  \\centering
+//		  '  <createSubfloat(vvuses,"Variable Variables","tbl-vvuses")>
+//		  ' \\qquad
+//		  '  <createSubfloat(vvcalls,"Variable Calls","tbl-vvcalls")>
+//		  '
+//		  '  <createSubfloat(vvmcalls,"Variable Method Calls","tbl-vvmcalls")>
+//		  ' \\qquad
+//		  '  <createSubfloat(vvprops,"Variable Properties","tbl-vvprops")>
+//		  '
+//		  '  <createSubfloat(vvnews,"Variable Instantiations","tbl-vvnews")>
+//		  ' \\qquad
+//		  '  <createSubfloat(vvall,"Combined","tbl-vvcombined")>
+//		  '  \\caption{PHP Variable Features\\label{table-var}}
+//		  '\\end{table*}
+//		  '";
+//	return res;
+//}
+
 public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses, 
 				 		   	 list[tuple[str p, str v, QueryResult qr]] vvcalls,
 							 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
 							 list[tuple[str p, str v, QueryResult qr]] vvnews,
 							 list[tuple[str p, str v, QueryResult qr]] vvprops,
 							 list[tuple[str p, str v, QueryResult qr]] vvall) {
+							 
+	lv = getLatestVersions();
+	ci = loadCountsCSV();
+	
+	str headerLine() {
+		return "Product & Files & \\multicolumn{19}{c}{Variable Features: Files/Uses} \\\\
+		       '\\cmidrule{3-21}
+		       ' & & \\multicolumn{2}{c}{Variables} & \\phantom{a} & \\multicolumn{2}{c}{Function Calls} & \\phantom{a} & \\multicolumn{2}{c}{Method Calls} & \\phantom{a} & \\multicolumn{2}{c}{Property Fetches} & \\phantom{a} & \\multicolumn{2}{c}{Instantiations} & \\phantom{a} & \\multicolumn{4}{c}{All} \\\\
+		       '\\cmidrule{3-4} \\cmidrule{6-7} \\cmidrule{9-10} \\cmidrule{12-13} \\cmidrule{15-16} \\cmidrule{18-21}
+		       ' &  & Files & Uses && Files & Uses && Files & Uses && Files & Uses && Files & Uses && Files & Uses & w/Includes & Gini \\\\ \\midrule";
+	}
+	
+	str c(str p, list[tuple[str p, str v, QueryResult qr]] vv) = "<size({qr.l.path|<p,_,qr><-vv})> & <size([qr|<p,_,qr><-vv])>";
+	
+	str productLine(str p) {
+		< lineCount, fileCount > = getOneFrom(ci[p,lv[p]]);
+		return "<p> & <fileCount> & <c(p,vvuses)> && <c(p,vvcalls)> && <c(p,vvmcalls)> && <c(p,vvnews)> && <c(p,vvprops)> && <c(p,vvall)> & & \\\\";
+	}
+
 	res = "\\begin{table*}
-		  '  \\centering
-		  '  <createSubfloat(vvuses,"Variable Variables","tbl-vvuses")>
-		  ' \\qquad
-		  '  <createSubfloat(vvcalls,"Variable Calls","tbl-vvcalls")>
-		  '
-		  '  <createSubfloat(vvmcalls,"Variable Method Calls","tbl-vvmcalls")>
-		  ' \\qquad
-		  '  <createSubfloat(vvprops,"Variable Properties","tbl-vvprops")>
-		  '
-		  '  <createSubfloat(vvnews,"Variable Instantiations","tbl-vvnews")>
-		  ' \\qquad
-		  '  <createSubfloat(vvall,"Combined","tbl-vvcombined")>
-		  '  \\caption{PHP Variable Features\\label{table-var}}
+		  '\\centering
+		  '\\ra{1.0}
+		  '\\begin{tabular}{@{}lrrrcrrcrrcrrcrrcrrrr@{}} \\toprule 
+		  '<headerLine()> <for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '  <productLine(p)> <}>
+		  '\\bottomrule
+		  '\\end{tabular}
+		  '\\caption{PHP Variable Features\\label{table-var}}
 		  '\\end{table*}
 		  '";
 	return res;
@@ -512,21 +551,31 @@ public str generateIncludeCountsTable(ICResult counts) {
 	str productLine(str p) {
 		v = lv[p];
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
-		return "<p> & <fileCount> & <includesPerProduct[<p,v>]> & <counts[<p,v>].unresolved.hc> & <counts[<p,v>].afterEval.hc> & <counts[<p,v>].afterMatch.hc> & <counts[<p,v>].afterBoth.hc> & <round((1.0 * counts[<p,v>].unresolved.hc - counts[<p,v>].afterBoth.hc) / counts[<p,v>].unresolved.hc * 10000.0) / 100.0> &  <counts[<p,v>].afterBoth.fc> & <counts[<p,v>].afterBoth.gc> \\\\";
+		return "<p> & \\numprint{<fileCount>} & \\numprint{<includesPerProduct[<p,v>]>} & \\numprint{<counts[<p,v>].unresolved.hc>} & \\numprint{<counts[<p,v>].afterEval.hc>} & \\numprint{<counts[<p,v>].afterMatch.hc>} & \\numprint{<counts[<p,v>].afterBoth.hc>} & & \\nprounddigits{1} \\numprint{<round((1.0 * counts[<p,v>].unresolved.hc - counts[<p,v>].afterBoth.hc) / counts[<p,v>].unresolved.hc * 1000.0) / 10.0>}\\% \\npnoround & \\numprint{<counts[<p,v>].afterBoth.fc>} & \\nprounddigits{2} \\numprint{<round(counts[<p,v>].afterBoth.gc*100.0)/100.0>} \\npnoround \\\\";
 	}
 		
-	res = "\\begin{table*}
+	res = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table*}
 		  '  \\centering
 		  '  \\ra{1.2}
-		  '  \\begin{tabular}{@{}lrrrrrrrrr@{}} \\toprule
-		  '  Product & Files & Includes & NL & AS & AM & AB & Resolved\\% & AB Files & Gini \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '  \\begin{tabular}{@{}lrrrrrrcrrr@{}} \\toprule
+		  '  Product & Files & \\multicolumn{5}{c}{Includes} & Resolved\\% & \\phantom{a} & Files with & Gini \\\\
+		  ' \\cmidrule{3-7} 
+		  '   &  & Total & Non-Literal & After Simp & After Match & After Both & & & Unresolved Includes &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '    <productLine(p)> <}>
 		  '  \\bottomrule
 		  '  \\end{tabular}
 		  '  \\caption{PHP Non-Literal Includes\\label{table-includes}}
 		  '\\end{table*}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
 		  '";
 	return res;	
+}
+
+public void writeIncludeCountsTable(ICResult counts) {
+	writeFile(|home:///Documents/Papers/2012/php-icse12/includes.tex|, generateIncludeCountsTable(counts));
 }
 
 alias MMResult = map[tuple[str p, str v], tuple[list[ClassItem] sets, list[ClassItem] gets, list[ClassItem] isSets, list[ClassItem] unsets, list[ClassItem] calls, list[ClassItem] staticCalls]];
