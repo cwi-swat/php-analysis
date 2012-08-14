@@ -17,6 +17,7 @@ import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::analysis::includes::IncludeCP;
 import lang::rascal::types::AbstractType;
 import util::Math;
+import lang::php::util::Config;
 
 import lang::csv::IO;
 import VVU;// = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
@@ -1295,13 +1296,52 @@ public map[str,set[str]] calculateVVTransIncludes(
 	
 	for (product <- lv) {
 		version = lv[product];
-		pt = loadBinary(product,version);
+		pt = loadBinaryWithIncludes(product,version);
 		corpusItemLoc = getCorpusItem(product,version);
-		IncludeGraph ig = computeGraph(pt, corpusItemLoc);
+		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
 		vvLocs = { qr.l | <product,version,qr> <- (vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets) };
 		transFiles = calculateVVTrans(ig, vvLocs, corpusItemLoc.path);
-		transitiveFiles[product] = transFiles;
+		transitiveFiles[product] = transFiles + vvLocs;
 	}
 	
 	return transitiveFiles;
 } 
+
+//alias MMResult = map[tuple[str p, str v], tuple[list[ClassItem] sets, list[ClassItem] gets, list[ClassItem] isSets, list[ClassItem] unsets, list[ClassItem] calls, list[ClassItem] staticCalls]];
+
+public map[str,set[str]] calculateMMTransIncludes(MMResult mmr)
+{
+	map[str,set[str]] transitiveFiles = ( );
+	lv = getLatestVersions();
+	
+	for (product <- lv) {
+		version = lv[product];
+		pt = loadBinaryWithIncludes(product,version);
+		corpusItemLoc = getCorpusItem(product,version);
+		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
+		mmrLocs = { (mm@at).path | mm <- (mmr[<product,version>].sets + mmr[<product,version>].gets + mmr[<product,version>].isSets + mmr[<product,version>].unsets + mmr[<product,version>].calls + mmr[<product,version>].staticCalls) };
+		transFiles = calculateVVTrans(ig, mmrLocs, corpusItemLoc.path);
+		transitiveFiles[product] = transFiles + mmrLocs;
+	}
+	
+	return transitiveFiles;
+} 
+
+public void writeIncludeBinaries() {
+	lv = getLatestVersions();
+	for (product <- lv) {
+		version = lv[product];
+		pt = loadBinary(product,version);
+		pt2 = matchIncludes(evalAllScalars(pt));
+		parsedItem = parsedDir + "<product>-<version>-icp.pt";
+		println("Writing binary: <parsedItem>");
+		writeBinaryValueFile(parsedItem, pt2);
+	}
+}
+
+public map[loc,Script] loadBinaryWithIncludes(str product, str version) {
+	parsedItem = parsedDir + "<product>-<version>-icp.pt";
+	println("Loading binary: <parsedItem>");
+	return readBinaryValueFile(#map[loc,Script],parsedItem);
+}
+			
