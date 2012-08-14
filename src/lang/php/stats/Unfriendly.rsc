@@ -1277,3 +1277,31 @@ public set[str] calculateVVTrans(IncludeGraph ig, set[loc] vvlocs, str prefix) {
 	importers = igTrans[vvfiles];
 	return importers;
 }
+
+public map[str,set[str]] calculateVVTransIncludes(
+	list[tuple[str p, str v, QueryResult qr]] vvuses, 
+	list[tuple[str p, str v, QueryResult qr]] vvcalls,
+	list[tuple[str p, str v, QueryResult qr]] vvmcalls,
+	list[tuple[str p, str v, QueryResult qr]] vvnews,
+	list[tuple[str p, str v, QueryResult qr]] vvprops,
+	list[tuple[str p, str v, QueryResult qr]] vvcconsts,
+	list[tuple[str p, str v, QueryResult qr]] vvscalls,
+	list[tuple[str p, str v, QueryResult qr]] vvstargets,
+	list[tuple[str p, str v, QueryResult qr]] vvsprops,
+	list[tuple[str p, str v, QueryResult qr]] vvsptargets)
+{
+	map[str,set[str]] transitiveFiles = ( );
+	lv = getLatestVersions();
+	
+	for (product <- lv) {
+		version = lv[product];
+		pt = loadBinary(product,version);
+		corpusItemLoc = getCorpusItem(product,version);
+		IncludeGraph ig = computeGraph(pt, corpusItemLoc);
+		vvLocs = { qr.l | <product,version,qr> <- (vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets) };
+		transFiles = calculateVVTrans(ig, vvLocs, corpusItemLoc.path);
+		transitiveFiles[product] = transFiles;
+	}
+	
+	return transitiveFiles;
+} 

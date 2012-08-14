@@ -146,7 +146,7 @@ public IncludeGraph computeGraph(map[loc fileloc, Script scr] prod, loc l) {
 	println("Resolving includes using path pattern matching");
 	prod3 = matchIncludes(prod2);
 	println("Extracting include graph");
-	return extractIncludeGraph(prod3,l);
+	return extractIncludeGraph(prod3,l.path);
 }
 
 public void renderIncludeGraph(IncludeGraph ig) {
