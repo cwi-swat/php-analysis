@@ -58,7 +58,7 @@ ID,Product,Path,Line,Derivable Names,Assigns Through,Made Global,Uses literal pa
 57,Kohana,modules/userguide/vendor/markdown/markdown.php,1236,Y,Y,N,,,,X,,"Either strong or em, set above in the code."
 58,MediaWiki,includes/Sanitizer.php,417,Y,Y,N,,X,,,,The possible values of the var-var are string literals in an array just before the foreach loop that sets these. This is the assignment.
 59,MediaWiki,includes/Sanitizer.php,417,Y,N,N,,X,,,,The possible values of the var-var are string literals in an array just before the foreach loop that sets these. This is the read.
-60,MediaWiki,includes/specials/SpecialVersion.php,699,?,?,?,,,,,,Used in some stupid intentionally obfuscated function called showEasterEgg. Ônuff said.
+60,MediaWiki,includes/specials/SpecialVersion.php,699,?,?,?,,,,,,Used in some stupid intentionally obfuscated function called showEasterEgg. ï¿½nuff said.
 61,MediaWiki,includes/job/UploadFromUrlJob.php,151,N,Y,N,,,,,,Actually looks like a bug...
 62,MediaWiki,extensions/Vector/Vector.hooks.php,167,N,N,Y,,,,,,Configuration values: the config array contains strings that name global vars. This is the global statement that aliases using the var-var value.
 63,MediaWiki,extensions/Vector/Vector.hooks.php,168,N,N,N,,,,,,Configuration values: the config array contains strings that name global vars. This read the var-var.
@@ -95,7 +95,7 @@ ID,Product,Path,Line,Derivable Names,Assigns Through,Made Global,Uses literal pa
 94,Moodle,mod/feedback/item/captcha/print_captcha.php,104,Y,N,N,X,,,,,Based on a literal appended with either 1 or 2 (chosen randomly).
 95,Moodle,mod/quiz/report/grading/report.php,74,Y,N,N,,X,,,,Based on literals given in an array which is then used in a foreach loop.
 96,Moodle,mod/quiz/report/grading/report.php,75,Y,N,N,,X,,,,Based on literals given in an array which is then used in a foreach loop.
-97,Moodle,mod/survey/report.php,105,Y,N,N,,,X,,,"Based on string literal, given in case labels, prepended with ÔstrÕ."
+97,Moodle,mod/survey/report.php,105,Y,N,N,,,X,,,"Based on string literal, given in case labels, prepended with ï¿½strï¿½."
 98,Moodle,report/completion/index.php,248,Y,N,N,,,,X,,Based on two string literals and a conditional.
 99,Moodle,report/completion/index.php,248,Y,N,N,,,,X,,Based on two string literals and a conditional.
 100,Moodle,report/completion/index.php,253,Y,N,N,,X,,,,Based on literals given in an array which is then used in a foreach loop; each literal is prepended with 'si'.
@@ -305,8 +305,8 @@ ID,Product,Path,Line,Derivable Names,Assigns Through,Made Global,Uses literal pa
 304,osCommerce,catalog/includes/modules/payment/sofortueberweisung_direct.php,343,N,N,Y,,,,,,Based on value in another global.
 305,osCommerce,catalog/includes/modules/payment/sofortueberweisung_direct.php,500,N,N,N,,,,,,Based on value in another global.
 306,osCommerce,catalog/includes/modules/payment/sofortueberweisung_direct.php,503,N,N,N,,,,,,Based on value in another global.
-307,phpBB,includes/acp/acp_language.php,662,Y,N,N,,X,,,,"Var-var names based on string literals from array in foreach, appended with Ô_filesÕ"
-308,phpBB,includes/acp/acp_language.php,669,Y,N,N,,X,,,,"Var-var names based on string literals from array in foreach, appended with Ô_filesÕ"
+307,phpBB,includes/acp/acp_language.php,662,Y,N,N,,X,,,,"Var-var names based on string literals from array in foreach, appended with ï¿½_filesï¿½"
+308,phpBB,includes/acp/acp_language.php,669,Y,N,N,,X,,,,"Var-var names based on string literals from array in foreach, appended with ï¿½_filesï¿½"
 309,phpBB,includes/acp/acp_profile.php,566,N,N,N,,X,,,,"Var-var names are in array, so derivable, but would have to show this array is not modified during function call (actually in 2-dimensional array, with other parts modified)."
 310,phpBB,includes/acp/acp_styles.php,2609,Y,Y,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
 311,phpBB,includes/acp/acp_styles.php,2613,Y,Y,N,,X,,,,"Var-var names are keys in an array, concatenated with a suffix."
@@ -388,8 +388,8 @@ ID,Product,Path,Line,Derivable Names,Assigns Through,Made Global,Uses literal pa
 387,phpBB,viewonline.php,362,Y,Y,N,,X,,,,Possible var-var names given in array above foreach.
 388,phpBB,viewonline.php,366,Y,Y,N,,X,,,,Possible var-var names given in array above foreach.
 389,phpMyAdmin,libraries/Table.class.php,260,N,Y,N,,,,,,Var-var names based on method call; function has comment stating it is unused.
-390,phpMyAdmin,libraries/schema/User_Schema.class.php,840,Y,N,Y,X,,,,,"All var-var names of the form Ôc_table_Õ#, maps to global"
-391,phpMyAdmin,libraries/schema/User_Schema.class.php,841,Y,Y,N,X,,,,,"All var-var names of the form Ôc_table_Õ#, maps to global"
+390,phpMyAdmin,libraries/schema/User_Schema.class.php,840,Y,N,Y,X,,,,,"All var-var names of the form ï¿½c_table_ï¿½#, maps to global"
+391,phpMyAdmin,libraries/schema/User_Schema.class.php,841,Y,Y,N,X,,,,,"All var-var names of the form ï¿½c_table_ï¿½#, maps to global"
 392,phpMyAdmin,libraries/common.inc.php,203,N,Y,N,,,,,,Var-var names based on all vars in scope
 393,phpMyAdmin,libraries/database_interface.lib.php,523,N,Y,N,,,,,,Var-var name given through a function parameter.
 394,phpMyAdmin,libraries/database_interface.lib.php,527,N,Y,N,,,,,,Var-var name given through a function parameter.
@@ -434,19 +434,19 @@ ID,Product,Path,Line,Derivable Names,Assigns Through,Made Global,Uses literal pa
 433,phpMyAdmin,libraries/replication.inc.php,129,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
 434,phpMyAdmin,libraries/replication.inc.php,131,Y,Y,N,,X,,,,"Name based on literal in an array, used in a foreach."
 435,phpMyAdmin,libraries/replication.inc.php,132,Y,N,N,,X,,,,"Name based on literal in an array, used in a foreach."
-436,phpMyAdmin,libraries/replication_gui.lib.php,90,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-437,phpMyAdmin,libraries/replication_gui.lib.php,91,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-438,phpMyAdmin,libraries/replication_gui.lib.php,92,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-439,phpMyAdmin,libraries/replication_gui.lib.php,93,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-440,phpMyAdmin,libraries/replication_gui.lib.php,94,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-441,phpMyAdmin,libraries/replication_gui.lib.php,125,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-442,phpMyAdmin,libraries/replication_gui.lib.php,134,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-443,phpMyAdmin,libraries/replication_gui.lib.php,135,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-444,phpMyAdmin,libraries/replication_gui.lib.php,135,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-445,phpMyAdmin,libraries/replication_gui.lib.php,139,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-446,phpMyAdmin,libraries/replication_gui.lib.php,140,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-447,phpMyAdmin,libraries/replication_gui.lib.php,140,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
-448,phpMyAdmin,libraries/replication_gui.lib.php,146,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ÔmasterÕ or ÔslaveÕ.
+436,phpMyAdmin,libraries/replication_gui.lib.php,90,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+437,phpMyAdmin,libraries/replication_gui.lib.php,91,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+438,phpMyAdmin,libraries/replication_gui.lib.php,92,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+439,phpMyAdmin,libraries/replication_gui.lib.php,93,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+440,phpMyAdmin,libraries/replication_gui.lib.php,94,N,N,Y,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+441,phpMyAdmin,libraries/replication_gui.lib.php,125,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+442,phpMyAdmin,libraries/replication_gui.lib.php,134,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+443,phpMyAdmin,libraries/replication_gui.lib.php,135,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+444,phpMyAdmin,libraries/replication_gui.lib.php,135,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+445,phpMyAdmin,libraries/replication_gui.lib.php,139,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+446,phpMyAdmin,libraries/replication_gui.lib.php,140,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+447,phpMyAdmin,libraries/replication_gui.lib.php,140,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
+448,phpMyAdmin,libraries/replication_gui.lib.php,146,N,N,N,,,,,X,Named based on input parameter. A comment says this could either be ï¿½masterï¿½ or ï¿½slaveï¿½.
 449,phpMyAdmin,server_databases.php,189,N,N,N,,,,,X,Name based on values in a global array.
 450,phpMyAdmin,server_databases.php,248,N,N,N,,,,,X,Name based on values in a global array.
 451,phpMyAdmin,server_status.php,1089,N,N,N,,,,,X,Name based on values in a global array.
@@ -496,4 +496,8 @@ ID,Product,Path,Line,Derivable Names,Assigns Through,Made Global,Uses literal pa
 495,phpMyAdmin,server_synchronize.php,528,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
 496,phpMyAdmin,server_synchronize.php,530,Y,Y,N,,X,,,,Var-var name based on one of two literals given above.
 497,phpMyAdmin,server_synchronize.php,533,Y,N,N,,X,,,,Var-var name based on one of two literals given above.
-498,phpMyAdmin,libraries/tbl_info.inc.php,101,N,Y,N,,,,,,Name based on values in an global array.
+498,phpMyAdmin,libraries/tbl_info.inc.php,101,N,Y,N,,,,,,Name based on values in a global array.
+499,Moodle,lib/tcpdf/tcpdf.php,22014,Y,Y,N,,X,,,,Var-var name based on keys of array defined above.
+500,Moodle,lib/tcpdf/tcpdf.php,23157,Y,Y,N,,X,,,,Var-var name based on keys of array defined above.
+501,phpMyAdmin,libraries/tcpdf/tcpdf.php,21674,Y,Y,N,,X,,,,Var-var name based on keys of array defined above.
+502,phpMyAdmin,libraries/tcpdf/tcpdf.php,22814,Y,Y,N,,X,,,,Var-var name based on keys of array defined above.
