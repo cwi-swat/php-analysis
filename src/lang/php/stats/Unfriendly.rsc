@@ -714,9 +714,9 @@ public void writeHistInfoCSV(HistInfo h) {
 
 public str squiglies(HistInfo hi) {
    labels = [l | /label(l,_) := #HistInfo];
-   return "\\begin{figure*}[t]
+   return "\\begin{figure}[t]
           '\\begin{tikzpicture}
-          '\\begin{loglogaxis}[legend cell align=left,ylabel={Frequency (log)},xlabel={``Variable feature\'\' occurences per file (log)},cycle list name=exotic]
+          '\\begin{loglogaxis}[width=.6\\columnwidth, ymax=1000,grid=both,legend cell align=left,ylabel={Frequency (log)},xlabel={``Variable feature\'\' occurences per file (log)},cycle list name=exotic,legend pos=outer north east,legend style={xshift=-.1\\columnwidth}]
           '<squiglyRound(hi<1,2>, labels[2])>
           '<squiglyRound(hi<1,3>, labels[3])>
           '<squiglyRound(hi<1,4>, labels[4])>
@@ -726,7 +726,7 @@ public str squiglies(HistInfo hi) {
           '\\end{tikzpicture}
           '\\hfill
           '\\begin{tikzpicture}
-          '\\begin{axis}[legend cell align=left,ylabel={Frequency},xlabel={``Variable feature\'\' occurences per file},cycle list name=exotic]
+          '\\begin{axis}[width=.6\\columnwidth,grid=both,legend cell align=left,ylabel={Frequency},xlabel={``Variable feature\'\' occurences per file},cycle list name=exotic,legend pos=outer north east,legend style={xshift=-.1\\columnwidth}]
           '<squigly(hi<1,7>, labels[7])>
           '<squigly(hi<1,8>, labels[8])>
           '<squigly(hi<1,9>, labels[9])>
@@ -735,7 +735,7 @@ public str squiglies(HistInfo hi) {
 	      '\\end{axis}
           '\\end{tikzpicture}
           '\\caption{How ``variable features\'\' are distributed over the corpus. Lines are guidelines for the eye only. Percentages show how many files contain at least one of these features. The histograms show how many files contain how many of which variable feature.\\label{Figure:VariableFeatureHistograms}}
-          '\\end{figure*}
+          '\\end{figure}
           ";
   
 }
@@ -907,7 +907,7 @@ public str generalFeatureSquiglies(FMap featsMap) {
   '\\begin{figure*}[t]
   '\\centering
   '\\begin{tikzpicture}
-  '\\begin{semilogyaxis}[grid=both, ylabel={Frequency (log)}, xlabel={Feature ratio per file (\\%)},height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=3,legend style={xshift=.4cm,yshift=.5cm}]
+  '\\begin{semilogyaxis}[grid=both, ymax=10000, ylabel={Frequency (log)}, xlabel={Feature ratio per file (\\%)},height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=3,legend style={xshift=.4cm,yshift=.5cm}]
   '<for (g <- sort([*groups<0>])) { indices = [ indexOf(labels, l) | l <- groups[g]];>
   '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
   '<}>\\end{semilogyaxis}
@@ -1344,4 +1344,3 @@ public map[loc,Script] loadBinaryWithIncludes(str product, str version) {
 	println("Loading binary: <parsedItem>");
 	return readBinaryValueFile(#map[loc,Script],parsedItem);
 }
-			
