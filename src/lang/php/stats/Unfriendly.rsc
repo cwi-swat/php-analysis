@@ -713,9 +713,9 @@ public void writeHistInfoCSV(HistInfo h) {
 
 public str squiglies(HistInfo hi) {
    labels = [l | /label(l,_) := #HistInfo];
-   return "\\begin{figure*}[t]
+   return "\\begin{figure}[t]
           '\\begin{tikzpicture}
-          '\\begin{loglogaxis}[legend cell align=left,ylabel={Frequency (log)},xlabel={``Variable feature\'\' occurences per file (log)},cycle list name=exotic]
+          '\\begin{loglogaxis}[width=.6\\columnwidth, ymax=1000,grid=both,legend cell align=left,ylabel={Frequency (log)},xlabel={``Variable feature\'\' occurences per file (log)},cycle list name=exotic,legend pos=outer north east,legend style={xshift=-.1\\columnwidth}]
           '<squiglyRound(hi<1,2>, labels[2])>
           '<squiglyRound(hi<1,3>, labels[3])>
           '<squiglyRound(hi<1,4>, labels[4])>
@@ -725,7 +725,7 @@ public str squiglies(HistInfo hi) {
           '\\end{tikzpicture}
           '\\hfill
           '\\begin{tikzpicture}
-          '\\begin{axis}[legend cell align=left,ylabel={Frequency},xlabel={``Variable feature\'\' occurences per file},cycle list name=exotic]
+          '\\begin{axis}[width=.6\\columnwidth,grid=both,legend cell align=left,ylabel={Frequency},xlabel={``Variable feature\'\' occurences per file},cycle list name=exotic,legend pos=outer north east,legend style={xshift=-.1\\columnwidth}]
           '<squigly(hi<1,7>, labels[7])>
           '<squigly(hi<1,8>, labels[8])>
           '<squigly(hi<1,9>, labels[9])>
@@ -734,7 +734,7 @@ public str squiglies(HistInfo hi) {
 	      '\\end{axis}
           '\\end{tikzpicture}
           '\\caption{How ``variable features\'\' are distributed over the corpus. Lines are guidelines for the eye only. Percentages show how many files contain at least one of these features. The histograms show how many files contain how many of which variable feature.\\label{Figure:VariableFeatureHistograms}}
-          '\\end{figure*}
+          '\\end{figure}
           ";
   
 }
