@@ -196,6 +196,42 @@ public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses,
 	return < vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets >;
 }
 
+public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses, 
+			 list[tuple[str p, str v, QueryResult qr]] vvcalls,
+			 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
+			 list[tuple[str p, str v, QueryResult qr]] vvnews,
+			 list[tuple[str p, str v, QueryResult qr]] vvprops,
+			 list[tuple[str p, str v, QueryResult qr]] vvcconsts,
+			 list[tuple[str p, str v, QueryResult qr]] vvscalls,
+			 list[tuple[str p, str v, QueryResult qr]] vvstargets,
+			 list[tuple[str p, str v, QueryResult qr]] vvsprops,
+			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] getAllVV(str product, str version, map[loc fileloc, Script scr] ptmap) 
+{
+	list[tuple[str p, str v, QueryResult qr]] vvuses = [ ]; 
+	list[tuple[str p, str v, QueryResult qr]] vvcalls = [ ];
+	list[tuple[str p, str v, QueryResult qr]] vvmcalls = [ ];
+	list[tuple[str p, str v, QueryResult qr]] vvnews = [ ];
+	list[tuple[str p, str v, QueryResult qr]] vvprops = [ ];
+	list[tuple[str p, str v, QueryResult qr]] vvcconsts = [ ];
+	list[tuple[str p, str v, QueryResult qr]] vvscalls = [ ];
+	list[tuple[str p, str v, QueryResult qr]] vvstargets = [ ];
+	list[tuple[str p, str v, QueryResult qr]] vvsprops = [ ];
+	list[tuple[str p, str v, QueryResult qr]] vvsptargets = [ ];
+	
+	vvuses += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherVarVarUses(ptmap)];
+	vvcalls += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherVVCalls(ptmap)];
+	vvmcalls += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherMethodVVCalls(ptmap)];
+	vvnews += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherVVNews(ptmap)];
+	vvprops += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
+	vvcconsts += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherVVClassConsts(ptmap)];
+	vvscalls += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherStaticVVCalls(ptmap)];
+	vvstargets += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherStaticVVTargets(ptmap)];
+	vvsprops += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
+	vvsptargets += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
+	
+	return < vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets >;
+}
+
 public list[tuple[str p, str path, int line]] showOrderedRel(rel[str p, str v, QueryResult qr] res) =
 	[ < i, rst, j.l.begin.line > | i <- sort(toList(res<0>)), j <- sort(toList(res[i]<1>),bool(QueryResult a, QueryResult b) { return (a.l.file < b.l.file) || (a.l.file == b.l.file && a.l.begin.line < b.l.begin.line); }), /<i>\/[^\/]+\/<rst:.+>/ := j.l.path ];
 	
@@ -1177,4 +1213,18 @@ public str vvUsagePatternsTable() {
 		  '";
 		  
 	return res;	
+}
+
+public set[loc] getVVLocs(list[tuple[str p, str v, QueryResult qr]] vv) = { qr.l | <_,_,qr> <- vv };
+public set[loc] getVVLocs(str p, str v, list[tuple[str p, str v, QueryResult qr]] vv) = { qr.l | <p,v,qr> <- vv };
+
+public set[str] calculateVVTrans(IncludeGraph ig, set[loc] vvlocs, str prefix) {
+	vvfiles = { substring(l.path,size(prefix)) | l <- vvlocs };
+	igCollapsed = collapseToGraph(ig);
+	
+	igFlipped = invert(igCollapsed);
+	igTrans = igFlipped+;
+	
+	importers = igTrans[vvfiles];
+	return importers;
 }
