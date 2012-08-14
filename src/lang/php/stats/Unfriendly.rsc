@@ -857,7 +857,7 @@ public str generalFeatureSquiglies(FMap featsMap) {
   '\\begin{figure*}[t]
   '\\centering
   '\\begin{tikzpicture}
-  '\\begin{semilogyaxis}[grid=both, ylabel={Frequency (log)}, xlabel={Feature ratio per file (\\%)},height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=3,legend style={xshift=.4cm,yshift=.5cm}]
+  '\\begin{semilogyaxis}[grid=both, ymax=10000, ylabel={Frequency (log)}, xlabel={Feature ratio per file (\\%)},height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=3,legend style={xshift=.4cm,yshift=.5cm}]
   '<for (g <- sort([*groups<0>])) { indices = [ indexOf(labels, l) | l <- groups[g]];>
   '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
   '<}>\\end{semilogyaxis}
