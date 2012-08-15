@@ -335,35 +335,43 @@ public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses,
 							 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
 							 list[tuple[str p, str v, QueryResult qr]] vvnews,
 							 list[tuple[str p, str v, QueryResult qr]] vvprops,
-							 list[tuple[str p, str v, QueryResult qr]] vvall) {
+							 list[tuple[str p, str v, QueryResult qr]] vvall,
+							 map[str,set[str]] transitiveUses) {
 							 
 	lv = getLatestVersions();
 	ci = loadCountsCSV();
+	hasGini = ( p : (size({qr|<p,_,qr> <- vvall}) > 1) ? true : false | p <- lv );
+	
+	gmap = resultsToGini(vvall);
 	
 	str headerLine() {
-		return "Product & Files & \\multicolumn{19}{c}{Variable Features: Files/Uses} \\\\
+		return "Product & Files & \\multicolumn{19}{c}{PHP Variable Features} \\\\
 		       '\\cmidrule{3-21}
 		       ' & & \\multicolumn{2}{c}{Variables} & \\phantom{a} & \\multicolumn{2}{c}{Function Calls} & \\phantom{a} & \\multicolumn{2}{c}{Method Calls} & \\phantom{a} & \\multicolumn{2}{c}{Property Fetches} & \\phantom{a} & \\multicolumn{2}{c}{Instantiations} & \\phantom{a} & \\multicolumn{4}{c}{All} \\\\
 		       '\\cmidrule{3-4} \\cmidrule{6-7} \\cmidrule{9-10} \\cmidrule{12-13} \\cmidrule{15-16} \\cmidrule{18-21}
-		       ' &  & Files & Uses && Files & Uses && Files & Uses && Files & Uses && Files & Uses && Files & Uses & w/Includes & Gini \\\\ \\midrule";
+		       ' &  & Files & Uses && Files & Uses && Files & Uses && Files & Uses && Files & Uses && Files & w/Inc & Uses & Gini \\\\ \\midrule";
 	}
 	
-	str c(str p, list[tuple[str p, str v, QueryResult qr]] vv) = "<size({qr.l.path|<p,_,qr><-vv})> & <size([qr|<p,_,qr><-vv])>";
+	str c(str p, list[tuple[str p, str v, QueryResult qr]] vv) = "\\numprint{<size({qr.l.path|<p,_,qr><-vv})>} & \\numprint{<size([qr|<p,_,qr><-vv])>}";
 	
 	str productLine(str p) {
 		< lineCount, fileCount > = getOneFrom(ci[p,lv[p]]);
-		return "<p> & <fileCount> & <c(p,vvuses)> && <c(p,vvcalls)> && <c(p,vvmcalls)> && <c(p,vvnews)> && <c(p,vvprops)> && <c(p,vvall)> & & \\\\";
+		return "<p> & \\numprint{<fileCount>} & <c(p,vvuses)> && <c(p,vvcalls)> && <c(p,vvmcalls)> && <c(p,vvprops)> && <c(p,vvnews)> && \\numprint{<size({qr.l.path|<p,_,qr><-vvall})>} & \\numprint{<size(transitiveUses[p])>} & \\numprint{<size([qr|<p,_,qr><-vvall])>} & < (!hasGini[p]) ? "N/A" : "\\nprounddigits{2} \\numprint{<round(gmap[p] * 100.0)/100.0>} \\npnoround" > \\\\";
 	}
 
-	res = "\\begin{table*}
+	res = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table*}
 		  '\\centering
 		  '\\ra{1.0}
+		  '\\scriptsize
 		  '\\begin{tabular}{@{}lrrrcrrcrrcrrcrrcrrrr@{}} \\toprule 
 		  '<headerLine()> <for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '  <productLine(p)> <}>
 		  '\\bottomrule
 		  '\\end{tabular}
-		  '\\caption{PHP Variable Features\\label{table-var}}
+		  '\\normalsize
+		  '\\caption{PHP Variable Features.\\label{table-var}}
 		  '\\end{table*}
 		  '";
 	return res;
@@ -425,9 +433,10 @@ public void generateTableFiles(list[tuple[str p, str v, QueryResult qr]] vvuses,
 							   list[tuple[str p, str v, QueryResult qr]] vvscalls,
 							   list[tuple[str p, str v, QueryResult qr]] vvstargets,
 							   list[tuple[str p, str v, QueryResult qr]] vvsprops,
-							   list[tuple[str p, str v, QueryResult qr]] vvsptargets
+							   list[tuple[str p, str v, QueryResult qr]] vvsptargets,
+							   map[str,set[str]] transitiveUses
 							   ) {
-	res = showVVInfoAsLatex(vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets);
+	res = showVVInfoAsLatex(vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets, transitiveUses);
 	writeFile(|file:///ufs/hills/Documents/Papers/2012/php-icse12/vvstats.tex|, res);
 }
 
@@ -561,13 +570,13 @@ public str generateIncludeCountsTable(ICResult counts) {
 		  '  \\centering
 		  '  \\ra{1.2}
 		  '  \\begin{tabular}{@{}lrrrrrrcrrr@{}} \\toprule
-		  '  Product & Files & \\multicolumn{5}{c}{Includes} & Resolved\\% & \\phantom{a} & Files with & Gini \\\\
+		  '  Product & Files & \\multicolumn{5}{c}{Includes} & \\phantom{a} & Resolved\\% & Files w/ Unresolved Includes & Gini \\\\
 		  ' \\cmidrule{3-7} 
-		  '   &  & Total & Non-Literal & After Simp & After Match & After Both & & & Unresolved Includes &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '   &  & Total & Non-Literal & After Simp & After Match & After Both & & & &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '    <productLine(p)> <}>
 		  '  \\bottomrule
 		  '  \\end{tabular}
-		  '  \\caption{PHP Non-Literal Includes\\label{table-includes}}
+		  '  \\caption{PHP Non-Literal Includes.\\label{table-includes}}
 		  '\\end{table*}
 		  '\\npfourdigitnosep
 		  '\\npnoaddmissingzero
@@ -597,7 +606,7 @@ public MMResult magicMethodUses() {
 	return res;
 }
 
-public str magicMethodCounts(MMResult res) {
+public str magicMethodCounts(MMResult res, map[str,set[str]] transitiveUses) {
 	lv = getLatestVersions();
 	ci = loadCountsCSV();
 	
@@ -622,21 +631,25 @@ public str magicMethodCounts(MMResult res) {
 		}
 		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
 
-		return "<p> & <fileCount> & <size(hits<0>)> && <setsSize> & <getsSize> & <isSetsSize> & <unsetsSize> & <callsSize> & <staticCallsSize> & <(size(hits) > 1) ? round(giniC*1000.0)/1000.0 : "X"> \\\\";
+		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} & \\numprint{<size(transitiveUses[p])>} && \\numprint{<setsSize>} & \\numprint{<getsSize>} & \\numprint{<isSetsSize>} & \\numprint{<unsetsSize>} & \\numprint{<callsSize>} & \\numprint{<staticCallsSize>} & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<round(giniC*1000.0)/1000.0>} \\npnoround" : "N/A"> \\\\";
 	}
 		
-	tbl = "\\begin{table*}
+	tbl = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table*}
 		  '  \\centering
 		  '  \\ra{1.2}
-		  '  \\begin{tabular}{@{}lrrcrrrrrrr@{}} \\toprule
-		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{abc} & \\multicolumn{6}{c}{Overloading Feature} & Gini \\\\
-		  '  \\cmidrule{2-3} \\cmidrule{5-10}
-		  '          & Total & w/Overload && Set & Get & Is Set & Unset & Call & Static Call &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '  \\begin{tabular}{@{}lrrrcrrrrrrr@{}} \\toprule
+		  '  Product & \\multicolumn{3}{c}{Files} & \\phantom{abc} & \\multicolumn{6}{c}{Overloading Feature (over all files)} & Gini \\\\
+		  '  \\cmidrule{2-4} \\cmidrule{6-11}
+		  '          & Total & w/Overload & w/Includes && Set & Get & Is Set & Unset & Call & Static Call &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '    <productLine(p)> <}>
 		  '  \\bottomrule
 		  '  \\end{tabular}
-		  '  \\caption{PHP Overloading (Magic Methods)\\label{table-magic}}
+		  '  \\caption{PHP Overloading (Magic Methods).\\label{table-magic}}
 		  '\\end{table*}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
 		  '";
 	return tbl;	
 	
@@ -848,16 +861,30 @@ public map[str,list[str]] getFeatureGroups() {
          + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","fetchConst","propertyFetch","fetchStaticProperty","traitUse"]);
 }
 
-public str groupsTable() {
+public str groupsTable(set[str] notIn80, set[str] notIn90, set[str] notIn100) {
   gg = getFeatureGroups();
   
-  return "\\begin{table*}
-         '\\begin{tabularx}{\\textwidth}{lX}
-         '<for (g <- sort([*gg<0>])) {>\\textbf{<g>} & <intercalate(", ", sort([shortLabel(n) | n <- gg[g]]))> \\\\
-         '<}>\\end{tabularx}
-         '\\caption{Logical groups of PHP features used to aggregrate usage data\\label{Table:FeatureGroups}}
-         '\\end{table*}";
+  str formatLabel(str l) {
+    rval = l;
+  	if (l in notIn100) rval = "\\textbf{<rval>}";
+  	if (l in notIn90) rval = "\\textit{<rval>}";
+  	if (l in notIn80) rval = "\\underline{<rval>}";
+  	return rval;
+  }
+  
+  return "\\begin{table}
+         '\\begin{tabularx}{\\columnwidth}{lX}
+         '<for (g <- sort([*gg<0>])) {>\\textbf{<g>} & <intercalate(", ", [formatLabel(n) | n <- sort([shortLabel(n) | n <- gg[g]])])> \\\\
+         '<}> & \\\\ \\end{tabularx}
+         '\\parbox{\\columnwidth}{Features in \\textbf{bold} are not used in the corpus. Features in \\textit{italics} 
+         'are not needed to achieve 90\\% coverage of the corpus. \\underline{Underlined} features are not needed to
+         'achieve 80\\% coverage of the corpus.}
+         '\\ \\vspace{1ex}
+         '\\caption{Logical groups of PHP features used to aggregrate usage data.\\label{Table:FeatureGroups}}
+         '\\end{table}";
 }
+
+public str groupsTable() = groupsTable({},{},{});
 
 public list[str] getFeatureLabels() = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
 
@@ -1268,15 +1295,16 @@ public str vvUsagePatternsTable() {
 public set[loc] getVVLocs(list[tuple[str p, str v, QueryResult qr]] vv) = { qr.l | <_,_,qr> <- vv };
 public set[loc] getVVLocs(str p, str v, list[tuple[str p, str v, QueryResult qr]] vv) = { qr.l | <p,v,qr> <- vv };
 
-public set[str] calculateVVTrans(IncludeGraph ig, set[loc] vvlocs, str prefix) {
-	vvfiles = { substring(l.path,size(prefix)) | l <- vvlocs };
+@doc{Given an includes graph and a set of files, return these files plus the files that (transitively) import them.}
+public set[str] calculateFeatureTrans(IncludeGraph ig, set[loc] featureLocs, str prefix) {
+	featureFiles = { substring(l.path,size(prefix)) | l <- featureLocs };
 	igCollapsed = collapseToGraph(ig);
 	
 	igFlipped = invert(igCollapsed);
 	igTrans = igFlipped+;
 	
-	importers = igTrans[vvfiles];
-	return importers;
+	importers = igTrans[featureFiles];
+	return importers + featureFiles;
 }
 
 public map[str,set[str]] calculateVVTransIncludes(
@@ -1300,8 +1328,8 @@ public map[str,set[str]] calculateVVTransIncludes(
 		corpusItemLoc = getCorpusItem(product,version);
 		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
 		vvLocs = { qr.l | <product,version,qr> <- (vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets) };
-		transFiles = calculateVVTrans(ig, vvLocs, corpusItemLoc.path);
-		transitiveFiles[product] = transFiles + vvLocs;
+		transFiles = calculateFeatureTrans(ig, vvLocs, corpusItemLoc.path);
+		transitiveFiles[product] = transFiles;
 	}
 	
 	return transitiveFiles;
@@ -1319,9 +1347,9 @@ public map[str,set[str]] calculateMMTransIncludes(MMResult mmr)
 		pt = loadBinaryWithIncludes(product,version);
 		corpusItemLoc = getCorpusItem(product,version);
 		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
-		mmrLocs = { (mm@at).path | mm <- (mmr[<product,version>].sets + mmr[<product,version>].gets + mmr[<product,version>].isSets + mmr[<product,version>].unsets + mmr[<product,version>].calls + mmr[<product,version>].staticCalls) };
-		transFiles = calculateVVTrans(ig, mmrLocs, corpusItemLoc.path);
-		transitiveFiles[product] = transFiles + mmrLocs;
+		mmrLocs = { mm@at | mm <- (mmr[<product,version>].sets + mmr[<product,version>].gets + mmr[<product,version>].isSets + mmr[<product,version>].unsets + mmr[<product,version>].calls + mmr[<product,version>].staticCalls) };
+		transFiles = calculateFeatureTrans(ig, mmrLocs, corpusItemLoc.path);
+		transitiveFiles[product] = transFiles;
 	}
 	
 	return transitiveFiles;
@@ -1343,4 +1371,32 @@ public map[loc,Script] loadBinaryWithIncludes(str product, str version) {
 	parsedItem = parsedDir + "<product>-<version>-icp.pt";
 	println("Loading binary: <parsedItem>");
 	return readBinaryValueFile(#map[loc,Script],parsedItem);
+}
+
+public map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] notCoveredBySystem(FeatureLattice lattice, map[int,set[str]] coverageMap) {
+	fieldNames = toSet(tail(tail(tail(getRelFieldNames((#getFeatsType).symbol)))));
+	
+	in80 = coverageMap[80];
+	in90 = coverageMap[90];
+	
+	in80Files = { *(n@files) | n <- carrier(lattice), n.features < in80 };
+	in90Files = { *(n@files) | n <- carrier(lattice), n.features < in90 };
+	
+	lv = getLatestVersions();
+	
+	map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] res = ( );
+	for (product <- lv) {
+		pt = loadBinary(product,lv[product]);
+		res[product] = < {l.path|l<-pt<0>} - in80Files, {l.path|l<-pt<0>} - in90Files >;
+	}
+	
+	return res;
+}
+
+public void writeNotCoveredInfo(map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] notCovered) {
+	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/notCovered.bin|, notCovered);
+}
+
+public map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] readNotCoveredInfo() {
+	return readBinaryValueFile(#map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered], |project://PHPAnalysis/src/lang/php/serialized/notCovered.bin|);
 }

@@ -73,33 +73,31 @@ public str generateCorpusInfoTable() {
 	}
 	
 	str productLine(tuple[str p, str v, str pname, str pdesc, str rdate, str phpversion, int sloc, int fc] ci) {
-		return "<ci.pname> & <replaceLast(ci.v,"-english","")> & <ci.phpversion> & <ci.rdate> & <ci.fc> & <ci.sloc> & <ci.pdesc> \\\\";
+		return "<ci.pname> & <replaceLast(ci.v,"-english","")> & <ci.phpversion> & <ci.rdate> & \\numprint{<ci.fc>} & \\numprint{<ci.sloc>} & <ci.pdesc> \\\\";
 	}
 
 	totalSystems = size(lv<0>);
 	totalSLOC = (0 | it + n | p <- lv, v := lv[p], <p,v,n,_> <- counts );
 	totalFiles = (0 | it + n | p <- lv, v := lv[p], <p,v,_,n> <- counts );
 	
-	res = "\\begin{table*}
+	res = "\\npaddmissingzero
+	      '\\npfourdigitsep
+		  '\\begin{table*}
 		  '\\centering
 		  '\\ra{1.2}
 		  '\\begin{tabular}{@{}llllrrl@{}} \\toprule
 		  '<headerLine()> <for (tt <- tableTuples) {>
 		  '  <productLine(tt)> <}>
 		  '\\bottomrule
-		  '\\end{tabular} 
-		  '\\\\
-		  '\\vspace{2ex}
-		  '\\footnotesize
-		  'The PHP Version listed above is the minimum required version for the system. 
-		  'The File Count includes files with either 
-		  '\\\\
-		  'a .php or an .inc extension, while SLOC includes source lines from these files.
-		  'In total, counting the most recent version \\\\ of each system, there are <totalSystems>
-		  'systems consisting of <totalFiles> files with <totalSLOC> total lines of source. 
-		  '\\normalsize
-		  '\\caption{The PHP Corpus: Most Recent Versions\\label{tbl:php-corpus}}
+		  '\\end{tabular}
+		  '\\parbox{.75\\textwidth}{The PHP Version listed above is the minimum required version for the system. 
+		  'The File Count includes files with either a .php or an .inc extension, while SLOC includes source lines
+		  'from these files. In total, counting the most recent version of each system, there are \\numprint{<totalSystems>}
+		  'systems consisting of \\numprint{<totalFiles>} files with \\numprint{<totalSLOC>} total lines of source.} 
+		  '\\caption{The PHP Corpus: Most Recent Versions.\\label{tbl:php-corpus}}
 		  '\\end{table*}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
 		  '";
 
 	return res;
