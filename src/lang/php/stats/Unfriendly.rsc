@@ -1351,7 +1351,7 @@ public map[loc,Script] loadBinaryWithIncludes(str product, str version) {
 	return readBinaryValueFile(#map[loc,Script],parsedItem);
 }
 
-public map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] notCoveredBySystem(FeatureLattice lattice, map[int,set[str]] coverageMap) {
+public NotCoveredMap notCoveredBySystem(FeatureLattice lattice, map[int,set[str]] coverageMap) {
 	fieldNames = toSet(tail(tail(tail(getRelFieldNames((#getFeatsType).symbol)))));
 	
 	in80 = coverageMap[80];
@@ -1371,10 +1371,47 @@ public map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered
 	return res;
 }
 
-public void writeNotCoveredInfo(map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] notCovered) {
+alias NotCoveredMap = map[str product, tuple[set[str] notIn80, set[str] notIn90] filesNotCovered];
+
+public void writeNotCoveredInfo(NotCoveredMap notCovered) {
 	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/notCovered.bin|, notCovered);
 }
 
-public map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] readNotCoveredInfo() {
-	return readBinaryValueFile(#map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered], |project://PHPAnalysis/src/lang/php/serialized/notCovered.bin|);
+public NotCoveredMap readNotCoveredInfo() {
+	return readBinaryValueFile(#NotCoveredMap, |project://PHPAnalysis/src/lang/php/serialized/notCovered.bin|);
 }
+
+public str coverageComparison(NotCoveredMap ncm) {
+	filecount = loadCountsCSV();
+	lv = getLatestVersions();
+
+	eightyPer = ( );
+	ninetyPer = ( );
+	
+	for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1) <= toUpperCase(s2); }), v := lv[p], <notIn80,notIn90> := ncm[p], <v,_,fc> <- filecount[p]) {
+		eightyPer[p] = 100.0-round(size(notIn80)*10000.0/fc)/100.0;
+		ninetyPer[p] = 100.0-round(size(notIn90)*10000.0/fc)/100.0;
+	}
+	
+	pOrder = reverse(sort(toList(lv<0>), bool(str s1,str s2) { return eightyPer[s1] <= eightyPer[s2]; }));
+	
+	tbl = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table}
+		  '  \\centering
+		  '  \\ra{1.2}
+		  '  \\begin{tabular}{@{}lrr@{}} \\toprule
+		  '  Product & \\multicolumn{2}{c}{\\%  Covered By} \\\\
+		  '  \\cmidrule{2-3}
+		  '  & 80\\% Features & 90\\% Features \\\\ \\midrule<for (p <- pOrder) {>
+		  '    <p> & \\nprounddigits{1} \\numprint{<eightyPer[p]>}\\% \\npnoround & \\nprounddigits{1} \\numprint{<ninetyPer[p]>}\\% \\npnoround \\\\ <}>
+		  '  \\bottomrule
+		  '  \\end{tabular}
+		  '  \\caption{Percent of System Covered by Feature Sets.\\label{table-fset-cover}}
+		  '\\end{table}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
+		  '";
+	return tbl;	
+		//return "<p> & \\numprint{<fileCount>} & <c(p,vvuses)> && <c(p,vvcalls)> && <c(p,vvmcalls)> && <c(p,vvprops)> && <c(p,vvnews)> && \\numprint{<size({qr.l.path|<p,_,qr><-vvall})>} & \\numprint{<size(transitiveUses[p])>} & \\numprint{<size([qr|<p,_,qr><-vvall])>} & < (!hasGini[p]) ? "N/A" : "\\nprounddigits{2} \\numprint{<round(gmap[p] * 100.0)/100.0>} \\npnoround" > \\\\";
+}	
