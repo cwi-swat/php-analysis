@@ -854,11 +854,11 @@ public map[str,list[str]] getFeatureGroups() {
          + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign", "unset"])
          + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure","methodDef","classConstDef","propertyDef"])
          + ("invocations" : ["call","methodCall","staticCall", "eval", "shellExec"])
-         + ("allocations" : ["array","new","scalar", "clone"]) 
+         + ("allocations" : ["array","new","scalar", "clone", "fetchArrayDim"]) 
          + ("casts"       : [l | str l:/^cast.*/ <- labels])
          + ("print"       : ["print","echo","inlineHTML" ])
          + ("predicates"  : ["isSet","empty","instanceOf"])
-         + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","fetchConst","propertyFetch","fetchStaticProperty","traitUse"]);
+         + ("lookups"     : ["fetchClassConst","var","fetchConst","propertyFetch","fetchStaticProperty","traitUse"]);
 }
 
 public str groupsTable(set[str] notIn80, set[str] notIn90, set[str] notIn100) {
@@ -904,31 +904,8 @@ public str generalFeatureSquiglies(FMap featsMap) {
          
    groupLabels = sort([*groups<0>]);
          
-//  indices = [ indexOf(l, labels) | l <- binOps];
-//  binOpsMap = { <f, (0 | it + featsMap[f][i] | i <- indices)> | f <- featsMap};
   int counter = 0;
   return 
-/*  "\\begin{figure}[t]
-  '\\centering
-  '\\begin{tikzpicture}
-  '\\begin{loglogaxis}[grid=both, height=.5\\columnwidth,width=\\columnwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left, legend style={yshift=2cm}, cycle list name=exotic, legend columns=3]
-  '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
-  '<squigly2({<file,sum([featsMap[file][i] | i <- indices ])> | file <- featsMap}, g)>
-  '<}>\\end{loglogaxis}
-  '\\end{tikzpicture}
-  '\\end{figure}
-  '
-  '\\begin{figure}[t]
-  '\\centering
-  '\\begin{tikzpicture}
-  '\\begin{axis}[grid=both, height=.5\\columnwidth,width=\\columnwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=2]
-  '<for (g <- groups) { indices = [ indexOf(labels, l) | l <- groups[g]];>
-  '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
-  '<}>\\end{axis}
-  '\\end{tikzpicture} 
-  '\\end{figure}
-  ' */
-  //"\\pgfplotscreateplotcyclelist{featuregroups}{{},<for (g <- groups) { counter +=1; ><if (counter != 1) {>, <}>{mark=<substring(g,0,1)>}<}>}
   "<for (g <- groups) {>\\pgfdeclareplotmark{<substring(g,0,1)>}{\\pgfpathmoveto{\\pgfpoint{1em}{1em}}\\pgftext{<substring(g,0,1)>}}
   '<}>
   '\\begin{figure*}[t]
@@ -956,6 +933,7 @@ public str shortLabel(str l) {
     case /^Boolean<rest:.*>/ : return  "Bool<rest>";
     case /^Logical<rest:.*>/ : return  "Log<rest>";
     case /^variable<rest:.*>/ : return shortLabel(rest);
+    case /^fetchArrayDim/ : return "nextArrayElem";
     case "NotIdentical" : return "NotId";
     default: return l;
   }
