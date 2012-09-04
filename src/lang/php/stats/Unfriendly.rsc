@@ -642,7 +642,7 @@ public str magicMethodCounts(MMResult res, map[str,set[str]] transitiveUses) {
 		  '  \\begin{tabular}{@{}lrrrcrrrrrrr@{}} \\toprule
 		  '  Product & \\multicolumn{3}{c}{Files} & \\phantom{abc} & \\multicolumn{6}{c}{Overloading Feature (over all files)} & Gini \\\\
 		  '  \\cmidrule{2-4} \\cmidrule{6-11}
-		  '          & Total & w/Overload & w/Includes && Set & Get & Is Set & Unset & Call & Static Call &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '          & Total & w/Magic Methods & Plus Includes && Set & Get & Is Set & Unset & Call & Static Call &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '    <productLine(p)> <}>
 		  '  \\bottomrule
 		  '  \\end{tabular}
@@ -651,8 +651,57 @@ public str magicMethodCounts(MMResult res, map[str,set[str]] transitiveUses) {
 		  '\\npfourdigitnosep
 		  '\\npnoaddmissingzero
 		  '";
-	return tbl;	
+	return tbl;		
+}
+
+public str skinnyMagicMethodCounts(MMResult res, map[str,set[str]] transitiveUses) {
+	lv = getLatestVersions();
+	ci = loadCountsCSV();
 	
+	str productLine(str p) {
+		v = lv[p];
+		< lineCount, fileCount > = getOneFrom(ci[p,v]);
+
+		setsSize = size(res[<p,lv[p]>].sets);
+		getsSize = size(res[<p,lv[p]>].gets);
+		isSetsSize = size(res[<p,lv[p]>].isSets);
+		unsetsSize = size(res[<p,lv[p]>].unsets);
+		callsSize = size(res[<p,lv[p]>].calls);
+		staticCallsSize = size(res[<p,lv[p]>].staticCalls);
+		allMM = res[<p,lv[p]>].sets + res[<p,lv[p]>].gets + res[<p,lv[p]>].isSets + res[<p,lv[p]>].unsets + res[<p,lv[p]>].calls + res[<p,lv[p]>].staticCalls;
+		hits = ( );
+		for (citem <- allMM) {
+			hitloc = citem@at.path;
+			if (hitloc in hits)
+				hits[hitloc] += 1;
+			else
+				hits[hitloc] = 1;
+		}
+		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
+
+		return "<p> & \\numprint{<size(hits<0>)>} & \\numprint{<size(transitiveUses[p])>} && \\numprint{<setsSize>} & \\numprint{<getsSize>} & \\numprint{<isSetsSize>} & \\numprint{<unsetsSize>} & \\numprint{<callsSize>} & \\numprint{<staticCallsSize>} & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<round(giniC*1000.0)/1000.0>} \\npnoround" : "N/A"> \\\\";
+	}
+		
+	tbl = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table}
+		  '  \\centering
+		  '  \\ra{1.0}
+		  '\\scriptsize
+		  '  \\begin{tabular}{@{}lrrcrrrrrrr@{}} \\toprule
+		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{a} & \\multicolumn{6}{c}{Magic Methods} & GC \\\\
+		  '  \\cmidrule{2-3} \\cmidrule{5-10}
+		  '          & MM & WI && S & G & I & U & C & SC &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '    <productLine(p)> <}>
+		  '  \\bottomrule
+		  '  \\end{tabular}
+		  '\\normalsize
+		  '  \\caption{PHP Overloading (Magic Methods).\\label{table-magic}}
+		  '\\end{table}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
+		  '";
+	return tbl;		
 }
 
 alias HistInfo = rel[str p, str file, int variableVariables, int variableCalls, int variableMethodCalls, int variableNews, 
@@ -1195,12 +1244,106 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	return < solution, solutionLabels, found >;
 }
 
+public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice) {
+	// The features in the system 
+	features = toSet(tail(tail(tail(getRelFieldNames((#getFeatsType).symbol)))));
+	
+	// The nodes in the system, representing feature * file combinations
+	nodes = carrier(lattice);
+
+	// The total number of files in the system
+	totalFileCount = size(fmap<0>);
+	
+	// labels that make up the solution (so far)
+	set[str] solution = { };
+	
+	// Which features are left?
+	set[str] remainingFeatures = features;
+	
+	// solutions -- map from percent (as int) to labels that cover it
+	map[int,set[str]] res = ( );
+	
+	// covered so far (percent-wise)
+	int coveredSoFar = 0;
+	
+	// Build some bookkeeping info -- this tells us which features we need to
+	// achieve a certain percent of coverage, coming at it from the other way --
+	// if we have 5% coverage, anything in more than 95% of the files must
+	// be in it. So, neededForLabels[5] would have the names of any features
+	// that occur in more than 95% of all files
+	list[str] fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
+	map[int,str] indexes = ( i : fieldNames[i] | i <- index(fieldNames) ); 
+	map[str,int] labelIndex = ( fieldNames[i] : i | i <- index(fieldNames) ); 
+	map[int,int] featureFileCount = ( n : size({l|l<-fmap<0>,fmap[l][n]>0}) | n <- index(fieldNames) );
+	map[int,real] featureFilePercent = ( n : featureFileCount[n]*100.0/totalFileCount | n <- featureFileCount ); 
+	map[int,set[int]] neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..100] ); 
+	map[int,set[str]] neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor ); 
+	
+	// seed the solution with all the features we need to achieve 1% coverage
+	solution = neededForLabels[1];
+	remainingFeatures = remainingFeatures - solution;
+	
+	// the features that aren't in there are left as the features to try
+	featuresToTry = reverse(sort(toList(remainingFeatures),bool(str a, str b) { return featureFilePercent[labelIndex[a]] <= featureFilePercent[labelIndex[b]]; }));
+	
+	// now, continually grow until we cover 100% of the files
+	while(coveredSoFar < 100) {
+		// nextStepMap holds the number of files we cover if we choose a specific feature
+		nextStepMap = ( feature : size({ *(n@transFiles) | n <- { n | n <- nodes, n.features < (solution + feature) } }) | feature <- remainingFeatures );
+		// this then sorts the map results, getting back the one that adds the most files
+		<nextFeature,nextFeatureCount> = head(reverse(sort([ < feature,nextStepMap[feature] > | feature <- nextStepMap ],bool(<str s1,int n1>, <str st,int n2>) { return n1 <= n2; })));
+
+		// it is possible that any one feature won't extend our set of solutions; if that is the
+		// case, we instead add the most popular
+		if (nextFeatureCount == 0 || (size(nextStepMap<0>) > 1 && size(nextStepMap<1>) == 1)) {
+			nextFeature = head(featuresToTry); featuresToTry = tail(featuresToTry);
+			nextFeatureCount = size({*(n@transFiles) | n <- nodes, n.features < (solution+nextFeature)});
+		}
+			
+		// Here, we did extend, so we add this feature into the solution
+		solution += nextFeature; remainingFeatures -= nextFeature; featuresToTry -= nextFeature;
+
+		// We may have grown by more than 1%, so check which percentiles we now cover
+		while(coveredSoFar < 100) {
+			nextTarget = round(((coveredSoFar + 1) / 100.0) * totalFileCount);
+			if (nextFeatureCount >= nextTarget) {
+				res[nextTarget] = solution;
+				coveredSoFar += 1;
+				println("Found coverage for <coveredSoFar>%, now covering <nextFeatureCount> files with <size(solution)> features.");
+
+				// to push this more quickly to a solution, add in anything we know we will
+				// need to reach the next percentile that isn't yet in there
+				notInYet = neededForLabels[coveredSoFar+1] - solution;
+				if (size(notInYet) > 0) {
+					solution += notInYet; remainingFeatures -= notInYet; for (f <- notInYet) featuresToTry -= f;
+					// if we did add something, extend the nextFeatureCount as well, since that should
+					// also have grown (i.e., we cover more files now that we added more stuff into
+					// the solution set)
+					nextFeatureCount = size({*(n@transFile) | n <- nodes, n.features < solution});
+				}
+			} else {
+				break;
+			}
+		}
+	}
+
+	return res;
+}
+
 public map[int,set[str]] featuresForPercents(FMap fmap, FeatureLattice lattice, list[int] percents) {
 	return ( p : features | p <- percents, < nodes, features, files > := minimumFeaturesForPercent(fmap,lattice,p) );
 }
 
 public map[int,set[str]] featuresForAllPercents(FMap fmap, FeatureLattice lattice) {
 	return featuresForPercents(fmap, lattice, [1..100]);
+}
+
+public map[int,set[str]] featuresForPercents2(FMap fmap, FeatureLattice lattice, list[int] percents) {
+	return ( p : minimumFeaturesForPercent2(fmap,lattice,p) | p <- percents );
+}
+
+public map[int,set[str]] featuresForAllPercents2(FMap fmap, FeatureLattice lattice) {
+	return featuresForPercents2(fmap, lattice, [1..100]);
 }
 
 public void saveCoverageMap(map[int,set[str]] coverageMap) {
