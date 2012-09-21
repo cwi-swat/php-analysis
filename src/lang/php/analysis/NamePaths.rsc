@@ -8,15 +8,23 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::analysis::NamePaths
 
+//
+// TODO: We need some way to encode the dynamic scopes of PHP here; for instance,
+// to encode that a function could be defined in one way on one branch of a conditional,
+// and in another way on another. This code assumes that we have a unique initial
+// introduction of a name in the code.
+@doc{Component parts of the name path.}
 data NamePart 
 	= root() 
 	| global() 
 	| class(str className)
 	| interface(str interfaceName)
+	| function(str functionName)
 	| method(str methodName) 
 	| field(str fieldName) 
 	| var(str varName) 
 	| arrayContents() 
 	;
-	
+
+@doc{The path, in terms of declared scoping constructs, to a name}
 alias NamePath = list[NamePart];

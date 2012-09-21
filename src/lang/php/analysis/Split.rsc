@@ -9,20 +9,27 @@
 module lang::php::analysis::Split
 
 import lang::php::analysis::NamePaths;
-
-import Node;
+import lang::php::ast::AbstractSyntax;
 import IO;
 import Set;
 
-public alias SplitScript = map[NamePath,node];
+@doc{The items we split the script into. This includes functions, methods, and the various
+     statements that sit at the top level and form the global scope.}
+public data SplitItem
+	= globalItem(list[Stmt])
+	| functionItem(str name, bool byRef, list[Param] params, list[Stmt] body)
+	| methodItem(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body)
+	;
+	
+@doc{The representation of the script, after splitting. This is a map from names to the item that
+     actually defines that name.}
+public alias SplitScript = map[NamePath,SplitItem];
 
-public SplitScript splitScript(node scr) {
-	println("INFO: Splitting script into individual functions/methods");
-	SplitScript ss = ( );
-	if (script(bs) := scr) {
-		gbody = [ b | b <- bs, getName(b) notin { "class_def", "interface_def", "method" }];
-		ss[[global()]] = "script"(gbody);
-		
+@doc{Split the script into it's component parts.}
+public SplitScript splitScript(Script scr) {
+	if (script(body) := scr) {
+		SplitScript ss = ( [global()] :  globalItem(scr.body) );
+
 		for (f:method(sig:signature(_,_,_,_,_,_,_,_,method_name(mn),_),_) <- bs)
 			ss[[global(),method(mn)]] = f;
 			
@@ -39,8 +46,9 @@ public SplitScript splitScript(node scr) {
 			for (a:attribute(_,_,_,_,_,name(variable_name(n),_)) <- ml)
 				ss[[class(cn),var(n)]] = a;
 		}
-
+		
+		return ss;
 	}
 	
-	return ss; 
+	return ( ); 
 }
