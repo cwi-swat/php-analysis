@@ -12,7 +12,6 @@ import Relation;
 import IO;
 import ValueIO;
 import Map;
-import stat::Inference;
 import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::analysis::includes::IncludeCP;
 import lang::rascal::types::AbstractType;
