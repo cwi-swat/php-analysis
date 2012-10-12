@@ -16,13 +16,15 @@ module lang::php::analysis::NamePaths
 @doc{Component parts of the name path.}
 data NamePart 
 	= root() 
-	| global() 
+	| global()
+	| library(str libName) 
 	| class(str className)
 	| interface(str interfaceName)
 	| function(str functionName)
 	| method(str methodName) 
 	| field(str fieldName) 
 	| var(str varName) 
+	| const(str constName)
 	| arrayContents() 
 	;
 
