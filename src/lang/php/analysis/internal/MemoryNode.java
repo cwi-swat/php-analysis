@@ -21,7 +21,6 @@ import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.type.Type;
 import org.eclipse.imp.pdb.facts.type.TypeFactory;
 import org.eclipse.imp.pdb.facts.type.TypeStore;
-import org.rascalmpl.interpreter.Typeifier;
 import org.rascalmpl.interpreter.types.ReifiedType;
 import org.rascalmpl.values.ValueFactoryFactory;
 
@@ -110,7 +109,6 @@ public class MemoryNode implements Cloneable {
 	public ISet getItems(IList path, IConstructor type) {
 		Type storeItem = ((ReifiedType) type.getType()).getTypeParameters().getFieldType(0);
 		TypeStore store = new TypeStore();
-		Typeifier.declare(type, store);
 		
 		ISetWriter sw = ValueFactoryFactory.getValueFactory().setWriter(TypeFactory.getInstance().abstractDataType(store, storeItem.getName()));
 		for (MemoryNode mn : getNodeCreatePath(path)) {
@@ -331,10 +329,7 @@ public class MemoryNode implements Cloneable {
 		TypeStore store = new TypeStore();
 
 		Type leftItem = ((ReifiedType) left.getType()).getTypeParameters().getFieldType(0);
-		Typeifier.declare(left, store);
-
 		Type rightItem = ((ReifiedType) right.getType()).getTypeParameters().getFieldType(0);
-		Typeifier.declare(right, store);		
 		
 		Type tupleItem = TypeFactory.getInstance().tupleType(
 				TypeFactory.getInstance().aliasType(store, "NamePath", 

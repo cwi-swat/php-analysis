@@ -17,7 +17,6 @@ import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.type.Type;
 import org.eclipse.imp.pdb.facts.type.TypeFactory;
 import org.eclipse.imp.pdb.facts.type.TypeStore;
-import org.rascalmpl.interpreter.Typeifier;
 import org.rascalmpl.interpreter.types.ReifiedType;
 import org.rascalmpl.values.ValueFactoryFactory;
 
@@ -64,7 +63,6 @@ public class SetValuedMap {
 	public ISet getKeys(IConstructor domainType) {
 		Type domain = ((ReifiedType) domainType.getType()).getTypeParameters().getFieldType(0);
 		TypeStore store = new TypeStore();
-		Typeifier.declare(domainType, store);
 		Type itemType = TypeFactory.getInstance().aliasType(store, "NamePath", 
 								TypeFactory.getInstance().listType(
 										TypeFactory.getInstance().abstractDataType(store, domain.getName())));
@@ -77,7 +75,6 @@ public class SetValuedMap {
 	public ISet getValues(IConstructor rangeType, IValue key) {
 		Type range = ((ReifiedType) rangeType.getType()).getTypeParameters().getFieldType(0);
 		TypeStore store = new TypeStore();
-		Typeifier.declare(rangeType, store);
 		Type itemType = TypeFactory.getInstance().aliasType(store, "NamePath", 
 								TypeFactory.getInstance().listType(
 										TypeFactory.getInstance().abstractDataType(store, range.getName())));
@@ -93,7 +90,6 @@ public class SetValuedMap {
 		// TODO: Declare once -- this assumes they are the same type...
 		TypeStore store = new TypeStore();
 		Type domain = ((ReifiedType) domainType.getType()).getTypeParameters().getFieldType(0);
-		Typeifier.declare(domainType, store);
 		Type itemType = TypeFactory.getInstance().aliasType(store, "NamePath", 
 								TypeFactory.getInstance().listType(
 										TypeFactory.getInstance().abstractDataType(store, domain.getName())));
@@ -123,7 +119,6 @@ public class SetValuedMap {
 	public IMap getKeyCountMap(IConstructor domainType) {
 		TypeStore store = new TypeStore();
 		Type domain = ((ReifiedType) domainType.getType()).getTypeParameters().getFieldType(0);
-		Typeifier.declare(domainType, store);
 		Type keyType = TypeFactory.getInstance().aliasType(store, "NamePath", 
 								TypeFactory.getInstance().listType(
 										TypeFactory.getInstance().abstractDataType(store, domain.getName())));

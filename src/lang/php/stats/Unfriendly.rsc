@@ -14,6 +14,7 @@ import ValueIO;
 import Map;
 import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::analysis::includes::IncludeCP;
+import lang::php::analysis::includes::IncludeGraph;
 import lang::rascal::types::AbstractType;
 import util::Math;
 import lang::php::util::Config;
