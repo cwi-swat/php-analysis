@@ -161,6 +161,24 @@ our tests with Eclipse 3.7 running on Linux, but this occurred with 3 files
 while running with Eclipse 4.2 on Mac OS X. We are working to track down the
 source of this bug and repair it.
 
+Building Binaries with Includes Information
+-------------------------------------------
+
+At runtime, the actual program is the PHP page that is visited with all
+includes resolved. We have developed an analysis that tries to resolve
+these includes statically, and are currently working on improving this.
+To use this information in the analysis, we first build binaries (as
+above), but with includes resolved, where possible, to literal paths.
+To do this, run the following code:
+
+	import lang::php::stats::Unfriendly;
+	writeIncludeBinaries();
+	
+This will generate a new binary, with includes resolved, for each
+product in the corpus. Note that this is needed to recreate the feature
+usage information, since that accounts for features included transitively
+where possible.
+
 Running the PHP Feature Usage Analysis Code
 -------------------------------------------
 
@@ -171,8 +189,11 @@ in file `Unfriendly.rsc`. This module contains code that measures the
 use of "analysis unfriendly" features such as variable variables and
 magic methods. This code also uses a number of functions defined
 in `Stats.rsc` for extracting information on the uses of individual
-features from PHP files. We ran this code ourselves, in the Rascal
-console, to generate the information that appears in our ICSE 2013
-submission; we are adding functions to automate this process to make
-it easier for reviews to check. These functions should be added over
-the next several days.
+features from PHP files.
+
+To make our experiments easily reproducible, folder `lang/php/experiments`
+contains a subdirectory for each paper, with a file containing calls that
+build the figures and tables. For instance, module `lang::php::experiments::icse2012::ICSE2013`
+contains one function for each table and figure in the submitted
+paper. Tracing through these functions shows the analysis steps
+taken to yield the results we reported.

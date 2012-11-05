@@ -3,6 +3,8 @@ module lang::php::analysis::includes::IncludeGraph
 import lang::php::ast::AbstractSyntax;
 import lang::php::stats::Stats;
 import analysis::graphs::Graph;
+import lang::php::analysis::evaluators::ScalarEval;
+import String;
 
 data IncludeGraphNode = igNode(str fileName, loc fileLoc);
 data IncludeGraphEdge = igEdge(IncludeGraphNode source, IncludeGraphNode target, Expr includeExpr);
