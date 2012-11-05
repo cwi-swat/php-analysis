@@ -8,6 +8,7 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::analysis::BasicBlocks
 
+import lang::php::ast::AbstractSyntax;
 import lang::php::pp::PrettyPrinter;
 import String;
 import List;
