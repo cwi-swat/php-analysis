@@ -38,7 +38,7 @@ public real mygini(list[tuple[num observation,int frequency]] values) {
 		return dup(item,frequency-1) + item;
 	}
 	
-	return mygini([ *dup(o,f) | <o,f> <- values ]);
+	return mygini([ *dup(o1,f) | <o1,f> <- values ]);
 }
 
 public real mygini(list[int] dist) {
@@ -851,7 +851,7 @@ public map[str,list[str]] getFeatureGroups() {
 
  return  ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
          + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
-         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label","ternary","suppress","haltCompiler"])
+         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label","ternary","haltCompiler","expressionStatementChainRule"])
          + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign", "unset"])
          + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure","methodDef","classConstDef","propertyDef"])
          + ("invocations" : ["call","methodCall","staticCall", "eval", "shellExec"])
@@ -865,21 +865,20 @@ public map[str,list[str]] getFeatureGroups() {
 public str groupsTable(set[str] notIn80, set[str] notIn90, set[str] notIn100) {
   gg = getFeatureGroups();
   
-  str formatLabel(str l) {
+  str formatLabel(str orig, str l) {
     rval = l;
-  	if (l in notIn100) rval = "\\textbf{<rval>}";
-  	if (l in notIn90) rval = "\\textit{<rval>}";
-  	if (l in notIn80) rval = "\\underline{<rval>}";
+  	if (orig in notIn100) rval = "\\textbf{<rval>}";
+  	if (orig in notIn90) rval = "\\textit{<rval>}";
+  	if (orig in notIn80) rval = "\\underline{<rval>}";
   	return rval;
   }
   
   return "\\begin{table}
          '\\begin{tabularx}{\\columnwidth}{lX}
-         '<for (g <- sort([*gg<0>])) {>\\textbf{<g>} & <intercalate(", ", [formatLabel(n) | n <- sort([shortLabel(n) | n <- gg[g]])])> \\\\
+         '<for (g <- sort([*gg<0>])) {>\\textbf{<g>} & <intercalate(", ", [formatLabel(n,sn) | <n,sn> <- sort([<n,shortLabel(n)> | n <- gg[g]], bool(tuple[str s1,str s2] v1, tuple[str s1, str s2] v2) { return v1.s2 < v2.s2; })])> \\\\
          '<}> & \\\\ \\end{tabularx}
-         '\\parbox{\\columnwidth}{Features in \\textbf{bold} are not used in the corpus. Features in \\textit{italics} 
-         'are not needed to achieve 90\\% coverage of the corpus. \\underline{Underlined} features are not needed to
-         'achieve 80\\% coverage of the corpus.}
+         '\\parbox{\\columnwidth}{Features in \\textbf{bold} are not used in the corpus. Features in \\textit{italics} and \\underline{underlined}
+		 'are not needed to achieve 90\\% and 80\\% coverage of the corpus,respectively.}
          '\\ \\vspace{1ex}
          '\\caption{Logical groups of PHP features used to aggregrate usage data.\\label{Table:FeatureGroups}}
          '\\end{table}";
@@ -934,6 +933,7 @@ public str shortLabel(str l) {
     case /^Boolean<rest:.*>/ : return  "Bool<rest>";
     case /^Logical<rest:.*>/ : return  "Log<rest>";
     case /^variable<rest:.*>/ : return shortLabel(rest);
+    case /expressionStatementChainRule/ : return "expStmt";
     case /^fetchArrayDim/ : return "nextArrayElem";
     case "NotIdentical" : return "NotId";
     default: return l;

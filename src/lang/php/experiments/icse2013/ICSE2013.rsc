@@ -3,8 +3,12 @@ module lang::php::experiments::icse2013::ICSE2013
 import lang::php::util::Utils;
 import lang::php::stats::Overall;
 import lang::php::stats::Unfriendly;
+import lang::rascal::types::AbstractType;
 
 import IO;
+import Type;
+import List;
+import Set;
 
 import lang::csv::IO;
 import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
@@ -30,7 +34,13 @@ public str generateTable2() {
 	fl = loadFeatureLattice();
 
 	fByPer = featuresForPercents(fmap,fl,[80,90,100]);
-	return groupsTable(fByPer[80],fByPer[90],fByPer[100]);
+	labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
+
+	notIn80 = toSet(labels) - fByPer[80];
+	notIn90 = toSet(labels) - fByPer[90];
+	notIn100 = toSet(labels) - fByPer[100];
+	
+	return groupsTable(notIn80, notIn90, notIn100);
 }
 
 public str generateFigure2() {
