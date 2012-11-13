@@ -38,7 +38,7 @@ public real mygini(list[tuple[num observation,int frequency]] values) {
 		return dup(item,frequency-1) + item;
 	}
 	
-	return mygini([ *dup(o,f) | <o,f> <- values ]);
+	return mygini([ *dup(o1,f) | <o1,f> <- values ]);
 }
 
 public real mygini(list[int] dist) {
@@ -510,11 +510,11 @@ public ICLists includesAnalysis() {
 }
 
 public void saveForLater(ICLists res) {
-	writeBinaryValueFile(|file:///export/scratch1/hills/temp/includes.bin|, res);
+	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/includes.bin|, res);
 }
 
 public ICLists reload() {
-	return readBinaryValueFile(#ICLists, |file:///export/scratch1/hills/temp/includes.bin|); 
+	return readBinaryValueFile(#ICLists, |project://PHPAnalysis/src/lang/php/serialized/includes.bin|); 
 }
 
 alias ICResult = map[tuple[str p, str v] pv, tuple[tuple[int hc,int fc,real gc] unresolved, tuple[int hc,int fc,real gc] afterEval, tuple[int hc, int fc,real gc] afterMatch, tuple[int hc,int fc,real gc] afterBoth] counts];
@@ -545,11 +545,11 @@ public ICResult calculateIncludeCounts(ICLists res) {
 }
 
 public void saveIncludeCountsForLater(ICResult res) {
-	writeBinaryValueFile(|file:///export/scratch1/hills/temp/includeCounts.bin|, res);
+	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/includeCounts.bin|, res);
 }
 
 public ICResult reloadIncludeCounts() {
-	return readBinaryValueFile(#ICResult, |file:///export/scratch1/hills/temp/includeCounts.bin|); 
+	return readBinaryValueFile(#ICResult, |project://PHPAnalysis/src/lang/php/serialized/includeCounts.bin|); 
 }
 
 public str generateIncludeCountsTable(ICResult counts) {
@@ -607,54 +607,6 @@ public MMResult magicMethodUses() {
 }
 
 public str magicMethodCounts(MMResult res, map[str,set[str]] transitiveUses) {
-	lv = getLatestVersions();
-	ci = loadCountsCSV();
-	
-	str productLine(str p) {
-		v = lv[p];
-		< lineCount, fileCount > = getOneFrom(ci[p,v]);
-
-		setsSize = size(res[<p,lv[p]>].sets);
-		getsSize = size(res[<p,lv[p]>].gets);
-		isSetsSize = size(res[<p,lv[p]>].isSets);
-		unsetsSize = size(res[<p,lv[p]>].unsets);
-		callsSize = size(res[<p,lv[p]>].calls);
-		staticCallsSize = size(res[<p,lv[p]>].staticCalls);
-		allMM = res[<p,lv[p]>].sets + res[<p,lv[p]>].gets + res[<p,lv[p]>].isSets + res[<p,lv[p]>].unsets + res[<p,lv[p]>].calls + res[<p,lv[p]>].staticCalls;
-		hits = ( );
-		for (citem <- allMM) {
-			hitloc = citem@at.path;
-			if (hitloc in hits)
-				hits[hitloc] += 1;
-			else
-				hits[hitloc] = 1;
-		}
-		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
-
-		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} & \\numprint{<size(transitiveUses[p])>} && \\numprint{<setsSize>} & \\numprint{<getsSize>} & \\numprint{<isSetsSize>} & \\numprint{<unsetsSize>} & \\numprint{<callsSize>} & \\numprint{<staticCallsSize>} & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<round(giniC*1000.0)/1000.0>} \\npnoround" : "N/A"> \\\\";
-	}
-		
-	tbl = "\\npaddmissingzero
-		  '\\npfourdigitsep
-		  '\\begin{table*}
-		  '  \\centering
-		  '  \\ra{1.2}
-		  '  \\begin{tabular}{@{}lrrrcrrrrrrr@{}} \\toprule
-		  '  Product & \\multicolumn{3}{c}{Files} & \\phantom{abc} & \\multicolumn{6}{c}{Overloading Feature (over all files)} & Gini \\\\
-		  '  \\cmidrule{2-4} \\cmidrule{6-11}
-		  '          & Total & w/Magic Methods & Plus Includes && Set & Get & Is Set & Unset & Call & Static Call &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
-		  '    <productLine(p)> <}>
-		  '  \\bottomrule
-		  '  \\end{tabular}
-		  '  \\caption{PHP Overloading (Magic Methods).\\label{table-magic}}
-		  '\\end{table*}
-		  '\\npfourdigitnosep
-		  '\\npnoaddmissingzero
-		  '";
-	return tbl;		
-}
-
-public str skinnyMagicMethodCounts(MMResult res, map[str,set[str]] transitiveUses) {
 	lv = getLatestVersions();
 	ci = loadCountsCSV();
 	
@@ -803,7 +755,7 @@ public str squiglies(HistInfo hi) {
 }
 
 public str squigly(rel[str, int] counts, str label) {
-  ds = distribution(counts);
+  ds = distribution([b|<a,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
@@ -813,7 +765,7 @@ public str squigly(rel[str, int] counts, str label) {
 }
 
 public str squiglyRound(rel[str, int] counts, str label) {
-  ds = distribution(counts);
+  ds = distribution([b|<a,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
@@ -823,7 +775,7 @@ public str squiglyRound(rel[str, int] counts, str label) {
 }
 
 public str squigly2(rel[str, int] counts, str label) {
-  ds = distribution(counts);
+  ds = distribution([b|<a,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
@@ -837,7 +789,7 @@ public str squigly2(rel[str, int] counts, str label) {
 }
 
 public str squigly3(rel[str, int] counts, str label) {
-  ds = distribution(counts);
+  ds = distribution([b|<a,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   
   if ((ds - (0:0)) == ()) {
@@ -850,7 +802,7 @@ public str squigly3(rel[str, int] counts, str label) {
 }
 
 public str labeledSquigly(rel[str, int] counts, str label) {
-  ds = distribution(counts);
+  ds = distribution([b|<a,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
@@ -880,11 +832,11 @@ public void featureCountsPerFile() {
 alias FMap = map[str file, tuple[int \break, int \classDef, int \const, int \continue, int \declare, int \do, int \echo, int \expressionStatementChainRule, int \for, int \foreach, int \functionDef, int \global, int \goto, int \haltCompiler, int \if, int \inlineHTML, int \interfaceDef, int \traitDef, int \label, int \namespace, int \return, int \static, int \switch, int \throw, int \tryCatch, int \unset, int \use, int \while, int \array, int \fetchArrayDim, int \fetchClassConst, int \assign, int \assignWithOperationBitwiseAnd, int \assignWithOperationBitwiseOr, int \assignWithOperationBitwiseXor, int \assignWithOperationConcat, int \assignWithOperationDiv, int \assignWithOperationMinus, int \assignWithOperationMod, int \assignWithOperationMul, int \assignWithOperationPlus, int \assignWithOperationRightShift, int \assignWithOperationLeftShift, int \listAssign, int \refAssign, int \binaryOperationBitwiseAnd, int \binaryOperationBitwiseOr, int \binaryOperationBitwiseXor, int \binaryOperationConcat, int \binaryOperationDiv, int \binaryOperationMinus, int \binaryOperationMod, int \binaryOperationMul, int \binaryOperationPlus, int \binaryOperationRightShift, int \binaryOperationLeftShift, int \binaryOperationBooleanAnd, int \binaryOperationBooleanOr, int \binaryOperationGt, int \binaryOperationGeq, int \binaryOperationLogicalAnd, int \binaryOperationLogicalOr, int \binaryOperationLogicalXor, int \binaryOperationNotEqual, int \binaryOperationNotIdentical, int \binaryOperationLt, int \binaryOperationLeq, int \binaryOperationEqual, int \binaryOperationIdentical, int \unaryOperationBooleanNot, int \unaryOperationBitwiseNot, int \unaryOperationPostDec, int \unaryOperationPreDec, int \unaryOperationPostInc, int \unaryOperationPreInc, int \unaryOperationUnaryPlus, int \unaryOperationUnaryMinus, int \new, int \castToInt, int \castToBool, int \castToFloat, int \castToString, int \castToArray, int \castToObject, int \castToUnset, int \clone, int \closure, int \fetchConst, int \empty, int \suppress, int \eval, int \exit, int \call, int \methodCall, int \staticCall, int \include, int \instanceOf, int \isSet, int \print, int \propertyFetch, int \shellExec, int \ternary, int \fetchStaticProperty, int \scalar, int \var, int \propertyDef, int \classConstDef, int \methodDef, int \traitUse] counts];
 
 public void writeFeatsMap(FMap m) {
-  writeBinaryValueFile(|tmp:///featsmap.bin|, m);
+  writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/featsmap.bin|, m);
 }
 
 public FMap readFeatsMap() {
-  return readBinaryValueFile(#FMap, |tmp:///featsmap.bin|);
+  return readBinaryValueFile(#FMap, |project://PHPAnalysis/src/lang/php/serialized/featsmap.bin|);
 }
 
 
@@ -899,7 +851,7 @@ public map[str,list[str]] getFeatureGroups() {
 
  return  ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
          + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
-         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label","ternary","suppress","haltCompiler"])
+         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label","ternary","haltCompiler","expressionStatementChainRule"])
          + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign", "unset"])
          + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure","methodDef","classConstDef","propertyDef"])
          + ("invocations" : ["call","methodCall","staticCall", "eval", "shellExec"])
@@ -913,21 +865,20 @@ public map[str,list[str]] getFeatureGroups() {
 public str groupsTable(set[str] notIn80, set[str] notIn90, set[str] notIn100) {
   gg = getFeatureGroups();
   
-  str formatLabel(str l) {
+  str formatLabel(str orig, str l) {
     rval = l;
-  	if (l in notIn100) rval = "\\textbf{<rval>}";
-  	if (l in notIn90) rval = "\\textit{<rval>}";
-  	if (l in notIn80) rval = "\\underline{<rval>}";
+  	if (orig in notIn100) rval = "\\textbf{<rval>}";
+  	if (orig in notIn90) rval = "\\textit{<rval>}";
+  	if (orig in notIn80) rval = "\\underline{<rval>}";
   	return rval;
   }
   
   return "\\begin{table}
          '\\begin{tabularx}{\\columnwidth}{lX}
-         '<for (g <- sort([*gg<0>])) {>\\textbf{<g>} & <intercalate(", ", [formatLabel(n) | n <- sort([shortLabel(n) | n <- gg[g]])])> \\\\
+         '<for (g <- sort([*gg<0>])) {>\\textbf{<g>} & <intercalate(", ", [formatLabel(n,sn) | <n,sn> <- sort([<n,shortLabel(n)> | n <- gg[g]], bool(tuple[str s1,str s2] v1, tuple[str s1, str s2] v2) { return v1.s2 < v2.s2; })])> \\\\
          '<}> & \\\\ \\end{tabularx}
-         '\\parbox{\\columnwidth}{Features in \\textbf{bold} are not used in the corpus. Features in \\textit{italics} 
-         'are not needed to achieve 90\\% coverage of the corpus. \\underline{Underlined} features are not needed to
-         'achieve 80\\% coverage of the corpus.}
+         '\\parbox{\\columnwidth}{Features in \\textbf{bold} are not used in the corpus. Features in \\textit{italics} and \\underline{underlined}
+		 'are not needed to achieve 90\\% and 80\\% coverage of the corpus,respectively.}
          '\\ \\vspace{1ex}
          '\\caption{Logical groups of PHP features used to aggregrate usage data.\\label{Table:FeatureGroups}}
          '\\end{table}";
@@ -982,6 +933,7 @@ public str shortLabel(str l) {
     case /^Boolean<rest:.*>/ : return  "Bool<rest>";
     case /^Logical<rest:.*>/ : return  "Log<rest>";
     case /^variable<rest:.*>/ : return shortLabel(rest);
+    case /expressionStatementChainRule/ : return "expStmt";
     case /^fetchArrayDim/ : return "nextArrayElem";
     case "NotIdentical" : return "NotId";
     default: return l;
@@ -989,7 +941,7 @@ public str shortLabel(str l) {
 }
 
 public str fileSizesHistogram(getLinesType ls) {
-  ds = distribution(ls<file,phplines>);
+  ds = distribution([ b | <a,b> <- ls<file,phplines>]);
   cds = cumulative(ds);
   
   return "\\begin{figure}
@@ -1352,6 +1304,14 @@ public void saveCoverageMap(map[int,set[str]] coverageMap) {
 
 public map[int,set[str]] loadCoverageMap() {
 	return readBinaryValueFile(#map[int,set[str]], |project://PHPAnalysis/src/lang/php/serialized/coverageMap.bin|);
+}
+
+public void saveFeatureLattice(FeatureLattice fl) {
+	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/featureLattice.bin|, fl);
+}
+
+public FeatureLattice loadFeatureLattice() {
+	return readBinaryValueFile(#FeatureLattice, |project://PHPAnalysis/src/lang/php/serialized/featureLattice.bin|);
 }
 
 public str coverageGraph(map[int,set[str]] coverageMap) {
