@@ -12,6 +12,8 @@ import String;
 import IO;
 import Exception;
 import lang::php::util::Config;
+import List;
+import Set;
 
 public data RuntimeException
 	= productNotFound(str product, str version, loc productDir)
@@ -100,6 +102,8 @@ public set[str] getVersions(str product) {
 		return versions(product);
 	throw productNotFound(product);
 }
+
+public list[str] getSortedVersions(str product) = sort(toList(getVersions(product)), compareVersion);
 
 public set[str] getPluginVersions(str plugin) {
 	if (plugin in plugins<0>)

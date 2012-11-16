@@ -94,14 +94,34 @@ public void buildBinaries(str product, str version) {
 	writeBinaryValueFile(binLoc, files);
 }
 
+public void buildMissingBinaries(str product, str version) {
+	loc l = getCorpusItem(product,version);
+	loc binLoc = parsedDir + "<product>-<version>.pt";
+	if (!exists(binLoc)) {
+		println("Parsing <product>-<version>");
+		files = loadPHPFiles(l);
+		writeBinaryValueFile(binLoc, files);
+	}
+}
+
 public void buildBinaries(str product) {
 	for (version <- getVersions(product))
 		buildBinaries(product, version);
 }
 
+public void buildMissingBinaries(str product) {
+	for (version <- getVersions(product))
+		buildMissingBinaries(product, version);
+}
+
 public void buildBinaries() {
 	for (product <- getProducts(), version <- getVersions(product))
 		buildBinaries(product, version);
+}
+
+public void buildMissingBinaries() {
+	for (product <- getProducts(), version <- getVersions(product))
+		buildMissingBinaries(product, version);
 }
 
 public void buildNewestBinaries() {
