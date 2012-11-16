@@ -11,6 +11,7 @@ module lang::php::pp::PrettyPrinter
 import lang::php::ast::AbstractSyntax;
 import List;
 import String;
+import Set;
 
 //public data OptionExpr = someExpr(Expr expr) | noExpr();
 public str pp(someExpr(Expr expr)) = pp(expr);
@@ -189,7 +190,7 @@ public str pp(staticPropertyFetch(expr(Expr cn),name(Name pn))) = "$<pp(cn)>::<p
 public str pp(staticPropertyFetch(expr(Expr cn),expr(Expr pn))) = "$<pp(cn)>::$<pp(pn)>";
 
 //	| scalar(Scalar scalarVal)
-public str pp(Scalar scalarVal) = pp(scalarVal);
+public str pp(scalar(Scalar scalarVal)) = pp(scalarVal);
 
 //	| var(NameOrExpr varName)	
 public str pp(var(NameOrExpr varName)) = "$<pp(varName)>";
@@ -234,40 +235,40 @@ public str pp(unaryMinus()) = "-";
 public str pp(equal()) = "==";
 public str pp(identical()) = "===";
 
-public str isUnary(booleanNot()) = true;
-public str isUnary(bitwiseNot()) = true;
-public str isUnary(postDec()) = true;
-public str isUnary(preDec()) = true;
-public str isUnary(postInc()) = true;
-public str isUnary(preInc()) = true;
-public str isUnary(unaryPlus()) = true;
-public str isUnary(unaryMinus()) = true;
+public bool isUnary(booleanNot()) = true;
+public bool isUnary(bitwiseNot()) = true;
+public bool isUnary(postDec()) = true;
+public bool isUnary(preDec()) = true;
+public bool isUnary(postInc()) = true;
+public bool isUnary(preInc()) = true;
+public bool isUnary(unaryPlus()) = true;
+public bool isUnary(unaryMinus()) = true;
 public default str isUnary(Op x) = false;
 
-public str ppOnLeft(booleanNot()) = true;
-public str ppOnLeft(bitwiseNot()) = true;
-public str ppOnLeft(postDec()) = false;
-public str ppOnLeft(preDec()) = true;
-public str ppOnLeft(postInc()) = false;
-public str ppOnLeft(preInc()) = true;
-public str ppOnLeft(unaryPlus()) = true;
-public str ppOnLeft(unaryMinus()) = true;
+public bool ppOnLeft(booleanNot()) = true;
+public bool ppOnLeft(bitwiseNot()) = true;
+public bool ppOnLeft(postDec()) = false;
+public bool ppOnLeft(preDec()) = true;
+public bool ppOnLeft(postInc()) = false;
+public bool ppOnLeft(preInc()) = true;
+public bool ppOnLeft(unaryPlus()) = true;
+public bool ppOnLeft(unaryMinus()) = true;
 public default str ppOnLeft(Op x) = false;
 
-public default str ppOnRight(Op x) = isUnary(x) && !ppOnLeft(x);
+public default bool ppOnRight(Op x) = isUnary(x) && !ppOnLeft(x);
 
 //public data Param = param(str paramName, 
 //						  OptionExpr paramDefault, 
 //						  OptionName paramType,
 //						  bool byRef);
-public str pp(str pn, noExpr(), noName(), false) = "$<pn>";
-public str pp(str pn, noExpr(), noName(), true) = "&$<pn>";
-public str pp(str pn, noExpr(), someName(Name n), false) = "<pp(n)> $<pn>";
-public str pp(str pn, noExpr(), someName(Name n), true) = "<pp(n)> &$<pn>";
-public str pp(str pn, someExpr(Expr e), noName(), false) = "$<pn> = <pp(e)>";
-public str pp(str pn, someExpr(Expr e), noName(), true) = "&$<pn> = <pp(e)>";
-public str pp(str pn, someExpr(Expr e), someName(Name n), false) = "<pp(n)> $<pn> = <pp(e)>";
-public str pp(str pn, someExpr(Expr e), someName(Name n), true) = "<pp(n)> &$<pn> = <pp(e)>";
+public str pp(param(str pn, noExpr(), noName(), false)) = "$<pn>";
+public str pp(param(str pn, noExpr(), noName(), true)) = "&$<pn>";
+public str pp(param(str pn, noExpr(), someName(Name n), false)) = "<pp(n)> $<pn>";
+public str pp(param(str pn, noExpr(), someName(Name n), true)) = "<pp(n)> &$<pn>";
+public str pp(param(str pn, someExpr(Expr e), noName(), false)) = "$<pn> = <pp(e)>";
+public str pp(param(str pn, someExpr(Expr e), noName(), true)) = "&$<pn> = <pp(e)>";
+public str pp(param(str pn, someExpr(Expr e), someName(Name n), false)) = "<pp(n)> $<pn> = <pp(e)>";
+public str pp(param(str pn, someExpr(Expr e), someName(Name n), true)) = "<pp(n)> &$<pn> = <pp(e)>";
 
 //public data Scalar
 //	= classConstant()
@@ -293,7 +294,7 @@ public str pp(namespaceConstant()) = "__NAMESPACE__";
 public str pp(traitConstant()) = "__TRAIT__";
 public str pp(Scalar::float(real r)) = "<r>";
 public str pp(integer(int i)) = "<i>";
-public str pp(Scalar::string(str s)) = "<s>";
+public str pp(Scalar::string(str s)) = "\'<s>\'";
 public str pp(encapsed(list[Expr] parts)) = intercalate(".",[pp(p) | p <- parts]);
 
 //public data Stmt 
@@ -339,20 +340,20 @@ public str pp(\for(list[Expr] inits, list[Expr] conds, list[Expr] exprs, list[St
 
 //	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
 public str pp(foreach(Expr arrayExpr, someExpr(Expr keyvar), false, Expr asVar, list[Stmt] body)) =
-	"foreach(<pp(arrayExpr)> as <pp(keyvar)> =\> <pp(asVar)> {
-	'	<for (b <- body) {><pp(b)><}>
+	"foreach(<pp(arrayExpr)> as <pp(keyvar)> =\> <pp(asVar)> {<for (b <- body) {>
+	'	<pp(b)><}>
 	'}";
 public str pp(foreach(Expr arrayExpr, someExpr(Expr keyvar), true, Expr asVar, list[Stmt] body)) =
-	"foreach(<pp(arrayExpr)> as <pp(keyvar)> =\> &<pp(asVar)> {
-	'	<for (b <- body) {><pp(b)><}>
+	"foreach(<pp(arrayExpr)> as <pp(keyvar)> =\> &<pp(asVar)> {<for (b <- body) {>
+	'	<pp(b)><}>
 	'}";
 public str pp(foreach(Expr arrayExpr, noExpr(), false, Expr asVar, list[Stmt] body)) =
-	"foreach(<pp(arrayExpr)> as <pp(asVar)> {
-	'	<for (b <- body) {><pp(b)><}>
+	"foreach(<pp(arrayExpr)> as <pp(asVar)> {<for (b <- body) {>
+	'	<pp(b)><}>
 	'}";
 public str pp(foreach(Expr arrayExpr, noExpr(), true, Expr asVar, list[Stmt] body)) =
-	"foreach(<pp(arrayExpr)> as &<pp(asVar)> {
-	'	<for (b <- body) {><pp(b)><}>
+	"foreach(<pp(arrayExpr)> as &<pp(asVar)> {<for (b <- body) {>
+	'	<pp(b)><}>
 	'}";
 	
 //	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
@@ -376,24 +377,24 @@ public str pp(haltCompiler(str remainingText)) = "__halt_compiler()";
 
 //	| \if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, OptionElse elseClause)
 public str pp(\if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, noElse())) = 
-	"if(<pp(cond)>) {
-	'	<for (b <- body) {><pp(b)><}>
+	"if(<pp(cond)>) {<for (b <- body) {>
+	'	<pp(b)><}>
 	'}" when isEmpty(elseIfs);
 public str pp(\if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, someElse(Else elseClause))) = 
-	"if(<pp(cond)>) {
-	'	<for (b <- body) {><pp(b)><}>
+	"if(<pp(cond)>) {<for (b <- body) {>
+	'	<pp(b)><}>
 	'}
 	'<pp(elseClause)>
 	'" when isEmpty(elseIfs);
 public str pp(\if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, noElse())) = 
-	"if(<pp(cond)>) {
-	'	<for (b <- body) {><pp(b)><}>
+	"if(<pp(cond)>) {<for (b <- body) {>
+	'	<pp(b)><}>
 	'}
 	'<for (e <- elseIfs) {><pp(e)><}>
 	'" when !isEmpty(elseIfs);
 public str pp(\if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, someElse(Else elseClause))) = 
-	"if(<pp(cond)>) {
-	'	<for (b <- body) {><pp(b)><}>
+	"if(<pp(cond)>) {<for (b <- body) {>
+	'	<pp(b)><}>
 	'}
 	'<for (e <- elseIfs) {><pp(e)><}>
 	'<pp(elseClause)>
@@ -491,7 +492,7 @@ public str pp(elseIf(Expr cond, list[Stmt] body)) =
 	
 //public data Else = \else(list[Stmt] body);
 public str pp(\else(list[Stmt] body)) =
-	"else (<pp(cond)>) {
+	"else {
 	'  <for (b <- body) {><pp(b)><}>"
 	;
 
@@ -512,8 +513,9 @@ public str pp(constCI(list[Const] consts)) =
 
 //	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body)
 public str pp(method(str name, set[Modifier] modifiers, true, list[Param] params, list[Stmt] body)) =
-	"<intercalate(" ", [pp(m)|m<-modifiers])> function &<name>(<intercalate(",",[pp(p)|p<-params])>) {
-	'	<for (b <- body) {><pp(b)><}>"
+	"<intercalate(" ", [pp(m)|m<-modifiers])> function &<name>(<intercalate(",",[pp(p)|p<-params])>) {<for (b <- body) {>
+	'	<pp(b)><}>
+	'}"
 	when !isEmpty(body);
 
 public str pp(method(str name, set[Modifier] modifiers, true, list[Param] params, list[Stmt] body)) =
@@ -521,8 +523,9 @@ public str pp(method(str name, set[Modifier] modifiers, true, list[Param] params
 	when isEmpty(body);
 
 public str pp(method(str name, set[Modifier] modifiers, false, list[Param] params, list[Stmt] body)) =
-	"<intercalate(" ", [pp(m)|m<-modifiers])> function <name>(<intercalate(",",[pp(p)|p<-params])>) {
-	'	<for (b <- body) {><pp(b)><}>"
+	"<intercalate(" ", [pp(m)|m<-modifiers])> function <name>(<intercalate(",",[pp(p)|p<-params])>) {<for (b <- body) {>
+	'	<pp(b)><}>
+	'}"
 	when !isEmpty(body);
 
 public str pp(method(str name, set[Modifier] modifiers, false, list[Param] params, list[Stmt] body)) =
@@ -539,8 +542,8 @@ public str pp(method(str name, set[Modifier] modifiers, false, list[Param] param
 //	;
 
 //public data Property = property(str propertyName, OptionExpr defaultValue);
-public str pp(str propertyName, someExpr(Expr defaultValue)) = "<propertyName> = <pp(defaultValue)>";
-public str pp(str propertyName, noExpr()) = propertyName;
+public str pp(str propertyName, someExpr(Expr defaultValue)) = "$<propertyName> = <pp(defaultValue)>";
+public str pp(str propertyName, noExpr()) = "$<propertyName>";
 
 //public data Modifier = \public() | \private() | protected() | static() | abstract() | final();
 public str pp(\public()) = "public";
@@ -558,7 +561,8 @@ public str pp(\final()) = "final";
 //
 public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members)) =
 	"class <className> extends <pp(extends)> {
-	'	<for (m <- members) {><pp(m)><}>
+	'	<for (m <- members) {>
+	'	<pp(m)><}>
 	'}" when isEmpty(modifiers) && isEmpty(implements);
 public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members)) =
 	"class <className> {
@@ -611,3 +615,5 @@ public str pp(staticVar(str name, NoExpr())) = "static $<name>";
 
 //public data Script = script(list[Stmt] body) | errscript(str err);
 public str pp(script(list[Stmt] body)) = intercalate("\n",[pp(b) | b <- body]);
+
+public default str pp(node n) { throw "No pretty-printer found for node <n>"; }
