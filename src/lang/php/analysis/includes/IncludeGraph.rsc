@@ -4,6 +4,7 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::stats::Stats;
 import analysis::graphs::Graph;
 import lang::php::analysis::evaluators::ScalarEval;
+import lang::php::analysis::syntactic::Constants;
 import String;
 
 data IncludeGraphNode = igNode(str fileName, loc fileLoc);
