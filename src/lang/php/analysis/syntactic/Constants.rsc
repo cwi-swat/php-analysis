@@ -77,18 +77,18 @@ public map[str,Expr] getConstants(map[loc fileloc, Script scr] scripts, set[loc]
 }
 
 data SignatureItem
-	= functionSig(str fname, int paramCount)
-	| constSig(str cname)
-	| classSig(str cname)
-	| methodSig(str cname, str mname, int paramCount)
-	| globalVarSig(str vname)
+	= functionSig(str functionName, int parameterCount)
+	| constSig(str constName)
+	| classSig(str className)
+	| methodSig(str className, str methodName, int parameterCount)
+	| classConstSig(str className, str constName)
 	;
 
 data Signature
 	= fileSignature(loc fileloc, set[SignatureItem] items)
 	;
 		
-public map[loc fileloc, Signature sig] getFileSignature(loc fileloc, Script scr) {
+public Signature getFileSignature(loc fileloc, Script scr) {
 	set[SignatureItem] items = { };
 	
 	// First, pull out all class definitions
@@ -98,21 +98,33 @@ public map[loc fileloc, Signature sig] getFileSignature(loc fileloc, Script scr)
 		for (method(mn,_,_,mps,_) <- cis) {
 			items += methodSig(cn, mn, size(mps));
 		}
+		for(constCI(consts) <- cis, const(name,_) <- consts) {
+			items += classConstSig(cn, name);
+		}
 	}
 	
 	// Second, get all top-level functions
 	items += { functionSig(fn,size(fps)) | /f:function(fn,_,fps,_) := scr };
-	
-	// Third, get all top-level variable names
-	
+
+	// TODO: We also want to add global variables here, but need to do this in the
+	// right way -- we don't know, at this point, if a name is introduced here for
+	// the first time, or is brought in through another include. The only way to
+	// know this for sure is either to a) resolve the includes here, or b) determine
+	// that there are no includes.
+		
 	// Finally, get all defined constants
-	items += { constSig(cn) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e:scalar(sv),false)]) := script };
+	items += { constSig(cn) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e:scalar(sv),false)]) := scr };
 	
-	return items;
+	return fileSignature(fileloc, items);
 }
 		
-public rel[str, loc] getAllDefinedConstants(map[loc fileloc, Script scr] scripts) {
+public map[loc,Signature] getSystemSignatures(map[loc fileloc, Script scr] scripts) {
+	return ( l : getFileSignature(l,scripts[l]) | l <- scripts );
+}
 
+public rel[str, loc] getAllDefinedConstants(map[loc fileloc, Script scr] scripts) {
+	ssigs = getSystemSignatures(scripts);
+	return { < cn, l > | fileSignature(l,sis) <- ssigs<1>, constSig(cn) <- sis };
 }
 
 // Goal: generate a module signature with all public info in the module; this can be used to constrain which

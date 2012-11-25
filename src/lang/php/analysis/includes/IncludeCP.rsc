@@ -14,6 +14,7 @@ import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::stats::Stats;
 import lang::php::util::Utils;
 import lang::php::analysis::includes::IncludeGraph;
+import lang::php::pp::PrettyPrinter;
 import Exception;
 import IO;
 import List;
@@ -54,15 +55,16 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 			list[str] parts = split("/",s);
 			while([a*,b,"..",c*] := parts) parts = [*a,*c];
 			while([a*,".",c*] := parts) parts = [*a,*c];		
-			return [ (p == "..") ? fnBit() : lit(p) | p <- parts ];
+			return [ (p == "..") ? fnBit() : FNBits::lit(p) | p <- parts ];
 		} else {
 			return [ fnBit() ];
 		}
 	}
 	
 	str fnBits2Str(FNBits fnb) {
+		str escaped(str c) = escape(c,("/" : "\\/"));
 		switch(fnb) {
-			case lit(s) : return intercalate("",[ "[<c>]" | c <- tail(split("",s)) ]);
+			case lit(s) : return intercalate("",[ "[<escaped(c)>]" | c <- tail(split("",s)) ]);
 			case fnBit() : return "\\S+";
 		}
 	}
@@ -77,7 +79,7 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 	for (i:include(iexp,_) <- varIncludes) {
 		list[FNBits] bits = flattenExpr(iexp);
 		while([a*,fnBit(),fnBit(),b*] := bits) bits = [*a,fnBit(),*b];
-		while([a*,lit(s1),lit(s2),b*] := bits) bits = [*a,lit(s1+s2),*b];
+		while([a*,lit(s1),lit(s2),b*] := bits) bits = [*a,lit("<s1>/<s2>"),*b];
 		list[str] reList = [ fnBits2Str(b) | b <- bits ];
 		str re = "^\\S*" + intercalate("",reList) + "$";
 		//println("Trying regular expression <re>");
@@ -85,6 +87,8 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 		//println("Found <size(filteredIncludes)> possible includes");
 		if (size(filteredIncludes) == 1) {
 			replacementMap[i] = scalar(string(filteredIncludes[0].path))[@at=iexp@at];
+		} else {
+			println("Could not replace <pp(iexp)> at <iexp@at>, found <size(filteredIncludes)> hits with rexp <re>");
 		}	
 	}
 	
