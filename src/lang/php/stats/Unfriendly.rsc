@@ -494,11 +494,15 @@ alias ICLists = map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr c
 
 public ICLists includesAnalysis() {
 	lv = getLatestVersions();
+	return includesAnalysis(lv);
+}
+
+public ICLists includesAnalysis(map[str Product, str Version] lv) {
 	res = ( );
 	for (p <- lv) {
 		scripts = loadBinary(p,lv[p]);
 		unresolved = gatherIncludesWithVarPaths(scripts);
-		scripts2 = evalAllScalars(scripts);
+		scripts2 = evalAllScalarsAndInline(scripts, getCorpusItem(p,lv[p]));
 		afterEval = gatherIncludesWithVarPaths(scripts2);
 		scripts3 = matchIncludes(scripts);
 		afterMatch = gatherIncludesWithVarPaths(scripts3);
@@ -553,7 +557,7 @@ public ICResult reloadIncludeCounts() {
 }
 
 public str generateIncludeCountsTable(ICResult counts) {
-	lv = getLatestVersions();
+	lv = ( p : v | <p,v> <- counts<0> );
 	ci = loadCountsCSV();
 	ec = expressionCounts();
 	includesPerProduct = ( <p,lv[p]> : getOneFrom((ec<product,version,include>)[p,lv[p]]) | p <- lv );

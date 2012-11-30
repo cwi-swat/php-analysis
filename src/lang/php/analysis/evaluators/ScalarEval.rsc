@@ -13,67 +13,69 @@ import lang::php::analysis::evaluators::MagicConstants;
 import lang::php::analysis::evaluators::AlgebraicSimplification;
 import lang::php::analysis::evaluators::SimulateCalls;
 import lang::php::analysis::evaluators::DefinedConstants;
+import lang::php::analysis::includes::IncludeGraph;
+import lang::php::analysis::syntactic::Constants;
 import Set;
 import List;
 import String;
 import Exception;
+import IO;
 
 @doc{Perform all defined scalar evaluations.}
 public map[loc fileloc, Script scr] evalAllScalars(map[loc fileloc, Script scr] scripts) {
 	// First, resolve all magic constants. We only need to do this once, since they are
 	// all resolvable in the files that they are contained within.
+	println("INLINING MAGIC CONSTANTS");
 	scripts = ( l : inlineMagicConstants(scripts[l],l) | l <- scripts );
+	println("INLINING MAGIC CONSTANTS FINISHED");
 	
 	solve(scripts) {
+		println("APPLYING SIMPLIFICATIONS");
 		scripts = ( l : algebraicSimplification(simulateCalls(scripts[l])) | l <- scripts );
-
-//		// This is in the solve because it can change on each iteration. This is all the constants that are
-//		// defined just once in the system. This is used as a "backup" to the more detailed analysis above,
-//		// since it could be that these constants are brought in with an include that itself has a non-literal
-//		// path (meaning the more detailed analysis won't find it).
-//		//
-//		// NOTE: This could give a wrong result, in the sense that we would have a constant that would actually,
-//		// at runtime, be an error, for instance if the programmer uses the constant without actually importing
-//		// the defining script.
-//		rel[str,Expr] constRel = { < cn, e > | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e:scalar(sv),false)]) := scripts<1> };
-//		map[str,Expr] constMap = ( s : e | <s,e> <- constRel, size(constRel[s]) == 1 ); 
-//		
-//		// Add in some predefined constants as well. These are from the Directories extension.
-//		// TODO: We should factor these out somehow.
-//		constMap["DIRECTORY_SEPARATOR"] = scalar(string("/"));
-//		constMap["PATH_SEPARATOR"] = scalar(string(":"));
-//
-//		scripts = ( l : evalConsts(scripts,l,constMap) | l <- scripts );
+		println("APPLYING SIMPLIFICATIONS FINISHED");
 	}			
+
 	return scripts;
 }
 
 @doc{Perform all defined scalar evaluations and inline constants.}
-public map[loc fileloc, Script scr] evalAllScalarsAndInline(map[loc fileloc, Script scr] scripts) {
+public map[loc fileloc, Script scr] evalAllScalarsAndInline(map[loc fileloc, Script scr] scripts, loc baseLoc) {
 	// First, resolve all magic constants. We only need to do this once, since they are
 	// all resolvable in the files that they are contained within.
+	println("INLINING MAGIC CONSTANTS");
 	scripts = ( l : inlineMagicConstants(scripts[l],l) | l <- scripts );
+	println("INLINING MAGIC CONSTANTS FINISHED");
 	
 	solve(scripts) {
+		println("APPLYING SIMPLIFICATIONS");
 		scripts = ( l : algebraicSimplification(simulateCalls(scripts[l])) | l <- scripts );
+		println("APPLYING SIMPLIFICATIONS FINISHED");
 
-		// This is in the solve because it can change on each iteration. This is all the constants that are
-		// defined just once in the system. This is used as a "backup" to the more detailed analysis above,
-		// since it could be that these constants are brought in with an include that itself has a non-literal
-		// path (meaning the more detailed analysis won't find it).
-		//
-		// NOTE: This could give a wrong result, in the sense that we would have a constant that would actually,
-		// at runtime, be an error, for instance if the programmer uses the constant without actually importing
-		// the defining script.
-		rel[str,Expr] constRel = { < cn, e > | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e:scalar(sv),false)]) := scripts<1> };
-		map[str,Expr] constMap = ( s : e | <s,e> <- constRel, size(constRel[s]) == 1 ); 
+		// Calculate the includes graph. We do this inside the solve since the information on
+		// reachable includes could change as we further resolve information.
+		println("REBUILDING INCLUDES GRAPH");
+		ig = collapseToLocGraph(extractIncludeGraph(scripts, baseLoc.path));
+		igTrans = ig*;
+		println("REBUILDING INCLUDES GRAPH FINISHED");
+		
+		// Extract out the signatures. Again, we do this here because the information in the
+		// signatures for constants could change (we could resolve a constant, defined in terms
+		// of another constant, to a specific literal, for instance)
+		println("EXTRACTING FILE SIGNATURES");
+		sigs = getSystemSignatures(scripts);		
+		println("EXTRACTING FILE SIGNATURES FINISHED");
 		
 		// Add in some predefined constants as well. These are from the Directories extension.
 		// TODO: We should factor these out somehow.
+		map[str, Expr] constMap = ( );
 		constMap["DIRECTORY_SEPARATOR"] = scalar(string("/"));
 		constMap["PATH_SEPARATOR"] = scalar(string(":"));
 
-		scripts = ( l : evalConsts(scripts,l,constMap) | l <- scripts );
+		// Now, actually do the constant replacement for each script in the system.
+		println("INLINING SCALAR REACHABLE CONSTANTS");
+		scripts = ( l : evalConsts(scripts[l],constMap,igTrans[l],sigs) | l <- scripts );
+		println("INLINING SCALAR REACHABLE CONSTANTS FINISHED");
 	}			
+
 	return scripts;
 }

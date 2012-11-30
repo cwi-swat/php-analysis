@@ -3,7 +3,6 @@ module lang::php::analysis::includes::IncludeGraph
 import lang::php::ast::AbstractSyntax;
 import lang::php::stats::Stats;
 import analysis::graphs::Graph;
-import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::analysis::syntactic::Constants;
 import String;
 
@@ -39,5 +38,9 @@ public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, st
 
 public Graph[str] collapseToGraph(IncludeGraph ig) {
 	return { < fn1, fn2 > | igEdge(igNode(fn1,_),igNode(fn2,_),_) <- ig.edges };
+}
+
+public Graph[loc] collapseToLocGraph(IncludeGraph ig) {
+	return { < fl1, fl2 > | igEdge(igNode(_,fl1),igNode(_,fl2),_) <- ig.edges };
 }
 

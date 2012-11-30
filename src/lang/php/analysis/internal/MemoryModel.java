@@ -9,7 +9,6 @@ import org.eclipse.imp.pdb.facts.IList;
 import org.eclipse.imp.pdb.facts.IRelation;
 import org.eclipse.imp.pdb.facts.ISet;
 import org.eclipse.imp.pdb.facts.IValueFactory;
-import org.rascalmpl.values.ValueFactoryFactory;
 
 public class MemoryModel {
 	private final IValueFactory vf;

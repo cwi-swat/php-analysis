@@ -78,10 +78,10 @@ public map[str,Expr] getConstants(map[loc fileloc, Script scr] scripts, set[loc]
 
 data SignatureItem
 	= functionSig(str functionName, int parameterCount)
-	| constSig(str constName)
+	| constSig(str constName, Expr e)
 	| classSig(str className)
 	| methodSig(str className, str methodName, int parameterCount)
-	| classConstSig(str className, str constName)
+	| classConstSig(str className, str constName, Expr e)
 	;
 
 data Signature
@@ -98,8 +98,8 @@ public Signature getFileSignature(loc fileloc, Script scr) {
 		for (method(mn,_,_,mps,_) <- cis) {
 			items += methodSig(cn, mn, size(mps));
 		}
-		for(constCI(consts) <- cis, const(name,_) <- consts) {
-			items += classConstSig(cn, name);
+		for(constCI(consts) <- cis, const(name,ce) <- consts) {
+			items += classConstSig(cn, name, ce);
 		}
 	}
 	
@@ -113,7 +113,7 @@ public Signature getFileSignature(loc fileloc, Script scr) {
 	// that there are no includes.
 		
 	// Finally, get all defined constants
-	items += { constSig(cn) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e:scalar(sv),false)]) := scr };
+	items += { constSig(cn,e) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e,false)]) := scr };
 	
 	return fileSignature(fileloc, items);
 }
