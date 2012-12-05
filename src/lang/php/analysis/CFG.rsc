@@ -8,24 +8,3 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::analysis::CFG
 
-import analysis::graphs::Graph;
-import lang::php::ast::AbstractSyntax;
-import lang::php::analysis::NamePaths;
-import lang::php::analysis::DataFlow;
-
-data CFGNode;
-data CFGEdge;
-
-data CFG = cfg(set[CFGNode] nodes, set[CFGEdge] edges);
-
-alias CFGMap = map[NamePath,CFG];
-
-public CFGMap createCFG(Script scr) {
-	// First, pull out the things we create CFGs for. This includes all functions
-	// and all top-level methods.
-}
-
-public FlowEdges generateFlowEdges(Script scr) {
-	< labeled, lm > = labelScript(scr, "CFG"); 
-	return { *internalFlow(b) | b <- labeled.body } + { flowEdge(final(b1),init(b2)) | [_*,b1,b2,_*] := labeled.body };
-}
