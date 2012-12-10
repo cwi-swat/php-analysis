@@ -340,19 +340,19 @@ public str pp(\for(list[Expr] inits, list[Expr] conds, list[Expr] exprs, list[St
 
 //	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
 public str pp(foreach(Expr arrayExpr, someExpr(Expr keyvar), false, Expr asVar, list[Stmt] body)) =
-	"foreach(<pp(arrayExpr)> as <pp(keyvar)> =\> <pp(asVar)> {<for (b <- body) {>
+	"foreach(<pp(arrayExpr)> as <pp(keyvar)> =\> <pp(asVar)>) {<for (b <- body) {>
 	'	<pp(b)><}>
 	'}";
 public str pp(foreach(Expr arrayExpr, someExpr(Expr keyvar), true, Expr asVar, list[Stmt] body)) =
-	"foreach(<pp(arrayExpr)> as <pp(keyvar)> =\> &<pp(asVar)> {<for (b <- body) {>
+	"foreach(<pp(arrayExpr)> as <pp(keyvar)> =\> &<pp(asVar)>) {<for (b <- body) {>
 	'	<pp(b)><}>
 	'}";
 public str pp(foreach(Expr arrayExpr, noExpr(), false, Expr asVar, list[Stmt] body)) =
-	"foreach(<pp(arrayExpr)> as <pp(asVar)> {<for (b <- body) {>
+	"foreach(<pp(arrayExpr)> as <pp(asVar)>) {<for (b <- body) {>
 	'	<pp(b)><}>
 	'}";
 public str pp(foreach(Expr arrayExpr, noExpr(), true, Expr asVar, list[Stmt] body)) =
-	"foreach(<pp(arrayExpr)> as &<pp(asVar)> {<for (b <- body) {>
+	"foreach(<pp(arrayExpr)> as &<pp(asVar)>) {<for (b <- body) {>
 	'	<pp(b)><}>
 	'}";
 	
@@ -493,7 +493,8 @@ public str pp(elseIf(Expr cond, list[Stmt] body)) =
 //public data Else = \else(list[Stmt] body);
 public str pp(\else(list[Stmt] body)) =
 	"else {
-	'  <for (b <- body) {><pp(b)><}>"
+	'  <for (b <- body) {><pp(b)><}>
+	'}"
 	;
 
 //public data Use = use(Name importName, OptionName asName);
