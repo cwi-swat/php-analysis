@@ -11,6 +11,7 @@ module lang::php::analysis::cfg::Visualize
 
 import lang::php::analysis::cfg::FlowEdge;
 import lang::php::analysis::cfg::CFG;
+import lang::php::pp::PrettyPrinter;
 import IO;
 import List;
 import String;
@@ -31,11 +32,11 @@ public void renderCFGAsDot(CFG c, loc writeTo) {
 	str getID(CFGNode n) = "<n@lab>";
 	cfg = visit(cfg) { case inlineHTML(_) => inlineHTML("HTMLCode") }
 	
-	nodes = [ "\"<getID(n)>\" [ label = \"<escapeForDot(printCFGNode(n))>\" labeljust=\"l\" ];" | n <- c.nodes ];
+	nodes = [ "\"<getID(n)>\" [ label = \"<escapeForDot(printCFGNode(n))>\", labeljust=\"l\" ];" | n <- c.nodes ];
 	edges = [ "\"<e.from>\" -\> \"<e.to>\" [ label = \"<printFlowEdgeLabel(e)>\"];" | e <- c.edges ];
 	str dotGraph = "digraph \"CFG\" {
 				   '	graph [ label = \"Control Flow Graph\" ];
-				   '	node [ color = white ];
+				   '	node [ shape = box ];
 				   '	<intercalate("\n", nodes)>
 				   '	<intercalate("\n",edges)>
 				   '}";

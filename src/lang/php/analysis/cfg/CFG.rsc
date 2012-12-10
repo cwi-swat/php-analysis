@@ -44,6 +44,8 @@ public str printCFGNode(CFGNode n) {
 		case scriptExit() : return "Exit";
 		case stmtNode(s,l) : {
 			switch(s) {
+				case classDef(ClassDef cd) : return "Class <cd.className>";
+				case function(fn,_,_,_) : return "Function <fn>";
 				default: return pp(s);
 			}
 		}

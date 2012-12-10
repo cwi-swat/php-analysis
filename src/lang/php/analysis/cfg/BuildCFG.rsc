@@ -21,17 +21,18 @@ import IO;
 import List;
 
 // TODOs:
-// 1. Break and continue statements currently do not account for the
-//    break/continue jump. To do this, we need to carry around a stack
-//    of possible jump targets. For now, a break or continue will just
-//    point to the next statement.
-//
 // 2. Gotos need to be handled by keeping track of which nodes are
 //    related to which labels, and then linking these up appropriately.
 //    For now, gotos just fall through to the next statement.
 //
 // 3. Throw statements should be linked to surrounding catch clauses.
 //
+// 4. Initializations of properties in classes, and of parameters with
+//    defaults, both need to be accounted for in the control flow graph.
+//    For the first, this should be done by moving the initializations
+//    into the constructor (if it exists) or adding a constructor (if
+//    needed). For the second, this should be done by adding these as
+//    possible assignments coming out of the entry node for the method.
 
 public map[NamePath,CFG] createCFGs(loc l) {
 	return createCFGs(loadPHPFile(l));
@@ -42,7 +43,11 @@ public map[NamePath,CFG] createCFGs(Script scr) {
 	< scrLabeled, lstate > = labelScript(scr, lstate);
 	
 	map[NamePath,CFG] res = ( );
-	
+
+	println("Creating CFG for top-level script");
+	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
+	res[[global()]] = scriptCFG;
+		
 	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,params,body) <- mbrs) {
 		methodNamePath = [class(cname),method(mname)];
 		println("Creating CFG for <cname>::<mname>");
@@ -50,13 +55,13 @@ public map[NamePath,CFG] createCFGs(Script scr) {
 		res[methodNamePath] = methodCFG;
 	}
 
-	//rel[str,Stmt] functions = { };
-	//for (/f:function(fname,_,params,body) := scr) {
-	//	functions += < fname, f >;
-	//}
-	// 
-	//< scrLabeled, edges > = generateFlowEdges(scr);
-	
+	for (/f:function(fname,_,params,body) := scrLabeled) {
+		functionNamePath = [global(),function(fname)];
+		println("Creating CFG for <fname>");
+		< functionCFG, lstate > = createFunctionCFG(functionNamePath, f, lstate);
+		res[functionNamePath] = functionCFG;
+	}
+	 
 	return res;
 }
 
@@ -70,6 +75,43 @@ public map[NamePath, ClassItem] getScriptMethods(Script scr) =
 
 public map[NamePath, Stmt] getScriptFunctions(Script scr) =
 	( [global(),function(fname)] : f | /f:function(fname,_,_,_) := scr );
+
+public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, LabelState lstate) {
+	Lab incLabel() { 
+		lstate.counter += 1; 
+		return lab(lstate.counter); 
+	}
+
+	cfgEntryNode = scriptEntry()[@lab=incLabel()];
+	cfgExitNode = scriptExit()[@lab=incLabel()];
+	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
+
+	scriptBody = scr.body;
+	
+	// Add all the statements and expressions as CFG nodes
+	lstate.nodes += { stmtNode(s, s@lab)[@lab=s@lab] | /Stmt s := scriptBody };
+	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := scriptBody };
+	
+	set[FlowEdge] edges = { };
+	for (b <- scriptBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
+	< edges, lstate > = addBodyEdges(edges, lstate, scriptBody);
+	if (size(scriptBody) > 0)
+		edges += flowEdge(cfgEntryNode@lab, init(head(scriptBody)));
+	else
+		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
+	nodes = lstate.nodes;
+	lstate = shrink(lstate);
+
+	//< nodes, edges, lstate > = addJoinNodes(nodes, edges, lstate);
+	
+	// Adding CFG nodes for the expressions and statements above added in all
+	// the nested nodes from inside functions and methods as well. Here, we
+	// discard these.
+	labels = { e.from, e.to | e <- edges };
+	nodes = { n | n <- nodes, n@lab in labels };
+	
+ 	return < cfg([global()], nodes, edges), lstate >;   
+}
 
 public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, ClassItem m, LabelState lstate) {
 	Lab incLabel() { 
@@ -92,6 +134,37 @@ public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Clas
 	< edges, lstate > = addBodyEdges(edges, lstate, methodBody);
 	if (size(methodBody) > 0)
 		edges += flowEdge(cfgEntryNode@lab, init(head(methodBody)));
+	else
+		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
+	nodes = lstate.nodes;
+	lstate = shrink(lstate);
+
+	//< nodes, edges, lstate > = addJoinNodes(nodes, edges, lstate);
+	
+ 	return < cfg(np, nodes, edges), lstate >;   
+}
+
+public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, Stmt f, LabelState lstate) {
+	Lab incLabel() { 
+		lstate.counter += 1; 
+		return lab(lstate.counter); 
+	}
+
+	cfgEntryNode = functionEntry(np[1].functionName)[@lab=incLabel()];
+	cfgExitNode = functionExit(np[1].functionName)[@lab=incLabel()];
+	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
+
+    functionBody = f.body;
+	
+	// Add all the statements and expressions as CFG nodes
+	lstate.nodes += { stmtNode(s, s@lab)[@lab=s@lab] | /Stmt s := functionBody };
+	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := functionBody };
+	
+	set[FlowEdge] edges = { };
+	for (b <- functionBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
+	< edges, lstate > = addBodyEdges(edges, lstate, functionBody);
+	if (size(functionBody) > 0)
+		edges += flowEdge(cfgEntryNode@lab, init(head(functionBody)));
 	else
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
 	nodes = lstate.nodes;
@@ -932,8 +1005,6 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			
 			lstate = popContinueLabel(popBreakLabel(lstate));
 		}
-		
-		default: throw "internalFlow(Stmt s): A case that was not expected: <s>";
 	}
 	
 	return < edges, lstate >;
