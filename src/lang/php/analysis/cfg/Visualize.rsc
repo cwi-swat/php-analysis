@@ -29,13 +29,17 @@ public str escapeForDot(str s) {
 }
 
 public void renderCFGAsDot(CFG c, loc writeTo) {
+	renderCFGAsDot(c, writeTo, "");
+}
+
+public void renderCFGAsDot(CFG c, loc writeTo, str title) {
 	str getID(CFGNode n) = "<n@lab>";
 	cfg = visit(cfg) { case inlineHTML(_) => inlineHTML("HTMLCode") }
 	
 	nodes = [ "\"<getID(n)>\" [ label = \"<escapeForDot(printCFGNode(n))>\", labeljust=\"l\" ];" | n <- c.nodes ];
 	edges = [ "\"<e.from>\" -\> \"<e.to>\" [ label = \"<printFlowEdgeLabel(e)>\"];" | e <- c.edges ];
 	str dotGraph = "digraph \"CFG\" {
-				   '	graph [ label = \"Control Flow Graph\" ];
+				   '	graph [ label = \"Control Flow Graph<size(title)>0?" for <title>":"">\" ];
 				   '	node [ shape = box ];
 				   '	<intercalate("\n", nodes)>
 				   '	<intercalate("\n",edges)>

@@ -95,10 +95,13 @@ public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Label
 	set[FlowEdge] edges = { };
 	for (b <- scriptBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
 	< edges, lstate > = addBodyEdges(edges, lstate, scriptBody);
-	if (size(scriptBody) > 0)
+	if (size(scriptBody) > 0) {
 		edges += flowEdge(cfgEntryNode@lab, init(head(scriptBody)));
-	else
+		if (!statementJumps(last(scriptBody)))
+			edges += flowEdge(final(last(scriptBody)), cfgExitNode@lab);
+	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
+	}
 	nodes = lstate.nodes;
 	lstate = shrink(lstate);
 
@@ -132,10 +135,13 @@ public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Clas
 	set[FlowEdge] edges = { };
 	for (b <- methodBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
 	< edges, lstate > = addBodyEdges(edges, lstate, methodBody);
-	if (size(methodBody) > 0)
+	if (size(methodBody) > 0) {
 		edges += flowEdge(cfgEntryNode@lab, init(head(methodBody)));
-	else
+		if (!statementJumps(last(methodBody)))
+			edges += flowEdge(final(last(methodBody)), cfgExitNode@lab);
+	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
+	}
 	nodes = lstate.nodes;
 	lstate = shrink(lstate);
 
@@ -163,10 +169,13 @@ public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, 
 	set[FlowEdge] edges = { };
 	for (b <- functionBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
 	< edges, lstate > = addBodyEdges(edges, lstate, functionBody);
-	if (size(functionBody) > 0)
+	if (size(functionBody) > 0) {
 		edges += flowEdge(cfgEntryNode@lab, init(head(functionBody)));
-	else
+		if (!statementJumps(last(functionBody)))
+			edges += flowEdge(final(last(functionBody)), cfgExitNode@lab);
+	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
+	}
 	nodes = lstate.nodes;
 	lstate = shrink(lstate);
 
