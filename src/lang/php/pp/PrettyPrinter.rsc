@@ -303,7 +303,7 @@ public str pp(\break(SomeExpr(Expr breakExpr))) = "break <pp(breakExpr)>;";
 public str pp(\break(NoExpr())) = "break;";
 
 //	| classDef(ClassDef classDef)
-public str pp(ClassDef classDef) = pp(classDef);
+public str pp(classDef(ClassDef classDef)) = pp(classDef);
 
 //	| const(list[Const] consts)
 public str pp(list[Const] consts) = intercalate("\n",[pp(c)|c<-consts]);
@@ -462,7 +462,7 @@ public str pp(declaration(str key, Expr val)) = "key=<pp(val)>";
 
 //public data Catch = \catch(Name xtype, str xname, list[Stmt] body);
 public str pp(\catch(Name xt, str xn, list[Stmt] body)) =
-	"catch (<pp(xtype)> <xname>) {
+	"catch (<pp(xt)> <xn>) {
 	'	<for (b <- body) {><pp(b)><}> }";
 	
 //public data Case = \case(OptionExpr cond, list[Stmt] body);
@@ -543,8 +543,8 @@ public str pp(method(str name, set[Modifier] modifiers, false, list[Param] param
 //	;
 
 //public data Property = property(str propertyName, OptionExpr defaultValue);
-public str pp(str propertyName, someExpr(Expr defaultValue)) = "$<propertyName> = <pp(defaultValue)>";
-public str pp(str propertyName, noExpr()) = "$<propertyName>";
+public str pp(Property::property(str propertyName, someExpr(Expr defaultValue))) = "$<propertyName> = <pp(defaultValue)>";
+public str pp(Property::property(str propertyName, noExpr())) = "$<propertyName>";
 
 //public data Modifier = \public() | \private() | protected() | static() | abstract() | final();
 public str pp(\public()) = "public";
