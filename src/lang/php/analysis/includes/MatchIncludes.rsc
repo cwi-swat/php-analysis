@@ -99,11 +99,14 @@ public void blah(Script scr) {
 	// to be (directly or indirectly) imported
 	// NOTE: This is the problem with this technique -- the needed constants, etc could
 	// be coming in indirectly...
+	// So, do we just resolve them to try to resolve more constants, or do we use this
+	// with the other matching info?
 	
 	// fetchClassConst(NameOrExpr className, str constName)
 	
 	// fetchConst(Name name)
 	
 	usedConstants = { n | /fetchConst(name(n)) := scr };
-	used
+	usedClassConstants = { < cn, n > | /fetchClassConst(name(name(cn)), n) := scr };
+	//usedClasses = 	
 }

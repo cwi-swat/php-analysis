@@ -18,11 +18,12 @@ import String;
 import vis::Figure;
 import vis::Render; 
 
-public void renderCFG(CFG c) {
-	nodes = [ box(text("<n>"), id(getID(n)), size(40)) | n <- carrier(cfg) ];
-	edges = [ edge(getID(n1),getID(n2)) | < n1, n2 > <- cfg ];
-	render(graph(nodes,edges,gap(40)));
-}
+//public void renderCFG(CFG c) {
+//	str getID(CFGNode n) = "<n@lab>";
+//	nodes = [ box(text("<escapeForDot(printCFGNode(n))>"), id(getID(n)), size(40)) | n <- c.nodes ];
+//	edges = [ edge("<e.from>","<e.to>") | e <- c.edges ];
+//	render(graph(nodes,edges,gap(40)));
+//}
 
 public str escapeForDot(str s) {
 	return escape(s, ("\n" : "\\n", "\"" : "\\\""));
