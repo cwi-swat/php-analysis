@@ -30,3 +30,13 @@ data NamePart
 
 @doc{The path, in terms of declared scoping constructs, to a name}
 alias NamePath = list[NamePart];
+
+public NamePath globalPath() = [global()];
+public NamePath functionPath(str fname) = [global(),function(fname)];
+public NamePath methodPath(str cname, str mname) = [class(cname),method(mname)];
+
+public str printNamePath([global()]) = "script";
+public str printNamePath([global(),function(str fn)]) = "function <fn>";
+public str printNamePath([class(str cn),method(str mn)]) = "method <cn>::<mn>";
+
+

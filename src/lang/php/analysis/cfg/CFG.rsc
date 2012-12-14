@@ -14,6 +14,7 @@ import lang::php::pp::PrettyPrinter;
 import lang::php::analysis::NamePaths;
 import lang::php::analysis::cfg::Label;
 import lang::php::analysis::cfg::FlowEdge;
+import analysis::graphs::Graph;
 
 public data CFG = cfg(NamePath item, set[CFGNode] nodes, FlowEdges edges);
 
@@ -59,4 +60,8 @@ public str printCFGNode(CFGNode n) {
 	}
 }
 
+public Graph[CFGNode] cfgAsGraph(CFG cfg) {
+	nodeMap = ( n@lab : n | n <- cfg.nodes );
+	return { < nodeMap[e.from], nodeMap[e.to] > | e <- cfg.edges };
+}
 

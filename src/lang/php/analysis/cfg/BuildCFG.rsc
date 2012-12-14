@@ -19,6 +19,7 @@ import lang::php::util::Utils;
 
 import IO;
 import List;
+import Set;
 
 // TODOs:
 // 2. Gotos need to be handled by keeping track of which nodes are
@@ -803,7 +804,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// If we have at least one expression, add an edge from the last expression
 			// to the end of the statement. If we have no expressions, this would add a
 			// self-loop, so in that case we add no edge (the construct does not loop).
-			if (size(edges) > 0)
+			if (size(exprs) > 0)
 				edges += flowEdge(final(last(exprs)), finalLabel);
 		}
 
@@ -908,10 +909,11 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			}
 						
 			// Reorder the cases to make sure default cases are at the end
-			nonDefaultCases = [ c | c:\case(someExpr(_)) <- cases ];
-			defaultCases = cases - nonDefaultCases;
+			nonDefaultCases = [ c | c:\case(someExpr(_),_) <- cases ];
+			defaultCases = [ c | c:\case(noExpr(),_) <- cases ];
+			
 			if (size(defaultCases) > 1)
-				println("WARNING: We should only have 1 default case, the others will not be tried");
+				println("WARNING: We should only have 1 default case, the others will not be tried (cases at lines <intercalate(",",["<c@at.begin.line>" | c <- defaultCases])>)");
 			cases = nonDefaultCases + defaultCases;
 			
 			// Link the switch condition expression to the first case. For a non-default case, this
@@ -927,33 +929,33 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			}
 			
 			// Link each case condition with the body of the case
-			for (\case(someExpr(e),b) <- cases, size(b) > 0) edges += trueConditionflowEdge(final(e),init(head(b)),e);
+			for (\case(someExpr(e),b) <- cases, size(b) > 0) edges += conditionTrueFlowEdge(final(e),init(head(b)),binaryOperation(cond,e,equal()));
 			
 			// If there is no body, instead link the case condition with the next case condition
 			for ([_*,\case(someExpr(e),b),\case(someExpr(e2),b2),_*] := cases, size(b) == 0)
-				edges += trueConditionFlowEdge(final(e),init(e2),e);
+				edges += conditionTrueFlowEdge(final(e),init(e2),binaryOperation(cond,e,equal()));
 			
 			// Corner case, if the last non-default condition has no body, link it to the default body
 			// (if there is one) or the final label
 			if ([_*,\case(someExpr(e),b),\case(noExpr(),b2),_*] := cases, size(b) == 0) {
 				if (size(b2) == 0)
-					edges += trueConditionFlowEdge(final(e),finalLabel,e);
+					edges += conditionTrueFlowEdge(final(e),finalLabel,binaryOperation(cond,e,equal()));
 				else
-					edges += trueConditionFlowEdge(final(e),init(head(b2)),e);
+					edges += conditionTrueFlowEdge(final(e),init(head(b2)),binaryOperation(cond,e,equal()));
 			}
 			
 			// For each case, link together the case condition with the next case condition, representing
 			// the situation where the case condition is tried but fails.  This also has the same corner
 			// case as above, for transferring control to the default, plus a case where there is no default.
-			edges += { falseConditionFlowEdge(final(e1),init(e2),e1) | [_*,\case(someExpr(e1),b1),\case(someExpr(e2),b2),_*] := cases};
+			edges += { conditionFalseFlowEdge(final(e1),init(e2),binaryOperation(cond,e1,equal())) | [_*,\case(someExpr(e1),b1),\case(someExpr(e2),b2),_*] := cases};
 			if ([_*,\case(someExpr(e1),b1),\case(noExpr(),b2),_*] := cases) {
 				if (size(b2) > 0)
-					edges += falseConditionFlowEdge(final(e1),init(head(b2)),e1);
+					edges += conditionFalseFlowEdge(final(e1),init(head(b2)),binaryOperation(cond,e1,equal()));
 				else
-					edges += falseConditionFlowEdge(final(e1),finalLabel,e1);
+					edges += conditionFalseFlowEdge(final(e1),finalLabel,binaryOperation(cond,e1,equal()));
 			}
 			if ([_*,\case(someExpr(e1),b1)] := cases)
-				edges += finalConditionFlowEdge(final(e1), finalLabel, e1);
+				edges += conditionFalseFlowEdge(final(e1), finalLabel, binaryOperation(cond,e1,equal()));
 			
 			// For each case, link together the last body element with the final label or, if the
 			// body is empty, link together the case condition with the final label
@@ -1026,17 +1028,12 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 	finalLabel = final(e);
 	FlowEdges edges = { };
 	
-	if (initLabel == finalLabel) return < edges, lstate >;
-
 	switch(e) {
 		case array(list[ArrayElement] items) : {
-			for (arrayElement(OptionExpr key, Expr val, bool byRef) <- items) {
-				< aeEdges, lstate > = internalFlow(val, lstate);
-				edges += aeEdges;
-			}
-			for (arrayElement(someExpr(Expr key), Expr val, bool byRef) <- items) {
-				< aeEdges, lstate > = internalFlow(val, lstate);
-				edges += aeEdges;
+			for (arrayElement(OptionExpr okey, Expr val, bool byRef) <- items) {
+				< edges, lstate > = addExpEdges(edges, lstate, val);
+				if (someExpr(Expr key) := okey)
+					< edges, lstate > = addExpEdges(edges, lstate, key);
 			}
 
 			for ([_*,arrayElement(k1,v1,_),arrayElement(k2,v2,_),_*] := items) {
@@ -1051,44 +1048,39 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		}
 		
 		case fetchArrayDim(Expr var, someExpr(Expr dim)) : {
-			< vedges, lstate > = internalFlow(var, lstate);
-			< dedges, lstate > = internalFlow(dim, lstate);
-			edges = edges + vedges + dedges + flowEdge(final(var), init(dim)) + flowEdge(final(dim),finalLabel);
-			return < edges, lstate >;
+			< edges, lstate > = addExpEdges(edges, lstate, var);
+			< edges, lstate > = addExpEdges(edges, lstate, dim);
+			edges = edges + flowEdge(final(var), init(dim)) + flowEdge(final(dim),finalLabel);
 		}
+		
 		case fetchArrayDim(Expr var, noExpr()) : {
-			< vedges, lstate > = internalFlow(var, lstate);
-			edges = edges + vedges + flowEdge(final(var), finalLabel);
-			return < edges, lstate >;
+			< edges, lstate > = addExpEdges(edges, lstate, var);
+			edges += flowEdge(final(var), finalLabel);
 		}
 		
 		case fetchClassConst(expr(Expr className), str constName) : {
-			< cedges, lstate > = internalFlow(className, lstate);
-			edges = edges + cedges + flowEdge(final(className), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, className);
+			edges += flowEdge(final(className), finalLabel);
 		}
 		
 		case assign(Expr assignTo, Expr assignExpr) : { 
-			< aedges, lstate > = internalFlow(assignTo, lstate);
-			< aedges2, lstate > = internalFlow(assignExpr, lstate);
-			edges = edges + flowEdge(final(assignExpr), init(assignTo)) + flowEdge(final(assignTo), finalLabel) + aedges + aedges2;
+			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
+			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
+			edges = edges + flowEdge(final(assignExpr), init(assignTo)) + flowEdge(final(assignTo), finalLabel);
 		}
 		
-		case assignWOp(Expr assignTo, Expr assignExpr, Op operation) : { 
-			< aedges, lstate > = internalFlow(assignTo, lstate);
-			< aedges2, lstate > = internalFlow(assignExpr, lstate);
-			edges = edges + flowEdge(final(assignExpr), init(assignTo)) + flowEdge(final(assignTo), finalLabel) + aedges + aedges2;
+		case assignWOp(Expr assignTo, Expr assignExpr, Op operation) : {
+			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
+			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
+			edges = edges + flowEdge(final(assignExpr), init(assignTo)) + flowEdge(final(assignTo), finalLabel);
 		}
 		
 		case listAssign(list[OptionExpr] assignsTo, Expr assignExpr) : {
-			< aedges, lstate > = internalFlow(assignExpr, lstate);
-			edges += aedges;
+			< edges, lstate > = addExpEdges(edges, lstate, assignExpr);
 
 			listExps = reverse([le|someExpr(le) <- assignsTo]);
-			for (le <- listExps) {
-				< ledges, lstate > = internalFlow(le, lstate);
-				edges += ledges;
-			} 
-			edges += { flowEdge(final(le1),init(le2)) | [_*,le1,le2,_*] := listExps };
+			for (le <- listExps) < edges, lstate > = addExpEdges(edges, lstate, le);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, listExps);
 			
 			if (size(listExps) > 0)
 				edges += flowEdge(final(last(listExps)), finalLabel);
@@ -1096,33 +1088,30 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 				edges += flowEdge(final(assignExpr), finalLabel);
 		}
 		
-		case refAssign(Expr assignTo, Expr assignExpr) : { 
-			< aedges, lstate > = internalFlow(assignTo, lstate);
-			< aedges2, lstate > = internalFlow(assignExpr, lstate);
-			edges += flowEdge(final(assignExpr), init(assignTo)) + flowEdge(final(assignTo), finalLabel) + aedges + aedges2;
+		case refAssign(Expr assignTo, Expr assignExpr) : {
+			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
+			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
+			edges = edges + flowEdge(final(assignExpr), init(assignTo)) + flowEdge(final(assignTo), finalLabel);
 		}
 		
 		case binaryOperation(Expr left, Expr right, Op operation) : { 
-			< ledges, lstate > = internalFlow(left, lstate);
-			< redges, lstate > = internalFlow(right, lstate);
-			edges = edges + ledges + redges + flowEdge(final(left), init(right)) + flowEdge(final(right), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, left);
+			< edges, lstate > = addExpEdges(edges, lstate, right);
+			edges = edges + flowEdge(final(left), init(right)) + flowEdge(final(right), finalLabel);
 		}
 		
-		case unaryOperation(Expr operand, Op operation) : { 
-			< oedges, lstate > = internalFlow(operand, lstate);
-			edges = edges + oedges + flowEdge(final(operand), finalLabel);
+		case unaryOperation(Expr operand, Op operation) : {
+			< edges, lstate > = addExpEdges(edges, lstate, operand); 
+			edges = edges + flowEdge(final(operand), finalLabel);
 		}
 		
 		case new(NameOrExpr className, list[ActualParameter] parameters) : {
-			for (actualParameter(aexp,_) <- parameters) {
-				< pedges, lstate > = internalFlow(aexp, lstate);
-				edges += pedges;
-			}
-			edges += { flowEdge(final(ae1), init(ae2)) | [_*,actualParameter(ae1,_),actualParameter(ae2,_),_*] := parameters };
+			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_) <- parameters]);
 
 			if (expr(Expr cn) := className) {
-				< cedges, lstate > = internalFlow(cn, lstate);
-				edges = edges + cedges + flowEdge(final(cn),finalLabel);
+				< edges, lstate > = addExpEdges(edges, lstate, cn);
+				edges += flowEdge(final(cn),finalLabel);
 				if (size(parameters) > 0)
 					edges += flowEdge(final(last(parameters).expr), init(cn));
 			} else {
@@ -1132,45 +1121,42 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		}
 		
 		case cast(CastType castType, Expr expr) : {
-			< eedges, lstate > = internalFlow(expr, lstate);
-			edges = edges + eedges + flowEdge(final(expr), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
+			edges += flowEdge(final(expr), finalLabel);
 		}
 		
 		case clone(Expr expr) : {
-			< eedges, lstate > = internalFlow(expr, lstate);
-			edges = edges + eedges + flowEdge(final(expr), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
+			edges += flowEdge(final(expr), finalLabel);
 		}
 		
 		case empty(Expr expr) : {
-			< eedges, lstate > = internalFlow(expr, lstate);
-			edges = edges + eedges + flowEdge(final(expr), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
+			edges += flowEdge(final(expr), finalLabel);
 		}
 		
 		case suppress(Expr expr) : {
-			< eedges, lstate > = internalFlow(expr, lstate);
-			edges = edges + eedges + flowEdge(final(expr), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
+			edges += flowEdge(final(expr), finalLabel);
 		}
 		
 		case eval(Expr expr) : {
-			< eedges, lstate > = internalFlow(expr, lstate);
-			edges = edges + eedges + flowEdge(final(expr), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
+			edges += flowEdge(final(expr), finalLabel);
 		}
 		
 		case exit(someExpr(Expr exitExpr)) : {
-			< eedges, lstate > = internalFlow(exitExpr, lstate);
-			edges = edges + eedges + flowEdge(final(exitExpr), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, exitExpr);
+			edges += flowEdge(final(exitExpr), finalLabel);
 		}
 		
 		case call(NameOrExpr funName, list[ActualParameter] parameters) : {
-			for (actualParameter(aexp,_) <- parameters) {
-				< pedges, lstate > = internalFlow(aexp, lstate);
-				edges += pedges;
-			}
-			edges += { flowEdge(final(ae1), init(ae2)) | [_*,actualParameter(ae1,_),actualParameter(ae2,_),_*] := parameters };
+			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae) <- parameters]);
 		
 			if (expr(Expr fn) := funName) {
-				< nedges, lstate > = internalFlow(fn, lstate);
-				edges = nedges + flowEdge(final(fn),finalLabel);
+				< edges, lstate > = addExpEdges(edges, lstate, fn);
+				edges += flowEdge(final(fn),finalLabel);
 				if (size(parameters) > 0)
 					edges += flowEdge(final(last(parameters).expr), init(fn));
 			} else {
@@ -1180,22 +1166,18 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		}
 		
 		case methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters) : {
-			for (actualParameter(aexp,_) <- parameters) {
-				< pedges, lstate > = internalFlow(aexp, lstate);
-				edges += pedges;
-			}
-			edges += { flowEdge(final(ae1), init(ae2)) | [_*,actualParameter(ae1,_),actualParameter(ae2,_),_*] := parameters };
-
-			< tedges, lstate > = internalFlow(target, lstate);
-			edges += tedges;
+			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae) <- parameters]);
+			
+			< edges, lstate > = addExpEdges(edges, lstate, target);
 
 			if (size(parameters) > 0) {
 				edges += flowEdge(final(last(parameters).expr), init(target));
 			}
 
 			if (expr(Expr mn) := methodName) {
-				< medges, lstate > = internalFlow(mn, lstate);
-				edges = edges + medges + flowEdge(final(target),init(mn)) + flowEdge(final(mn),finalLabel);
+				< edges, lstate > = addExpEdges(edges, lstate, mn);
+				edges = edges + flowEdge(final(target),init(mn)) + flowEdge(final(mn),finalLabel);
 			} else {
 				edges += flowEdge(final(target), finalLabel);
 			}
@@ -1203,118 +1185,118 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 
 		
 		case staticCall(NameOrExpr staticTarget, NameOrExpr methodName, list[ActualParameter] parameters) : {
-			for (actualParameter(aexp,_) <- parameters) {
-				< pedges, lstate > = internalFlow(aexp, lstate);
-				edges += pedges;
+			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae) <- parameters]);
+
+			if (size(parameters) > 0 && expr(Expr tn) := staticTarget) {
+				edges += flowEdge(final(last(parameters).expr), init(tn));
+			} else if (size(parameters) > 0 && expr(Expr mn) := methodName) {
+				edges += flowEdge(final(last(parameters).expr), init(mn));
+			} else {
+				edges += flowEdge(final(last(parameters).expr), finalLabel);
 			}
-			edges += { flowEdge(final(ae1), init(ae2)) | [_*,actualParameter(ae1,_),actualParameter(ae2,_),_*] := parameters };
 
-			< tedges, lstate > = internalFlow(staticTarget, lstate);
-			edges += tedges;
-
-			if (size(parameters) > 0) {
-				edges += flowEdge(final(last(parameters).expr), init(staticTarget));
+			if (expr(Expr tn) := staticTarget) {
+				< edges, lstate > = addExpEdges(edges, lstate, tn);
+				if (expr(Expr mn) := methodName)
+					edges += flowEdge(final(tn),init(mn));
+				else
+					edges += flowEdge(final(tn),finalLabel);
 			}
 
 			if (expr(Expr mn) := methodName) {
-				< medges, lstate > = internalFlow(mn, lstate);
-				edges = edges + medges + flowEdge(final(staticTarget),init(mn)) + flowEdge(final(mn),finalLabel);
-			} else {
-				edges += flowEdge(final(staticTarget), finalLabel);
+				< edges, lstate > = addExpEdges(edges, lstate, mn);
+				edges = edges + flowEdge(final(mn),finalLabel);
 			}
 		}
 
 		
 		case include(Expr expr, IncludeType includeType) : {
-			< eedges, lstate > = internalFlow(expr, lstate);
-			edges = edges + eedges + flowEdge(final(expr), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
+			edges += flowEdge(final(expr), finalLabel);
 		}
 		
 		case instanceOf(Expr expr, expr(Expr toCompare)) : {
-			< eedges, lstate > = internalFlow(expr, lstate);
-			< cedges, lstate > = internalFlow(toCompare, lstate);
-			edges = edges + eedges + cedges + flowEdge(final(expr),init(toCompare)) + flowEdge(final(toCompare),finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
+			< edges, lstate > = addExpEdges(edges, lstate, toCompare);
+			edges = edges + flowEdge(final(expr),init(toCompare)) + flowEdge(final(toCompare),finalLabel);
 		}
 		
 		case instanceOf(Expr expr, name(Name toCompare)) : {
-			< eedges, lstate > = internalFlow(expr, lstate);
-			edges = edges + eedges + flowEdge(final(expr),finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
+			edges += flowEdge(final(expr), finalLabel);
 		}
 
 		case isSet(list[Expr] exprs) : {
-			for (ex <- exprs) {
-				< eedges, lstate > = internalFlow(ex, lstate);
-				edges += eedges;
-			}
-			edges += { flowEdge(final(e1),init(e2)) | [_*,e1,e2,_*] := exprs };
-
+			for (ex <- exprs) < edges, lstate > = addExpEdges(edges, lstate, ex);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, exprs);
 			if (size(exprs) > 0)
 				edges += flowEdge(final(last(exprs)), finalLabel);
 		}
 		
 		case print(Expr expr) : {
-			< eedges, lstate > = internalFlow(expr, lstate);
-			edges = edges + eedges + flowEdge(final(expr), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
+			edges += flowEdge(final(expr), finalLabel);
 		}
 		
 		case propertyFetch(Expr target, expr(Expr propertyName)) : {
-			< tedges, lstate > = internalFlow(target);
-			< pedges, lstate > = internalFlow(propertyName);
-			edges = edges + tedges + pedges + flowEdge(final(target),init(propertyName)) + flowEdge(final(propertyName),finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, target);
+			< edges, lstate > = addExpEdges(edges, lstate, propertyName);
+			edges = edges + flowEdge(final(target),init(propertyName)) + flowEdge(final(propertyName),finalLabel);
 		}
 		
 		case propertyFetch(Expr target, name(Name propertyName)) : {
-			< tedges, lstate > = internalFlow(target, lstate);
-			edges = edges + tedges + flowEdge(final(target), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, target);
+			edges += flowEdge(final(target), finalLabel);
 		}
 
 		case shellExec(list[Expr] parts) : {
-			for (ex <- parts) {
-				< pedges, lstate > = internalFlow(ex, lstate);
-				edges += pedges;
-			}
-			edges += { flowEdge(final(e1),init(e2)) | [_*,e1,e2,_*] := parts };
-
+			for (ex <- parts) < edges, lstate > = addExpEdges(edges, lstate, ex);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, parts);
 			if (size(parts) > 0)
 				edges += flowEdge(final(last(parts)), finalLabel);
 		}
 
 		case ternary(Expr cond, someExpr(Expr ifBranch), Expr elseBranch) : {
-			< cedges, lstate > = internalFlow(cond, lstate);
-			< iedges, lstate > = internalFlow(ifBranch, lstate);
-			< eedges, lstate > = internalFlow(elseBranch, lstate);
-			edges = edges + cedges + iedges + eedges + 
-				   flowEdge(final(cond),init(ifBranch)) + flowEdge(final(cond),init(elseBranch)) +
+			< edges, lstate > = addExpEdges(edges, lstate, cond);
+			< edges, lstate > = addExpEdges(edges, lstate, ifBranch);
+			< edges, lstate > = addExpEdges(edges, lstate, elseBranch);
+
+			edges = edges +  
+				   conditionTrueFlowEdge(final(cond),init(ifBranch),cond) + 
+				   conditionFalseFlowEdge(final(cond),init(elseBranch),cond) +
 				   flowEdge(final(ifBranch), finalLabel) + flowEdge(final(elseBranch), finalLabel);
 		}
 		
 		case ternary(Expr cond, noExpr(), Expr elseBranch) : {
-			< cedges, lstate > = internalFlow(cond, lstate);
-			< eedges, lstate > = internalFlow(elseBranch, lstate);
-			edges = edges + cedges + eedges + 
-				   flowEdge(final(cond), init(elseBranch)) +
-				   flowEdge(final(cond), finalLabel) + flowEdge(final(elseBranch), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, cond);
+			< edges, lstate > = addExpEdges(edges, lstate, elseBranch);
+
+			edges = edges + 
+				   conditionFalseFlowEdge(final(cond), init(elseBranch),cond) +
+				   conditionTrueFlowEdge(final(cond), finalLabel,cond) + 
+				   flowEdge(final(elseBranch), finalLabel);
 		}
 
 		case staticPropertyFetch(expr(Expr className), expr(Expr propertyName)) : {
-			< cedges, lstate > = internalFlow(className, lstate);
-			< pedges, lstate > = internalFlow(propertyName, lstate);
-			edges = edges + cedges + pedges + flowEdge(final(className),init(propertyName)) + flowEdge(final(propertyName),finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, className);
+			< edges, lstate > = addExpEdges(edges, lstate, propertyName);
+			edges = edges + flowEdge(final(className),init(propertyName)) + flowEdge(final(propertyName), finalLabel);
 		}
 
 		case staticPropertyFetch(name(Name className), expr(Expr propertyName)) : {
-			< pedges, lstate > = internalFlow(propertyName, lstate);
-			edges = edges  + pedges + flowEdge(final(propertyName), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, propertyName);
+			edges += flowEdge(final(propertyName), finalLabel);
 		}
 
 		case staticPropertyFetch(expr(Expr className), name(Name propertyName)) : {
-			< cedges, lstate > = internalFlow(className, lstate);
-			edges = edges + cedges + flowEdge(final(className), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, className);
+			edges += flowEdge(final(className), finalLabel);
 		}
 		
 		case var(expr(Expr varName)) : {
-			< vedges, lstate > = internalFlow(varName, lstate);
-			edges = edges + vedges + flowEdge(final(expr), finalLabel);
+			< edges, lstate > = addExpEdges(edges, lstate, varName);
+			edges += flowEdge(final(varName), finalLabel);
 		}
 	}
 
