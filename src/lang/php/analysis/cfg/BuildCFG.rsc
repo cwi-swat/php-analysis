@@ -33,11 +33,11 @@ import List;
 // 3. Throw statements should be linked to surrounding catch clauses.
 //
 
-public map[NamePath,CFG] createCFGs(loc l) {
-	return createCFGs(loadPHPFile(l));
+public map[NamePath,CFG] buildCFGs(loc l) {
+	return buildCFGs(loadPHPFile(l));
 }
 
-public map[NamePath,CFG] createCFGs(Script scr) {
+public map[NamePath,CFG] buildCFGs(Script scr) {
 	lstate = newLabelState();
 	< scrLabeled, lstate > = labelScript(scr, lstate);
 	
@@ -932,8 +932,6 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			
 			lstate = popContinueLabel(popBreakLabel(lstate));
 		}
-		
-		default: throw "internalFlow(Stmt s): A case that was not expected: <s>";
 	}
 	
 	return < edges, lstate >;
@@ -1030,7 +1028,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		
 		case unaryOperation(Expr operand, Op operation) : { 
 			< oedges, lstate > = internalFlow(operand, lstate);
-			edges = edges + lstate + flowEdge(final(operand), finalLabel);
+			edges = edges + oedges + flowEdge(final(operand), finalLabel);
 		}
 		
 		case new(NameOrExpr className, list[ActualParameter] parameters) : {
