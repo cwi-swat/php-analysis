@@ -12,6 +12,7 @@ module lang::php::analysis::cfg::Visualize
 import lang::php::analysis::cfg::FlowEdge;
 import lang::php::analysis::cfg::CFG;
 import lang::php::pp::PrettyPrinter;
+import lang::php::analysis::cfg::BasicBlocks;
 import IO;
 import List;
 import String;

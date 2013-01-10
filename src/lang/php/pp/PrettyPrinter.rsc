@@ -309,8 +309,8 @@ public str pp(classDef(ClassDef classDef)) = pp(classDef);
 public str pp(list[Const] consts) = intercalate("\n",[pp(c)|c<-consts]);
 
 //	| \continue(OptionExpr continueExpr)
-public str pp(\continue(SomeExpr(Expr continueExpr))) = "continue <pp(continueExpr)>;";
-public str pp(\continue(NoExpr())) = "continue;";
+public str pp(\continue(someExpr(Expr continueExpr))) = "continue <pp(continueExpr)>;";
+public str pp(\continue(noExpr())) = "continue;";
 
 //	| declare(list[Declaration] decls, list[Stmt] body)
 public str pp(declare(list[Declaration] decls, list[Stmt] body)) = 

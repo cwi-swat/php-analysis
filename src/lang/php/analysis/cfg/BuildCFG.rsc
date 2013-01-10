@@ -15,6 +15,7 @@ import lang::php::analysis::cfg::CFG;
 import lang::php::analysis::cfg::Label;
 import lang::php::analysis::cfg::LabelState;
 import lang::php::analysis::cfg::FlowEdge;
+import lang::php::analysis::cfg::BasicBlocks;
 import lang::php::util::Utils;
 
 import IO;
@@ -66,6 +67,16 @@ public map[NamePath,CFG] buildCFGs(Script scr) {
 	return res;
 }
 
+public map[NamePath,CFG] buildCFGsAndBlocks(loc l) {
+	return buildCFGsAndBlocks(loadPHPFile(l));
+}
+
+public map[NamePath,CFG] buildCFGsAndBlocks(Script scr) {
+	map[NamePath,CFG] res = buildCFGs(scr);
+	for (np <- res) res[np] = createBasicBlocks(res[np]);
+	return res;
+}
+
 public tuple[Script, FlowEdges] generateFlowEdges(Script scr) {
 	< labeled, lstate > = labelScript(scr); 
 	return < labeled, { *internalFlow(b) | b <- labeled.body } + { flowEdge(final(b1),init(b2)) | [_*,b1,b2,_*] := labeled.body } >;
@@ -98,8 +109,7 @@ public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Label
 	< edges, lstate > = addBodyEdges(edges, lstate, scriptBody);
 	if (size(scriptBody) > 0) {
 		edges += flowEdge(cfgEntryNode@lab, init(head(scriptBody)));
-		if (!statementJumps(last(scriptBody)))
-			edges += flowEdge(final(last(scriptBody)), cfgExitNode@lab);
+		edges += flowEdge(final(last(scriptBody)), cfgExitNode@lab);
 	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
 	}
@@ -114,7 +124,7 @@ public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Label
 	labels = { e.from, e.to | e <- edges };
 	nodes = { n | n <- nodes, n@lab in labels };
 	
- 	return < cfg([global()], nodes, edges), lstate >;   
+ 	return < cfg([global()], nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
 public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, ClassItem m, LabelState lstate) {
@@ -138,8 +148,7 @@ public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Clas
 	< edges, lstate > = addBodyEdges(edges, lstate, methodBody);
 	if (size(methodBody) > 0) {
 		edges += flowEdge(cfgEntryNode@lab, init(head(methodBody)));
-		if (!statementJumps(last(methodBody)))
-			edges += flowEdge(final(last(methodBody)), cfgExitNode@lab);
+		edges += flowEdge(final(last(methodBody)), cfgExitNode@lab);
 	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
 	}
@@ -148,7 +157,7 @@ public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Clas
 
 	//< nodes, edges, lstate > = addJoinNodes(nodes, edges, lstate);
 	
- 	return < cfg(np, nodes, edges), lstate >;   
+ 	return < cfg(np, nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
 public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, Stmt f, LabelState lstate) {
@@ -172,8 +181,7 @@ public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, 
 	< edges, lstate > = addBodyEdges(edges, lstate, functionBody);
 	if (size(functionBody) > 0) {
 		edges += flowEdge(cfgEntryNode@lab, init(head(functionBody)));
-		if (!statementJumps(last(functionBody)))
-			edges += flowEdge(final(last(functionBody)), cfgExitNode@lab);
+		edges += flowEdge(final(last(functionBody)), cfgExitNode@lab);
 	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
 	}
@@ -182,7 +190,7 @@ public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, 
 
 	//< nodes, edges, lstate > = addJoinNodes(nodes, edges, lstate);
 	
- 	return < cfg(np, nodes, edges), lstate >;   
+ 	return < cfg(np, nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
 // Find the initial label for each statement. In the case of a statement with
@@ -438,6 +446,7 @@ public Lab init(Expr e) {
 			return e@lab;
 		}
 		
+		case scalar(encapsed(parts)) : return init(head(parts));
 		case scalar(Scalar scalarVal) : return e@lab;
 		
 		case var(expr(Expr varName)) : return init(varName);
@@ -750,9 +759,11 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// control flow, we add this node as an explicit "check point". We also add an
 			// edge from the check to the end of the statement, representing the case where
 			// the array is exhausted.
-			Lab newLabel = incLabel(); 
+			Lab newLabel = incLabel();
+			Lab varLabel = incLabel(); 
 			testNode = foreachTest(arrayExpr,newLabel)[@lab=newLabel];
-			lstate.nodes = lstate.nodes + testNode;
+			varNode = foreachAssignValue(asVar,varLabel)[@lab=varLabel];
+			lstate.nodes = lstate.nodes + testNode + varNode;
 			edges += iteratorEmptyFlowEdge(testNode@lab, finalLabel, arrayExpr);
 			
 			// Add in the edges for break and continue. Continue will go to the test node
@@ -776,22 +787,26 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// body back around to the test. Else, just link the value to the test, this
 			// would model the case where we just keep assigning new key/value pairs until
 			// we exhaust the array.
+			edges += flowEdge(final(asVar), varLabel);
 			if (size(body) > 0) {
-				edges += flowEdge(final(asVar), init(head(body)));
+				edges += flowEdge(varLabel, init(head(body)));
 				edges += flowEdge(final(last(body)), testNode@lab);
 			} else {
-				edges += flowEdge(final(asVar), testNode@lab);
+				edges += flowEdge(varLabel, testNode@lab);
 			}
 			
 			// This is needed to properly link up the key and value pairs, since keys are
 			// not required (but values are). If we have a key, we link the test to that,
 			// and we link it to the value, else we just link the test to the value.
 			if (someExpr(keyexp) := keyvar) {
-				edges += { iteratorNotEmptyFlowEdge(testNode@lab, init(keyexp), arrayExpr), flowEdge(final(keyexp),init(asVar)) };
+				Lab keyLabel = incLabel();
+				keyNode = foreachAssignKey(keyexp,keyLabel)[@lab=keyLabel];
+				lstate.nodes = lstate.nodes + keyNode;
+				edges += { iteratorNotEmptyFlowEdge(testNode@lab, init(keyexp), arrayExpr), flowEdge(final(keyexp),keyLabel), flowEdge(keyLabel,init(asVar)) };
 			} else {
 				edges += iteratorNotEmptyFlowEdge(testNode@lab, init(asVar), arrayExpr);
 			}
-
+			
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		}
 
@@ -832,11 +847,12 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// Now, add the edges that model the flow through the if. First, if
 			// we have a true body, flow goes through the body and out the other
 			// side. If we have no body in this case, flow just goes to the end. 
-			if (size(body) > 0)
+			if (size(body) > 0) {
 				edges += conditionTrueFlowEdge(final(cond), init(head(body)), cond);
 				if (!statementJumps(last(body))) edges += flowEdge(final(last(body)), finalLabel);
-			else
+			} else {
 				edges += conditionTrueFlowEdge(final(cond), finalLabel, cond);
+			}
 
 			// Next, we need the flow from condition to condition, and into
 			// the bodies of each elseif.
@@ -1036,6 +1052,9 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 					< edges, lstate > = addExpEdges(edges, lstate, key);
 			}
 
+			for (arrayElement(someExpr(kv),v1,_) <- items)
+					edges += flowEdge(final(kv), init(v1));
+
 			for ([_*,arrayElement(k1,v1,_),arrayElement(k2,v2,_),_*] := items) {
 				if (someExpr(kv) := k2)
 					edges += flowEdge(final(v1), init(kv));
@@ -1152,7 +1171,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		
 		case call(NameOrExpr funName, list[ActualParameter] parameters) : {
 			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae) <- parameters]);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_) <- parameters]);
 		
 			if (expr(Expr fn) := funName) {
 				< edges, lstate > = addExpEdges(edges, lstate, fn);
@@ -1167,7 +1186,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		
 		case methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters) : {
 			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae) <- parameters]);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_) <- parameters]);
 			
 			< edges, lstate > = addExpEdges(edges, lstate, target);
 
@@ -1186,7 +1205,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		
 		case staticCall(NameOrExpr staticTarget, NameOrExpr methodName, list[ActualParameter] parameters) : {
 			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae) <- parameters]);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_) <- parameters]);
 
 			if (size(parameters) > 0 && expr(Expr tn) := staticTarget) {
 				edges += flowEdge(final(last(parameters).expr), init(tn));
@@ -1278,6 +1297,11 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 				   flowEdge(final(elseBranch), finalLabel);
 		}
 
+		case scalar(encapsed(parts)) : {
+			< edges, lstate > = addExpSeqEdges(edges, lstate, parts);
+			edges += flowEdge(final(last(parts)), finalLabel);
+		}
+		
 		case staticPropertyFetch(expr(Expr className), expr(Expr propertyName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
 			< edges, lstate > = addExpEdges(edges, lstate, propertyName);

@@ -37,13 +37,13 @@ public str printFlowEdgeLabel(FlowEdge fe) {
 		case conditionTrueFlowEdge(_,_,Expr why,_) : 
 			return "True: <pp(why)>";
 		case conditionTrueFlowEdge(_,_,list[Expr] whys) : 
-			return "True: <pp(intercalate(",",[pp(w)|w<-whys]))>";
+			return "True: <intercalate(",",[pp(w)|w<-whys])>";
 		case conditionTrueFlowEdge(_,_,list[Expr] whys,_) : 
-			return "True: <pp(intercalate(",",[pp(w)|w<-whys]))>";
+			return "True: <intercalate(",",[pp(w)|w<-whys])>";
 		case conditionFalseFlowEdge(_,_,Expr whyNot) : 
 			return "False: <pp(whyNot)>";
 		case conditionFalseFlowEdge(_,_,list[Expr] whyNots) : 
-			return "False";
+			return "False: <intercalate(",",[pp(w)|w<-whyNots])>";
 			//return "False: <pp(intercalate(",",[pp(w)|w<-whyNots]))>";
 		case iteratorEmptyFlowEdge(_,_,arr) : 
 			return "Empty";
