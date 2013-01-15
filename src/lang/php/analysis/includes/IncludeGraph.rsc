@@ -3,7 +3,7 @@ module lang::php::analysis::includes::IncludeGraph
 import lang::php::ast::AbstractSyntax;
 import lang::php::stats::Stats;
 import analysis::graphs::Graph;
-import lang::php::analysis::syntactic::Constants;
+import lang::php::util::LocUtils;
 import String;
 
 data IncludeGraphNode = igNode(str fileName, loc fileLoc);

@@ -16,7 +16,7 @@ import List;
 import Map;
 import lang::html::IO;
 import lang::php::analysis::NamePaths;
-import lang::php::analysis::signatures::Signatures;
+import lang::php::analysis::signatures::Summaries;
 
 private loc defaultStart = |http://www.php.net/manual/en/funcref.php|;
 private loc dbVendorStart = |http://nl3.php.net/manual/en/refs.database.vendors.php|;

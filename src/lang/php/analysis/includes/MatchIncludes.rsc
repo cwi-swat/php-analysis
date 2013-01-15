@@ -23,7 +23,7 @@ import Set;
 import Relation;
 import util::Math;
 
-data FNBits = lit(str s) | fnBit();
+data FNBits = lit(str s) | fnBit() | goUp() | dirSep();
 
 // This function just calls the next function on each script in the map. The bulk of
 // what happens is done in the function below.
@@ -43,15 +43,23 @@ public map[loc fileloc, Script scr] matchIncludes(map[loc fileloc, Script scr] s
 //
 // TODO: Add code to do the latter. For now, if we don't resolve this, we just
 // leave it alone.
+public list[&T] insertSeps(list[&T] l, &T sep) {
+	res = [ l[i],sep | i <- index(l), i != size(l)-1 ];
+	if (size(l) > 0) res = res + last(l);
+	return res;
+}
+
 public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 	list[FNBits] flattenExpr(Expr e) {
 		if (binaryOperation(l,r,concat()) := e) {
 			return flattenExpr(l) + flattenExpr(r);
+		} else if (scalar(string("/")) := e) {
+			return [ dirSep() ];
 		} else if (scalar(string(s)) := e) {
 			list[str] parts = split("/",s);
 			while([a*,b,"..",c*] := parts) parts = [*a,*c];
 			while([a*,".",c*] := parts) parts = [*a,*c];		
-			return [ (p == "..") ? fnBit() : FNBits::lit(p) | p <- parts ];
+			return insertSeps([ (p == "..") ? FNBits::goUp() : FNBits::lit(p) | p <- parts ],dirSep());
 		} else {
 			return [ fnBit() ];
 		}
@@ -62,6 +70,8 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 		switch(fnb) {
 			case lit(s) : return intercalate("",[ "[<escaped(c)>]" | c <- tail(split("",s)) ]);
 			case fnBit() : return "\\S+";
+			case goUp() : return "\\S+";
+			case dirSep() : return "\\/";
 		}
 	}
 	
@@ -75,7 +85,8 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 	for (i:include(iexp,_) <- varIncludes) {
 		list[FNBits] bits = flattenExpr(iexp);
 		while([a*,fnBit(),fnBit(),b*] := bits) bits = [*a,fnBit(),*b];
-		while([a*,lit(s1),lit(s2),b*] := bits) bits = [*a,lit("<s1>/<s2>"),*b];
+		while([a*,dirSep(),lit(s1),goUp(),b*] := bits) bits = [*a,*b];
+		//while([a*,lit(s1),lit(s2),b*] := bits) bits = [*a,lit("<s1>/<s2>"),*b];
 		list[str] reList = [ fnBits2Str(b) | b <- bits ];
 		str re = "^\\S*" + intercalate("",reList) + "$";
 		//println("Trying regular expression <re>");
@@ -85,6 +96,11 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 			replacementMap[i] = scalar(string(filteredIncludes[0].path))[@at=iexp@at];
 		} else {
 			println("Could not replace <pp(iexp)> at <iexp@at>, found <size(filteredIncludes)> hits with rexp <re>");
+			if (size(filteredIncludes) < 4) {
+				println("With bits: <bits>");
+				for (fi <- filteredIncludes)
+					println("\t<fi.path>");
+				}
 		}	
 	}
 	

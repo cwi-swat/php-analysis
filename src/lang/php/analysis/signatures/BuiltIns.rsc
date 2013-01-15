@@ -9,7 +9,7 @@
 module lang::php::analysis::signatures::BuiltIns
 
 import Set;
-import lang::php::analysis::signatures::Signatures;
+import lang::php::analysis::signatures::Summaries;
 import lang::php::analysis::NamePaths;
 
 @doc{List from http://www.php.net/manual/en/reserved.constants.php}

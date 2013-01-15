@@ -33,10 +33,15 @@ alias NamePath = list[NamePart];
 
 public NamePath globalPath() = [global()];
 public NamePath functionPath(str fname) = [global(),function(fname)];
+public NamePath constPath(str cname) = [global(),const(cname)];
+public NamePath classPath(str cname) = [class(cname)];
 public NamePath methodPath(str cname, str mname) = [class(cname),method(mname)];
+public NamePath classConstPath(str cname, str constName) = [class(cname),const(constName)];
 
 public str printNamePath([global()]) = "script";
 public str printNamePath([global(),function(str fn)]) = "function <fn>";
+public str printNamePath([global(),const(str cn)]) = "const <cn>";
+public str printNamePath([class(str cn)]) = "class <cn>";
 public str printNamePath([class(str cn),method(str mn)]) = "method <cn>::<mn>";
-
+public str printNamePath([class(str cn),const(str constName)]) = "class const <cn>::<constName>";
 

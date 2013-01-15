@@ -502,7 +502,7 @@ public ICLists includesAnalysis(map[str Product, str Version] lv) {
 	for (p <- lv) {
 		scripts = loadBinary(p,lv[p]);
 		unresolved = gatherIncludesWithVarPaths(scripts);
-		scripts2 = evalAllScalarsAndInline(scripts, getCorpusItem(p,lv[p]));
+		scripts2 = evalAllScalarsAndInlineUniques(scripts, getCorpusItem(p,lv[p]));
 		afterEval = gatherIncludesWithVarPaths(scripts2);
 		scripts3 = matchIncludes(scripts);
 		afterMatch = gatherIncludesWithVarPaths(scripts3);
@@ -1522,3 +1522,14 @@ public str coverageComparison(NotCoveredMap ncm) {
 	return tbl;	
 		//return "<p> & \\numprint{<fileCount>} & <c(p,vvuses)> && <c(p,vvcalls)> && <c(p,vvmcalls)> && <c(p,vvprops)> && <c(p,vvnews)> && \\numprint{<size({qr.l.path|<p,_,qr><-vvall})>} & \\numprint{<size(transitiveUses[p])>} & \\numprint{<size([qr|<p,_,qr><-vvall])>} & < (!hasGini[p]) ? "N/A" : "\\nprounddigits{2} \\numprint{<round(gmap[p] * 100.0)/100.0>} \\npnoround" > \\\\";
 }	
+
+public rel[str product, str version, loc fileloc, Expr call] corpusEvalUses() {
+	cmap = getICSE2013Corpus();
+	rel[str product, str version, loc fileloc, Expr call] res = { };
+	for (p <- cmap) {
+		corpusItem = loadBinary(p,cmap[p]);
+		evals = gatherEvals(corpusItem);
+		for (<l,e> <- evals) res += < p, cmap[p], l, e >;
+	}
+	return res;
+}

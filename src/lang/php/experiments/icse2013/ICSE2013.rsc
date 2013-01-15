@@ -4,6 +4,7 @@ import lang::php::util::Utils;
 import lang::php::stats::Overall;
 import lang::php::stats::Unfriendly;
 import lang::rascal::types::AbstractType;
+import lang::php::util::Corpus;
 
 import IO;
 import Type;
@@ -80,7 +81,7 @@ public str generateTable4() {
 	// As above, the following is quite expensive, so the result
 	// has been serialized. Just uncomment the following line, and
 	// comment out the line below it, to run the analysis from scratch.
-	//icl = includesAnalysis();
+	//icl = includesAnalysis(getICSE2013Corpus());
 	
 	icl = reload();
 	icr = calculateIncludeCounts(icl);

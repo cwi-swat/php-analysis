@@ -20,6 +20,7 @@ import Set;
 import List;
 import String;
 import Exception;
+import IO;
 
 @doc{Replace magic constants with their actual values.}
 public Script inlineMagicConstants(Script scr, loc l) {
@@ -82,4 +83,11 @@ public Script inlineMagicConstants(Script scr, loc l) {
 		}
 	}
 	return scr;
+}
+
+public map[loc fileloc, Script scr] inlineMagicConstants(map[loc fileloc, Script scr] scripts) {
+	println("INLINING MAGIC CONSTANTS");
+	scripts = ( l : inlineMagicConstants(scripts[l],l) | l <- scripts );
+	println("INLINING MAGIC CONSTANTS FINISHED");
+	return scripts;
 }

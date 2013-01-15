@@ -108,6 +108,10 @@ public list[tuple[loc fileloc, Expr call]] getVACallUses(map[loc fileloc, Script
 public list[Stmt] fetchVarBreak(map[loc fileloc, Script scr] scripts) = [ x | l <- scripts<0>, /x:\break(someExpr(e)) := scripts[l], scalar(_) !:= e ];
 public list[Stmt] fetchVarContinue(map[loc fileloc, Script scr] scripts) = [ x | l <- scripts<0>, /x:\continue(someExpr(e)) := scripts[l], scalar(_) !:= e ];
 
+@doc{Uses of eval}
+public list[Expr] fetchEvalUses(Script scr) = [ e | /e:eval(_) := scr ];
+public list[tuple[loc fileloc, Expr call]] gatherEvals(map[loc fileloc, Script scr] scripts) = gatherExprStats(scripts, fetchEvalUses);
+
 public map[str,int] featureCounts(map[loc fileloc, Script scr] scripts) {
 	map[str,int] counts = ( );
 	

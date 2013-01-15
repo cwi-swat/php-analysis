@@ -8,68 +8,66 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::analysis::signatures::Signatures
 
-import ValueIO;
 import lang::php::analysis::NamePaths;
+import lang::php::ast::AbstractSyntax;
+import List;
 
-data SummaryParam
-	= standardParam(str paramType, str paramName)
-	| standardRefParam(str paramType, str paramName)
-	| optionalParam(str paramType, str paramName)
-	| optionalRefParam(str paramType, str paramName)
-	| voidParam()
+data SignatureItem
+	= functionSig(NamePath namepath, int parameterCount)
+	| constSig(NamePath namepath, Expr e)
+	| classSig(NamePath namepath)
+	| methodSig(NamePath namepath, int parameterCount)
+	| classConstSig(NamePath namepath, Expr e)
 	;
 
-data Summary 
-	= functionSummary(NamePath name, list[SummaryParam] params, bool returnsRef, str returnType, bool mayAlterGlobals, set[str] throwsTypes)
-	| methodSummary(NamePath name, set[str] modifiers, list[SummaryParam] params, bool returnsRef, str returnType, bool mayAlterGlobals, set[str] throwsTypes)
-	| constructorSummary(NamePath name, set[str] modifiers, list[SummaryParam] params, bool mayAlterGlobals, set[str] throwsTypes)
-	| constantSummary(NamePath name, str constType)
-	| classSummary(NamePath name, set[str] extends, set[str] implements)
-	| fieldSummary(NamePath name, str fieldType, set[str] modifiers, str initializer)
-	| invalidSummary(NamePath name, str reason)
-	| emptySummary(NamePath name, loc path)
+data Signature
+	= fileSignature(loc fileloc, set[SignatureItem] items)
 	;
+		
+public Signature getFileSignature(loc fileloc, Script scr) {
+	set[SignatureItem] items = { };
 	
-public anno loc Summary@from;
+	// First, pull out all class definitions
+	classDefs = { c | /ClassDef c := scr };
+	for (class(cn,_,_,_,cis) <- classDefs) {
+		items += classSig(classPath(cn));
+		for (method(mn,_,_,mps,_) <- cis) {
+			items += methodSig(methodPath(cn, mn), size(mps));
+		}
+		for(constCI(consts) <- cis, const(name,ce) <- consts) {
+			items += classConstSig(classConstPath(cn, name), ce);
+		}
+	}
+	
+	// Second, get all top-level functions
+	items += { functionSig(functionPath(fn),size(fps)) | /f:function(fn,_,fps,_) := scr };
 
-data NamePart = libraryConstants();
-
-public set[Summary] loadFunctionSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpFunctions.bin|);
+	// TODO: We also want to add global variables here, but need to do this in the
+	// right way -- we don't know, at this point, if a name is introduced here for
+	// the first time, or is brought in through another include. The only way to
+	// know this for sure is either to a) resolve the includes here, or b) determine
+	// that there are no includes.
+		
+	// Finally, get all defined constants
+	items += { constSig(constPath(cn),e) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e,false)]) := scr };
+	
+	return fileSignature(fileloc, items);
+}
+		
+public map[loc,Signature] getSystemSignatures(map[loc fileloc, Script scr] scripts) {
+	return ( l : getFileSignature(l,scripts[l]) | l <- scripts );
 }
 
-public void saveFunctionSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpFunctions.bin|, summaries);
+public rel[SignatureItem, loc] getAllDefinedConstants(map[loc fileloc, Script scr] scripts) {
+	ssigs = getSystemSignatures(scripts);
+	return { < si, l > | fileSignature(l,sis) <- ssigs<1>, 
+						 si <- sis, 
+						 constSig(cn,e) := si || classConstSig(cln,cn,e) := si };
 }
 
-public set[Summary] loadConstantSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpConstants.bin|);
-}
-
-public void saveConstantSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpConstants.bin|, summaries);
-}
-
-public set[Summary] loadClassSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpClasses.bin|);
-}
-
-public void saveClassSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpClasses.bin|, summaries);
-}
-
-public set[Summary] loadMethodSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpMethods.bin|);
-}
-
-public void saveMethodSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpMethods.bin|, summaries);
-}
-
-public set[Summary] loadSummaries() {
-	functionSummaries = loadFunctionSummaries();
-	constantSummaries = loadConstantSummaries();
-	classSummaries = loadClassSummaries();
-	methodSummaries = loadMethodSummaries();
-	return functionSummaries + constantSummaries + classSummaries + methodSummaries;
+public rel[SignatureItem,loc] getDefinitionsForItem(map[loc fileloc, Script scr] scripts, NamePath itemName) {
+	ssigs = getSystemSignatures(scripts);
+	return { < si, l > | fileSignature(l,sis) <- ssigs<1>, 
+						 si <- sis,
+						 si.namepath == itemName }; 
 }
