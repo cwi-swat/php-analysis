@@ -16,6 +16,7 @@ module lang::php::analysis::evaluators::MagicConstants
 // TODO: Add support for __TRAIT__. We aren't encountering this yet in code.
 
 import lang::php::ast::AbstractSyntax;
+import lang::php::util::System;
 import Set;
 import List;
 import String;
@@ -85,7 +86,7 @@ public Script inlineMagicConstants(Script scr, loc l) {
 	return scr;
 }
 
-public map[loc fileloc, Script scr] inlineMagicConstants(map[loc fileloc, Script scr] scripts) {
+public System inlineMagicConstants(System scripts) {
 	println("INLINING MAGIC CONSTANTS");
 	scripts = ( l : inlineMagicConstants(scripts[l],l) | l <- scripts );
 	println("INLINING MAGIC CONSTANTS FINISHED");

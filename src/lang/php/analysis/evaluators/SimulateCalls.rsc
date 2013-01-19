@@ -51,6 +51,55 @@ public Script evalMWStatics(Script scr) {
 	}
 	return scr;
 }
+
+public Script evalStrrchr(Script scr) {
+	scr = visit(scr) {
+		case c:call(name(name("strrchr")),[actualParameter(scalar(string(s1)),false), actualParameter(scalar(string(s2)),false)]) : {
+			if (size(s2) >= 1) {
+				if (size(s2) > 1) s2 = s2[0];
+				pos = findLast(s1,s2);
+				if (pos == -1)
+					insert(scalar(boolean(false)));
+				else
+					insert(scalar(string(substring(s1,pos))));
+			}
+		}
+	}
+	return scr;
+}
+
+// TODO: Handle the negative case for i1, which starts from the end
+public Script evalSubstr(Script scr) {
+	scr = visit(scr) {
+		case c:call(name(name("substr")),[actualParameter(scalar(string(s1)),false), actualParameter(scalar(integer(i1)),false)]) : {
+			if (size(s1) > 0) {
+				if (i1 >= 0) {
+					if (i1 <= (size(s1)-1)) {
+						insert(scalar(string(substring(s1, i1))));
+					} 
+				}
+			}
+		} 
+
+		case c:call(name(name("substr")),[actualParameter(scalar(string(s1)),false), actualParameter(scalar(integer(i1)),false), actualParameter(scalar(integer(i2)),false)]) : {
+			if (size(s1) > 0) {
+				if (i1 >= 0) {
+					if (i1 <= (size(s1)-1)) {
+						if (i2 >= 1) {
+							s2 = substring(s1,i1);
+							if (size(s2) < i2)
+								insert(scalar(string(s2)));
+							else
+								insert(scalar(string(substring(s2, 0,i2))));
+						}
+					} 
+				}
+			}
+		} 
+	}
+	return scr;
+}
+
 private map[str fname, Script(Script) fhandler] handlers =
 	( "dirname" : evalDirname, "mwInit" : evalMWStatics );
 	

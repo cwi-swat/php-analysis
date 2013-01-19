@@ -15,6 +15,8 @@ import lang::php::util::Config;
 import List;
 import Set;
 
+alias Corpus = map[str Product, str Version];
+
 public data RuntimeException
 	= productNotFound(str product, str version, loc productDir)
 	| versionNotFound(str product, str version)
@@ -57,29 +59,6 @@ private set[str] mwversions = { "1.7.1", "1.7.3", "1.8.2", "1.8.4", "1.8.5", "1.
 								"1.12.3", "1.12.4", "1.13.0", "1.13.1", "1.13.2", "1.13.3", "1.13.4", "1.13.5", "1.14.0", "1.14.1", "1.15.0",
 								"1.15.1", "1.15.2", "1.15.3", "1.15.4", "1.15.5", "1.16.0", "1.16.1", "1.16.2", "1.16.3", "1.16.4", "1.16.5",
 								"1.17.0", "1.17.1", "1.17.2", "1.17.3", "1.18.0", "1.18.1", "1.6.12", "1.18.2"};
-
-private map[str Product, str Version] icse13Corpus = (
-	"osCommerce":"2.3.1",
-	"ZendFramework":"1.11.12",
-	"CodeIgniter":"2.1.2",
-	"Symfony":"2.0.12",
-	"SilverStripe":"2.4.7",
-	"WordPress":"3.4",
-	"Joomla":"2.5.4",
-	"phpBB":"3",
-	"Drupal":"7.14",
-	"MediaWiki":"1.19.1",
-	"Gallery":"3.0.4",
-	"SquirrelMail":"1.4.22",
-	"Moodle":"2.3",
-	"Smarty":"3.1.11",
-	"Kohana":"3.2",
-	"phpMyAdmin":"3.5.0-english",
-	"PEAR":"1.9.4",
-	"CakePHP":"2.2.0-0",
-	"DoctrineORM":"2.2.2");
-
-public map[str Product, str Version] getICSE2013Corpus() = icse13Corpus;
 
 public loc getCorpusItem(str product, str version) {
 	if (product in products()) {

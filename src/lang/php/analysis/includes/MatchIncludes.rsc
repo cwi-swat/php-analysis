@@ -95,9 +95,9 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 		if (size(filteredIncludes) == 1) {
 			replacementMap[i] = scalar(string(filteredIncludes[0].path))[@at=iexp@at];
 		} else {
-			println("Could not replace <pp(iexp)> at <iexp@at>, found <size(filteredIncludes)> hits with rexp <re>");
+			//println("Could not replace <pp(iexp)> at <iexp@at>, found <size(filteredIncludes)> hits with rexp <re>");
 			if (size(filteredIncludes) < 4) {
-				println("With bits: <bits>");
+				//println("With bits: <bits>");
 				for (fi <- filteredIncludes)
 					println("\t<fi.path>");
 				}
@@ -108,21 +108,4 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 		case i:include(iexp,itype) => include(replacementMap[i],itype)[@at=i@at] when i in replacementMap
 	}
 	return scr;
-}
-
-public void blah(Script scr) {
-	// First, develop the signature for what is needed; this can tell us what needs
-	// to be (directly or indirectly) imported
-	// NOTE: This is the problem with this technique -- the needed constants, etc could
-	// be coming in indirectly...
-	// So, do we just resolve them to try to resolve more constants, or do we use this
-	// with the other matching info?
-	
-	// fetchClassConst(NameOrExpr className, str constName)
-	
-	// fetchConst(Name name)
-	
-	usedConstants = { n | /fetchConst(name(n)) := scr };
-	usedClassConstants = { < cn, n > | /fetchClassConst(name(name(cn)), n) := scr };
-	//usedClasses = 	
 }

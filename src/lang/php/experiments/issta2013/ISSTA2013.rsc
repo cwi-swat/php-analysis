@@ -6,7 +6,7 @@
   http://www.eclipse.org/legal/epl-v10.html
 }
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
-module lang::php::experiments::icse2013::ICSE2013
+module lang::php::experiments::issta2013::ISSTA2013
 
 import lang::php::util::Utils;
 import lang::php::stats::Overall;
@@ -22,7 +22,7 @@ import Set;
 import lang::csv::IO;
 import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
 
-private Corpus icse13Corpus = (
+private Corpus issta13Corpus = (
 	"osCommerce":"2.3.1",
 	"ZendFramework":"1.11.12",
 	"CodeIgniter":"2.1.2",
@@ -43,7 +43,7 @@ private Corpus icse13Corpus = (
 	"CakePHP":"2.2.0-0",
 	"DoctrineORM":"2.2.2");
 
-public Corpus getICSE2013Corpus() = icse13Corpus;
+public Corpus getISSTA2013Corpus() = issta13Corpus;
 
 public str generateTable1() {
 	return generateCorpusInfoTable();

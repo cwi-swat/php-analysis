@@ -9,6 +9,7 @@ import List;
 import Exception;
 import DateTime;
 import lang::php::util::Corpus;
+import lang::php::util::System;
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Config;
 import lang::csv::IO;
@@ -30,13 +31,13 @@ public Script loadPHPFile(loc l) {
 	return res;
 }
 
-public map[loc,Script] loadPHPFiles(loc l) {
+public System loadPHPFiles(loc l) {
 
 	list[loc] entries = [ l + e | e <- listEntries(l) ];
 	list[loc] dirEntries = [ e | e <- entries, isDirectory(e) ];
 	list[loc] phpEntries = [ e | e <- entries, e.extension in {"php","inc"} ];
 
-	map[loc,Script] phpNodes = ( );
+	System phpNodes = ( );
 	for (e <- phpEntries) {
 		try {
 			Script scr = loadPHPFile(e);
@@ -130,10 +131,10 @@ public void buildNewestBinaries() {
 		buildBinaries(product, lv[product]);
 }
 
-public map[loc,Script] loadBinary(str product, str version) {
+public System loadBinary(str product, str version) {
 	parsedItem = parsedDir + "<product>-<version>.pt";
 	println("Loading binary: <parsedItem>");
-	return readBinaryValueFile(#map[loc,Script],parsedItem);
+	return readBinaryValueFile(#System,parsedItem);
 }
 
 public void writeFeatureCounts(str product, str version, map[str,int] fc) {

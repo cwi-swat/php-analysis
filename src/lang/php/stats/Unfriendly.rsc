@@ -1523,13 +1523,73 @@ public str coverageComparison(NotCoveredMap ncm) {
 		//return "<p> & \\numprint{<fileCount>} & <c(p,vvuses)> && <c(p,vvcalls)> && <c(p,vvmcalls)> && <c(p,vvprops)> && <c(p,vvnews)> && \\numprint{<size({qr.l.path|<p,_,qr><-vvall})>} & \\numprint{<size(transitiveUses[p])>} & \\numprint{<size([qr|<p,_,qr><-vvall])>} & < (!hasGini[p]) ? "N/A" : "\\nprounddigits{2} \\numprint{<round(gmap[p] * 100.0)/100.0>} \\npnoround" > \\\\";
 }	
 
-public rel[str product, str version, loc fileloc, Expr call] corpusEvalUses() {
-	cmap = getICSE2013Corpus();
+alias EvalUses = rel[str product, str version, loc fileloc, Expr call];
+
+public EvalUses corpusEvalUses(Corpus corpus) {
 	rel[str product, str version, loc fileloc, Expr call] res = { };
-	for (p <- cmap) {
-		corpusItem = loadBinary(p,cmap[p]);
+	for (p <- corpus) {
+		corpusItem = loadBinary(p,corpus[p]);
 		evals = gatherEvals(corpusItem);
-		for (<l,e> <- evals) res += < p, cmap[p], l, e >;
+		for (<l,e> <- evals) res += < p, corpus[p], l, e >;
 	}
 	return res;
+}
+
+public map[str,set[str]] calculateEvalTransIncludes(Corpus corpus, EvalUses evalUses)
+{
+	map[str,set[str]] transitiveFiles = ( );
+	
+	for (product <- corpus) {
+		version = corpus[product];
+		pt = loadBinaryWithIncludes(product,version);
+		corpusItemLoc = getCorpusItem(product,version);
+		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
+		evalLocs = { l | l <- evalUses[product, version]<0>  };
+		transFiles = calculateFeatureTrans(ig, evalLocs, corpusItemLoc.path);
+		transitiveFiles[product] = transFiles;
+	}
+	
+	return transitiveFiles;
+} 
+
+public str evalCounts(Corpus corpus, EvalUses evalUses, map[str,set[str]] transitiveUses) {
+	ci = loadCountsCSV();
+	
+	str productLine(str p) {
+		v = corpus[p];
+		< lineCount, fileCount > = getOneFrom(ci[p,v]);
+		evalsForProduct = size(evalUses[p,v]);
+		hits = ( );
+		for (<l,e> <- evalUses[p,v]) {
+			hitloc = l.path;
+			if (hitloc in hits)
+				hits[hitloc] += 1;
+			else
+				hits[hitloc] = 1;
+		}
+		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
+		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
+		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} && \\numprint{<size(evalUses[p,v])>}  & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
+	}
+		
+	tbl = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table}
+		  '  \\centering
+		  '  \\ra{1.1}
+		  '\\scriptsize
+		  '  \\begin{tabular}{@{}lrrcrr@{}} \\toprule
+		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{a} & \\texttt{eval} Uses & Gini \\\\
+		  '  \\cmidrule{2-3} 
+		  '          & Total & w/\\texttt{eval} & & &  \\\\ \\midrule<for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '    <productLine(p)> <}>
+		  '  \\bottomrule
+		  '  \\end{tabular}
+		  '\\normalsize
+		  '  \\caption{Usage of \\texttt{eval}.\\label{table-eval}}
+		  '\\end{table}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
+		  '";
+	return tbl;		
 }

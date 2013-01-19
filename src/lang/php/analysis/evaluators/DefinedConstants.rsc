@@ -45,10 +45,10 @@ public Script evalConsts(Script scr, map[str, Expr] constMap, set[loc] reachable
 		
 		case c:fetchConst(name(s)) : {
 			if (s in constsInScript) {
-				println("Found matching const <s>");
+				//println("Found matching const <s>");
 				insert(constsInScript[s][@at=c@at]);
 			} else if (s in constMap) { 
-				println("Found matching const <s>");
+				//println("Found matching const <s>");
 				insert(constMap[s][@at=c@at]);
 			}
 		}
