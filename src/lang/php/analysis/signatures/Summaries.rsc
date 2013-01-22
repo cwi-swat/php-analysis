@@ -16,6 +16,10 @@ data SummaryParam
 	| standardRefParam(str paramType, str paramName)
 	| optionalParam(str paramType, str paramName)
 	| optionalRefParam(str paramType, str paramName)
+	| standardVarParam(str paramType)
+	| standardVarRefParam(str paramType)
+	| optionalVarParam(str paramType)
+	| optionalVarRefParam(str paramType)
 	| voidParam()
 	;
 

@@ -25,6 +25,8 @@ public map[NamePath,loc] getLibraryPages() = getLibraryPages(defaultStart);
 
 public map[NamePath,loc] getDBLibraryPages() = getLibraryPages(dbVendorStart);
 
+public map[NamePath,loc] getAllLibraryPages() = getLibraryPages() + getDBLibraryPages();
+
 public map[NamePath,loc] getLibraryPages(loc startingLoc) {
 	map[NamePath,loc] pathPages = ( );
 	
@@ -107,9 +109,13 @@ public set[Summary] extractFunctionSummary(str bookname, str functionName, loc f
 	node ftxt = readHTMLFile(functionLoc);
 	str httpishName = replaceAll(functionName,"_","-");
 	set[node] matches = { n | /node n := ftxt, getName(n) == "div", "id" in getAnnotations(n), getAnnotations(n)["id"] == "function.<httpishName>" };
+	if (size(matches) == 0) {
+		httpishName = toLowerCase(httpishName);
+		matches = { n | /node n := ftxt, getName(n) == "div", "id" in getAnnotations(n), getAnnotations(n)["id"] == "function.<httpishName>" };
+	}
 	set[Summary] summaries = { };
 	for (match <- matches) {
-		set[node] divTags = { n | /node n := match, "div" == getName(n), "class" in getAnnotations(n), str s := getAnnotations(n)["class"], /methodsynopsis/ := s };
+		set[node] divTags = { n | /node n := match, "div" == getName(n), "class" in getAnnotations(n), str cn := getAnnotations(n)["class"], /methodsynopsis/ := cn };
 		for ("div"(list[node] tagList) <- divTags) {
 			bool foundRType = false;
 			str rType = "";
@@ -136,7 +142,7 @@ public set[Summary] extractFunctionSummary(str bookname, str functionName, loc f
 	
 				if ("text"(s) := tagItem, /\]/ := s) optionalDepth -= 1;
 				 	
-				if (sn:"span"(slist) := tagItem, "class" in getAnnotations(sn), "methodparam" == getAnnotations(sn)["class"]) {
+				if (sn:"span"(slist) := tagItem, "class" in getAnnotations(sn), getAnnotations(sn)["class"] == "methodparam") {
 					if (["text"("void")] := slist) {
 						params += voidParam();
 						break;
@@ -160,15 +166,29 @@ public set[Summary] extractFunctionSummary(str bookname, str functionName, loc f
 					
 					if (size(pname) > 0 && pname[0] == "&") {
 						pname = substring(pname,1);
-						if (optionalDepth > 0)
-							params += optionalRefParam(ptype, pname);
-						else
-							params += standardRefParam(ptype, pname);
+						if (optionalDepth > 0) {
+							if ("$..." == pname)
+								params += optionalVarRefParam(ptype);
+							else
+								params += optionalRefParam(ptype, pname);
+						} else {
+							if ("$..." == pname)
+								params += standardVarRefParam(ptype);
+							else
+								params += standardRefParam(ptype, pname);
+						}
 					} else {
-						if (optionalDepth > 0)
-							params += optionalParam(ptype, pname);
-						else
-							params += standardParam(ptype, pname);					
+						if (optionalDepth > 0) {
+							if ("$..." == pname)
+								params += optionalVarParam(ptype);
+							else
+								params += optionalParam(ptype, pname);
+						} else {
+							if ("$..." == pname)
+								params += standardVarParam(ptype);
+							else
+								params += standardParam(ptype, pname);
+						}					
 					}
 				}
 			}			
@@ -337,7 +357,7 @@ public set[Summary] extractMethodSummary(str bookname, str className, str method
 							optionalDepth -= 1;
 						} else if (mn:"span"(["strong"(["text"(str mname)])]) := tagItem, "class" in getAnnotations(mn), getAnnotations(mn)["class"] == "methodname") {
 							methodName = mname;
-						} else if (sn:"span"(slist) := tagItem, "class" in getAnnotations(sn), "methodparam" == getAnnotations(sn)["class"]) {
+						} else if (sn:"span"(slist) := tagItem, "class" in getAnnotations(sn), getAnnotations(sn)["class"] == "methodparam") {
 							if (["text"("void")] := slist) {
 								params += voidParam();
 								break;
@@ -418,7 +438,7 @@ public set[Summary] extractFunctionSummaries(map[NamePath,loc] pagePaths) {
 		if (count % 100 == 0) println("Extracted <count> function summary pages");
 	}
 	println("Finished extracting function summary pages, extracted <size(functionSummaries)> summaries");
-	writeBinaryValueFile(|home:///phpFunctions.bin|, functionSummaries);
+	saveFunctionSummaries(functionSummaries);
 	return functionSummaries;
 }
 
@@ -435,7 +455,7 @@ public set[Summary] extractConstantSummaries(map[NamePath,loc] pagePaths) {
 		if (count % 100 == 0) println("Extracted <count> constant summary pages");
 	}
 	println("Finished extracting constant summary pages, extracted <size(constantSummaries)> summaries");
-	writeBinaryValueFile(|home:///phpConstants.bin|, constantSummaries);
+	saveConstantSummaries(constantSummaries);
 	return constantSummaries;
 }
 
@@ -452,7 +472,7 @@ public set[Summary] extractClassSummaries(map[NamePath,loc] pagePaths) {
 		if (count % 100 == 0) println("Extracted <count> class summary pages");
 	}
 	println("Finished extracting class summary pages, extracted <size(classSummaries)> class, constant, and field summaries");
-	writeBinaryValueFile(|home:///phpClasses.bin|, classSummaries);
+	saveClassSummaries(classSummaries);
 	return classSummaries;
 }
 
@@ -469,7 +489,7 @@ public set[Summary] extractMethodSummaries(map[NamePath,loc] pagePaths) {
 		if (count % 100 == 0) println("Extracted <count> method summary pages");
 	}
 	println("Finished extracting method summary pages, extracted <size(methodSummaries)> method and function summaries");
-	writeBinaryValueFile(|home:///phpMethods.bin|, methodSummaries);
+	saveMethodSummaries(methodSummaries);
 	return methodSummaries;
 }
 

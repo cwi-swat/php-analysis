@@ -2,8 +2,16 @@ module lang::php::stats::Unfriendly
 
 import lang::php::util::Utils;
 import lang::php::stats::Stats;
+import lang::php::util::System;
 import lang::php::util::Corpus;
 import lang::php::ast::AbstractSyntax;
+import lang::php::analysis::evaluators::ScalarEval;
+import lang::php::analysis::includes::IncludeCP;
+import lang::php::analysis::includes::IncludeGraph;
+import lang::rascal::types::AbstractType;
+import lang::php::util::Config;
+import lang::php::analysis::signatures::Summaries;
+
 import List;
 import String;
 import Set;
@@ -12,12 +20,8 @@ import Relation;
 import IO;
 import ValueIO;
 import Map;
-import lang::php::analysis::evaluators::ScalarEval;
-import lang::php::analysis::includes::IncludeCP;
-import lang::php::analysis::includes::IncludeGraph;
-import lang::rascal::types::AbstractType;
+import Node;
 import util::Math;
-import lang::php::util::Config;
 
 import lang::csv::IO;
 import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
@@ -892,15 +896,15 @@ public str groupsTable() = groupsTable({},{},{});
 
 public list[str] getFeatureLabels() = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
 
-public void checkGroups() {
-  labels = getFeatureLabels();
-  groups = getFeatureGroups();
-  //keys = [rascalFriendlyKey(k) | k <- (exprKeyOrder()+stmtKeyOrder())];
-  missing = {*labels} - {*groups[g] | g <- groups};
-  extra = {*groups[g] | g <- groups} - {*labels};
-  for (m <- missing) println("Missing: <m>");
-  for (e <- extra) println("Extra: <e>");          
-}
+//public void checkGroups() {
+//  labels = getFeatureLabels();
+//  groups = getFeatureGroups();
+//  //keys = [rascalFriendlyKey(k) | k <- (exprKeyOrder()+stmtKeyOrder())];
+//  missing = {*labels} - {*groups[g] | g <- groups};
+//  extra = {*groups[g] | g <- groups} - {*labels};
+//  for (m <- missing) println("Missing: <m>");
+//  for (e <- extra) println("Extra: <e>");          
+//}
 
 public str generalFeatureSquiglies(FMap featsMap) {
    labels = getFeatureLabels();
@@ -1552,7 +1556,7 @@ public map[str,set[str]] calculateEvalTransIncludes(Corpus corpus, EvalUses eval
 	return transitiveFiles;
 } 
 
-public str evalCounts(Corpus corpus, EvalUses evalUses, map[str,set[str]] transitiveUses) {
+public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses, map[str,set[str]] transitiveUses) {
 	ci = loadCountsCSV();
 	
 	str productLine(str p) {
@@ -1560,7 +1564,7 @@ public str evalCounts(Corpus corpus, EvalUses evalUses, map[str,set[str]] transi
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
 		evalsForProduct = size(evalUses[p,v]);
 		hits = ( );
-		for (<l,e> <- evalUses[p,v]) {
+		for (<l,e> <- (evalUses[p,v]+fuses[p,v])) {
 			hitloc = l.path;
 			if (hitloc in hits)
 				hits[hitloc] += 1;
@@ -1569,7 +1573,79 @@ public str evalCounts(Corpus corpus, EvalUses evalUses, map[str,set[str]] transi
 		}
 		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
 		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
-		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} && \\numprint{<size(evalUses[p,v])>}  & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
+		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} && \\numprint{<size(evalUses[p,v])>} & \\numprint{<size(fuses[p,v])>} & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
+	}
+		
+	tbl = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table}
+		  '  \\centering
+		  '  \\ra{1.1}
+		  '\\scriptsize
+		  '  \\begin{tabular}{@{}lrrcrrr@{}} \\toprule
+		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{a} & \\texttt{eval} Uses & \\texttt{create_function} Uses & Gini \\\\
+		  '  \\cmidrule{2-3} 
+		  '          & Total & w/eval logic & & & & \\\\ \\midrule<for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '    <productLine(p)> <}>
+		  '  \\bottomrule
+		  '  \\end{tabular}
+		  '\\normalsize
+		  '  \\caption{Usage of \\texttt{eval} and \\texttt{create_function}.\\label{table-eval}}
+		  '\\end{table}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
+		  '";
+	return tbl;		
+}
+
+alias FunctionUses = rel[str product, str version, loc fileloc, Expr call];
+
+public FunctionUses systemFunctionUses(str product, str version, System sys) {
+	rel[str product, str version, loc fileloc, Expr call] res = { };
+	funsToFind = { "create_function", "call_user_func", "call_user_func_array", "call_user_method", "call_user_method_array", "func_get_args", "func_num_args", "func_get_arg" };
+	evals = [ < e@at, e > | /e:call(name(name(str fn)),_) := sys, fn in funsToFind ];
+	for (<l,e> <- evals) res += < product, version, l, e >;
+	return res;
+}
+
+public FunctionUses corpusFunctionUses(Corpus corpus)
+	= { *systemFunctionUses(p, corpus[p], loadBinary(p,corpus[p])) | p <- corpus };
+
+public void functionUsesByFun(FunctionUses functionUses) {
+	for (<p,v> <- functionUses<0,1>) {
+		functionsForPV = functionUses[p,v];
+		map[str,int] fcount = ( );
+		for (<l,e> <- functionsForPV, call(name(name(fn)),_) := e) {
+			if (fn notin fcount)
+				fcount[fn] = 1;
+			else
+				fcount[fn] = fcount[fn] + 1;
+		}
+		println(p);
+		for (fn <- fcount) {
+			println("<fn>:<fcount[fn]>");
+		}
+	}
+}
+
+public str functionUsesCounts(Corpus corpus, FunctionUses functionUses) {
+	ci = loadCountsCSV();
+	
+	str productLine(str p) {
+		v = corpus[p];
+		< lineCount, fileCount > = getOneFrom(ci[p,v]);
+		usesForProduct = size(functionUses[p,v]);
+		hits = ( );
+		for (<l,e> <- functionUses[p,v]) {
+			hitloc = l.path;
+			if (hitloc in hits)
+				hits[hitloc] += 1;
+			else
+				hits[hitloc] = 1;
+		}
+		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
+		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
+		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} && \\numprint{<size(functionUses[p,v])>}  & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
 	}
 		
 	tbl = "\\npaddmissingzero
@@ -1579,17 +1655,132 @@ public str evalCounts(Corpus corpus, EvalUses evalUses, map[str,set[str]] transi
 		  '  \\ra{1.1}
 		  '\\scriptsize
 		  '  \\begin{tabular}{@{}lrrcrr@{}} \\toprule
-		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{a} & \\texttt{eval} Uses & Gini \\\\
+		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{a} & Function Uses & Gini \\\\
 		  '  \\cmidrule{2-3} 
 		  '          & Total & w/\\texttt{eval} & & &  \\\\ \\midrule<for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '    <productLine(p)> <}>
 		  '  \\bottomrule
 		  '  \\end{tabular}
 		  '\\normalsize
-		  '  \\caption{Usage of \\texttt{eval}.\\label{table-eval}}
+		  '  \\caption{Usage of Variadic Functions.\\label{table-fuses}}
 		  '\\end{table}
 		  '\\npfourdigitnosep
 		  '\\npnoaddmissingzero
 		  '";
 	return tbl;		
+}
+
+public FunctionUses filterFunctionUses(FunctionUses functionUses, set[str] fnames) =
+	{ fu | fu:<p,v,l,e> <- functionUses, call(name(name(s)),_) := e, s in fnames };
+
+public FunctionUses filterFunctionUses(FunctionUses functionUses, str fname) =
+	filterFunctionUses(functionUses, { fname });
+
+public FunctionUses createFunctionUses(FunctionUses functionUses) =
+	filterFunctionUses(functionUses, "create_function");
+
+public FunctionUses invokeFunctionUses(FunctionUses functionUses) =
+	filterFunctionUses(functionUses, { "call_user_func", "call_user_func_array" });
+
+public FunctionUses varargsFunctionUses(FunctionUses functionUses) =
+	filterFunctionUses(functionUses, { "func_get_args", "func_num_args", "func_get_arg" });
+	
+public data Def 
+	= functionDef(str functionName, Stmt functionDef, loc defLoc) 
+	| methodDef(str className, str methodName, ClassItem methodDef, loc defLoc)
+	;
+	
+public set[Def] varargsFunctionsAndMethods(System sys) {
+	set[Def] res = { };
+	funsToFind = { "func_get_args", "func_num_args", "func_get_arg" };
+	
+	for (/f:function(fname, _, _, body) := sys) {
+		if (/e:call(name(name(str fn)),_) := body, fn in funsToFind) {
+			res += functionDef(fname, f, f@at);   
+		}
+	}
+	for (/c:class(cname, _, _, _, members) := sys) {
+		for (m:method(name, modifiers, byRef, params, body) <- members) {
+			if (/e:call(name(name(str fn)),_) := body, fn in funsToFind) {
+				res += methodDef(cname, name, m, m@at);   
+			}
+		}
+	}
+	return res;
+}
+
+public rel[loc,Expr,bool] varargsCalls(System sys) {
+	// Get the varargs functions and methods in the current system
+	defs = varargsFunctionsAndMethods(sys);
+	
+	// Get the varargs functions and methods in the library
+	functionSummaries = loadFunctionSummaries();
+	functionSummaries = { fs | fs:functionSummary(_,ps,_,_,_,_) <- functionSummaries, p <- ps, /Var/ := getName(p) };
+	methodSummaries = loadMethodSummaries();
+	methodSummaries = { ms | ms:methodSummary(_,_,ps,_,_,_,_) <- methodSummaries, p <- ps, /Var/ := getName(p) };
+	
+	// Build maps from the function names to their definitions
+	functionDefs = ( fn : d | d:functionDef(fn,_,_) <- defs );
+	systemFunctionNames = functionDefs<0>;
+	functionNames = systemFunctionNames + { fn | functionSummary(fn,_,_,_,_,_) <- functionSummaries };
+	
+	// Also do the same with methods -- here we collapse these into a
+	// relation for method names (since we could have multiple methods
+	// of the same name but different classes), plus we grab just the
+	// method names for matching below
+	methodDefs = ( cn : ( mn : d | d:methodDef(cn,mn,_,_) <- defs ) | cn <- { cn | methodDef(cn,_,_,_) <- defs } );
+	flatMethodDefs = { < mn , d > | d:methodDef(_,mn,_,_) <- defs };
+	systemMethods = flatMethodDefs<0>;
+	methodNames = systemMethods + { mn | methodSummary(mn,_,_,_,_,_,_) <- methodSummaries };
+	
+	rel[loc,Expr,bool] vaCalls = { };
+	for (/e:call(name(name(str fn)),args) := sys, fn in functionNames) {
+		vaCalls = vaCalls + < e@at, e, fn in systemFunctionNames >;	
+	}
+
+	for (/e:methodCall(_,name(name(str fn)),args) := sys, fn in methodNames) {
+		vaCalls = vaCalls + < e@at, e, fn in systemMethods>;	
+	}
+	
+	return vaCalls;
+}
+
+public rel[str,str,loc,Expr,bool] varargsCalls(Corpus corpus) {
+	rel[str,str,loc,Expr] res = { };
+	for (p <- corpus) {
+		sys = loadBinary(p,corpus[p]);
+		sysCalls = varargsCalls(sys);
+		res += { <p,corpus[p],l,e> | <l,e> <- sysCalls };
+	}
+	return res;
+}
+
+public rel[loc,Expr] allCalls(System sys) {
+	return { < e@at, e > | /e:call(name(name(str fn)),args) := sys } + { < e@at, e > | /e:methodCall(_,name(name(str fn)),args) := sys };
+}
+
+public rel[str,str,loc,Expr] allCalls(Corpus corpus) {
+	rel[str,str,loc,Expr] res = { };
+	for (p <- corpus) {
+		sys = loadBinary(p,corpus[p]);
+		sysCalls = allCalls(sys);
+		res += { <p,corpus[p],l,e> | <l,e> <- sysCalls };
+	}
+	return res;
+}
+
+public void saveAllCalls(rel[str,str,loc,Expr] calls) {
+	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/allCalls.bin|, calls);	
+}
+
+public rel[str,str,loc,Expr] loadAllCalls() {
+	return readBinaryValueFile(#rel[str,str,loc,Expr], |project://PHPAnalysis/src/lang/php/serialized/allCalls.bin|);
+}
+
+public void saveVarargsCalls(rel[str,str,loc,Expr,bool] calls) {
+	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/varargsCalls.bin|, calls);	
+}
+
+public rel[str,str,loc,Expr,bool] loadVarargsCalls() {
+	return readBinaryValueFile(#rel[str,str,loc,Expr,bool], |project://PHPAnalysis/src/lang/php/serialized/varargsCalls.bin|);
 }
