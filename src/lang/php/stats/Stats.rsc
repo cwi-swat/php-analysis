@@ -72,7 +72,7 @@ public list[tuple[loc fileloc, Expr call]] gatherStaticVVTargets(map[loc fileloc
 
 @doc{Gather information on includes with paths based on expressions}
 public list[Expr] fetchIncludeUses(Script scr) = [ i | /i:include(_,_) := scr ];
-public list[Expr] fetchIncludeUsesVarPaths(Script scr) = [ i | i:include(Expr e,_) <- fetchIncludeUses(scr), scalar(_) !:= e ];
+public list[Expr] fetchIncludeUsesVarPaths(Script scr) = [ i | i:include(Expr e,_) <- fetchIncludeUses(scr), scalar(string(_)) !:= e ];
 public list[tuple[loc fileloc, Expr call]] gatherIncludesWithVarPaths(map[loc fileloc, Script scr] scripts) = gatherExprStats(scripts, fetchIncludeUsesVarPaths);
 
 @doc{Gather information on property fetch expressions with the property name given as a variable-variable}

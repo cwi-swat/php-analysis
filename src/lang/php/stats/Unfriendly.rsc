@@ -495,7 +495,7 @@ public map[str p, real gc] resultsToGini(list[tuple[str p, str v, QueryResult qr
 	return gcmap;
 }
 
-alias ICLists = map[tuple[str product, str version] sysinfo, tuple[lrel[loc fileloc, Expr call] unresolved, lrel[loc fileloc, Expr call] resolved] hits];
+alias ICLists = map[tuple[str product, str version] sysinfo, tuple[lrel[loc fileloc, Expr call] initial, lrel[loc fileloc, Expr call] unresolved] hits];
 
 public ICLists includesAnalysis() {
 	corpus = getLatestVersions();
@@ -506,12 +506,26 @@ public ICLists includesAnalysis(Corpus corpus) {
 	res = ( );
 	for (product <- corpus) {
 		sys = loadBinary(product,corpus[product]);
-		unresolved = gatherIncludesWithVarPaths(sys);
+		initial = gatherIncludesWithVarPaths(sys);
 		
 		sysResolved = resolveIncludes(sys, getCorpusItem(product,corpus[product]));
-		resolved = gatherIncludesWithVarPaths(sysResolved);
+		unresolved = gatherIncludesWithVarPaths(sysResolved);
 		
-		res[<product,corpus[product]>] = < unresolved, resolved >;		
+		res[<product,corpus[product]>] = < initial, unresolved >;		
+	}
+	return res;
+}
+
+public ICLists includesAnalysisFromBinaries(Corpus corpus) {
+	res = ( );
+	for (product <- corpus) {
+		sys = loadBinary(product,corpus[product]);
+		initial = gatherIncludesWithVarPaths(sys);
+		
+		sysResolved = loadBinaryWithIncludes(product,corpus[product]);
+		unresolved = gatherIncludesWithVarPaths(sysResolved);
+		
+		res[<product,corpus[product]>] = < initial, unresolved >;		
 	}
 	return res;
 }
@@ -524,7 +538,9 @@ public ICLists reload() {
 	return readBinaryValueFile(#ICLists, |project://PHPAnalysis/src/lang/php/serialized/includes.bin|); 
 }
 
-alias ICResult = map[tuple[str product, str version] sysinfo, tuple[tuple[int hc,int fc,real gc] unresolved, tuple[int hc,int fc,real gc] resolved] counts];
+// NOTE: Technically, field resolved holds info on the number of unresolved includes
+// left after all resolution attempts are made.
+alias ICResult = map[tuple[str product, str version] sysinfo, tuple[tuple[int hc,int fc,real gc] initial, tuple[int hc,int fc,real gc] unresolved] counts];
 
 public ICResult calculateIncludeCounts(ICLists res) {
 	counts = ( );
@@ -532,17 +548,27 @@ public ICResult calculateIncludeCounts(ICLists res) {
 	tuple[int hc, int fc, real gc] calc(list[tuple[loc fileloc, Expr call]] hits) {
 		hc = size(hits);
 		fc = size({ l.path | <l,_> <- hits });
-		hitmap = ( l.path : size([i|i:<l,_> <- hits]) | l <- {l | <l,_> <- hits} );
+		map[str,int] hitmap = ( );
+		for (<l,e> <- hits)
+			if (l.path in hitmap)
+				hitmap[l.path] += 1;
+			else
+				hitmap[l.path] = 1;
+		//hitmap = ( l.path : size([i|i:<l,_> <- hits]) | l <- {l | <l,_> <- hits} );
 		//distmap = ( );
 		//for (l <- hitmap) if (hitmap[l] in distmap) distmap[hitmap[l]] += 1; else distmap[hitmap[l]] = 1;
 		distlist = [ hitmap[l] | l <- hitmap ];
-		gc = round(mygini(distlist)*10000.0)/10000.0;
-		return < hc, fc, gc >;
+
+		giniC = (size(distlist) > 1) ? mygini(distlist) : 0;
+		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
+
+		//gc = round(mygini(distlist)*10000.0)/10000.0;
+		return < hc, fc, giniToPrint >;
 	}
 	
 	for (<p,v> <- res) {
-		l1 = res[<p,v>].unresolved;
-		l2 = res[<p,v>].resolved;
+		l1 = res[<p,v>].initial;
+		l2 = res[<p,v>].unresolved;
 		counts[<p,v>] = < calc(l1), calc(l2) >;
 	}
 	
@@ -557,32 +583,53 @@ public ICResult reloadIncludeCounts() {
 	return readBinaryValueFile(#ICResult, |project://PHPAnalysis/src/lang/php/serialized/includeCounts.bin|); 
 }
 
-public str generateIncludeCountsTable(ICResult counts) {
+public map[tuple[str p, str v], int] includeCounts(Corpus corpus) {
+	map[tuple[str p, str v], int] res = ( );
+	for (p <- corpus) {
+		sys = loadBinary(p,corpus[p]);
+		totalIncludes = size([ i | /i:include(iexp,_) := sys ]);
+		res[<p,corpus[p]>] = totalIncludes;
+	}
+	return res;
+}
+
+public void saveTotalIncludes(map[tuple[str p, str v], int] ti) {
+	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/totalIncludes.bin|, ti);
+}
+
+public map[tuple[str p, str v], int] loadTotalIncludes() {
+	return readBinaryValueFile(#map[tuple[str p, str v], int], |project://PHPAnalysis/src/lang/php/serialized/totalIncludes.bin|);
+}
+
+public str generateIncludeCountsTable(ICResult counts, map[tuple[str p, str v], int] totalIncludes) {
 	lv = ( p : v | <p,v> <- counts<0> );
 	ci = loadCountsCSV();
-	ec = expressionCounts();
-	includesPerProduct = ( <p,lv[p]> : getOneFrom((ec<product,version,include>)[p,lv[p]]) | p <- lv );
 		
 	str productLine(str p) {
 		v = lv[p];
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
-		return "<p> & \\numprint{<fileCount>} & \\numprint{<includesPerProduct[<p,v>]>} & \\numprint{<counts[<p,v>].unresolved.hc>} & \\numprint{<counts[<p,v>].afterEval.hc>} & \\numprint{<counts[<p,v>].afterMatch.hc>} & \\numprint{<counts[<p,v>].afterBoth.hc>} & & \\nprounddigits{1} \\numprint{<round((1.0 * counts[<p,v>].unresolved.hc - counts[<p,v>].afterBoth.hc) / counts[<p,v>].unresolved.hc * 1000.0) / 10.0>}\\% \\npnoround & \\numprint{<counts[<p,v>].afterBoth.fc>} & \\nprounddigits{2} \\numprint{<round(counts[<p,v>].afterBoth.gc*100.0)/100.0>} \\npnoround \\\\";
+		giniC = counts[<p,v>].unresolved.gc;
+		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
+
+		return "<p> & \\numprint{<totalIncludes[<p,v>]>} & \\numprint{<counts[<p,v>].initial.hc>}  & \\numprint{<counts[<p,v>].initial.hc-counts[<p,v>].unresolved.hc>} & \\numprint{<fileCount>}(\\numprint{<counts[<p,v>].unresolved.fc>}) & \\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround \\\\";
 	}
 		
 	res = "\\npaddmissingzero
 		  '\\npfourdigitsep
-		  '\\begin{table*}
+		  '\\begin{table}
 		  '  \\centering
 		  '  \\ra{1.2}
-		  '  \\begin{tabular}{@{}lrrrrrrcrrr@{}} \\toprule
-		  '  Product & Files & \\multicolumn{5}{c}{Includes} & \\phantom{a} & Resolved\\% & Files w/ Unresolved Includes & Gini \\\\
-		  ' \\cmidrule{3-7} 
-		  '   &  & Total & Non-Literal & After Simp & After Match & After Both & & & &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '  \\scriptsize
+		  '  \\begin{tabular}{@{}lrrrrr@{}} \\toprule
+		  '  Product & \\multicolumn{3}{c}{Includes} & Files & Gini \\\\
+		  ' \\cmidrule{2-4} 
+		  '   &  Total & Dynamic & Resolved & &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '    <productLine(p)> <}>
 		  '  \\bottomrule
 		  '  \\end{tabular}
+		  '  \\normalsize
 		  '  \\caption{PHP Non-Literal Includes.\\label{table-includes}}
-		  '\\end{table*}
+		  '\\end{table}
 		  '\\npfourdigitnosep
 		  '\\npnoaddmissingzero
 		  '";
@@ -1441,12 +1488,11 @@ public map[str,set[str]] calculateMMTransIncludes(MMResult mmr)
 	return transitiveFiles;
 } 
 
-public void writeIncludeBinaries() {
-	lv = getLatestVersions();
-	for (product <- lv) {
-		version = lv[product];
+public void writeIncludeBinaries(Corpus corpus) {
+	for (product <- corpus) {
+		version = corpus[product];
 		pt = loadBinary(product,version);
-		pt2 = matchIncludes(evalAllScalars(pt));
+		pt2 = resolveIncludes(pt,getCorpusItem(product,corpus[product]));
 		parsedItem = parsedDir + "<product>-<version>-icp.pt";
 		println("Writing binary: <parsedItem>");
 		writeBinaryValueFile(parsedItem, pt2);
@@ -1534,6 +1580,14 @@ public EvalUses corpusEvalUses(Corpus corpus) {
 		for (<l,e> <- evals) res += < p, corpus[p], l, e >;
 	}
 	return res;
+}
+
+public void saveEvalUses(EvalUses evalUses) {
+	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/evalUses.bin|, evalUses);
+}
+
+public EvalUses loadEvalUses() {
+	return readBinaryValueFile(#EvalUses, |project://PHPAnalysis/src/lang/php/serialized/evalUses.bin|);
 }
 
 public map[str,set[str]] calculateEvalTransIncludes(Corpus corpus, EvalUses evalUses)
@@ -1624,6 +1678,14 @@ public FunctionUses systemFunctionUses(str product, str version, System sys) {
 
 public FunctionUses corpusFunctionUses(Corpus corpus)
 	= { *systemFunctionUses(p, corpus[p], loadBinary(p,corpus[p])) | p <- corpus };
+
+public void saveFunctionUses(FunctionUses functionUses) {
+	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/functionUses.bin|, functionUses);
+}
+
+public FunctionUses loadFunctionUses() {
+	return readBinaryValueFile(#FunctionUses, |project://PHPAnalysis/src/lang/php/serialized/functionUses.bin|);
+}
 
 public void functionUsesByFun(FunctionUses functionUses) {
 	for (<p,v> <- functionUses<0,1>) {
