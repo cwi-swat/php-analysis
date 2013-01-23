@@ -1553,8 +1553,25 @@ public map[str,set[str]] calculateEvalTransIncludes(Corpus corpus, EvalUses eval
 	return transitiveFiles;
 } 
 
-public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses, map[str,set[str]] transitiveUses) {
+public map[str,set[str]] calculateTransIncludes(Corpus corpus, set[loc] locset)
+{
+	map[str,set[str]] transitiveFiles = ( );
+	
+	for (product <- corpus) {
+		version = corpus[product];
+		pt = loadBinaryWithIncludes(product,version);
+		corpusItemLoc = getCorpusItem(product,version);
+		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
+		transFiles = calculateFeatureTrans(ig, locset, corpusItemLoc.path);
+		transitiveFiles[product] = transFiles;
+	}
+	
+	return transitiveFiles;
+} 
+
+public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses) {
 	ci = loadCountsCSV();
+	fuses = createFunctionUses(fuses);
 	
 	str productLine(str p) {
 		v = corpus[p];
@@ -1570,7 +1587,7 @@ public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses, map[
 		}
 		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
 		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
-		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} && \\numprint{<size(evalUses[p,v])>} & \\numprint{<size(fuses[p,v])>} & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
+		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} && \\numprint{<size(evalUses[p,v])>}/\\numprint{<size(fuses[p,v])>}  & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
 	}
 		
 	tbl = "\\npaddmissingzero
@@ -1579,15 +1596,15 @@ public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses, map[
 		  '  \\centering
 		  '  \\ra{1.1}
 		  '\\scriptsize
-		  '  \\begin{tabular}{@{}lrrcrrr@{}} \\toprule
-		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{a} & \\texttt{eval} Uses & \\texttt{create_function} Uses & Gini \\\\
+		  '  \\begin{tabular}{@{}lrrcrr@{}} \\toprule
+		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{a} & Total Uses & Gini \\\\
 		  '  \\cmidrule{2-3} 
-		  '          & Total & w/eval logic & & & & \\\\ \\midrule<for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '          & Total & w/eval logic & & & \\\\ \\midrule<for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '    <productLine(p)> <}>
 		  '  \\bottomrule
 		  '  \\end{tabular}
 		  '\\normalsize
-		  '  \\caption{Usage of \\texttt{eval} and \\texttt{create_function}.\\label{table-eval}}
+		  '  \\caption{Usage of \\texttt{eval} and \\texttt{create\\_function}.\\label{table-eval}}
 		  '\\end{table}
 		  '\\npfourdigitnosep
 		  '\\npnoaddmissingzero
