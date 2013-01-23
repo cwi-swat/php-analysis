@@ -18,19 +18,23 @@ import lang::php::util::Utils;
 import lang::php::stats::Stats;
 
 public System resolveIncludes(System sys, loc baseLoc) {
-	sys = inlineMagicConstants(sys);
-	sys = evalAllScalarsAndInlineUniques(sys, baseLoc);
-	sys = matchIncludes(sys);
+	solve(sys) {
+		sys = inlineMagicConstants(sys);
+		sys = evalAllScalarsAndInlineUniques(sys, baseLoc);
+		sys = matchIncludes(sys);
+	}
 	return sys;
 }
 
-public map[str,tuple[System,System,lrel[loc,Expr]]] resolveCorpusIncludes(Corpus corpus) {
-	map[str,tuple[System,System,lrel[loc,Expr]]] res = ( );
+alias IncludesInfo = tuple[System sysBefore, System sysAfter, lrel[loc,Expr] vpBefore, lrel[loc,Expr] vpAfter];
+public map[str,IncludesInfo] resolveCorpusIncludes(Corpus corpus) {
+	map[str,IncludesInfo] res = ( );
 	for (product <- corpus) {
 		sys = loadBinary(product,corpus[product]);
+		vpIncludesInitial = gatherIncludesWithVarPaths(sys);
 		resolved = resolveIncludes(sys, getCorpusItem(product,corpus[product]));
 		vpIncludes = gatherIncludesWithVarPaths(resolved);
-		res[product] = < sys, resolved, vpIncludes >;
+		res[product] = < sys, resolved, vpIncludesInitial, vpIncludes >;
 	}
 	return res;
 }

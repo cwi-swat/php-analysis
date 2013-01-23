@@ -11,6 +11,7 @@ import lang::php::analysis::includes::IncludeGraph;
 import lang::rascal::types::AbstractType;
 import lang::php::util::Config;
 import lang::php::analysis::signatures::Summaries;
+import lang::php::analysis::includes::ResolveIncludes;
 
 import List;
 import String;
@@ -494,25 +495,23 @@ public map[str p, real gc] resultsToGini(list[tuple[str p, str v, QueryResult qr
 	return gcmap;
 }
 
-alias ICLists = map[tuple[str p, str v] pv, tuple[list[tuple[loc fileloc, Expr call]] unresolved, list[tuple[loc fileloc, Expr call]] afterEval, list[tuple[loc fileloc, Expr call]]afterMatch, list[tuple[loc fileloc, Expr call]] afterBoth] hits];
+alias ICLists = map[tuple[str product, str version] sysinfo, tuple[lrel[loc fileloc, Expr call] unresolved, lrel[loc fileloc, Expr call] resolved] hits];
 
 public ICLists includesAnalysis() {
-	lv = getLatestVersions();
-	return includesAnalysis(lv);
+	corpus = getLatestVersions();
+	return includesAnalysis(corpus);
 }
 
-public ICLists includesAnalysis(map[str Product, str Version] lv) {
+public ICLists includesAnalysis(Corpus corpus) {
 	res = ( );
-	for (p <- lv) {
-		scripts = loadBinary(p,lv[p]);
-		unresolved = gatherIncludesWithVarPaths(scripts);
-		scripts2 = evalAllScalarsAndInlineUniques(scripts, getCorpusItem(p,lv[p]));
-		afterEval = gatherIncludesWithVarPaths(scripts2);
-		scripts3 = matchIncludes(scripts);
-		afterMatch = gatherIncludesWithVarPaths(scripts3);
-		scripts4 = matchIncludes(scripts2);
-		afterBoth = gatherIncludesWithVarPaths(scripts4);
-		res[<p,lv[p]>] = < unresolved, afterEval, afterMatch, afterBoth >;		
+	for (product <- corpus) {
+		sys = loadBinary(product,corpus[product]);
+		unresolved = gatherIncludesWithVarPaths(sys);
+		
+		sysResolved = resolveIncludes(sys, getCorpusItem(product,corpus[product]));
+		resolved = gatherIncludesWithVarPaths(sysResolved);
+		
+		res[<product,corpus[product]>] = < unresolved, resolved >;		
 	}
 	return res;
 }
@@ -525,7 +524,7 @@ public ICLists reload() {
 	return readBinaryValueFile(#ICLists, |project://PHPAnalysis/src/lang/php/serialized/includes.bin|); 
 }
 
-alias ICResult = map[tuple[str p, str v] pv, tuple[tuple[int hc,int fc,real gc] unresolved, tuple[int hc,int fc,real gc] afterEval, tuple[int hc, int fc,real gc] afterMatch, tuple[int hc,int fc,real gc] afterBoth] counts];
+alias ICResult = map[tuple[str product, str version] sysinfo, tuple[tuple[int hc,int fc,real gc] unresolved, tuple[int hc,int fc,real gc] resolved] counts];
 
 public ICResult calculateIncludeCounts(ICLists res) {
 	counts = ( );
@@ -543,10 +542,8 @@ public ICResult calculateIncludeCounts(ICLists res) {
 	
 	for (<p,v> <- res) {
 		l1 = res[<p,v>].unresolved;
-		l2 = res[<p,v>].afterEval;
-		l3 = res[<p,v>].afterMatch;
-		l4 = res[<p,v>].afterBoth;
-		counts[<p,v>] = < calc(l1), calc(l2), calc(l3), calc(l4) >;
+		l2 = res[<p,v>].resolved;
+		counts[<p,v>] = < calc(l1), calc(l2) >;
 	}
 	
 	return counts;
@@ -1733,30 +1730,43 @@ public rel[loc,Expr,bool] varargsCalls(System sys) {
 	systemMethods = flatMethodDefs<0>;
 	methodNames = systemMethods + { mn | methodSummary(mn,_,_,_,_,_,_) <- methodSummaries };
 	
+	// Now, find calls to the varargs functions and methods. We can have standard
+	// function calls, standard method calls, and calls to static methods.
 	rel[loc,Expr,bool] vaCalls = { };
-	for (/e:call(name(name(str fn)),args) := sys, fn in functionNames) {
-		vaCalls = vaCalls + < e@at, e, fn in systemFunctionNames >;	
+	visit(sys) {
+		case e:call(name(name(str fn)),args) : {
+			if (fn in functionNames)
+				vaCalls = vaCalls + < e@at, e, fn in systemFunctionNames >;
+		}
+		
+		case e:methodCall(_,name(name(str fn)),args) : {
+			if (fn in methodNames)
+				vaCalls = vaCalls + < e@at, e, fn in systemMethods>;
+		}
+		
+		case e:staticCall(_,name(name(str fn)),args) : {
+			if (fn in methodNames)
+				vaCalls = vaCalls + < e@at, e, fn in systemMethods>;
+		}
 	}
 
-	for (/e:methodCall(_,name(name(str fn)),args) := sys, fn in methodNames) {
-		vaCalls = vaCalls + < e@at, e, fn in systemMethods>;	
-	}
-	
 	return vaCalls;
 }
 
 public rel[str,str,loc,Expr,bool] varargsCalls(Corpus corpus) {
-	rel[str,str,loc,Expr] res = { };
+	rel[str,str,loc,Expr,bool] res = { };
 	for (p <- corpus) {
 		sys = loadBinary(p,corpus[p]);
 		sysCalls = varargsCalls(sys);
-		res += { <p,corpus[p],l,e> | <l,e> <- sysCalls };
+		res += { <p,corpus[p],l,e,b> | <l,e,b> <- sysCalls };
 	}
 	return res;
 }
 
 public rel[loc,Expr] allCalls(System sys) {
-	return { < e@at, e > | /e:call(name(name(str fn)),args) := sys } + { < e@at, e > | /e:methodCall(_,name(name(str fn)),args) := sys };
+	return { < e@at, e > | /e:call(name(name(str fn)),args) := sys } + 
+		   { < e@at, e > | /e:methodCall(_,name(name(str fn)),args) := sys } +
+		   { < e@at, e > | /e:staticCall(_,name(name(str fn)),args) := sys };
 }
 
 public rel[str,str,loc,Expr] allCalls(Corpus corpus) {
@@ -1783,4 +1793,26 @@ public void saveVarargsCalls(rel[str,str,loc,Expr,bool] calls) {
 
 public rel[str,str,loc,Expr,bool] loadVarargsCalls() {
 	return readBinaryValueFile(#rel[str,str,loc,Expr,bool], |project://PHPAnalysis/src/lang/php/serialized/varargsCalls.bin|);
+}
+
+public map[str product,tuple[int classes, int interfaces] ciCount] classAndInterfaceCount(Corpus corpus) {
+	map[str product,tuple[int classes, int interfaces] ciCount] res = ( );
+	for (p <- corpus) {
+		sys = loadBinary(p,corpus[p]);
+		classCount = size({ c | /c:class(_,_,_,_,_) := sys });
+		interfaceCount = size({ i | /i:interface(_,_,_) := sys });
+		res[p] = < classCount, interfaceCount >;
+	}
+	return res;
+}
+
+public rel[str product, str path] classAndInterfaceFiles(Corpus corpus) {
+	rel[str product, str path] res = { };
+	for (p <- corpus) {
+		sys = loadBinary(p,corpus[p]);
+		classPaths = { c@at.path | /c:class(_,_,_,_,_) := sys };
+		interfacePaths = { i@at.path | /i:interface(_,_,_) := sys };
+		res += { < p, pth > | pth <- (classPaths + interfacePaths) };
+	}
+	return res;
 }
