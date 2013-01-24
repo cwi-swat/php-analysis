@@ -341,11 +341,10 @@ public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses,
 							 list[tuple[str p, str v, QueryResult qr]] vvnews,
 							 list[tuple[str p, str v, QueryResult qr]] vvprops,
 							 list[tuple[str p, str v, QueryResult qr]] vvall,
-							 map[str,set[str]] transitiveUses) {
+							 map[str,set[str]] transitiveUses, Corpus corpus) {
 							 
-	lv = getLatestVersions();
 	ci = loadCountsCSV();
-	hasGini = ( p : (size({qr|<p,_,qr> <- vvall}) > 1) ? true : false | p <- lv );
+	hasGini = ( p : (size({qr|<p,_,qr> <- vvall}) > 1) ? true : false | p <- corpus );
 	
 	gmap = resultsToGini(vvall);
 	
@@ -360,7 +359,7 @@ public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses,
 	str c(str p, list[tuple[str p, str v, QueryResult qr]] vv) = "\\numprint{<size({qr.l.path|<p,_,qr><-vv})>} & \\numprint{<size([qr|<p,_,qr><-vv])>}";
 	
 	str productLine(str p) {
-		< lineCount, fileCount > = getOneFrom(ci[p,lv[p]]);
+		< lineCount, fileCount > = getOneFrom(ci[p,corpus[p]]);
 		return "<p> & \\numprint{<fileCount>} & <c(p,vvuses)> && <c(p,vvcalls)> && <c(p,vvmcalls)> && <c(p,vvprops)> && <c(p,vvnews)> && \\numprint{<size({qr.l.path|<p,_,qr><-vvall})>} & \\numprint{<size(transitiveUses[p])>} & \\numprint{<size([qr|<p,_,qr><-vvall])>} & < (!hasGini[p]) ? "N/A" : "\\nprounddigits{2} \\numprint{<round(gmap[p] * 100.0)/100.0>} \\npnoround" > \\\\";
 	}
 
@@ -369,13 +368,13 @@ public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses,
 		  '\\begin{table*}
 		  '\\centering
 		  '\\ra{1.0}
-		  '\\scriptsize
+		  '\\resizebox{\\textwidth}{!}{%
 		  '\\begin{tabular}{@{}lrrrcrrcrrcrrcrrcrrrr@{}} \\toprule 
-		  '<headerLine()> <for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '<headerLine()> <for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '  <productLine(p)> <}>
 		  '\\bottomrule
 		  '\\end{tabular}
-		  '\\normalsize
+		  '}
 		  '\\caption{PHP Variable Features.\\label{table-var}}
 		  '\\end{table*}
 		  '";
@@ -416,16 +415,16 @@ public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses,
 			 list[tuple[str p, str v, QueryResult qr]] vvsprops,
 			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] loadVVFiles() {
 	return <
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|file:///export/scratch1/hills/temp/vvuses.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|file:///export/scratch1/hills/temp/vvcalls.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|file:///export/scratch1/hills/temp/vvmcalls.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|file:///export/scratch1/hills/temp/vvnews.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|file:///export/scratch1/hills/temp/vvprops.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|file:///export/scratch1/hills/temp/vvcconsts.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|file:///export/scratch1/hills/temp/vvscalls.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|file:///export/scratch1/hills/temp/vvstargets.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|file:///export/scratch1/hills/temp/vvsprops.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|file:///export/scratch1/hills/temp/vvsptargets.bin|) >;
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvuses.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvcalls.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvmcalls.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvnews.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvprops.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvcconsts.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvscalls.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvstargets.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvsprops.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvsptargets.bin|) >;
 }
 
 // TODO: Change this to generate these list...
@@ -642,37 +641,35 @@ public void writeIncludeCountsTable(ICResult counts) {
 
 alias MMResult = map[tuple[str p, str v], tuple[list[ClassItem] sets, list[ClassItem] gets, list[ClassItem] isSets, list[ClassItem] unsets, list[ClassItem] calls, list[ClassItem] staticCalls]];
 
-public MMResult magicMethodUses() {
-	lv = getLatestVersions();
+public MMResult magicMethodUses(Corpus corpus) {
 	res = ( );
-	for (p <- lv) {
-		pt = loadBinary(p,lv[p]);
+	for (p <- corpus) {
+		pt = loadBinary(p,corpus[p]);
 		sets = fetchOverloadedSet(pt);
 		gets = fetchOverloadedGet(pt);
 		isSets = fetchOverloadedIsSet(pt);
 		unsets = fetchOverloadedUnset(pt);
 		calls = fetchOverloadedCall(pt);
 		staticCalls = fetchOverloadedCallStatic(pt);
-		res[<p,lv[p]>] = < sets, gets, isSets, unsets, calls, staticCalls >;
+		res[<p,corpus[p]>] = < sets, gets, isSets, unsets, calls, staticCalls >;
 	}
 	return res;
 }
 
-public str magicMethodCounts(MMResult res, map[str,set[str]] transitiveUses) {
-	lv = getLatestVersions();
+public str magicMethodCounts(Corpus corpus, MMResult res, map[str,set[str]] transitiveUses) {
 	ci = loadCountsCSV();
 	
 	str productLine(str p) {
-		v = lv[p];
+		v = corpus[p];
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
 
-		setsSize = size(res[<p,lv[p]>].sets);
-		getsSize = size(res[<p,lv[p]>].gets);
-		isSetsSize = size(res[<p,lv[p]>].isSets);
-		unsetsSize = size(res[<p,lv[p]>].unsets);
-		callsSize = size(res[<p,lv[p]>].calls);
-		staticCallsSize = size(res[<p,lv[p]>].staticCalls);
-		allMM = res[<p,lv[p]>].sets + res[<p,lv[p]>].gets + res[<p,lv[p]>].isSets + res[<p,lv[p]>].unsets + res[<p,lv[p]>].calls + res[<p,lv[p]>].staticCalls;
+		setsSize = size(res[<p,corpus[p]>].sets);
+		getsSize = size(res[<p,corpus[p]>].gets);
+		isSetsSize = size(res[<p,corpus[p]>].isSets);
+		unsetsSize = size(res[<p,corpus[p]>].unsets);
+		callsSize = size(res[<p,corpus[p]>].calls);
+		staticCallsSize = size(res[<p,corpus[p]>].staticCalls);
+		allMM = res[<p,corpus[p]>].sets + res[<p,corpus[p]>].gets + res[<p,corpus[p]>].isSets + res[<p,corpus[p]>].unsets + res[<p,corpus[p]>].calls + res[<p,corpus[p]>].staticCalls;
 		hits = ( );
 		for (citem <- allMM) {
 			hitloc = citem@at.path;
@@ -681,9 +678,10 @@ public str magicMethodCounts(MMResult res, map[str,set[str]] transitiveUses) {
 			else
 				hits[hitloc] = 1;
 		}
-		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
 
-		return "<p> & \\numprint{<size(hits<0>)>} & \\numprint{<size(transitiveUses[p])>} && \\numprint{<setsSize>} & \\numprint{<getsSize>} & \\numprint{<isSetsSize>} & \\numprint{<unsetsSize>} & \\numprint{<callsSize>} & \\numprint{<staticCallsSize>} & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<round(giniC*1000.0)/1000.0>} \\npnoround" : "N/A"> \\\\";
+		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
+		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
+		return "<p> & \\numprint{<size(hits<0>)>} & \\numprint{<size(transitiveUses[p])>} && \\numprint{<setsSize>} & \\numprint{<getsSize>} & \\numprint{<isSetsSize>} & \\numprint{<unsetsSize>} & \\numprint{<callsSize>} & \\numprint{<staticCallsSize>} & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A"> \\\\";
 	}
 		
 	tbl = "\\npaddmissingzero
@@ -691,15 +689,15 @@ public str magicMethodCounts(MMResult res, map[str,set[str]] transitiveUses) {
 		  '\\begin{table}
 		  '  \\centering
 		  '  \\ra{1.0}
-		  '\\scriptsize
+		  '\\resizebox{\\columnwidth}{!}{%
 		  '  \\begin{tabular}{@{}lrrcrrrrrrr@{}} \\toprule
 		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{a} & \\multicolumn{6}{c}{Magic Methods} & GC \\\\
 		  '  \\cmidrule{2-3} \\cmidrule{5-10}
-		  '          & MM & WI && S & G & I & U & C & SC &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '          & MM & WI && S & G & I & U & C & SC &  \\\\ \\midrule<for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '    <productLine(p)> <}>
 		  '  \\bottomrule
 		  '  \\end{tabular}
-		  '\\normalsize
+		  '}
 		  '  \\caption{PHP Overloading (Magic Methods).\\label{table-magic}}
 		  '\\end{table}
 		  '\\npfourdigitnosep
@@ -1450,13 +1448,13 @@ public map[str,set[str]] calculateVVTransIncludes(
 	list[tuple[str p, str v, QueryResult qr]] vvscalls,
 	list[tuple[str p, str v, QueryResult qr]] vvstargets,
 	list[tuple[str p, str v, QueryResult qr]] vvsprops,
-	list[tuple[str p, str v, QueryResult qr]] vvsptargets)
+	list[tuple[str p, str v, QueryResult qr]] vvsptargets,
+	Corpus corpus)
 {
 	map[str,set[str]] transitiveFiles = ( );
-	lv = getLatestVersions();
 	
-	for (product <- lv) {
-		version = lv[product];
+	for (product <- corpus) {
+		version = corpus[product];
 		pt = loadBinaryWithIncludes(product,version);
 		corpusItemLoc = getCorpusItem(product,version);
 		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
@@ -1470,13 +1468,12 @@ public map[str,set[str]] calculateVVTransIncludes(
 
 //alias MMResult = map[tuple[str p, str v], tuple[list[ClassItem] sets, list[ClassItem] gets, list[ClassItem] isSets, list[ClassItem] unsets, list[ClassItem] calls, list[ClassItem] staticCalls]];
 
-public map[str,set[str]] calculateMMTransIncludes(MMResult mmr)
+public map[str,set[str]] calculateMMTransIncludes(Corpus corpus, MMResult mmr)
 {
 	map[str,set[str]] transitiveFiles = ( );
-	lv = getLatestVersions();
 	
-	for (product <- lv) {
-		version = lv[product];
+	for (product <- corpus) {
+		version = corpus[product];
 		pt = loadBinaryWithIncludes(product,version);
 		corpusItemLoc = getCorpusItem(product,version);
 		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
@@ -1601,6 +1598,23 @@ public map[str,set[str]] calculateEvalTransIncludes(Corpus corpus, EvalUses eval
 		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
 		evalLocs = { l | l <- evalUses[product, version]<0>  };
 		transFiles = calculateFeatureTrans(ig, evalLocs, corpusItemLoc.path);
+		transitiveFiles[product] = transFiles;
+	}
+	
+	return transitiveFiles;
+} 
+
+public map[str,set[str]] calculateFunctionTransIncludes(Corpus corpus, FunctionUses fuses)
+{
+	map[str,set[str]] transitiveFiles = ( );
+	
+	for (product <- corpus) {
+		version = corpus[product];
+		pt = loadBinaryWithIncludes(product,version);
+		corpusItemLoc = getCorpusItem(product,version);
+		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
+		fuseLocs = { l | l <- fuses[product, version]<0>  };
+		transFiles = calculateFeatureTrans(ig, fuseLocs, corpusItemLoc.path);
 		transitiveFiles[product] = transFiles;
 	}
 	
