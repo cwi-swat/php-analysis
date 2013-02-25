@@ -11,6 +11,7 @@ module lang::php::analysis::includes::ResolveIncludes
 import lang::php::analysis::evaluators::MagicConstants;
 import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::analysis::includes::MatchIncludes;
+import lang::php::analysis::includes::PropagateStringVars;
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::System;
 import lang::php::util::Corpus;
@@ -26,7 +27,23 @@ public System resolveIncludes(System sys, loc baseLoc) {
 	return sys;
 }
 
+public System resolveIncludesWithVars(System sys, loc baseLoc) {
+	solve(sys) {
+		sys = inlineMagicConstants(sys);
+		sys = evalAllScalarsAndInlineUniques(sys, baseLoc);
+		sys = matchIncludes(sys);
+	}
+	
+	sys2 = evalStringVars(sys);
+	
+	if (sys != sys2)
+		return resolveIncludesWithVars(sys2, baseLoc);
+		
+	return sys;
+}
+
 alias IncludesInfo = tuple[System sysBefore, System sysAfter, lrel[loc,Expr] vpBefore, lrel[loc,Expr] vpAfter];
+
 public map[str,IncludesInfo] resolveCorpusIncludes(Corpus corpus) {
 	map[str,IncludesInfo] res = ( );
 	for (product <- corpus) {

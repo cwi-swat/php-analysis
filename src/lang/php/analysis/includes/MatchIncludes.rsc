@@ -25,6 +25,8 @@ import util::Math;
 
 data FNBits = lit(str s) | fnBit() | goUp() | dirSep();
 
+public anno set[loc] Expr@possibleIncludes;
+
 // This function just calls the next function on each script in the map. The bulk of
 // what happens is done in the function below.
 public map[loc fileloc, Script scr] matchIncludes(map[loc fileloc, Script scr] scripts) {
@@ -53,6 +55,8 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 	list[FNBits] flattenExpr(Expr e) {
 		if (binaryOperation(l,r,concat()) := e) {
 			return flattenExpr(l) + flattenExpr(r);
+		} else if (scalar(encapsed(el)) := e) {
+			return [*flattenExpr(eli) | eli <- el];
 		} else if (scalar(string("/")) := e) {
 			return [ dirSep() ];
 		} else if (scalar(string(s)) := e) {
@@ -86,6 +90,7 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 		list[FNBits] bits = flattenExpr(iexp);
 		while([a*,fnBit(),fnBit(),b*] := bits) bits = [*a,fnBit(),*b];
 		while([a*,dirSep(),lit(s1),goUp(),b*] := bits) bits = [*a,*b];
+		while([a*,lit(""),b*] := bits) bits = [*a,*b];
 		//while([a*,lit(s1),lit(s2),b*] := bits) bits = [*a,lit("<s1>/<s2>"),*b];
 		list[str] reList = [ fnBits2Str(b) | b <- bits ];
 		str re = "^\\S*" + intercalate("",reList) + "$";

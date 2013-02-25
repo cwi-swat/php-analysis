@@ -87,12 +87,15 @@ public rel[str product, str version, loc fileloc, Script scr] loadProduct(str pr
 	return corpusItems;
 }
 
-public void buildBinaries(str product, str version) {
-	loc l = getCorpusItem(product,version);
+public void buildBinaries(str product, str version, loc l) {
 	println("Parsing <product>-<version>");
 	files = loadPHPFiles(l);
 	loc binLoc = parsedDir + "<product>-<version>.pt";
 	writeBinaryValueFile(binLoc, files);
+}
+
+public void buildBinaries(str product, str version) {
+	buildBinaries(product, version, getCorpusItem(product,version));
 }
 
 public void buildMissingBinaries(str product, str version) {

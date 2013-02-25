@@ -16,7 +16,7 @@ import Exception;
 
 @doc{Evaluate the PHP dirname function, given a string literal argument.}
 public Script evalDirname(Script scr) {
-	scr = visit(scr) {
+	scr = bottom-up visit(scr) {
 		case c:call(name(name("dirname")),[actualParameter(scalar(string(s1)),false)]) : {
 			try {
 				// NOTE: This assumes that we use "/" as the directory separator. If this
@@ -40,7 +40,7 @@ public Script evalDirname(Script scr) {
 
 @doc{Evaluate the PHP dirname function, given a string literal argument.}
 public Script evalMWStatics(Script scr) {
-	scr = visit(scr) {
+	scr = bottom-up visit(scr) {
 		case c:staticCall(name(name("MWInit")), name(name("compiledPath")), [actualParameter(scalar(string(s1)),false)]) : {
 			insert(scalar(string(s1))[@at=c@at]);
 		}
@@ -53,7 +53,7 @@ public Script evalMWStatics(Script scr) {
 }
 
 public Script evalStrrchr(Script scr) {
-	scr = visit(scr) {
+	scr = bottom-up visit(scr) {
 		case c:call(name(name("strrchr")),[actualParameter(scalar(string(s1)),false), actualParameter(scalar(string(s2)),false)]) : {
 			if (size(s2) >= 1) {
 				if (size(s2) > 1) s2 = s2[0];
@@ -70,7 +70,7 @@ public Script evalStrrchr(Script scr) {
 
 // TODO: Handle the negative case for i1, which starts from the end
 public Script evalSubstr(Script scr) {
-	scr = visit(scr) {
+	scr = bottom-up visit(scr) {
 		case c:call(name(name("substr")),[actualParameter(scalar(string(s1)),false), actualParameter(scalar(integer(i1)),false)]) : {
 			if (size(s1) > 0) {
 				if (i1 >= 0) {

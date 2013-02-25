@@ -21,6 +21,7 @@ import lang::php::util::Utils;
 import IO;
 import List;
 import Set;
+import Node;
 
 // TODOs:
 // 2. Gotos need to be handled by keeping track of which nodes are
@@ -65,6 +66,42 @@ public map[NamePath,CFG] buildCFGs(Script scr) {
 	}
 	 
 	return res;
+}
+
+// TODO: This needs some refactoring...
+public tuple[Script,map[NamePath,CFG]] buildCFGsAndScript(Script scr) {
+	lstate = newLabelState();
+	< scrLabeled, lstate > = labelScript(scr, lstate);
+	
+	map[NamePath,CFG] res = ( );
+
+	println("Creating CFG for top-level script");
+	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
+	res[[global()]] = scriptCFG;
+		
+	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,params,body) <- mbrs) {
+		methodNamePath = [class(cname),method(mname)];
+		println("Creating CFG for <cname>::<mname>");
+		< methodCFG, lstate > = createMethodCFG(methodNamePath, m, lstate);
+		res[methodNamePath] = methodCFG;
+	}
+
+	for (/f:function(fname,_,params,body) := scrLabeled) {
+		functionNamePath = [global(),function(fname)];
+		println("Creating CFG for <fname>");
+		< functionCFG, lstate > = createFunctionCFG(functionNamePath, f, lstate);
+		res[functionNamePath] = functionCFG;
+	}
+	 
+	return < scrLabeled, res >;
+}
+
+public Script stripLabels(Script scr) {
+	str labAnno = "lab";
+	return visit(scr) {
+		case Expr e => delAnnotation(e, labAnno) when (e@lab)?
+		case Stmt s => delAnnotation(s, labAnno) when (s@lab)?
+	}
 }
 
 public map[NamePath,CFG] buildCFGsAndBlocks(loc l) {
@@ -451,6 +488,8 @@ public Lab init(Expr e) {
 		
 		case var(expr(Expr varName)) : return init(varName);
 		case var(name(Name varName)) : return e@lab;
+		
+		case scriptFragment(list[Stmt] body) : return (size(body) == 0) ? e@lab : init(head(body));
 	}
 }
 
@@ -982,7 +1021,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 		}
 
 		case \throw(Expr expr) : {
-			< edges, lstate > = internalFlow(edges, lstate, expr);
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
 			// TODO: This actually needs to instead transfer control to surrounding catches
 			edges += flowEdge(final(expr), finalLabel);
 		}
@@ -1211,7 +1250,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 				edges += flowEdge(final(last(parameters).expr), init(tn));
 			} else if (size(parameters) > 0 && expr(Expr mn) := methodName) {
 				edges += flowEdge(final(last(parameters).expr), init(mn));
-			} else {
+			} else if (size(parameters) > 0) {
 				edges += flowEdge(final(last(parameters).expr), finalLabel);
 			}
 
@@ -1321,6 +1360,13 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		case var(expr(Expr varName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, varName);
 			edges += flowEdge(final(varName), finalLabel);
+		}
+		
+		case scriptFragment(list[Stmt] body) : {
+			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
+			< edges, lstate > = addBodyEdges(edges, lstate, body);
+			if (size(body) > 0)
+				edges += flowEdge(final(last(body)), finalLabel);
 		}
 	}
 

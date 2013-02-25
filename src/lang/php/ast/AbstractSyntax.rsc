@@ -64,6 +64,7 @@ public data Expr
 	| staticPropertyFetch(NameOrExpr className, NameOrExpr propertyName)
 	| scalar(Scalar scalarVal)
 	| var(NameOrExpr varName)	
+	| scriptFragment(list[Stmt] body)
 	;
 	
 public data Op = bitwiseAnd() | bitwiseOr() | bitwiseXor() | concat() | div() 
@@ -122,7 +123,8 @@ public data Stmt
 	| tryCatch(list[Stmt] body, list[Catch] catches)
 	| unset(list[Expr] unsetVars)
 	| use(list[Use] uses)
-	| \while(Expr cond, list[Stmt] body)	
+	| \while(Expr cond, list[Stmt] body)
+	| removedStmt()	// This is used in places during transformations, but should never persist
 	;
 
 public data Declaration = declaration(str key, Expr val);
