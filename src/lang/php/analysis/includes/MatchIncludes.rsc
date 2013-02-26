@@ -30,7 +30,10 @@ public anno set[loc] Expr@possibleIncludes;
 // This function just calls the next function on each script in the map. The bulk of
 // what happens is done in the function below.
 public map[loc fileloc, Script scr] matchIncludes(map[loc fileloc, Script scr] scripts) {
-	return ( l : matchIncludes(scripts<0>,scripts[l]) | l <- scripts );
+	println("MATCHING INCLUDE FILE PATTERNS");
+	scripts = ( l : matchIncludes(scripts<0>,scripts[l]) | l <- scripts );
+	println("MATCHING INCLUDE FILE PATTERNS FINISHED");
+	return scripts;	
 }
 
 // Attempt to resolve includes in the file by first building a pattern, based on the
@@ -85,6 +88,7 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 	// list of includable files.
 	list[Expr] varIncludes = fetchIncludeUsesVarPaths(scr);
 	map[Expr,Expr] replacementMap = ( );
+	map[Expr,set[loc]] possibleIncludes = ( );
 	
 	for (i:include(iexp,_) <- varIncludes) {
 		list[FNBits] bits = flattenExpr(iexp);
@@ -99,18 +103,28 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 		//println("Found <size(filteredIncludes)> possible includes");
 		if (size(filteredIncludes) == 1) {
 			replacementMap[i] = scalar(string(filteredIncludes[0].path))[@at=iexp@at];
-		} else {
+		//} else {
 			//println("Could not replace <pp(iexp)> at <iexp@at>, found <size(filteredIncludes)> hits with rexp <re>");
-			if (size(filteredIncludes) < 4) {
+			//if (size(filteredIncludes) < 4) {
 				//println("With bits: <bits>");
-				for (fi <- filteredIncludes)
-					println("\t<fi.path>");
-				}
-		}	
+				//for (fi <- filteredIncludes)
+				//	println("\t<fi.path>");
+				//}
+		} else if (size(filteredIncludes) > 1) {
+			possibleIncludes[i] = filteredIncludes;
+		}
 	}
 	
 	scr = visit(scr) {
-		case i:include(iexp,itype) => include(replacementMap[i],itype)[@at=i@at] when i in replacementMap
+		case i:include(iexp,itype) : {
+			if (i in replacementMap) {
+				insert(include(replacementMap[i],itype)[@at=i@at][@possibleIncludes={}]);
+			} else if (i in possibleIncludes) {
+				insert(i[@possibleIncludes=possibleIncludes[i]]);
+			} else {
+				insert(i[@possibleIncludes={}]);
+			}
+		}
 	}
 	return scr;
 }

@@ -42,8 +42,9 @@ public map[loc fileloc, Script scr] evalAllScalarsAndInline(map[loc fileloc, Scr
 		// Calculate the includes graph. We do this inside the solve since the information on
 		// reachable includes could change as we further resolve information.
 		println("REBUILDING INCLUDES GRAPH");
-		ig = collapseToLocGraph(extractIncludeGraph(scripts, baseLoc.path));
-		igTrans = ig*;
+		igraph = extractIncludeGraph(scripts, baseLoc.path);
+		//ig = collapseToNodeGraph(igraph);
+		igTrans = (collapseToNodeGraph(igraph))*;
 		println("REBUILDING INCLUDES GRAPH FINISHED");
 		
 		// Extract out the signatures. Again, we do this here because the information in the
@@ -61,7 +62,7 @@ public map[loc fileloc, Script scr] evalAllScalarsAndInline(map[loc fileloc, Scr
 
 		// Now, actually do the constant replacement for each script in the system.
 		println("INLINING SCALAR REACHABLE CONSTANTS");
-		scripts = ( l : evalConsts(scripts[l],constMap,igTrans[l],sigs) | l <- scripts );
+		scripts = ( l : evalConsts(scripts[l],constMap,igTrans[node4l],sigs) | l <- scripts, node4l := nodeForLoc(igraph, l) );
 		println("INLINING SCALAR REACHABLE CONSTANTS FINISHED");
 	}			
 
@@ -78,8 +79,9 @@ public map[loc fileloc, Script scr] evalAllScalarsAndInlineUniques(map[loc filel
 		// Calculate the includes graph. We do this inside the solve since the information on
 		// reachable includes could change as we further resolve information.
 		println("REBUILDING INCLUDES GRAPH");
-		ig = collapseToLocGraph(extractIncludeGraph(scripts, baseLoc.path));
-		igTrans = ig*;
+		igraph = extractIncludeGraph(scripts, baseLoc.path);
+		//ig = collapseToNodeGraph(igraph);
+		igTrans = (collapseToNodeGraph(igraph))*;
 		println("REBUILDING INCLUDES GRAPH FINISHED");
 		
 		// Extract out the signatures. Again, we do this here because the information in the
@@ -101,7 +103,7 @@ public map[loc fileloc, Script scr] evalAllScalarsAndInlineUniques(map[loc filel
 		
 		// Now, actually do the constant replacement for each script in the system.
 		println("INLINING SCALAR REACHABLE CONSTANTS PLUS UNIQUES");
-		scripts = ( l : evalConsts(scripts[l],constMap,igTrans[l],sigs) | l <- scripts );
+		scripts = ( l : evalConsts(scripts[l],constMap,igTrans[node4l],sigs) | l <- scripts, node4l := nodeForLoc(igraph, l) );
 		println("INLINING SCALAR REACHABLE CONSTANTS PLUS UNIQUES FINISHED");
 	}		
 

@@ -10,6 +10,7 @@ module lang::php::analysis::evaluators::DefinedConstants
 
 import lang::php::ast::AbstractSyntax;
 import lang::php::analysis::signatures::Signatures;
+import lang::php::analysis::includes::IncludeGraph;
 
 import Set;
 import List;
@@ -20,9 +21,25 @@ import IO;
 
 @doc{Evaluate any constants, replacing them with their assigned value in cases where 
 	 this assigned value is itself a literal.}
-public Script evalConsts(Script scr, map[str, Expr] constMap, set[loc] reachable, map[loc,Signature] sigs) {
+public Script evalConsts(Script scr, map[str, Expr] constMap, set[IncludeGraphNode] reachable, map[loc,Signature] sigs) {
+	// If we can reach an unknown (i.e., dynamic) include on our include path, this means
+	// we could pull in alternate definitions for the include. In this case, we just use
+	// the constMap, since that contains constants that we know are uniquely defined. 	
+	if (unknownNode() in reachable) {
+		println("A dynamic include is reachable from <head(scr.body)@at.path>, using unique constants");
+		scr = visit(scr) {
+			case c:fetchConst(name(s)) : {
+				if (s in constMap) { 
+					insert(constMap[s][@at=c@at]);
+				}
+			}
+		}
+		return scr;
+	}
+
 	// Restrict the signatures we look at to only those that are reachable, based on our current
 	// knowledge of the includes relation (which is what the reachable parameter is based on)
+	reachableLocs = { l | igNode(_,l) <- reachable };
 	reachableSigs = domainR(sigs, reachable);
 
 	// Get back all the constants, by name. Then, narrow this down -- only keep those where 
