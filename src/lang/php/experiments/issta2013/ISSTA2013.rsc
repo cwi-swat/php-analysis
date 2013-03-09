@@ -112,11 +112,12 @@ public str generateTable4() {
 	// As above, the following is quite expensive, so the result
 	// has been serialized. Just uncomment the following line, and
 	// comment out the line below it, to run the analysis from scratch.
-	//icl = includesAnalysis(getICSE2013Corpus());
+	//icl = includesAnalysis(getISSTA2013Corpus());
 	
 	icl = reload();
 	icr = calculateIncludeCounts(icl);
-	return generateIncludeCountsTable(icr);
+	icounts = includeCounts(getISSTA2013Corpus());
+	return generateIncludeCountsTable(icr, icounts);
 }
 
 public str generateTable5() {

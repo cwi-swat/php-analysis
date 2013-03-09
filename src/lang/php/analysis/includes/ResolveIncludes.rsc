@@ -28,17 +28,14 @@ public System resolveIncludes(System sys, loc baseLoc) {
 }
 
 public System resolveIncludesWithVars(System sys, loc baseLoc) {
+	sys = inlineMagicConstants(sys);
 	solve(sys) {
-		sys = inlineMagicConstants(sys);
-		sys = evalAllScalarsAndInlineUniques(sys, baseLoc);
-		sys = matchIncludes(sys);
-	}
-	
-	sys2 = evalStringVars(sys);
-	
-	if (sys != sys2)
-		return resolveIncludesWithVars(sys2, baseLoc);
-		
+		solve(sys) {
+			sys = matchIncludes(sys);
+			sys = evalAllScalarsAndInlineUniques(sys, baseLoc);
+		}
+		sys = evalStringVars(sys);
+	}	
 	return sys;
 }
 

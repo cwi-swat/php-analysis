@@ -12,6 +12,8 @@ data IncludeGraphNode = igNode(str fileName, loc fileLoc) | unknownNode();
 data IncludeGraphEdge = igEdge(IncludeGraphNode source, IncludeGraphNode target, Expr includeExpr);
 data IncludeGraph = igGraph(set[IncludeGraphNode] nodes, set[IncludeGraphEdge] edges);
 
+public anno set[loc] Expr@possibleIncludes;
+
 public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, str productRoot) {
 	int sizeToRemove = size(productRoot);
 	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- scripts );
@@ -28,7 +30,11 @@ public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, st
 					edgeSet += igEdge(nodeMap[l],unknownNode(),iexp);
 				}
 			} else {
-				edgeSet += igEdge(nodeMap[l],unknownNode(),iexp);
+				if ( (iexp@possibleIncludes)? && size(iexp@possibleIncludes) > 0 ) {
+					edgeSet += { igEdge(nodeMap[l],nodeMap[l2],iexp) | l2 <- iexp@possibleIncludes };
+				} else {
+					edgeSet += igEdge(nodeMap[l],unknownNode(),iexp);
+				}
 			}
 		}
 	}

@@ -11,11 +11,14 @@ import IO;
 import Set;
 import ValueIO;
 
-private loc testCorpus = |file:///Users/mhills/Projects/phpsa/includes/systems|;
+private loc testCorpus = |file:///export/scratch2/hills/includes/systems|;
 
 alias SysMap = map[str sysname, loc sysloc];
 public SysMap getIncludesSystems() = getIncludesSystems(testCorpus);
 public SysMap getIncludesSystems(loc base) = (l.file : l | l <- base.ls, isDirectory(l));
+
+public Corpus getIncludesSystemsCorpus() = getIncludesSystemsCorpus(getIncludesSystems());
+public Corpus getIncludesSystemsCorpus(SysMap smap) = ( s : "HEAD" | s <- smap );
 
 public void buildESECBinaries(SysMap smap) {
 	for (p <- smap) {

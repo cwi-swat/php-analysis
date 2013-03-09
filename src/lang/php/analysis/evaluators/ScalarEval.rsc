@@ -90,20 +90,31 @@ public map[loc fileloc, Script scr] evalAllScalarsAndInlineUniques(map[loc filel
 		println("EXTRACTING FILE SIGNATURES");
 		sigs = getSystemSignatures(scripts);		
 		println("EXTRACTING FILE SIGNATURES FINISHED");
-		
-		// Add in some predefined constants as well. These are from the Directories extension.
-		// TODO: We should factor these out somehow.
+
+		// Retrieve all defined constants and class constants		
+		allConsts = getAllDefinedConstants(scripts);
+
+		// Fill in the constant map. These are all constants that have a system-wide
+		// unique definition.
 		map[str, Expr] constMap = ( );
 		constMap["DIRECTORY_SEPARATOR"] = scalar(string("/"));
 		constMap["PATH_SEPARATOR"] = scalar(string(":"));
-		allConsts = getAllDefinedConstants(scripts);
 		constsRel = { < cn, ce > | constSig([global(),const(cn)],ce) <- allConsts<0> }; 
-		//classConstsRel = { < cn, con, ce > | constSig([class(cn),const(con)],ce) <- allConsts<0> }; 
-		constMap += ( cn : ce | cn <- constsRel<0>, size(constsRel[cn]) == 1, ce:scalar(sv) := getOneFrom(constsRel[cn]) );
+		constMap += ( cn : ce | cn <- constsRel<0>, size(constsRel[cn]) == 1, ce:scalar(sv) := getOneFrom(constsRel[cn]), encapsed(_) !:= sv );
+
+		// Fill in the class constant map. These are all constants that have a system-wide
+		// unique definition.
+		map[str, map[str, Expr]] classConstMap = ( );
+		classConstsRel = { < cn, con, ce > | constSig([class(cn),const(con)],ce) <- allConsts<0> };
+		for (cn <- classConstsRel<0>) {
+			constsForCn = classConstsRel[cn];
+			mapForCn = (con : ce | con <- constsForCn<0>, size(constsForCn[con]) == 1, ce:scalar(sv) := getOneFrom(constsForCn[con]), encapsed(_) != sv );
+			classConstMap[cn] = mapForCn; 
+		} 
 		
 		// Now, actually do the constant replacement for each script in the system.
 		println("INLINING SCALAR REACHABLE CONSTANTS PLUS UNIQUES");
-		scripts = ( l : evalConsts(scripts[l],constMap,igTrans[node4l],sigs) | l <- scripts, node4l := nodeForLoc(igraph, l) );
+		scripts = ( l : evalConsts(scripts[l],constMap,classConstMap,igTrans[node4l],sigs) | l <- scripts, node4l := nodeForLoc(igraph, l) );
 		println("INLINING SCALAR REACHABLE CONSTANTS PLUS UNIQUES FINISHED");
 	}		
 

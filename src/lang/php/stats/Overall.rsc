@@ -104,3 +104,44 @@ public str generateCorpusInfoTable() {
 
 }
 
+public str generateESECIncludesInfoTable(Corpus corpus) {
+	pSorted = sort(toList(corpus<0>), bool (str a, str b) { return toUpperCase(a) < toUpperCase(b); });
+	counts = loadCountsCSV();
+	
+	list[tuple[str p, str v, int sloc, int fc]] tableTuples = 
+		[ <p, v, sloc, fc> | p <- pSorted, v := corpus[p], <p,v,sloc,fc> <- counts ];
+
+	str headerLine() {
+		return "Product & File Count & SLOC  \\\\ \\midrule";
+	}
+	
+	str productLine(tuple[str p, str v, int sloc, int fc] ci) {
+		return "<ci.p> & \\numprint{<ci.fc>} & \\numprint{<ci.sloc>} \\\\";
+	}
+
+	totalSystems = size(corpus<0>);
+	totalSLOC = (0 | it + n | p <- corpus, v := corpus[p], <p,v,n,_> <- counts );
+	totalFiles = (0 | it + n | p <- corpus, v := corpus[p], <p,v,_,n> <- counts );
+	
+	res = "\\npaddmissingzero
+	      '\\npfourdigitsep
+		  '\\begin{table*}
+		  '\\centering
+		  '\\ra{1.2}
+		  '\\begin{tabular}{@{}lrr@{}} \\toprule
+		  '<headerLine()> <for (tt <- tableTuples) {>
+		  '  <productLine(tt)> <}>
+		  '\\bottomrule
+		  '\\end{tabular}
+		  '\\parbox{.75\\textwidth}{The File Count includes files with either a .php or an .inc extension, while SLOC includes source lines
+		  'from these files. In total, there are \\numprint{<totalSystems>}
+		  'systems consisting of \\numprint{<totalFiles>} files with \\numprint{<totalSLOC>} total lines of source.} 
+		  '\\caption{Github Systems in Extension.\\label{tbl:php-extension}}
+		  '\\end{table*}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
+		  '";
+
+	return res;
+
+}

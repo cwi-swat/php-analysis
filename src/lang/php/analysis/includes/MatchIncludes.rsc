@@ -25,8 +25,6 @@ import util::Math;
 
 data FNBits = lit(str s) | fnBit() | goUp() | dirSep();
 
-public anno set[loc] Expr@possibleIncludes;
-
 // This function just calls the next function on each script in the map. The bulk of
 // what happens is done in the function below.
 public map[loc fileloc, Script scr] matchIncludes(map[loc fileloc, Script scr] scripts) {
@@ -88,8 +86,10 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 	// list of includable files.
 	list[Expr] varIncludes = fetchIncludeUsesVarPaths(scr);
 	map[Expr,Expr] replacementMap = ( );
-	map[Expr,set[loc]] possibleIncludes = ( );
+	map[Expr,set[loc]] possibleIncludesMap = ( );
 	
+	// TODO: We should probably cut the prefix off of all the locations
+	// instead, so we only have to match the part after the install dir.
 	for (i:include(iexp,_) <- varIncludes) {
 		list[FNBits] bits = flattenExpr(iexp);
 		while([a*,fnBit(),fnBit(),b*] := bits) bits = [*a,fnBit(),*b];
@@ -99,10 +99,10 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 		list[str] reList = [ fnBits2Str(b) | b <- bits ];
 		str re = "^\\S*" + intercalate("",reList) + "$";
 		//println("Trying regular expression <re>");
-		filteredIncludes = [ l | l <- possibleIncludes, rexpMatch(l.path,re) ];
+		filteredIncludes = { l | l <- possibleIncludes, rexpMatch(l.path,re) };
 		//println("Found <size(filteredIncludes)> possible includes");
 		if (size(filteredIncludes) == 1) {
-			replacementMap[i] = scalar(string(filteredIncludes[0].path))[@at=iexp@at];
+			replacementMap[i] = scalar(string(getOneFrom(filteredIncludes).path))[@at=iexp@at];
 		//} else {
 			//println("Could not replace <pp(iexp)> at <iexp@at>, found <size(filteredIncludes)> hits with rexp <re>");
 			//if (size(filteredIncludes) < 4) {
@@ -111,7 +111,7 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 				//	println("\t<fi.path>");
 				//}
 		} else if (size(filteredIncludes) > 1) {
-			possibleIncludes[i] = filteredIncludes;
+			possibleIncludesMap[i] = filteredIncludes;
 		}
 	}
 	
@@ -119,8 +119,8 @@ public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
 		case i:include(iexp,itype) : {
 			if (i in replacementMap) {
 				insert(include(replacementMap[i],itype)[@at=i@at][@possibleIncludes={}]);
-			} else if (i in possibleIncludes) {
-				insert(i[@possibleIncludes=possibleIncludes[i]]);
+			} else if (i in possibleIncludesMap) {
+				insert(i[@possibleIncludes=possibleIncludesMap[i]]);
 			} else {
 				insert(i[@possibleIncludes={}]);
 			}

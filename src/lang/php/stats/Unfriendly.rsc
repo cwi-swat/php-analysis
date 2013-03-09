@@ -12,6 +12,7 @@ import lang::rascal::types::AbstractType;
 import lang::php::util::Config;
 import lang::php::analysis::signatures::Summaries;
 import lang::php::analysis::includes::ResolveIncludes;
+import lang::php::analysis::NamePaths;
 
 import List;
 import String;
@@ -25,11 +26,11 @@ import Node;
 import util::Math;
 
 import lang::csv::IO;
-import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
-import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
-import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
-import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
-import Versions = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
+import VVU; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
+import Exprs; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
+import Feats; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
+import Sizes; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
+import Versions; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -520,9 +521,10 @@ public ICLists includesAnalysisFromBinaries(Corpus corpus) {
 	for (product <- corpus) {
 		sys = loadBinary(product,corpus[product]);
 		initial = gatherIncludesWithVarPaths(sys);
+		sys = ( );
 		
-		sysResolved = loadBinaryWithIncludes(product,corpus[product]);
-		unresolved = gatherIncludesWithVarPaths(sysResolved);
+		sys = loadBinaryWithIncludes(product,corpus[product]);
+		unresolved = gatherIncludesWithVarPaths(sys);
 		
 		res[<product,corpus[product]>] = < initial, unresolved >;		
 	}
@@ -627,7 +629,47 @@ public str generateIncludeCountsTable(ICResult counts, map[tuple[str p, str v], 
 		  '  \\bottomrule
 		  '  \\end{tabular}
 		  '  \\normalsize
-		  '  \\caption{PHP Non-Literal Includes.\\label{table-includes}}
+		  '  \\caption{PHP Dynamic Includes.\\label{table-includes}}
+		  '\\end{table}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
+		  '";
+	return res;	
+}
+
+public str generateIncludeCountsTable(ICResult counts, map[tuple[str p, str v], int] totalIncludes, str caption, str texlabel) {
+	lv = ( p : v | <p,v> <- counts<0> );
+	ci = loadCountsCSV();
+		
+	str productLine(str p) {
+		v = lv[p];
+		< lineCount, fileCount > = getOneFrom(ci[p,v]);
+		giniC = counts[<p,v>].unresolved.gc;
+		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
+		percentToPrint = 0.00;
+		hasPercent = false;
+		if ((counts[<p,v>].initial.hc) > 0) {
+			percentToPrint = ((counts[<p,v>].initial.hc-counts[<p,v>].unresolved.hc) * 100.00) / (counts[<p,v>].initial.hc);
+			hasPercent = true;
+		}
+		return "<p> & \\numprint{<totalIncludes[<p,v>]>} & \\numprint{<counts[<p,v>].initial.hc>}  & \\numprint{<counts[<p,v>].initial.hc-counts[<p,v>].unresolved.hc>} & & \\numprint{<fileCount>} & \\numprint{<counts[<p,v>].unresolved.fc>} & & <hasPercent ? "\\nprounddigits{2} \\numprint{<percentToPrint>}" : "N/A"> & \\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround \\\\";
+	}
+		
+	res = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table}
+		  '  \\centering
+		  '  \\ra{1.2}
+		  '  \\scriptsize
+		  '  \\begin{tabular}{@{}lrrrcrrcrr@{}} \\toprule
+		  '  Product & \\multicolumn{3}{c}{Includes} & \\phantom{abc} & \\multicolumn{2}{c}{Files} & \\phantom{def} & \\% Resolved & Gini \\\\
+		  ' \\cmidrule{2-4} \\cmidrule{6-7} 
+		  '   & Total & Dynamic & Resolved & & Total & Unresolved & & & \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '    <productLine(p)> <}>
+		  '  \\bottomrule
+		  '  \\end{tabular}
+		  '  \\normalsize
+		  '  \\caption{<caption>\\label{<texlabel>}}
 		  '\\end{table}
 		  '\\npfourdigitnosep
 		  '\\npnoaddmissingzero
@@ -1489,10 +1531,21 @@ public void writeIncludeBinaries(Corpus corpus) {
 	for (product <- corpus) {
 		version = corpus[product];
 		pt = loadBinary(product,version);
-		pt2 = resolveIncludes(pt,getCorpusItem(product,corpus[product]));
+		pt = resolveIncludes(pt,getCorpusItem(product,corpus[product]));
 		parsedItem = parsedDir + "<product>-<version>-icp.pt";
 		println("Writing binary: <parsedItem>");
-		writeBinaryValueFile(parsedItem, pt2);
+		writeBinaryValueFile(parsedItem, pt);
+	}
+}
+
+public void writeIncludeBinariesExperimental(Corpus corpus) {
+	for (product <- corpus) {
+		version = corpus[product];
+		pt = loadBinary(product,version);
+		pt = resolveIncludesWithVars(pt,getCorpusItem(product,corpus[product]));
+		parsedItem = parsedDir + "<product>-<version>-icp-exp.pt";
+		println("Writing binary: <parsedItem>");
+		writeBinaryValueFile(parsedItem, pt);
 	}
 }
 
@@ -1637,7 +1690,7 @@ public map[str,set[str]] calculateTransIncludes(Corpus corpus, set[loc] locset)
 	return transitiveFiles;
 } 
 
-public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses) {
+public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses, map[str,set[str]] transEvals, map[str,set[str]] transFuses) {
 	ci = loadCountsCSV();
 	fuses = createFunctionUses(fuses);
 	
@@ -1655,7 +1708,7 @@ public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses) {
 		}
 		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
 		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
-		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} && \\numprint{<size(evalUses[p,v])>}/\\numprint{<size(fuses[p,v])>}  & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
+		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} & \\numprint{<size(transEvals[p])+size(transFuses[p])>} && \\numprint{<size(evalUses[p,v])>}/\\numprint{<size(fuses[p,v])>}  & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
 	}
 		
 	tbl = "\\npaddmissingzero
@@ -1664,10 +1717,10 @@ public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses) {
 		  '  \\centering
 		  '  \\ra{1.1}
 		  '\\scriptsize
-		  '  \\begin{tabular}{@{}lrrcrr@{}} \\toprule
-		  '  Product & \\multicolumn{2}{c}{Files} & \\phantom{a} & Total Uses & Gini \\\\
-		  '  \\cmidrule{2-3} 
-		  '          & Total & w/eval logic & & & \\\\ \\midrule<for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '  \\begin{tabular}{@{}lrrrcrr@{}} \\toprule
+		  '  Product & \\multicolumn{3}{c}{Files} & \\phantom{a} & Total Uses & Gini \\\\
+		  '  \\cmidrule{2-4} 
+		  '          & Total & EV & WI & & & \\\\ \\midrule<for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '    <productLine(p)> <}>
 		  '  \\bottomrule
 		  '  \\end{tabular}
@@ -1770,7 +1823,7 @@ public FunctionUses createFunctionUses(FunctionUses functionUses) =
 	filterFunctionUses(functionUses, "create_function");
 
 public FunctionUses invokeFunctionUses(FunctionUses functionUses) =
-	filterFunctionUses(functionUses, { "call_user_func", "call_user_func_array" });
+	filterFunctionUses(functionUses, { "call_user_func", "call_user_func_array", "call_user_method", "call_user_method_array" });
 
 public FunctionUses varargsFunctionUses(FunctionUses functionUses) =
 	filterFunctionUses(functionUses, { "func_get_args", "func_num_args", "func_get_arg" });
@@ -1799,6 +1852,10 @@ public set[Def] varargsFunctionsAndMethods(System sys) {
 	return res;
 }
 
+public rel[str p, str v, Def d] varargsFunctionsAndMethods(Corpus corpus) {
+	return { < p, v, d > | p <- corpus, v := corpus[p], d <- varargsFunctionsAndMethods(loadBinary(p,v)) };
+}
+
 public rel[loc,Expr,bool] varargsCalls(System sys) {
 	// Get the varargs functions and methods in the current system
 	defs = varargsFunctionsAndMethods(sys);
@@ -1812,7 +1869,7 @@ public rel[loc,Expr,bool] varargsCalls(System sys) {
 	// Build maps from the function names to their definitions
 	functionDefs = ( fn : d | d:functionDef(fn,_,_) <- defs );
 	systemFunctionNames = functionDefs<0>;
-	functionNames = systemFunctionNames + { fn | functionSummary(fn,_,_,_,_,_) <- functionSummaries };
+	functionNames = systemFunctionNames + { fn | functionSummary([library(_),function(fn)],_,_,_,_,_) <- functionSummaries };
 	
 	// Also do the same with methods -- here we collapse these into a
 	// relation for method names (since we could have multiple methods
@@ -1821,7 +1878,7 @@ public rel[loc,Expr,bool] varargsCalls(System sys) {
 	methodDefs = ( cn : ( mn : d | d:methodDef(cn,mn,_,_) <- defs ) | cn <- { cn | methodDef(cn,_,_,_) <- defs } );
 	flatMethodDefs = { < mn , d > | d:methodDef(_,mn,_,_) <- defs };
 	systemMethods = flatMethodDefs<0>;
-	methodNames = systemMethods + { mn | methodSummary(mn,_,_,_,_,_,_) <- methodSummaries };
+	methodNames = systemMethods + { mn | methodSummary([library(_),class(_),method(mn)],_,_,_,_,_,_) <- methodSummaries };
 	
 	// Now, find calls to the varargs functions and methods. We can have standard
 	// function calls, standard method calls, and calls to static methods.
@@ -1909,3 +1966,117 @@ public rel[str product, str path] classAndInterfaceFiles(Corpus corpus) {
 	}
 	return res;
 }
+
+public str showVarArgsUses(Corpus corpus, rel[str p, str v, Def d] vaDefs, rel[str,str,loc,Expr,bool] vaCalls, rel[str,str,loc,Expr] allCalls, map[str,set[str]] vatrans) {
+	ci = loadCountsCSV();
+	
+	str productLine(str p) {
+		v = corpus[p];
+		< lineCount, fileCount > = getOneFrom(ci[p,v]);
+		
+		hits = ( );
+		for (<l,e,b> <- vaCalls[p,v]) {
+			hitloc = l.path;
+			if (hitloc in hits)
+				hits[hitloc] += 1;
+			else
+				hits[hitloc] = 1;
+		}
+		
+		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
+		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
+		
+		sysDefs = size(vaDefs[p,v]);
+		sysVACalls = size(vaCalls[p,v]);
+		sysLibCalls = sysVACalls - size({ <l,e> | <l,e,true> <- vaCalls[p,v] });
+		sysAllCalls = size(allCalls[p,v]);
+		
+		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} & \\numprint{<size(vatrans[p])>} && \\numprint{<sysDefs>} & \\numprint{<sysVACalls>} & \\numprint{<sysLibCalls>} & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
+	}
+		
+	tbl = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table}
+		  '  \\centering
+		  '  \\ra{1.1}
+		  '\\resizebox{\\columnwidth}{!}{%
+		  '  \\begin{tabular}{@{}lrrrcrrrrr@{}} \\toprule
+		  '  Product & \\multicolumn{3}{c}{Files} & \\phantom{a} & VDefs & VCalls & LCalls & Gini \\\\
+		  '  \\cmidrule{2-4} 
+		  '          & Total & VA & WI & & & & & \\\\ \\midrule<for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '    <productLine(p)> <}>
+		  '  \\bottomrule
+		  '  \\end{tabular}
+		  '}
+		  '  \\caption{Usage of Variadic Functions.\\label{table-variadic}}
+		  '\\end{table}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
+		  '";
+	return tbl;		
+}
+
+public str invokeFunctionUsesCounts(Corpus corpus, FunctionUses functionUses, map[str,set[str]] transInvokes) {
+	ci = loadCountsCSV();
+	
+	str productLine(str p) {
+		v = corpus[p];
+		< lineCount, fileCount > = getOneFrom(ci[p,v]);
+		usesForProduct = size(functionUses[p,v]);
+		hits = ( );
+		for (<l,e> <- functionUses[p,v]) {
+			hitloc = l.path;
+			if (hitloc in hits)
+				hits[hitloc] += 1;
+			else
+				hits[hitloc] = 1;
+		}
+		
+		callUserFunctionCount = size({ fn | fn:<p,v,l,call(name(name("call_user_func")),_)> <- functionUses });
+		callUserFunctionArrayCount = size({ fn | fn:<p,v,l,call(name(name("call_user_func_array")),_)> <- functionUses });
+		callUserMethodCount = size({ fn | fn:<p,v,l,call(name(name("call_user_method")),_)> <- functionUses });
+		callUserMethodArrayCount = size({ fn | fn:<p,v,l,call(name(name("call_user_method_array")),_)> <- functionUses });
+		
+		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
+		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
+		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} & \\numprint{<size(transInvokes[p])>} && \\numprint{<callUserFunctionCount>} & \\numprint{<callUserFunctionArrayCount>} & \\numprint{<callUserMethodCount>} & \\numprint{<callUserMethodArrayCount>} & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
+	}
+		
+	tbl = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table}
+		  '  \\centering
+		  '  \\ra{1.1}
+		  '\\resizebox{\\columnwidth}{!}{%
+		  '  \\begin{tabular}{@{}lrrrcrrrrr@{}} \\toprule
+		  '  Product & \\multicolumn{3}{c}{Files} & \\phantom{a} & CUF & CUFA & CUM & CUMA & Gini \\\\
+		  '  \\cmidrule{2-4} 
+		  '          & Total & Inv & Inc & & & & & & \\\\ \\midrule<for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '    <productLine(p)> <}>
+		  '  \\bottomrule
+		  '  \\end{tabular}
+		  '}
+		  '  \\caption{Usage of Invocation Functions.\\label{table-invokers}}
+		  '\\end{table}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
+		  '";
+	return tbl;		
+}
+
+public map[str,set[str]] calculateVACallsTransIncludes(Corpus corpus, rel[str,str,loc,Expr,bool] vaCalls)
+{
+	map[str,set[str]] transitiveFiles = ( );
+	
+	for (product <- corpus) {
+		version = corpus[product];
+		pt = loadBinaryWithIncludes(product,version);
+		corpusItemLoc = getCorpusItem(product,version);
+		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
+		vaLocs = { l | l <- vaCalls[product, version]<0>  };
+		transFiles = calculateFeatureTrans(ig, vaLocs, corpusItemLoc.path);
+		transitiveFiles[product] = transFiles;
+	}
+	
+	return transitiveFiles;
+} 

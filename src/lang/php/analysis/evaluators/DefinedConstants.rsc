@@ -21,7 +21,7 @@ import IO;
 
 @doc{Evaluate any constants, replacing them with their assigned value in cases where 
 	 this assigned value is itself a literal.}
-public Script evalConsts(Script scr, map[str, Expr] constMap, set[IncludeGraphNode] reachable, map[loc,Signature] sigs) {
+public Script evalConsts(Script scr, map[str, Expr] constMap, map[str, map[str, Expr]] classConstMap, set[IncludeGraphNode] reachable, map[loc,Signature] sigs) {
 	// If we can reach an unknown (i.e., dynamic) include on our include path, this means
 	// we could pull in alternate definitions for the include. In this case, we just use
 	// the constMap, since that contains constants that we know are uniquely defined. 	
@@ -31,6 +31,12 @@ public Script evalConsts(Script scr, map[str, Expr] constMap, set[IncludeGraphNo
 			case c:fetchConst(name(s)) : {
 				if (s in constMap) { 
 					insert(constMap[s][@at=c@at]);
+				}
+			}
+
+			case c:fetchClassConst(name(name(cln)), cn) : {
+				if (cln in classConstMap && cn in classConstMap[cln]) {
+					insert(classConstMap[cln][cn][@at=c@at]);
 				}
 			}
 		}
@@ -46,27 +52,27 @@ public Script evalConsts(Script scr, map[str, Expr] constMap, set[IncludeGraphNo
 	// 1) only one constant of that name is found, and
 	// 2) the definition of the constant is a constant (scalar) value.
 	rel[str,Expr] constsRel = { <cn,ce> | l <- reachableSigs, fileSignature(_,items) := reachableSigs[l], constSig([global(),const(cn)],ce) <- items };
-	map[str,Expr] constsInScript = ( cn : ce | cn <- constsRel<0>, size(constsRel[cn]) == 1, ce:scalar(sv) := getOneFrom(constsRel[cn]) );
+	map[str,Expr] constsInScript = ( cn : ce | cn <- constsRel<0>, size(constsRel[cn]) == 1, ce:scalar(sv) := getOneFrom(constsRel[cn]), encapsed(_) !:= sv );
 
 	// Do the same as the above, but for class constants, not standard constants.
 	rel[str,str,Expr] classConstsRel = { <cln,cn,ce> | l <- reachableSigs, fileSignature(_,items) := reachableSigs[l], classConstSig([class(cln),const(cn)],ce) <- items };
-	map[str,map[str,Expr]] classConstsInScript = ( cln : ( cn : ce | cn <- classConstsRel[cln]<0>, size(classConstsRel[cln,cn]) == 1, ce:scalar(sv) := getOneFrom(classConstsRel[cln,cn]) ) | cln <- classConstsRel<0> );
+	map[str,map[str,Expr]] classConstsInScript = ( cln : ( cn : ce | cn <- classConstsRel[cln]<0>, size(classConstsRel[cln,cn]) == 1, ce:scalar(sv) := getOneFrom(classConstsRel[cln,cn]) ) | cln <- classConstsRel<0>, encapsed(_) !:= sv);
 
 	// Replace constants and class constants with their defining values where possible
 	scr = visit(scr) {
 		case c:fetchClassConst(name(name(cln)), cn) : {
-			if (cln in classConstsInScript && cn in classConstsInScript[cln]) {
+			if (cln in classConstMap && cn in classConstMap[cln]) {
+				insert(classConstMap[cln][cn][@at=c@at]);
+			} else if (cln in classConstsInScript && cn in classConstsInScript[cln]) {
 				insert(classConstsInScript[cln][cn][@at=c@at]);
 			}
 		}
 		
 		case c:fetchConst(name(s)) : {
-			if (s in constsInScript) {
-				//println("Found matching const <s>");
-				insert(constsInScript[s][@at=c@at]);
-			} else if (s in constMap) { 
-				//println("Found matching const <s>");
+			if (s in constMap) {
 				insert(constMap[s][@at=c@at]);
+			} else if (s in constsInScript) {
+				insert(constsInScript[s][@at=c@at]);
 			}
 		}
 	}
