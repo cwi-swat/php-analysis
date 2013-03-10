@@ -19,8 +19,8 @@ import lang::php::util::Utils;
 import lang::php::stats::Stats;
 
 public System resolveIncludes(System sys, loc baseLoc) {
+	sys = inlineMagicConstants(sys);
 	solve(sys) {
-		sys = inlineMagicConstants(sys);
 		sys = evalAllScalarsAndInlineUniques(sys, baseLoc);
 		sys = matchIncludes(sys);
 	}
