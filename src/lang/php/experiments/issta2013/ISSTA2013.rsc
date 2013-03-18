@@ -46,7 +46,7 @@ private Corpus issta13Corpus = (
 public Corpus getISSTA2013Corpus() = issta13Corpus;
 
 public str generateTable1() {
-	return generateCorpusInfoTable();
+	return generateCorpusInfoTable(getISSTA2013Corpus());
 }
 
 public str generateFigure1() {
@@ -95,7 +95,7 @@ public str generateFigure3() {
 	// and comment out the line after to recompute it.	
 	//coverageMap = featuresForAllPercents(fmap, fl);
 	coverageMap = loadCoverageMap();
-	
+
 	return coverageGraph(coverageMap);
 }
 
@@ -104,8 +104,8 @@ public str generateTable3() {
 	// see above for code that will calculate them from scratch.
 	fl = loadFeatureLattice();
 	coverageMap = loadCoverageMap();
-	ncm = notCoveredBySystem(fl, coverageMap);
-	return coverageComparison(ncm);
+	ncm = notCoveredBySystem(getISSTA2013Corpus(), fl, coverageMap);
+	return coverageComparison(getISSTA2013Corpus(),ncm);
 }
 
 public str generateTable4() {

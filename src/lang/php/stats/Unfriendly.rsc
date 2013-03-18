@@ -62,14 +62,12 @@ public QueryResults getVVUses(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherVarVarUses(ptmap)];
 }
 
-public rel[str p, str v, QueryResult qr] getVVUses() {
-	lv = getLatestVersions();
-	return { < p, lv[p], u > | p <- getProducts(), u <- getVVUses(p,lv[p]) };
+public rel[str p, str v, QueryResult qr] getVVUses(Corpus corpus) {
+	return { < p, corpus[p], u > | p <- getProducts(), u <- getVVUses(p,corpus[p]) };
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVUsesAsList() {
-	lv = getLatestVersions();
-	return [ < p, lv[p], u > | p <- getProducts(), u <- getVVUses(p,lv[p]) ];
+public list[tuple[str p, str v, QueryResult qr]] getVVUsesAsList(Corpus corpus) {
+	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVUses(p,corpus[p]) ];
 }
 
 public QueryResults getVVNews(str product, str version) {
@@ -77,9 +75,8 @@ public QueryResults getVVNews(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherVVNews(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVNewsAsList() {
-	lv = getLatestVersions();
-	return [ < p, lv[p], u > | p <- getProducts(), u <- getVVNews(p,lv[p]) ];
+public list[tuple[str p, str v, QueryResult qr]] getVVNewsAsList(Corpus corpus) {
+	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVNews(p,corpus[p]) ];
 }
 
 public QueryResults getVVCalls(str product, str version) {
@@ -87,9 +84,8 @@ public QueryResults getVVCalls(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherVVCalls(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVCallsAsList() {
-	lv = getLatestVersions();
-	return [ < p, lv[p], u > | p <- getProducts(), u <- getVVCalls(p,lv[p]) ];
+public list[tuple[str p, str v, QueryResult qr]] getVVCallsAsList(Corpus corpus) {
+	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVCalls(p,corpus[p]) ];
 }
 
 public QueryResults getVVMethodCalls(str product, str version) {
@@ -97,9 +93,8 @@ public QueryResults getVVMethodCalls(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherMethodVVCalls(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVMethodCallsAsList() {
-	lv = getLatestVersions();
-	return [ < p, lv[p], u > | p <- getProducts(), u <- getVVMethodCalls(p,lv[p]) ];
+public list[tuple[str p, str v, QueryResult qr]] getVVMethodCallsAsList(Corpus corpus) {
+	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVMethodCalls(p,corpus[p]) ];
 }
 
 public QueryResults getVVPropertyRefs(str product, str version) {
@@ -107,9 +102,8 @@ public QueryResults getVVPropertyRefs(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVPropertyRefsAsList() {
-	lv = getLatestVersions();
-	return [ < p, lv[p], u > | p <- getProducts(), u <- getVVPropertyRefs(p,lv[p]) ];
+public list[tuple[str p, str v, QueryResult qr]] getVVPropertyRefsAsList(Corpus corpus) {
+	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVPropertyRefs(p,corpus[p]) ];
 }
 
 public QueryResults getVVClassConsts(str product, str version) {
@@ -117,9 +111,8 @@ public QueryResults getVVClassConsts(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherVVClassConsts(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVClassConstsAsList() {
-	lv = getLatestVersions();
-	return [ < p, lv[p], u > | p <- getProducts(), u <- getVVClassConsts(p,lv[p]) ];
+public list[tuple[str p, str v, QueryResult qr]] getVVClassConstsAsList(Corpus corpus) {
+	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVClassConsts(p,corpus[p]) ];
 }
 
 public QueryResults getVVStaticCalls(str product, str version) {
@@ -127,9 +120,8 @@ public QueryResults getVVStaticCalls(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherStaticVVCalls(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVStaticCallsAsList() {
-	lv = getLatestVersions();
-	return [ < p, lv[p], u > | p <- getProducts(), u <- getVVStaticCalls(p,lv[p]) ];
+public list[tuple[str p, str v, QueryResult qr]] getVVStaticCallsAsList(Corpus corpus) {
+	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVStaticCalls(p,corpus[p]) ];
 }
 
 public QueryResults getVVStaticCallTargets(str product, str version) {
@@ -137,9 +129,8 @@ public QueryResults getVVStaticCallTargets(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherStaticVVTargets(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVStaticCallTargetsAsList() {
-	lv = getLatestVersions();
-	return [ < p, lv[p], u > | p <- getProducts(), u <- getVVStaticCallTargets(p,lv[p]) ];
+public list[tuple[str p, str v, QueryResult qr]] getVVStaticCallTargetsAsList(Corpus corpus) {
+	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVStaticCallTargets(p,corpus[p]) ];
 }
 
 public QueryResults getVVStaticPropNames(str product, str version) {
@@ -147,9 +138,8 @@ public QueryResults getVVStaticPropNames(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVStaticPropNamesAsList() {
-	lv = getLatestVersions();
-	return [ < p, lv[p], u > | p <- getProducts(), u <- getVVStaticPropNames(p,lv[p]) ];
+public list[tuple[str p, str v, QueryResult qr]] getVVStaticPropNamesAsList(Corpus corpus) {
+	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVStaticPropNames(p,corpus[p]) ];
 }
 
 public QueryResults getVVStaticPropTargets(str product, str version) {
@@ -157,9 +147,8 @@ public QueryResults getVVStaticPropTargets(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVStaticPropTargetsAsList() {
-	lv = getLatestVersions();
-	return [ < p, lv[p], u > | p <- getProducts(), u <- getVVStaticPropTargets(p,lv[p]) ];
+public list[tuple[str p, str v, QueryResult qr]] getVVStaticPropTargetsAsList(Corpus corpus) {
+	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVStaticPropTargets(p,corpus[p]) ];
 }
 
 public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses, 
@@ -171,7 +160,7 @@ public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses,
 			 list[tuple[str p, str v, QueryResult qr]] vvscalls,
 			 list[tuple[str p, str v, QueryResult qr]] vvstargets,
 			 list[tuple[str p, str v, QueryResult qr]] vvsprops,
-			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] getAllVV() 
+			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] getAllVV(Corpus corpus) 
 {
 	list[tuple[str p, str v, QueryResult qr]] vvuses = [ ]; 
 	list[tuple[str p, str v, QueryResult qr]] vvcalls = [ ];
@@ -184,20 +173,19 @@ public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses,
 	list[tuple[str p, str v, QueryResult qr]] vvsprops = [ ];
 	list[tuple[str p, str v, QueryResult qr]] vvsptargets = [ ];
 	
-	lv = getLatestVersions();
-	for (product <- lv) {
-		ptmap = loadBinary(product,lv[product]);
+	for (product <- corpus) {
+		ptmap = loadBinary(product,corpus[product]);
 
-		vvuses += [< product, lv[product], exprResult(e@at,e) > | <_,e> <-  gatherVarVarUses(ptmap)];
-		vvcalls += [< product, lv[product], exprResult(e@at,e) > | <_,e> <-  gatherVVCalls(ptmap)];
-		vvmcalls += [< product, lv[product], exprResult(e@at,e) > | <_,e> <-  gatherMethodVVCalls(ptmap)];
-		vvnews += [< product, lv[product], exprResult(e@at,e) > | <_,e> <-  gatherVVNews(ptmap)];
-		vvprops += [< product, lv[product], exprResult(e@at,e) > | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
-		vvcconsts += [< product, lv[product], exprResult(e@at,e) > | <_,e> <-  gatherVVClassConsts(ptmap)];
-		vvscalls += [< product, lv[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticVVCalls(ptmap)];
-		vvstargets += [< product, lv[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticVVTargets(ptmap)];
-		vvsprops += [< product, lv[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
-		vvsptargets += [< product, lv[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
+		vvuses += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherVarVarUses(ptmap)];
+		vvcalls += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherVVCalls(ptmap)];
+		vvmcalls += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherMethodVVCalls(ptmap)];
+		vvnews += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherVVNews(ptmap)];
+		vvprops += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
+		vvcconsts += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherVVClassConsts(ptmap)];
+		vvscalls += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticVVCalls(ptmap)];
+		vvstargets += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticVVTargets(ptmap)];
+		vvsprops += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
+		vvsptargets += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
 	}
 	
 	return < vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets >;
@@ -248,33 +236,31 @@ public void writeOrderedRel(rel[str p, str v, QueryResult qr] res, loc writeLoc)
 	writeFile(writeLoc,toWrite);
 }
 
-public map[str,tuple[int totalCount, int derivableCount]] varVarUsesInfo() {
+public map[str,tuple[int totalCount, int derivableCount]] varVarUsesInfo(Corpus corpus) {
 	vvu = varVarUses();
-	lv = getLatestVersions();
-	map[str,int] derivableCount = ( p : 0 | p <- lv<0> );
-	map[str,int] totalCount = ( p : 0 | p <- lv<0> );
+	map[str,int] derivableCount = ( p : 0 | p <- corpus<0> );
+	map[str,int] totalCount = ( p : 0 | p <- corpus<0> );
 	for (i <- vvu) {
 		if (i.DerivableNames == "Y")
 			derivableCount[i.Product] += 1;
 		totalCount[i.Product] += 1;
 	}
-	return ( p : < totalCount[p], derivableCount[p] > | p <- lv<0> );
+	return ( p : < totalCount[p], derivableCount[p] > | p <- corpus<0> );
 }
 
-public void showUsageCounts(list[tuple[str p, str v, QueryResult qr]] res) {
-	mr = ( p : size([ e | <p,_,e> <- res ]) | p <- getLatestVersions()<0> );
+public void showUsageCounts(Corpus corpus, list[tuple[str p, str v, QueryResult qr]] res) {
+	mr = ( p : size([ e | <p,_,e> <- res ]) | p <- corpus );
 	for (p <- sort([p | str p <- mr<0>])) println("<p>:<mr[p]>");
 }
 
-public void showFileInfo(list[tuple[str p, str v, QueryResult qr]] res) {
-	lv = getLatestVersions();
+public void showFileInfo(Corpus corpus, list[tuple[str p, str v, QueryResult qr]] res) {
 	ci = loadCountsCSV();
 	pr = { < p, v, qr.l.path > | <p, v, qr > <- res };
-	pc = ( p : size([qr|<p,_,qr><-res])  | p <- lv<0> );
+	pc = ( p : size([qr|<p,_,qr><-res])  | p <- corpus );
 	println("product,# of files,# of hits,# of files with hits,% of files with hits,average number per file with hit");
-	for (p <- sort(toList(lv<0>))) {
-		< lineCount, fileCount > = getOneFrom(ci[p,lv[p]]);
-		featureFileCount = size(pr[p,lv[p]]);
+	for (p <- sort(toList(corpus))) {
+		< lineCount, fileCount > = getOneFrom(ci[p,corpus[p]]);
+		featureFileCount = size(pr[p,corpus[p]]);
 		println("<p>: <fileCount>, <pc[p]>, <featureFileCount>, < toInt((featureFileCount*1.0)/fileCount*100000)/1000.0 >, < (featureFileCount == 0) ? 0 : (toInt((pc[p]*1.0)/featureFileCount*1000)/1000.0) >");
 	}
 }
@@ -888,7 +874,7 @@ public str squigly3(rel[str, int] counts, str label) {
     return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
   }
   else {
-    return "\\addplot+ [mark=<substring(label, 0, 1)>] coordinates { <for (ev <- [5,10..100] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<label>} \\label{<label>}
+    return "\\addplot+ [mark=<substring(label, 0, 1)>] coordinates { <for (ev <- [5,10..105] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<label>} \\label{<label>}
            ";
   }
 }
@@ -902,19 +888,18 @@ public str labeledSquigly(rel[str, int] counts, str label) {
          ";
 }
 
-public void featureCountsPerFile() {
-	map[str p, str v] lv = getLatestVersions();
+public void featureCountsPerFile(Corpus corpus) {
 	list[str] keyOrder = stmtKeyOrder() + exprKeyOrder() + classItemKeyOrder();
 	str fileHeader = "product,version,file,<intercalate(",",["\\<rascalFriendlyKey(i)>" | i <- keyOrder ])>\n";
 	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv|, fileHeader);
 	
-	for (product <- lv) {
-		productAst = loadBinary(product,lv[product]);
+	for (product <- corpus) {
+		productAst = loadBinary(product,corpus[product]);
 		map[str file, map[str feature, int count] counts] counts = stmtAndExprCountsByFile(productAst);
 		list[str] featureFile = [ ];
 		for (file <- counts) {
 			list[int] infoCounts = [ (f in counts[file]) ? counts[file][f] : 0 | f <- keyOrder ];
-			featureFile += "<product>,<lv[product]>,<file>,<intercalate(",",infoCounts)>";
+			featureFile += "<product>,<corpus[product]>,<file>,<intercalate(",",infoCounts)>";
 		}
 		appendToFile(|project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv|, intercalate("\n",featureFile) + "\n");	
 	}
@@ -960,8 +945,8 @@ public str groupsTable(set[str] notIn80, set[str] notIn90, set[str] notIn100) {
   str formatLabel(str orig, str l) {
     rval = l;
   	if (orig in notIn100) rval = "\\textbf{<rval>}";
-  	if (orig in notIn90) rval = "\\textit{<rval>}";
-  	if (orig in notIn80) rval = "\\underline{<rval>}";
+  	else if (orig in notIn90) rval = "\\textit{<rval>}";
+  	else if (orig in notIn80) rval = "\\underline{<rval>}";
   	return rval;
   }
   
@@ -969,10 +954,9 @@ public str groupsTable(set[str] notIn80, set[str] notIn90, set[str] notIn100) {
          '\\begin{tabularx}{\\columnwidth}{lX}
          '<for (g <- sort([*gg<0>])) {>\\textbf{<g>} & <intercalate(", ", [formatLabel(n,sn) | <n,sn> <- sort([<n,shortLabel(n)> | n <- gg[g]], bool(tuple[str s1,str s2] v1, tuple[str s1, str s2] v2) { return v1.s2 < v2.s2; })])> \\\\
          '<}> & \\\\ \\end{tabularx}
-         '\\parbox{\\columnwidth}{Features in \\textbf{bold} are not used in the corpus. Features in \\textit{italics} and \\underline{underlined}
-		 'are not needed to achieve 90\\% and 80\\% coverage of the corpus,respectively.}
+         '\\parbox{\\columnwidth}{Features in \\textbf{bold} are not used in the corpus. Features in \\textit{italics} are not used in 90\\% of the corpus files. Features that are \\underline{underlined} are not used in 80\\% of the corpus files.}
          '\\ \\vspace{1ex}
-         '\\caption{Logical groups of PHP features used to aggregrate usage data.\\label{Table:FeatureGroups}}
+         '\\caption{Logical Groups of PHP Features.\\label{Table:FeatureGroups}}
          '\\end{table}";
 }
 
@@ -1037,23 +1021,23 @@ public str fileSizesHistogram(getLinesType ls) {
   cds = cumulative(ds);
   
   return "\\begin{figure}
-         '\\subfloat[Linear scale]{
+         '\\subfloat{
          '\\begin{tikzpicture}
-         '\\begin{axis}[ylabel={Frequency},xlabel={LOC},grid=both, height=.5\\columnwidth,width=.45\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
+         '\\begin{axis}[ylabel={Frequency},xlabel={LOC},grid=both, height=.5\\columnwidth,width=.45\\columnwidth,xmin=1,axis x line=bottom, axis y line=left,cycle list name=black white]
          '\\addplot [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
          '\\end{axis}
          '\\end{tikzpicture}
          '}
          '\\hfill
-         '\\subfloat[Log scale]{
+         '\\subfloat{
          '\\begin{tikzpicture}
-         '\\begin{loglogaxis}[xlabel={LOC \\& cumulative LOC},grid=both, height=.5\\columnwidth,width=.45\\columnwidth,xmin=1,axis x line=bottom, axis y line=left]
+         '\\begin{loglogaxis}[xlabel={LOC \\& cumulative LOC},grid=both, height=.5\\columnwidth,width=.45\\columnwidth,xmin=1,axis x line=bottom, axis y line=left,cycle list={{black!30,mark=x},{black!80,mark=o}}]
          '\\addplot+ [only marks] coordinates {<for(x <- ds) {>(<x>,<ds[x]>) <}>};
          '\\addplot+ [only marks] coordinates {<for(x <- cds) {>(<x>,<cds[x]>) <}>};
          '\\end{loglogaxis}
          '\\end{tikzpicture}
          '}
-         '\\caption{PHP file sizes histogram\\label{Figure:FileSizeHistogram}}
+         '\\caption{PHP File Sizes, Linear and Log Scales.\\label{Figure:FileSizeHistogram}}
          '\\end{figure}
          ";
 }
@@ -1107,7 +1091,7 @@ public FeatureLattice buildFeatureLattice(map[int,set[FeatureNode]] nodesBySize,
 		for (n <- nodesBySize[i]) {
 			set[FeatureNode] children = { };
 			set[FeatureNode] covered = { };
-			for (ci <- reverse([0..i-1]), ci in possibleIndices) {
+			for (ci <- reverse([0..i]), ci in possibleIndices) {
 				set[FeatureNode] newChildren = { cn | cn <- nodesBySize[ci], cn notin covered, cn.features < n.features }; // , isEmpty(coveredBy[cn] & children) };
 				covered = covered + { *covers[cn] | cn <- newChildren };
 				children = children + newChildren; 
@@ -1121,7 +1105,7 @@ public FeatureLattice buildFeatureLattice(map[int,set[FeatureNode]] nodesBySize,
 		println("Added <size(nodesBySize[i])> nodes");
 		
 		//println("Synthesizing missing nodes for layer <i>");
-		//allChildren = { *(nodesBySize[j]) | j <- [0..i-1] };
+		//allChildren = { *(nodesBySize[j]) | j <- [0..i] };
 		//directChildren = nodesBySize[i-1];
 		//possibleNodes = { *(dc.features) | dc <- directChildren };
 		//addedCounter = 0;
@@ -1136,7 +1120,7 @@ public FeatureLattice buildFeatureLattice(map[int,set[FeatureNode]] nodesBySize,
 		//	// As with the above, insert it into the lattice and set up the covering relation properly
 		//	set[FeatureNode] children = { };
 		//	set[FeatureNode] covered = { };
-		//	for (ci <- reverse([0..i-1]), ci in possibleIndices) {
+		//	for (ci <- reverse([0..i]), ci in possibleIndices) {
 		//		set[FeatureNode] newChildren = { cn | cn <- nodesBySize[ci], cn notin covered, cn.features < synthNode.features }; // , isEmpty(coveredBy[cn] & children) };
 		//		covered = covered + { *covers[cn] | cn <- newChildren };
 		//		children = children + newChildren; 
@@ -1258,7 +1242,7 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	
 	// features needed for a given percent -- if we aim for 20%, for instance, any feature occuring
 	// in 80% or more of the files must be in this; we get both the IDs and the labels
-	neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..100] );
+	neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..101] );
 	neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor );
 	
 	// Based on the percent, how many files (at least) do we need?
@@ -1276,7 +1260,7 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	remainingFeatures = toSet(fieldNames) - solutionLabels;
 	
 	// List of features to try -- just sort them by coverage amount
-	featuresToTry = reverse(sort(toList(remainingFeatures),bool(str a, str b) { return featureFilePercent[labelIndex[a]] <= featureFilePercent[labelIndex[b]]; })); 
+	featuresToTry = reverse(sort(toList(remainingFeatures),bool(str a, str b) { return featureFilePercent[labelIndex[a]] < featureFilePercent[labelIndex[b]]; })); 
 
 	for (feature <- featuresToTry, featureFileCount[labelIndex[feature]] > 0) {
 		solutionLabels += feature;
@@ -1320,7 +1304,7 @@ public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice la
 	map[str,int] labelIndex = ( fieldNames[i] : i | i <- index(fieldNames) ); 
 	map[int,int] featureFileCount = ( n : size({l|l<-fmap<0>,fmap[l][n]>0}) | n <- index(fieldNames) );
 	map[int,real] featureFilePercent = ( n : featureFileCount[n]*100.0/totalFileCount | n <- featureFileCount ); 
-	map[int,set[int]] neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..100] ); 
+	map[int,set[int]] neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..101] ); 
 	map[int,set[str]] neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor ); 
 	
 	// seed the solution with all the features we need to achieve 1% coverage
@@ -1379,7 +1363,7 @@ public map[int,set[str]] featuresForPercents(FMap fmap, FeatureLattice lattice, 
 }
 
 public map[int,set[str]] featuresForAllPercents(FMap fmap, FeatureLattice lattice) {
-	return featuresForPercents(fmap, lattice, [1..100]);
+	return featuresForPercents(fmap, lattice, [1..101]);
 }
 
 public map[int,set[str]] featuresForPercents2(FMap fmap, FeatureLattice lattice, list[int] percents) {
@@ -1387,7 +1371,7 @@ public map[int,set[str]] featuresForPercents2(FMap fmap, FeatureLattice lattice,
 }
 
 public map[int,set[str]] featuresForAllPercents2(FMap fmap, FeatureLattice lattice) {
-	return featuresForPercents2(fmap, lattice, [1..100]);
+	return featuresForPercents2(fmap, lattice, [1..101]);
 }
 
 public void saveCoverageMap(map[int,set[str]] coverageMap) {
@@ -1555,7 +1539,7 @@ public map[loc,Script] loadBinaryWithIncludes(str product, str version) {
 	return readBinaryValueFile(#map[loc,Script],parsedItem);
 }
 
-public NotCoveredMap notCoveredBySystem(FeatureLattice lattice, map[int,set[str]] coverageMap) {
+public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, map[int,set[str]] coverageMap) {
 	fieldNames = toSet(tail(tail(tail(getRelFieldNames((#getFeatsType).symbol)))));
 	
 	in80 = coverageMap[80];
@@ -1564,11 +1548,9 @@ public NotCoveredMap notCoveredBySystem(FeatureLattice lattice, map[int,set[str]
 	in80Files = { *(n@files) | n <- carrier(lattice), n.features < in80 };
 	in90Files = { *(n@files) | n <- carrier(lattice), n.features < in90 };
 	
-	lv = getLatestVersions();
-	
 	map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] res = ( );
-	for (product <- lv) {
-		pt = loadBinary(product,lv[product]);
+	for (product <- corpus) {
+		pt = loadBinary(product,corpus[product]);
 		res[product] = < {l.path|l<-pt<0>} - in80Files, {l.path|l<-pt<0>} - in90Files >;
 	}
 	
@@ -1585,19 +1567,18 @@ public NotCoveredMap readNotCoveredInfo() {
 	return readBinaryValueFile(#NotCoveredMap, |project://PHPAnalysis/src/lang/php/serialized/notCovered.bin|);
 }
 
-public str coverageComparison(NotCoveredMap ncm) {
+public str coverageComparison(Corpus corpus, NotCoveredMap ncm) {
 	filecount = loadCountsCSV();
-	lv = getLatestVersions();
 
 	eightyPer = ( );
 	ninetyPer = ( );
 	
-	for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1) <= toUpperCase(s2); }), v := lv[p], <notIn80,notIn90> := ncm[p], <v,_,fc> <- filecount[p]) {
+	for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1) <= toUpperCase(s2); }), v := corpus[p], <notIn80,notIn90> := ncm[p], <v,_,fc> <- filecount[p]) {
 		eightyPer[p] = 100.0-round(size(notIn80)*10000.0/fc)/100.0;
 		ninetyPer[p] = 100.0-round(size(notIn90)*10000.0/fc)/100.0;
 	}
 	
-	pOrder = reverse(sort(toList(lv<0>), bool(str s1,str s2) { return eightyPer[s1] <= eightyPer[s2]; }));
+	pOrder = reverse(sort(toList(corpus<0>), bool(str s1,str s2) { return eightyPer[s1] <= eightyPer[s2]; }));
 	
 	tbl = "\\npaddmissingzero
 		  '\\npfourdigitsep
