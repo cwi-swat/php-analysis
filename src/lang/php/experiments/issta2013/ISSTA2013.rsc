@@ -121,21 +121,42 @@ public str generateTable4() {
 }
 
 public str generateTable5() {
-	< vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets > = getAllVV();
-	trans = calculateVVTransIncludes(vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets);
+	< vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets > = getAllVV(getISSTA2013Corpus());
+	trans = calculateVVTransIncludes(vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets, getISSTA2013Corpus());
 	return showVVInfoAsLatex(vvuses, vvcalls, vvmcalls, vvnews, vvprops,
 		vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls +
-		vvstargets + vvsprops + vvsptargets, trans);
+		vvstargets + vvsprops + vvsptargets, trans, getISSTA2013Corpus());
 }
 
 public str generateTable6() {
-	return vvUsagePatternsTable();
+	return vvUsagePatternsTable(getISSTA2013Corpus());
 }
 
 public str generateTable7() {
-	mmr = magicMethodUses();
-	trans = calculateMMTransIncludes(mmr);
-	return magicMethodCounts(mmr, trans);
+	mmr = magicMethodUses(getISSTA2013Corpus());
+	trans = calculateMMTransIncludes(getISSTA2013Corpus(),mmr);
+	return magicMethodCounts(getISSTA2013Corpus(), mmr, trans);
+}
+
+public str generateTable8() {
+	evalUses = corpusEvalUses(getISSTA2013Corpus());
+	transUses = calculateEvalTransIncludes(getISSTA2013Corpus(), evalUses);
+	fuses = createFunctionUses(corpusFunctionUses(getISSTA2013Corpus()));
+	ftransUses = calculateFunctionTransIncludes(getISSTA2013Corpus(), fuses);
+	
+	return evalCounts(getISSTA2013Corpus(), evalUses, fuses, transUses, ftransUses);
+}
+
+public str generateTable9() {
+	allcalls = allCalls(getISSTA2013Corpus());
+	vcalls = varargsCalls(getISSTA2013Corpus());
+	vdefs = varargsFunctionsAndMethods(getISSTA2013Corpus());
+	vcallsTrans = calculateFunctionTransIncludes(getISSTA2013Corpus, vcalls<0,1,2,3>);
+	return showVarArgsUses(getISSTA2013Corpus(), vdefs, vcalls, allcalls, vcallsTrans);
+}
+
+public str generateTable10() {
+
 }
 
 // This generates all the tables and figures, but doesn't
@@ -144,6 +165,9 @@ public str generateTable7() {
 // the console, then print the result, e.g.:
 //		table1 = generateTable1();
 //  	println(table1);
+// or write it to a file, e.g.:
+//      table1 = generateTable1();
+//      writeFile(|file:///tmp/table1.txt|, table1);
 public void main() {
 	// Generate all the tables
 	table1 = generateTable1();
@@ -153,6 +177,9 @@ public void main() {
 	table5 = generateTable5();
 	table6 = generateTable6();
 	table7 = generateTable7();
+	table8 = generateTable8();
+	table9 = generateTable9();
+	table10 = generateTable10();
 	
 	// Generate all the figures
 	figure1 = generateFigure1();

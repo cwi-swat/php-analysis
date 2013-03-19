@@ -26,11 +26,11 @@ import Node;
 import util::Math;
 
 import lang::csv::IO;
-import VVU; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
-import Exprs; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
-import Feats; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
-import Sizes; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
-import Versions; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
+import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
+import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
+import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
+import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
+import Versions = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -1312,14 +1312,14 @@ public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice la
 	remainingFeatures = remainingFeatures - solution;
 	
 	// the features that aren't in there are left as the features to try
-	featuresToTry = reverse(sort(toList(remainingFeatures),bool(str a, str b) { return featureFilePercent[labelIndex[a]] <= featureFilePercent[labelIndex[b]]; }));
+	featuresToTry = reverse(sort(toList(remainingFeatures),bool(str a, str b) { return featureFilePercent[labelIndex[a]] < featureFilePercent[labelIndex[b]]; }));
 	
 	// now, continually grow until we cover 100% of the files
 	while(coveredSoFar < 100) {
 		// nextStepMap holds the number of files we cover if we choose a specific feature
 		nextStepMap = ( feature : size({ *(n@transFiles) | n <- { n | n <- nodes, n.features < (solution + feature) } }) | feature <- remainingFeatures );
 		// this then sorts the map results, getting back the one that adds the most files
-		<nextFeature,nextFeatureCount> = head(reverse(sort([ < feature,nextStepMap[feature] > | feature <- nextStepMap ],bool(<str s1,int n1>, <str st,int n2>) { return n1 <= n2; })));
+		<nextFeature,nextFeatureCount> = head(reverse(sort([ < feature,nextStepMap[feature] > | feature <- nextStepMap ],bool(<str s1,int n1>, <str st,int n2>) { return n1 < n2; })));
 
 		// it is possible that any one feature won't extend our set of solutions; if that is the
 		// case, we instead add the most popular
@@ -1409,7 +1409,7 @@ public str coverageGraph(map[int,set[str]] coverageMap) {
          ";
 }
 
-public str vvUsagePatternsTable() {
+public str vvUsagePatternsTable(Corpus corpus) {
 	vvUses = varVarUses();
 	map[str,int] templateCounts = ( p : size({n|<n,p,path,line,"Y",at,mg,lpat,feach,sw,cond,der,notes> <- vvUses,(lpat=="X"||feach=="X"||sw=="X"||cond=="X")}) | p <- vvUses<1> );
 	map[str,int] reflectiveCounts = ( p : size({n|<n,p,path,line,drv,at,mg,lpat,feach,sw,cond,der,notes> <- vvUses, drv != "Y"}) | p <- vvUses<1> );
@@ -1419,9 +1419,8 @@ public str vvUsagePatternsTable() {
 	overallTotal = ( 0 | it + totalCounts[p] | p <- totalCounts<0> );
 	templateAverage = round(templateTotal*10000.0/overallTotal)/100.0;
 
-	lv = getLatestVersions();
 	ver = getVersions();
-	php4Products = { p | p <- lv, <_,phpv,_> <- ver[p,lv[p]], "4" := phpv[0] };
+	php4Products = { p | p <- corpus, <_,phpv,_> <- ver[p,corpus[p]], "4" := phpv[0] };
 
 	templateTotalPHP5 = ( 0 | it + templateCounts[p] | p <- templateCounts<0>, p notin php4Products );
 	overallTotalPHP5 = ( 0 | it + totalCounts[p] | p <- totalCounts<0>, p notin php4Products );
@@ -1573,12 +1572,12 @@ public str coverageComparison(Corpus corpus, NotCoveredMap ncm) {
 	eightyPer = ( );
 	ninetyPer = ( );
 	
-	for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1) <= toUpperCase(s2); }), v := corpus[p], <notIn80,notIn90> := ncm[p], <v,_,fc> <- filecount[p]) {
+	for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1) < toUpperCase(s2); }), v := corpus[p], <notIn80,notIn90> := ncm[p], <v,_,fc> <- filecount[p]) {
 		eightyPer[p] = 100.0-round(size(notIn80)*10000.0/fc)/100.0;
 		ninetyPer[p] = 100.0-round(size(notIn90)*10000.0/fc)/100.0;
 	}
 	
-	pOrder = reverse(sort(toList(corpus<0>), bool(str s1,str s2) { return eightyPer[s1] <= eightyPer[s2]; }));
+	pOrder = reverse(sort(toList(corpus<0>), bool(str s1,str s2) { return eightyPer[s1] < eightyPer[s2]; }));
 	
 	tbl = "\\npaddmissingzero
 		  '\\npfourdigitsep
