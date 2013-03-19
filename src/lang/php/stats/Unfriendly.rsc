@@ -200,7 +200,7 @@ public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses,
 			 list[tuple[str p, str v, QueryResult qr]] vvscalls,
 			 list[tuple[str p, str v, QueryResult qr]] vvstargets,
 			 list[tuple[str p, str v, QueryResult qr]] vvsprops,
-			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] getAllVV(str product, str version, map[loc fileloc, Script scr] ptmap) 
+			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] getAllVV(str product, str version, System ptmap) 
 {
 	list[tuple[str p, str v, QueryResult qr]] vvuses = [ ]; 
 	list[tuple[str p, str v, QueryResult qr]] vvcalls = [ ];

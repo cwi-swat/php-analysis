@@ -33,16 +33,16 @@ private Corpus esec13BaseCorpus = (
 	"CakePHP":"2.2.0-0",
 	"DoctrineORM":"2.2.2");
 
+@doc{The location of the corpus extension, change to your location!}
+private loc includesSystemsLoc = |file:///Users/mhills/Projects/phpsa/includes/systems|;
+
 @doc{Retrieve the base corpus}
 public Corpus getBaseCorpus() = esec13BaseCorpus;
-
-@doc{Location of the corpus extension, change if necessary}
-private loc testCorpus = |file:///export/scratch2/hills/includes/systems|;
 
 @doc{Retrieve information on the extension; in this case we do not have
      version information, so we just go from name to location}
 alias SysMap = map[str sysname, loc sysloc];
-public SysMap getIncludesSystems() = getIncludesSystems(testCorpus);
+public SysMap getIncludesSystems() = getIncludesSystems(includesSystemsLoc);
 public SysMap getIncludesSystems(loc base) = (l.file : l | l <- base.ls, isDirectory(l));
 
 @doc{Get the extension as a name/version corpus, with version always "HEAD"
