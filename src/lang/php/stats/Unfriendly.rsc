@@ -1947,7 +1947,7 @@ public rel[str product, str path] classAndInterfaceFiles(Corpus corpus) {
 	return res;
 }
 
-public str showVarArgsUses(Corpus corpus, rel[str p, str v, Def d] vaDefs, rel[str,str,loc,Expr,bool] vaCalls, rel[str,str,loc,Expr] allCalls, map[str,set[str]] vatrans) {
+public str showVarArgsUses(Corpus corpus, rel[str p, str v, Def d] vaDefs, rel[str,str,loc,Expr,bool] vaCalls, rel[str,str,int] allCallsCounts, map[str,set[str]] vatrans) {
 	ci = loadCountsCSV();
 	
 	str productLine(str p) {
@@ -1969,7 +1969,7 @@ public str showVarArgsUses(Corpus corpus, rel[str p, str v, Def d] vaDefs, rel[s
 		sysDefs = size(vaDefs[p,v]);
 		sysVACalls = size(vaCalls[p,v]);
 		sysLibCalls = sysVACalls - size({ <l,e> | <l,e,true> <- vaCalls[p,v] });
-		sysAllCalls = size(allCalls[p,v]);
+		sysAllCalls = size(allCallsCounts[p,v]);
 		
 		return "<p> & \\numprint{<fileCount>} & \\numprint{<size(hits<0>)>} & \\numprint{<size(vatrans[p])>} && \\numprint{<sysDefs>} & \\numprint{<sysVACalls>} & \\numprint{<sysLibCalls>} & <(size(hits) > 1) ? "\\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround" : "N/A">  \\\\";
 	}

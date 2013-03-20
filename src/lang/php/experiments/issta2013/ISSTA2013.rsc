@@ -18,6 +18,7 @@ import IO;
 import Type;
 import List;
 import Set;
+import Map;
 
 import lang::csv::IO;
 import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
@@ -46,7 +47,8 @@ private Corpus issta13Corpus = (
 public Corpus getISSTA2013Corpus() = issta13Corpus;
 
 public str generateTable1() {
-	return generateCorpusInfoTable(getISSTA2013Corpus());
+	issta = getISSTA2013Corpus();
+	return generateCorpusInfoTable(issta);
 }
 
 public str generateFigure1() {
@@ -100,63 +102,79 @@ public str generateFigure3() {
 }
 
 public str generateTable3() {
+	issta = getISSTA2013Corpus();
+
 	// The feature lattice and coverage map are both serialized;
 	// see above for code that will calculate them from scratch.
 	fl = loadFeatureLattice();
 	coverageMap = loadCoverageMap();
-	ncm = notCoveredBySystem(getISSTA2013Corpus(), fl, coverageMap);
-	return coverageComparison(getISSTA2013Corpus(),ncm);
+	ncm = notCoveredBySystem(issta, fl, coverageMap);
+	return coverageComparison(issta,ncm);
 }
 
 public str generateTable4() {
+	issta = getISSTA2013Corpus();
+
 	// As above, the following is quite expensive, so the result
 	// has been serialized. Just uncomment the following line, and
 	// comment out the line below it, to run the analysis from scratch.
-	//icl = includesAnalysis(getISSTA2013Corpus());
+	//icl = includesAnalysis(issta);
 	
 	icl = reload();
 	icr = calculateIncludeCounts(icl);
-	icounts = includeCounts(getISSTA2013Corpus());
+	icounts = includeCounts(issta);
 	return generateIncludeCountsTable(icr, icounts);
 }
 
 public str generateTable5() {
-	< vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets > = getAllVV(getISSTA2013Corpus());
-	trans = calculateVVTransIncludes(vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets, getISSTA2013Corpus());
+	issta = getISSTA2013Corpus();
+	< vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets > = getAllVV(issta);
+	trans = calculateVVTransIncludes(vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets, issta);
 	return showVVInfoAsLatex(vvuses, vvcalls, vvmcalls, vvnews, vvprops,
 		vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls +
-		vvstargets + vvsprops + vvsptargets, trans, getISSTA2013Corpus());
+		vvstargets + vvsprops + vvsptargets, trans, issta);
 }
 
 public str generateTable6() {
-	return vvUsagePatternsTable(getISSTA2013Corpus());
+	issta = getISSTA2013Corpus();
+	return vvUsagePatternsTable(issta);
 }
 
 public str generateTable7() {
-	mmr = magicMethodUses(getISSTA2013Corpus());
-	trans = calculateMMTransIncludes(getISSTA2013Corpus(),mmr);
-	return magicMethodCounts(getISSTA2013Corpus(), mmr, trans);
+	issta = getISSTA2013Corpus();
+	mmr = magicMethodUses(issta);
+	trans = calculateMMTransIncludes(issta,mmr);
+	return magicMethodCounts(issta, mmr, trans);
 }
 
 public str generateTable8() {
-	evalUses = corpusEvalUses(getISSTA2013Corpus());
-	transUses = calculateEvalTransIncludes(getISSTA2013Corpus(), evalUses);
-	fuses = createFunctionUses(corpusFunctionUses(getISSTA2013Corpus()));
-	ftransUses = calculateFunctionTransIncludes(getISSTA2013Corpus(), fuses);
+	issta = getISSTA2013Corpus();
+	evalUses = corpusEvalUses(issta);
+	transUses = calculateEvalTransIncludes(issta, evalUses);
+	fuses = createFunctionUses(corpusFunctionUses(issta));
+	ftransUses = calculateFunctionTransIncludes(issta, fuses);
 	
-	return evalCounts(getISSTA2013Corpus(), evalUses, fuses, transUses, ftransUses);
+	return evalCounts(issta, evalUses, fuses, transUses, ftransUses);
 }
 
 public str generateTable9() {
-	allcalls = allCalls(getISSTA2013Corpus());
-	vcalls = varargsCalls(getISSTA2013Corpus());
-	vdefs = varargsFunctionsAndMethods(getISSTA2013Corpus());
-	vcallsTrans = calculateFunctionTransIncludes(getISSTA2013Corpus, vcalls<0,1,2,3>);
-	return showVarArgsUses(getISSTA2013Corpus(), vdefs, vcalls, allcalls, vcallsTrans);
+	rel[str,str,int] allCallsCounts = { };
+	issta = getISSTA2013Corpus();
+	for (p <- issta) {
+		allcalls = allCalls(domainR(issta,{p}));
+		allCallsCounts += < p, issta[p], size(allcalls) >;
+	}
+	vcalls = varargsCalls(issta);
+	vdefs = varargsFunctionsAndMethods(issta);
+	vcallsTrans = calculateFunctionTransIncludes(issta, vcalls<0,1,2,3>);
+	return showVarArgsUses(issta, vdefs, vcalls, allCallsCounts, vcallsTrans);
 }
 
 public str generateTable10() {
-
+	issta = getISSTA2013Corpus();
+	fuses = invokeFunctionUses(corpusFunctionUses(issta));
+	ftrans = calculateFunctionTransIncludes(issta, fuses);
+	return invokeFunctionUsesCounts(issta, fuses, ftrans);
 }
 
 // This generates all the tables and figures, but doesn't
