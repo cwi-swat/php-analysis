@@ -9,42 +9,37 @@ Running Our Software
 The main prerequisites to running the PHP and Rascal code used
 to implement our analysis are:
 
-* the Java JDK, available from the [Java download][java] page or as
-  part of the Mac Xcode toolset
+* Java JDK version 1.7, available from the [Java download][java]
 * Eclipse, available on the [Eclipse download][eclipse] page
 * PHP, available from the [PHP download][php] page in source format
   or as part of the Mac Xcode toolset
   
-We still use Eclipse version 3.7 in most of our development, but 
-are also using version 4.2 (Juno). Both should work fine.
+Eclipse versions 3.7 and 4.2 (Juno) should both work fine. The latest
+version of PHP should also work -- we use PHP to parse PHP files, but
+otherwise just pick the version you need to run the PHP software you
+plan to use (variants of 5.3 and 5.4 should both work).
 
 Once these are installed, you can install the Eclipse Rascal plugin
 by following the directions at the [Rascal download][rascal] page.
 
-Note that we have made some changes since the last Rascal release to
-increase the performance of reading and writing binary forms of
-Rascal values, functionality which is used to store and load the parsed
-forms of the PHP code we analyze. To take advantage of these changes,
-you should use the Rascal [unstable release channel][unstable] instead
-of the standard URL given in the downloading instructions. This release
-is available at [http://www.rascal-mpl.org/unstable-updates][unstable].
-If you use the normal release, it will still work, but saving the
-parsed versions of the PHP systems inside the `buildBinaries`
-call, shown below, will take much longer.
+Note that we are actively developing Rascal, which means the standard
+plugin is more stable, but potentially slower and missing some new
+features. You can use the Rascal [unstable release channel][unstable]
+to get the most recent version of Rascal which builds and passes all
+unit tests. This release is available at [http://www.rascal-mpl.org/unstable-updates][unstable].
 
-Also, the instructions specify that you should allocate 1GB
-of RAM for Rascal; in some cases, since we are working with
-the parsed representation of an entire system, this may need
-to be adjusted upwards even beyond this. I currently have the
-maximum heap size set to 4GB. This is needed especially for working
-with Moodle, which is quite large.
+Also, the Rascal installation instructions specify that you should
+allocate 1GB of RAM for Rascal; in some cases, since we are working
+with the parsed representation of large software systems, this may need
+to be adjusted upwards even beyond this. For most functionality in the
+analysis, a maximum heap size of 4GB is fine. Some operations may require
+more, especially those that work over not just one system, but multiple
+systems at the same time, for instance in the work we are doing on comparing
+how features are used in various systems. 
 
 To parse PHP code, we are using a fork of an open-source PHP
 Parser. This is also available in our Github repository, and
-is named [PHP-Parser][phpp]. The current version should work,
-but we have also created tags corresponding to specific points
-in time. For instance, the icse13 tag corresponds to the version
-of the parser used for our [ICSE 2013 submission][icse2013].
+is named [PHP-Parser][phpp].
 
 [java]: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 [rascal]: http://www.rascal-mpl.org
@@ -53,6 +48,8 @@ of the parser used for our [ICSE 2013 submission][icse2013].
 [php]: http://www.php.net/downloads.php
 [phpp]: https://github.com/cwi-swat/PHP-Parser
 [icse2013]: http://homepages.cwi.nl/~hills/publications/hills-klint-vinju-2013-icse-submitted.pdf
+[issta2013]: http://homepages.cwi.nl/~hills/publications/php-feature-usage.pdf
+[esecfse2013]: http://homepages.cwi.nl/~hills/publications/resolving-php-includes.pdf
 
 Note that we assume, for this README, that all code is being
 placed in directory `~/PHPAnalysis`. To check out the parser
@@ -65,11 +62,14 @@ Downloading the Corpus
 ----------------------
 
 The corpus is rather large, so here we are providing just those
-systems that we used in our experiments in our [ICSE 2013 submission][icse2013].
-This is what we reference as the [most recent versions][mrvicse13] 
-in the paper.
+systems that we used in our experiments in our [ISSTA 2013 submission][issta2013]
+(the same corpus was used in our [ICSE 2013 submission][icse2013]) and in our
+[ESEC/FSE 2013 submission][esecfse2013]. The [first part of the corpus][corpus1]
+is used in both papers, while [the second][corpus2] is used just in the
+[ESEC/FSE 2013 submission][esecfse2013].
 
-[mrvicse13]: http://homepages.cwi.nl/~hills/experiments/corpus-icse13.tgz
+[corpus1]: http://homepages.cwi.nl/~hills/experiments/corpus-icse13.tgz
+[corpus2]: http://homepages.cwi.nl/~hills/experiments/corpus-includes-extension.tgz
 
 Assuming that `wget` is installed:
     
@@ -77,8 +77,13 @@ Assuming that `wget` is installed:
     wget http://homepages.cwi.nl/~hills/experiments/corpus-icse13.tgz
     tar -xpzvf corpus-icse13.tgz
 
-This will place the files into a subdirectory named `corpus-icse13`. If
-`wget` is not installed, click on the [most recent versions][mrvicse13]
+and, if needed:
+
+    wget http://homepages.cwi.nl/~hills/experiments/corpus-includes-extension.tgz
+    tar -xpzvf corpus-includes-extension.tgz
+
+Assuming just the first, this will place the files into a subdirectory named 
+`corpus-icse13`. If `wget` is not installed, click on the [base corpus][corpus1]
 link, save this to the `~/PHPAnalysis` directory, and extract it with the
 command given above.
 
@@ -126,9 +131,9 @@ other directory `PHPAnalysis` has been installed in:
     
     public loc phploc = |file:///usr/bin/php|;
     
-    public loc parserLoc = |file:///Users/mhills/PHPAnalysis/PHP-Parser|;
-    public loc rgenLoc = parserLoc + "lib/Rascal/AST2Rascal.php";
-    public loc rgenCwd = parserLoc + "lib/Rascal";
+    public loc parserLoc = |file:///Users/mhills/PHPAnalysis|;
+    public loc rgenLoc = parserLoc + "PHP-Parser/lib/Rascal/AST2Rascal.php";
+    public loc rgenCwd = parserLoc + "PHP-Parser/lib/Rascal";
     
     public loc baseLoc = |file:///Users/mhills/PHPAnalysis|;
     public loc parsedDir = baseLoc + "parsed";
@@ -192,8 +197,9 @@ in `Stats.rsc` for extracting information on the uses of individual
 features from PHP files.
 
 To make our experiments easily reproducible, folder `lang/php/experiments`
-contains a subdirectory for each paper, with a file containing calls that
-build the figures and tables. For instance, module `lang::php::experiments::icse2012::ICSE2013`
+contains a subdirectory for each set of experiments, categorized by the
+paper in which they were collected, with a file containing calls that
+build the figures and tables. For instance, module `lang::php::experiments::issta2013::ISSTA2013`
 contains one function for each table and figure in the submitted
 paper. Tracing through these functions shows the analysis steps
 taken to yield the results we reported.
