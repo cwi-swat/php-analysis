@@ -124,7 +124,6 @@ public data Stmt
 	| unset(list[Expr] unsetVars)
 	| use(list[Use] uses)
 	| \while(Expr cond, list[Stmt] body)
-	| removedStmt()	// This is used in places during transformations, but should never persist
 	;
 
 public data Declaration = declaration(str key, Expr val);

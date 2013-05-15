@@ -14,8 +14,11 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::util::Config;
 import lang::csv::IO;
 
-public Script loadPHPFile(loc l) {
-	//println("Loading PHP file <l>");
+public Script loadPHPFile(loc l) throws AssertionFailed {
+	if (!exists(l)) throw AssertionFailed("Location <l> does not exist");
+	if (l.scheme != "file") throw AssertionFailed("Only file locations are supported");
+	if (!isFile(l)) throw AssertionFailed("Location <l> must be a file");
+
 	PID pid = createProcess(phploc.path, ["-d memory_limit=512M", rgenLoc.path, "<l.path>"], rgenCwd);
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
@@ -31,11 +34,17 @@ public Script loadPHPFile(loc l) {
 	return res;
 }
 
-public System loadPHPFiles(loc l) {
+public System loadPHPFiles(loc l) throws AssertionFailed = loadPHPFiles(l, {"php", "inc"});
 
+public System loadPHPFiles(loc l, set[str] extensions) throws AssertionFailed {
+
+	if (!exists(l)) throw AssertionFailed("Location <l> does not exist");
+	if (l.scheme != "file") throw AssertionFailed("Only file locations are supported");
+	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
+	
 	list[loc] entries = [ l + e | e <- listEntries(l) ];
 	list[loc] dirEntries = [ e | e <- entries, isDirectory(e) ];
-	list[loc] phpEntries = [ e | e <- entries, e.extension in {"php","inc"} ];
+	list[loc] phpEntries = [ e | e <- entries, e.extension in extensions ];
 
 	System phpNodes = ( );
 	for (e <- phpEntries) {
