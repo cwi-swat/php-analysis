@@ -489,7 +489,7 @@ public Lab init(Expr e) {
 		case var(expr(Expr varName)) : return init(varName);
 		case var(name(Name varName)) : return e@lab;
 		
-		case scriptFragment(list[Stmt] body) : return (size(body) == 0) ? e@lab : init(head(body));
+		//case scriptFragment(list[Stmt] body) : return (size(body) == 0) ? e@lab : init(head(body));
 	}
 }
 
@@ -917,9 +917,10 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// no else, we instead have to add edges from the last false condition directly to
 			// the end.
 			if (someElse(\else(ebody)) := elseClause) {
-				if (size(ebody) > 0)
+				if (size(ebody) > 0) {
 					edges += conditionFalseFlowEdge(final(last(falseConds)), init(head(ebody)), falseConds);
-					if (!statementJumps(last(ebody))) edges += flowEdge(final(last(ebody)), finalLabel);				
+					if (!statementJumps(last(ebody))) edges += flowEdge(final(last(ebody)), finalLabel);
+				}				
 			} else {
 				edges += conditionFalseFlowEdge(final(last(falseConds)), finalLabel, falseConds);
 			}
@@ -1362,12 +1363,12 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges += flowEdge(final(varName), finalLabel);
 		}
 		
-		case scriptFragment(list[Stmt] body) : {
-			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
-			< edges, lstate > = addBodyEdges(edges, lstate, body);
-			if (size(body) > 0)
-				edges += flowEdge(final(last(body)), finalLabel);
-		}
+		//case scriptFragment(list[Stmt] body) : {
+		//	for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
+		//	< edges, lstate > = addBodyEdges(edges, lstate, body);
+		//	if (size(body) > 0)
+		//		edges += flowEdge(final(last(body)), finalLabel);
+		//}
 	}
 
 	return < edges, lstate >;			

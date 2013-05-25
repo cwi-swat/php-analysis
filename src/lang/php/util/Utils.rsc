@@ -34,12 +34,21 @@ public Script loadPHPFile(loc l) throws AssertionFailed {
 	return res;
 }
 
-public System loadPHPFiles(loc l) throws AssertionFailed = loadPHPFiles(l, {"php", "inc"});
+public System loadPHPFiles(loc l) throws AssertionFailed {
+	return loadPHPFiles(l, {"php", "inc"}, loadPHPFile);
+}
 
 public System loadPHPFiles(loc l, set[str] extensions) throws AssertionFailed {
+	return loadPHPFiles(l, extensions, loadPHPFile);
+}
 
-	if (!exists(l)) throw AssertionFailed("Location <l> does not exist");
-	if (l.scheme != "file") throw AssertionFailed("Only file locations are supported");
+public System loadPHPFiles(loc l, Script(loc) loader) throws AssertionFailed {
+	return loadPHPFiles(l, {"php", "inc"}, loader);
+}
+
+public System loadPHPFiles(loc l, set[str] extensions, Script(loc) loader) throws AssertionFailed {
+
+	if ((l.scheme == "file") && !exists(l)) throw AssertionFailed("Location <l> does not exist");
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
 	
 	list[loc] entries = [ l + e | e <- listEntries(l) ];
@@ -49,7 +58,7 @@ public System loadPHPFiles(loc l, set[str] extensions) throws AssertionFailed {
 	System phpNodes = ( );
 	for (e <- phpEntries) {
 		try {
-			Script scr = loadPHPFile(e);
+			Script scr = loader(e);
 			phpNodes[e] = scr;
 		} catch IO(msg) : {
 			println("<msg>");
@@ -57,7 +66,7 @@ public System loadPHPFiles(loc l, set[str] extensions) throws AssertionFailed {
 			println("<msg>");
 		}
 	}
-	for (d <- dirEntries) phpNodes = phpNodes + loadPHPFiles(d);
+	for (d <- dirEntries) phpNodes = phpNodes + loadPHPFiles(d, extensions, loader);
 	
 	return phpNodes;
 }

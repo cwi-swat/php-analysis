@@ -32,6 +32,8 @@ public data ClosureUse = closureUse(str name, bool byRef);
 
 public data IncludeType = include() | includeOnce() | require() | requireOnce();
 
+// TODO: This does not properly handle nested lists in list assignments. We need to
+// modify the AST to deal with this case.
 public data Expr 
 	= array(list[ArrayElement] items)
 	| fetchArrayDim(Expr var, OptionExpr dim)
@@ -66,7 +68,7 @@ public data Expr
 	| var(NameOrExpr varName)	
 	| scriptFragment(list[Stmt] body)
 	;
-	
+
 public data Op = bitwiseAnd() | bitwiseOr() | bitwiseXor() | concat() | div() 
 			   | minus() | \mod() | mul() | plus() | rightShift() | leftShift()
 			   | booleanAnd() | booleanOr() | booleanNot() | bitwiseNot()
@@ -124,6 +126,8 @@ public data Stmt
 	| unset(list[Expr] unsetVars)
 	| use(list[Use] uses)
 	| \while(Expr cond, list[Stmt] body)
+	| emptyStmt()
+	| block(list[Stmt] body)
 	;
 
 public data Declaration = declaration(str key, Expr val);
