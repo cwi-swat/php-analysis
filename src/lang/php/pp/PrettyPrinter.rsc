@@ -504,7 +504,7 @@ public str pp(Use::use(Name importName, noName())) = "<pp(importName)>";
 //public data ClassItem 
 //	= property(set[Modifier] modifiers, list[Property] prop)
 public str pp(ClassItem::property(set[Modifier] modifiers, list[Property] prop)) =
-	"<for(p <- prop) {><intercalate(" ",[pp(m)|m<-modifiers])> $<pp(p)>;
+	"<for(p <- prop) {><intercalate(" ",[pp(m)|m<-modifiers])> <pp(p)>;
 	'<}>";
 
 //	| constCI(list[Const] consts)
