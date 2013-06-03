@@ -26,11 +26,11 @@ import Node;
 import util::Math;
 
 import lang::csv::IO;
-import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
-import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
-import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
-import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
-import Versions = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
+import VVU; //= |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
+import Exprs; //= |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
+import Feats; //= |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
+import Sizes; //= |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
+import Versions; //= |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -866,7 +866,7 @@ public str squigly2(rel[str, int] counts, str label) {
   }
 }
 
-public str squigly3(rel[str, int] counts, str label) {
+public str squigly3(rel[str, int] counts, str label, map[str,str] printingGroups) {
   ds = distribution([b|<a,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   
@@ -874,7 +874,7 @@ public str squigly3(rel[str, int] counts, str label) {
     return "\\addplot+ [only marks, mark=text, text mark={}] coordinates { (1,1) }; \\label{<label>}";
   }
   else {
-    return "\\addplot+ [mark=<substring(label, 0, 1)>] coordinates { <for (ev <- [5,10..105] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<label>} \\label{<label>}
+    return "\\addplot+ [mark=<printingGroups[label]>] coordinates { <for (ev <- [5,10..105] /*, ev != 0 */) {>(<ev>,<ev in ds ? ds[ev] : 0>) <}>};  \\addlegendentry{<(label != "assignment ops") ? label : "assignments">} \\label{<label>}
            ";
   }
 }
@@ -964,35 +964,50 @@ public str groupsTable() = groupsTable({},{},{});
 
 public list[str] getFeatureLabels() = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
 
-//public void checkGroups() {
-//  labels = getFeatureLabels();
-//  groups = getFeatureGroups();
-//  //keys = [rascalFriendlyKey(k) | k <- (exprKeyOrder()+stmtKeyOrder())];
-//  missing = {*labels} - {*groups[g] | g <- groups};
-//  extra = {*groups[g] | g <- groups} - {*labels};
-//  for (m <- missing) println("Missing: <m>");
-//  for (e <- extra) println("Extra: <e>");          
-//}
+public void checkGroups() {
+  labels = getFeatureLabels();
+  groups = getFeatureGroups();
+  //keys = [rascalFriendlyKey(k) | k <- (exprKeyOrder()+stmtKeyOrder())];
+  missing = {*labels} - {*groups[g] | g <- groups};
+  extra = {*groups[g] | g <- groups} - {*labels};
+  for (m <- missing) println("Missing: <m>");
+  for (e <- extra) println("Extra: <e>");          
+}
 
 public str generalFeatureSquiglies(FMap featsMap) {
    labels = getFeatureLabels();
    groups = getFeatureGroups();
-         
+   
+   // We don't want to count chain rules
+   //labels = labels - "expressionStatementChainRule";
+   //groups["control flow"] = groups["control flow"] - "expressionStatementChainRule";
+   
+   printingGroups = ( gn : gn | gn <- groups<0> );
+   printingGroups["assignment ops"] = "assignments";
+   printingGroups["binary ops"] = "binaryops";
+   printingGroups["control flow"] = "controlflow";
+   printingGroups["unary ops"] = "unaryops";
+   
+   pgfmarks = ( gn : substring(gn,0,1) | gn <- printingGroups<1> );
+   pgfmarks["predicates"] = "r";
+   pgfmarks["assignments"] = "s";
+   pgfmarks["controlflow"] = "o";
+   
    groupLabels = sort([*groups<0>]);
          
   int counter = 0;
   return 
-  "<for (g <- groups) {>\\pgfdeclareplotmark{<substring(g,0,1)>}{\\pgfpathmoveto{\\pgfpoint{1em}{1em}}\\pgftext{<substring(g,0,1)>}}
+  "<for (g <- groups) {>\\pgfdeclareplotmark{<printingGroups[g]>}{\\pgfpathmoveto{\\pgfpoint{1em}{1em}}\\pgftext{<pgfmarks[printingGroups[g]]>}}
   '<}>
   '\\begin{figure*}[t]
   '\\centering
   '\\begin{tikzpicture}
-  '\\begin{semilogyaxis}[grid=both, ymax=10000, ylabel={Frequency (log)}, xlabel={Feature ratio per file (\\%)},height=.5\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=exotic, legend columns=3,legend style={xshift=.4cm,yshift=.5cm}]
-  '<for (g <- sort([*groups<0>])) { indices = [ indexOf(labels, l) | l <- groups[g]];>
-  '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g)>
+  '\\begin{semilogyaxis}[grid=both, ymax=10000, ylabel={Frequency (log)}, xlabel={Feature ratio per file (\\%)},height=.4\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=linestyles*, legend columns=3,legend style={xshift=0cm,yshift=.5cm}]
+  '<for (g <- sort([*groups<0>])) { indices = [ indexOf(labels, l) | l <- groups[g], l != "expressionStatementChainRule"];>
+  '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g, printingGroups)>
   '<}>\\end{semilogyaxis}
   '\\end{tikzpicture}
-  '\\caption{What features to expect in a given PHP file? This histogram shows, for each feature group, how many times it covers a certain percentage of the total number of features per file. Lines between dots are guidelines for the eye only.\\label{Figure:FeatureHistograms}} 
+  '\\caption{What features should one expect to find in a given PHP file? This histogram shows, for each feature group, how many times it covers a certain percentage of the total number of features per file. Lines between dots are guidelines for the eye only.\\label{Figure:FeatureHistograms}} 
   '\\end{figure*}
   ";
   
@@ -1398,13 +1413,14 @@ public str coverageGraph(map[int,set[str]] coverageMap) {
   return "\\begin{figure}
   		 '\\centering
          '\\begin{tikzpicture}
-         '\\begin{axis}[grid=both, height=\\columnwidth,width=\\columnwidth,xmin=0,xmax=105,ymin=0,ymax=109,axis x line=bottom, axis y line=left,ylabel=Implemented Features,xlabel=Percent of Files Covered]
+         '\\begin{axis}[grid=both, height=.8\\columnwidth,width=\\columnwidth,xmin=0,xmax=105,ymin=0,ymax=109,axis x line=bottom, axis y line=left,ylabel=Implemented Features,xlabel=Percent of Files Covered]
          '\\addplot [color=blue,only marks,mark=*] coordinates {<for(n <- sort(toList(coverageMap<0>)),n%5==0) {>(<n>,<size(coverageMap[n])>) <}>};
          '\\addplot [color=blue] coordinates {<for(n <- sort(toList(coverageMap<0>))) {>(<n>,<size(coverageMap[n])>) <}>};
          '<for(n<-sort(toList(coverageMap<0>)),n%5==0){>\\node[coordinate,pin={[color=black,rotate=<angles[n]>]<position[n]>:<size(coverageMap[n])>}] at (axis cs:<n>,<size(coverageMap[n])>) { };<}>
          '\\end{axis}
          '\\end{tikzpicture}
-         '\\caption{Features Needed for File Coverage. Numbers given for each 5\\% increment. 109 Features Total. \\label{Figure:FileCoverageGraph}}
+         '\\caption{Features Needed for Percent File Coverage. Numbers of features are shown for each 5\\% increment in coverage. There are 109 features total. \\label{Figure:FileCoverageGraph}}
+         '\\vspace{-4ex}
          '\\end{figure}
          ";
 }
