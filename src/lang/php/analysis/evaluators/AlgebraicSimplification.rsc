@@ -18,7 +18,7 @@ import Exception;
 public Scalar concatScalars(Scalar sc1:string(str s1), Scalar sc2:string(str s2)) = string(s1+s2);
 public Scalar concatScalars(Scalar sc1:string(str s1), Scalar sc2:integer(int i1)) = string("<s1><i1>");
 public Scalar concatScalars(Scalar sc1:integer(int i1), Scalar sc2:string(str s2)) = string("<i1><s2>");
-public Scalar concatScalars(Scalar sc1:integer(int i1), Scalar sc2:integer(str i2)) = string("<i1><i2>");
+public Scalar concatScalars(Scalar sc1:integer(int i1), Scalar sc2:integer(int i2)) = string("<i1><i2>");
 public Scalar concatScalars(Scalar sc1:string(str s1), Scalar sc2:float(real r1)) = string("<s1><r1>");
 public Scalar concatScalars(Scalar sc1:float(real r1), Scalar sc2:string(str s2)) = string("<r1><s2>");
 public Scalar concatScalars(Scalar sc1:float(real r1), Scalar sc2:float(real r2)) = string("<r1><r2>");
