@@ -19,7 +19,9 @@ public Script loadPHPFile(loc l) throws AssertionFailed {
 	if (l.scheme != "file") throw AssertionFailed("Only file locations are supported");
 	if (!isFile(l)) throw AssertionFailed("Location <l> must be a file");
 
-	PID pid = createProcess(phploc.path, ["-d memory_limit=512M", rgenLoc.path, "<l.path>"], rgenCwd);
+	println("Loading <l.path>");
+	
+	PID pid = createProcess(phploc.path, ["-d memory_limit=512M", rgenLoc.path, "-f<l.path>", "-l"], rgenCwd);
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
 	Script res = errscript("Could not parse file <l.path>: <phcErr>");

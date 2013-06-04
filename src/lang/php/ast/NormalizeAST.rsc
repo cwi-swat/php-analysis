@@ -2,6 +2,28 @@ module lang::php::ast::NormalizeAST
 
 import lang::php::ast::AbstractSyntax;
 import List;
+import IO;
+import String;
+
+data Expr = blockedVar(NameOrExpr varName);
+
+public Script oldListAssignments(Script s) { 
+	solve(s) { 
+		s = visit(s) { 
+			case assign(listExpr(L),E) => listAssign(L,E) 
+		}
+	} 
+	return s;
+}
+
+public Script oldNamespaces(Script s) {
+	solve(s) {
+		s = visit(s) {
+			case namespaceHeader(Name nn) => namespace(someName(nn), [])
+		}
+	}
+	return s;
+}
 
 public Stmt createIf(elseIf(Expr cond, list[Stmt] body), OptionElse oe) {
 	return \if(cond, body, [], oe);
@@ -59,11 +81,13 @@ public Script useBuiltins(Script s) {
 			
 			case call(name(name("die")),[actualParameter(e,_)]) => exit(someExpr(e))
 
-			case call(name(name("print")),[actualParameter(e,_)]) => print(e)
+			case call(name(name("print")),[actualParameter(e,_)]) => Expr::print(e)
 			
 			case exprstmt(call(name(name("unset")),params)) => unset([e | actualParameter(e,_) <- params])
 
 			case call(name(name("empty")),[actualParameter(e,_)]) => empty(e)
+
+			case call(name(name("eval")),[actualParameter(e,_)]) => eval(e)
 		}
 	}
 	return s;
@@ -101,7 +125,7 @@ public Script normalizeArrayAccesses(Script s) {
 	solve(s) {
 		s = bottom-up visit(s) {
 			case staticPropertyFetch(pc,expr(fetchArrayDim(v:var(vn),ad))) =>
-				 fetchArrayDim(staticPropertyFetch(pc,vn),ad)
+				fetchArrayDim(staticPropertyFetch(pc,vn),ad)
 				 
 			case propertyFetch(e,expr(fetchArrayDim(v:var(vn),ad))) =>
 				 fetchArrayDim(propertyFetch(e,vn),ad)
@@ -129,6 +153,83 @@ public Script normalizeArrayAccesses(Script s) {
 				 
 			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad5),ad4),ad3),ad2),ad))) =>
 				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad5),ad4),ad3),ad2),ad)
+
+			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad6),ad5),ad4),ad3),ad2),ad))) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad6),ad5),ad4),ad3),ad2),ad)
+				 
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad6),ad5),ad4),ad3),ad2),ad))) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad6),ad5),ad4),ad3),ad2),ad)
+
+			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+				 
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+
+			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+				 
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+
+			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+				 
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+
+			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad10),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad10),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+				 
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(v:var(vn),ad10),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad10),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+		}
+	}
+	return s;
+}
+
+public Script replaceBlockedVars(Script s) {
+	solve(s) {
+		s = visit(s) {
+			case blockedVar(v) => var(v)
+		}
+	}
+	return s;
+}
+
+public Script switchNamespaceSeparators(Script s) {
+	//solve(s) {
+	//	s = visit(s) {
+	//		case name(str ns) => name(replaceAll(ns,"::","\\")) when contains(ns,"::")
+	//	}
+	//}
+	return s;
+}
+
+public Script setDefaultUseAlias(Script s) {
+	solve(s) {
+		s = visit(s) {
+			case use(name(str un), noName()) => use(name(un),someName(name(last(split("::",un)))))
+		}
+	}
+	return s;
+}
+
+public Script normalizeEncapsedStrings(Script s) {
+	solve(s) {
+		s = visit(s) {
+			case scalar(encapsed([scalar(string(str ic))])) => scalar(string(ic))
+		}
+	}
+	return s;
+}
+
+public Script discardModifiers(Script s) {
+	set[Modifier] emptySM = { };
+	
+	solve(s) {
+		s = visit(s) {
+			case set[Modifier] sm => emptySM 
 		}
 	}
 	return s;

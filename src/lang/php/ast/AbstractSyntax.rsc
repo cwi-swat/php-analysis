@@ -32,8 +32,8 @@ public data ClosureUse = closureUse(str name, bool byRef);
 
 public data IncludeType = include() | includeOnce() | require() | requireOnce();
 
-// TODO: This does not properly handle nested lists in list assignments. We need to
-// modify the AST to deal with this case.
+// NOTE: In PHP, yield is a statement, but it can also be used as an expression.
+// To handle this, we just treat it as an expression. The parser does this as well.
 public data Expr 
 	= array(list[ArrayElement] items)
 	| fetchArrayDim(Expr var, OptionExpr dim)
@@ -66,7 +66,8 @@ public data Expr
 	| staticPropertyFetch(NameOrExpr className, NameOrExpr propertyName)
 	| scalar(Scalar scalarVal)
 	| var(NameOrExpr varName)	
-	| scriptFragment(list[Stmt] body)
+	| yield(OptionExpr keyExpr, OptionExpr valueExpr)
+	| listExpr(list[OptionExpr] listExprs)
 	;
 
 public data Op = bitwiseAnd() | bitwiseOr() | bitwiseXor() | concat() | div() 
@@ -118,11 +119,13 @@ public data Stmt
 	| traitDef(TraitDef traitDef)
 	| label(str labelName)
 	| namespace(OptionName nsName, list[Stmt] body)
+	| namespaceHeader(Name namespaceName)
 	| \return(OptionExpr returnExpr)
 	| static(list[StaticVar] vars)
 	| \switch(Expr cond, list[Case] cases)
 	| \throw(Expr expr)
 	| tryCatch(list[Stmt] body, list[Catch] catches)
+	| tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
 	| unset(list[Expr] unsetVars)
 	| use(list[Use] uses)
 	| \while(Expr cond, list[Stmt] body)
@@ -200,3 +203,31 @@ public anno loc ClassDef@at;
 public anno loc InterfaceDef@at;
 public anno loc StaticVar@at;
 public anno loc Script@at;
+
+public anno str ActualParameter@id;
+public anno str Const@id;
+public anno str ArrayElement@id;
+public anno str Name@id;
+public anno str NameOrExpr@id;
+public anno str CastType@id;
+public anno str ClosureUse@id;
+public anno str IncludeType@id;
+public anno str Expr@id;
+public anno str Op@id;
+public anno str Param@id;
+public anno str Scalar@id;
+public anno str Stmt@id;
+public anno str Declaration@id;
+public anno str Catch@id;
+public anno str Case@id;
+public anno str ElseIf@id;
+public anno str Else@id;
+public anno str Use@id;
+public anno str ClassItem@id;
+public anno str Property@id;
+public anno str Modifier@id;
+public anno str ClassDef@id;
+public anno str InterfaceDef@id;
+public anno str StaticVar@id;
+public anno str Script@id;
+
