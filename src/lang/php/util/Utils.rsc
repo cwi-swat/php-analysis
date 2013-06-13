@@ -1,3 +1,11 @@
+@license{
+  Copyright (c) 2009-2013 CWI
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+}
+@contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::util::Utils
 
 import util::ShellExec;
@@ -13,6 +21,31 @@ import lang::php::util::System;
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Config;
 import lang::csv::IO;
+
+public Stmt parsePHPStatement(str s) {
+	tempFile = |file:///tmp/parseStmt.php|;
+	writeFile(tempFile, "\<?php\n<s>?\>");
+	PID pid = createProcess(phploc.path, ["-d memory_limit=512M", rgenLoc.path, "-f<tempFile.path>"], rgenCwd);
+	str phcOutput = readEntireStream(pid);
+	str phcErr = readEntireErrStream(pid);
+	Script res = errscript("Could not parse <s>");
+	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
+		if (trim(phcOutput) == "")
+			throw "Parser failed in unknown way";
+		else
+			res = readTextValueString(#Script, phcOutput);
+	}
+	if (errscript(_) := res) throw "Found error in PHP code to parse";
+	killProcess(pid);
+	if (script(sl) := res && size(sl) == 1) return head(sl);
+	if (script(sl) := res) return block(sl);
+	throw "Could not parse statement <s>";
+}
+
+public Expr parsePHPExpression(str s) {
+	if (exprstmt(e) := parsePHPStatement(s)) return e;
+	throw "Could not parse expression <s>";
+}
 
 public Script loadPHPFile(loc l) throws AssertionFailed {
 	if (!exists(l)) throw AssertionFailed("Location <l> does not exist");
