@@ -1,6 +1,5 @@
 @license{
-
-  Copyright (c) 2009-2011 CWI
+  Copyright (c) 2009-2013 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -36,7 +35,7 @@ public void renderCFGAsDot(CFG c, loc writeTo) {
 
 public void renderCFGAsDot(CFG c, loc writeTo, str title) {
 	str getID(CFGNode n) = "<n@lab>";
-	cfg = visit(cfg) { case inlineHTML(_) => inlineHTML("HTMLCode") }
+	c = visit(c) { case inlineHTML(_) => inlineHTML("HTMLCode") }
 	
 	nodes = [ "\"<getID(n)>\" [ label = \"<escapeForDot(printCFGNode(n))>\", labeljust=\"l\" ];" | n <- c.nodes ];
 	edges = [ "\"<e.from>\" -\> \"<e.to>\" [ label = \"<printFlowEdgeLabel(e)>\"];" | e <- c.edges ];

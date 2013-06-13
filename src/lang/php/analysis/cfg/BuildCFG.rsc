@@ -1,6 +1,5 @@
 @license{
-
-  Copyright (c) 2009-2011 CWI
+  Copyright (c) 2009-2013 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -180,20 +179,40 @@ public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Clas
 	lstate.nodes += { stmtNode(s, s@lab)[@lab=s@lab] | /Stmt s := methodBody };
 	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := methodBody };
 	
+	// Add any initializer expressions from the parameters as CFG nodes
+	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := m.params };
+	
+	// Add initial nodes to represent initializing parameters with default values,
+	// plus add flow edges between these default initializers
+	notProvided = [ actualNotProvided(pn, e, br)[@lab=incLabel()] | param(pn,someExpr(e),_,br) <- m.params ];
+	lstate.nodes += toSet(notProvided);
+
 	set[FlowEdge] edges = { };
 	for (b <- methodBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
 	< edges, lstate > = addBodyEdges(edges, lstate, methodBody);
-	if (size(methodBody) > 0) {
+
+	for (npi <- notProvided) edges += flowEdge(npi@lab, init(npi.expr));
+	for ([_*,np1,np2,_*] := notProvided) edges += flowEdge(final(np1.expr), np2@lab);
+
+	// Wire up the entry, exit, default init, and body nodes.
+	if (size(notProvided) > 0) {
+		edges += flowEdge(cfgEntryNode@lab, head(notProvided)@lab);
+		if (size(methodBody) > 0) {
+			edges += flowEdge(final(last(notProvided).expr), init(head(methodBody)));
+			edges += flowEdge(final(last(methodBody)), cfgExitNode@lab);
+		} else {
+			edges += flowEdge(final(last(notProvided).expr), cfgExitNode@lab);
+		}
+	} else if (size(methodBody) > 0) {
 		edges += flowEdge(cfgEntryNode@lab, init(head(methodBody)));
 		edges += flowEdge(final(last(methodBody)), cfgExitNode@lab);
 	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
 	}
+
 	nodes = lstate.nodes;
 	lstate = shrink(lstate);
 
-	//< nodes, edges, lstate > = addJoinNodes(nodes, edges, lstate);
-	
  	return < cfg(np, nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
@@ -213,20 +232,40 @@ public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, 
 	lstate.nodes += { stmtNode(s, s@lab)[@lab=s@lab] | /Stmt s := functionBody };
 	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := functionBody };
 	
+	// Add any initializer expressions from the parameters as CFG nodes
+	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := f.params };
+	
+	// Add initial nodes to represent initializing parameters with default values,
+	// plus add flow edges between these default initializers
+	notProvided = [ actualNotProvided(pn, e, br)[@lab=incLabel()] | param(pn,someExpr(e),_,br) <- f.params ];
+	lstate.nodes += toSet(notProvided);
+
 	set[FlowEdge] edges = { };
 	for (b <- functionBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
 	< edges, lstate > = addBodyEdges(edges, lstate, functionBody);
-	if (size(functionBody) > 0) {
+
+	for (npi <- notProvided) edges += flowEdge(npi@lab, init(npi.expr));
+	for ([_*,np1,np2,_*] := notProvided) edges += flowEdge(final(np1.expr), np2@lab);
+	
+	// Wire up the entry, exit, default init, and body nodes.
+	if (size(notProvided) > 0) {
+		edges += flowEdge(cfgEntryNode@lab, head(notProvided)@lab);
+		if (size(functionBody) > 0) {
+			edges += flowEdge(final(last(notProvided).expr), init(head(functionBody)));
+			edges += flowEdge(final(last(functionBody)), cfgExitNode@lab);
+		} else {
+			edges += flowEdge(final(last(notProvided).expr), cfgExitNode@lab);
+		}
+	} else if (size(functionBody) > 0) {
 		edges += flowEdge(cfgEntryNode@lab, init(head(functionBody)));
 		edges += flowEdge(final(last(functionBody)), cfgExitNode@lab);
 	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
 	}
+
 	nodes = lstate.nodes;
 	lstate = shrink(lstate);
 
-	//< nodes, edges, lstate > = addJoinNodes(nodes, edges, lstate);
-	
  	return < cfg(np, nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
@@ -429,10 +468,10 @@ public Lab init(Expr e) {
 		case exit(noExpr()) : return e@lab;
 		
 		case call(NameOrExpr funName, list[ActualParameter] parameters) : {
-			if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef) := head(parameters))
-				return init(expr);
-			else if (expr(Expr fname) := funName)
+			if (expr(Expr fname) := funName)
 				return init(fname);
+			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef) := head(parameters))
+				return init(expr);
 			return e@lab;
 		}
 		
@@ -1215,9 +1254,12 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		
 			if (expr(Expr fn) := funName) {
 				< edges, lstate > = addExpEdges(edges, lstate, fn);
-				edges += flowEdge(final(fn),finalLabel);
-				if (size(parameters) > 0)
-					edges += flowEdge(final(last(parameters).expr), init(fn));
+				if (size(parameters) > 0) {
+					edges += flowEdge(final(fn), init(head(parameters).expr));
+					edges += flowEdge(final(last(parameters).expr),finalLabel);
+				} else {
+					edges += flowEdge(final(fn),finalLabel);
+				}
 			} else {
 				if (size(parameters) > 0)
 					edges += flowEdge(final(last(parameters).expr), finalLabel);
