@@ -134,6 +134,9 @@ public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Label
 	cfgExitNode = scriptExit()[@lab=incLabel()];
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
+	if (script(list[Stmt] b) !:= scr)
+		return < cfg([global()], lstate.nodes, { }, cfgEntryNode, cfgExitNode), lstate >;
+	
 	scriptBody = scr.body;
 	
 	// Add all the statements and expressions as CFG nodes
@@ -406,6 +409,13 @@ public Lab init(Stmt s) {
 
 		// In a while loop, the while condition is executed first and thus provides the first label.
 		case \while(Expr cond, _) : return init(cond);	
+		
+		// An empty statement is atomic
+		case emptyStmt() : return s@lab;
+		
+		// In a block, the first statement provides the first label. If there is no body,
+		// the statement itself provides the label.
+		case block(list[Stmt] body) : return isEmpty(body) ? s@alb : init(head(body));
 	}
 }
 
@@ -525,7 +535,14 @@ public Lab init(Expr e) {
 		case var(expr(Expr varName)) : return init(varName);
 		case var(name(Name varName)) : return e@lab;
 		
-		//case scriptFragment(list[Stmt] body) : return (size(body) == 0) ? e@lab : init(head(body));
+		case yield(someExpr(key), _) : return init(key);
+		case yield(noExpr(), someExpr(val)) : return init(val);
+		case yield(noExpr(), noExpr()) : return e@lab;
+		
+		case listExpr(exprs) : {
+			actualExprs = [ ei | someExpr(ei) <- exprs ];
+			return isEmpty(actualExprs) ? e@lab : init(head(actualExprs));
+		}
 	}
 }
 
@@ -1108,6 +1125,14 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			
 			lstate = popContinueLabel(popBreakLabel(lstate));
 		}
+		
+		case block(list[Stmt] body) : {
+			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
+			< edges, lstate > = addBodyEdges(edges, lstate, body);
+			if (size(body) > 0) {
+				edges += flowEdge(final(last(body)), finalLabel);
+			}		
+		}
 	}
 	
 	return < edges, lstate >;
@@ -1208,7 +1233,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 				< edges, lstate > = addExpEdges(edges, lstate, cn);
 				if (size(parameters) > 0) {
 					edges += flowEdge(final(cn), init(head(parameters).expr));
-					edges += flowEdge(final(last(parameters)), finalLabel);
+					edges += flowEdge(final(last(parameters).expr), finalLabel);
 				} else {
 					edges += flowEdge(final(cn), finalLabel);
 				}
@@ -1411,12 +1436,31 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges += flowEdge(final(varName), finalLabel);
 		}
 		
-		//case scriptFragment(list[Stmt] body) : {
-		//	for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
-		//	< edges, lstate > = addBodyEdges(edges, lstate, body);
-		//	if (size(body) > 0)
-		//		edges += flowEdge(final(last(body)), finalLabel);
-		//}
+		case yield(someExpr(k), noExpr()) : {
+			< edges, lstate > = addExpEdges(edges, lstate, k);
+			edges += flowEdge(final(k), finalLabel);
+		}
+
+		case yield(noExpr(), someExpr(v)) : {
+			< edges, lstate > = addExpEdges(edges, lstate, v);
+			edges += flowEdge(final(v), finalLabel);
+		}
+
+		case yield(someExpr(k), someExpr(v)) : {
+			< edges, lstate > = addExpEdges(edges, lstate, k);
+			< edges, lstate > = addExpEdges(edges, lstate, v);
+			edges += flowEdge(final(k), init(v));
+			edges += flowEdge(final(v), finalLabel);
+		}
+		
+		case listExpr(exprs) : {
+			actualExprs = [ ei | someExpr(ei) <- exprs ];
+			if (size(actualExprs) > 0) {
+				< edges, lstate > = addExpSeqEdges(edges, lstate, actualExprs);
+				edges += flowEdge(final(last(actualExprs)), finalLabel);
+			}
+		}
+		
 	}
 
 	return < edges, lstate >;			
