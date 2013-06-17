@@ -48,13 +48,21 @@ public Expr parsePHPExpression(str s) {
 }
 
 public Script loadPHPFile(loc l) throws AssertionFailed {
+	loadPHPFile(l, true, false);
+}
+
+public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds) throws AssertionFailed {
 	if (!exists(l)) throw AssertionFailed("Location <l> does not exist");
 	if (l.scheme != "file") throw AssertionFailed("Only file locations are supported");
 	if (!isFile(l)) throw AssertionFailed("Location <l> must be a file");
 
 	println("Loading <l.path>");
 	
-	PID pid = createProcess(phploc.path, ["-d memory_limit=512M", rgenLoc.path, "-f<l.path>", "-l"], rgenCwd);
+	list[str] opts = [ ];
+	if (addLocationAnnotations) opts += "-l";
+	if (addUniqueIds) opts += "-i";
+	
+	PID pid = createProcess(phploc.path, ["-d memory_limit=512M", rgenLoc.path, "-f<l.path>"] + opts, rgenCwd);
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
 	Script res = errscript("Could not parse file <l.path>: <phcErr>");
@@ -69,19 +77,23 @@ public Script loadPHPFile(loc l) throws AssertionFailed {
 	return res;
 }
 
-public System loadPHPFiles(loc l) throws AssertionFailed {
-	return loadPHPFiles(l, {"php", "inc"}, loadPHPFile);
+public System loadPHPFiles(loc l, bool addLocationAnnotations = true, bool addUniqueIds = false) throws AssertionFailed {
+	return loadPHPFiles(l, {"php", "inc"}, loadPHPFile, addLocationAnnotations, addUniqueIds);
 }
 
-public System loadPHPFiles(loc l, set[str] extensions) throws AssertionFailed {
-	return loadPHPFiles(l, extensions, loadPHPFile);
+public System loadPHPFiles(loc l, set[str] extensions, bool addLocationAnnotations = true, bool addUniqueIds = false) throws AssertionFailed {
+	return loadPHPFiles(l, extensions, loadPHPFile, addLocationAnnotations, addUniqueIds);
 }
 
-public System loadPHPFiles(loc l, Script(loc) loader) throws AssertionFailed {
-	return loadPHPFiles(l, {"php", "inc"}, loader);
+public System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocationAnnotations = true, bool addUniqueIds = false) throws AssertionFailed {
+	return loadPHPFiles(l, {"php", "inc"}, loader, addLocationAnnotations, addUniqueIds);
 }
 
-public System loadPHPFiles(loc l, set[str] extensions, Script(loc) loader) throws AssertionFailed {
+public System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) loader, bool addLocationAnnotations = true, bool addUniqueIds = false) throws AssertionFailed {
+	return loadPHPFiles(l, extensions, loader, addLocationAnnotations, addUniqueIds);
+}
+
+private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) loader, bool addLocationAnnotations, bool addUniqueIds) throws AssertionFailed {
 
 	if ((l.scheme == "file") && !exists(l)) throw AssertionFailed("Location <l> does not exist");
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
@@ -93,7 +105,7 @@ public System loadPHPFiles(loc l, set[str] extensions, Script(loc) loader) throw
 	System phpNodes = ( );
 	for (e <- phpEntries) {
 		try {
-			Script scr = loader(e);
+			Script scr = loader(e, addLocationAnnotations, addUniqueIds);
 			phpNodes[e] = scr;
 		} catch IO(msg) : {
 			println("<msg>");
@@ -101,7 +113,7 @@ public System loadPHPFiles(loc l, set[str] extensions, Script(loc) loader) throw
 			println("<msg>");
 		}
 	}
-	for (d <- dirEntries) phpNodes = phpNodes + loadPHPFiles(d, extensions, loader);
+	for (d <- dirEntries) phpNodes = phpNodes + loadPHPFiles(d, extensions, loader, addLocationAnnotations, addUniqueIds);
 	
 	return phpNodes;
 }
