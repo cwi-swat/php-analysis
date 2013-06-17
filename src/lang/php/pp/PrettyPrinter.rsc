@@ -1,5 +1,5 @@
 @license{
-  Copyright (c) 2009-2012 CWI
+  Copyright (c) 2009-2013 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -194,6 +194,15 @@ public str pp(scalar(Scalar scalarVal)) = pp(scalarVal);
 
 //	| var(NameOrExpr varName)	
 public str pp(var(NameOrExpr varName)) = "$<pp(varName)>";
+
+//  | yield(OptionExpr keyExpr, OptionExpr valueExpr)
+public str pp(yield(noExpr(), noExpr())) = "yield";
+public str pp(yield(noExpr(), someExpr(Expr v))) = "yield <pp(v)>";
+public str pp(yield(someExpr(Expr k), someExpr(Expr v))) = "yield <pp(k)> =\> <pp(v)>";
+public str pp(yield(someExpr(Expr k), noExpr())) { throw "Yielding a key with no value makes no sense."; }
+	
+//  | listExpr(list[OptionExpr] listExprs)
+public str pp(listExpr(list[OptionExpr] listExprs)) = "list(<intercalate(", ", [ pp(oe) | oe <- listExprs ])>)";
 
 //public data Op = bitwiseAnd() | bitwiseOr() | bitwiseXor() | concat() | div() 
 //			   | minus() | \mod() | mul() | plus() | rightShift() | leftShift()
@@ -457,6 +466,15 @@ public str pp(\while(Expr cond, list[Stmt] body)) =
 	'	<for (b <- body) {><pp(b)><}>
 	'}";
 
+//	| emptyStmt()
+public str pp(emptyStmt()) = ";";
+
+//	| block(list[Stmt] body)
+public str pp(block(list[Stmt] body)) =
+	"{
+	'	<for (b <- body) {><pp(b)><}>
+	'}";
+	
 //public data Declaration = declaration(str key, Expr val);
 public str pp(declaration(str key, Expr val)) = "key=<pp(val)>";
 
