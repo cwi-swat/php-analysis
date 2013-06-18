@@ -48,7 +48,7 @@ public Expr parsePHPExpression(str s) {
 }
 
 public Script loadPHPFile(loc l) throws AssertionFailed {
-	loadPHPFile(l, true, false);
+	return loadPHPFile(l, true, false);
 }
 
 public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds) throws AssertionFailed {
