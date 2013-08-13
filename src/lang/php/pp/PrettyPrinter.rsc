@@ -12,6 +12,7 @@ import lang::php::ast::AbstractSyntax;
 import List;
 import String;
 import Set;
+import IO;
 
 //public data OptionExpr = someExpr(Expr expr) | noExpr();
 public str pp(someExpr(Expr expr)) = pp(expr);
@@ -237,8 +238,8 @@ public str pp(postDec()) = "--";
 public str pp(preDec()) = "--";
 public str pp(postInc()) = "++";
 public str pp(preInc()) = "++";
-public str pp(lt()) = "\<=";
-public str pp(leq()) = "\<";
+public str pp(lt()) = "\<";
+public str pp(leq()) = "\<=";
 public str pp(unaryPlus()) = "+";
 public str pp(unaryMinus()) = "-";
 public str pp(equal()) = "==";
@@ -308,8 +309,8 @@ public str pp(encapsed(list[Expr] parts)) = intercalate(".",[pp(p) | p <- parts]
 
 //public data Stmt 
 //	= \break(OptionExpr breakExpr)
-public str pp(\break(SomeExpr(Expr breakExpr))) = "break <pp(breakExpr)>;";
-public str pp(\break(NoExpr())) = "break;";
+public str pp(\break(someExpr(Expr breakExpr))) = "break <pp(breakExpr)>;";
+public str pp(\break(noExpr())) = "break;";
 
 //	| classDef(ClassDef classDef)
 public str pp(classDef(ClassDef classDef)) = pp(classDef);
@@ -336,7 +337,7 @@ public str pp(do(Expr cond, list[Stmt] body)) =
 	'}";
 
 //	| echo(list[Expr] exprs)
-public str pp(echo(list[Expr] exprs)) = "echo(<intercalate(".",[pp(e)|e<-exprs])>)";
+public str pp(echo(list[Expr] exprs)) = "echo(<intercalate(".",[pp(e)|e<-exprs])>);";
 
 //	| exprstmt(Expr expr)
 public str pp(exprstmt(Expr expr)) = "<pp(expr)>;";
@@ -505,7 +506,8 @@ public str pp(\case(someExpr(Expr e), list[Stmt] body)) =
 //public data ElseIf = elseIf(Expr cond, list[Stmt] body);
 public str pp(elseIf(Expr cond, list[Stmt] body)) =
 	"elseif (<pp(cond)>) {
-	'  <for (b <- body) {><pp(b)><}>"
+	'  <for (b <- body) {><pp(b)><}>
+	'}"
 	;
 	
 //public data Else = \else(list[Stmt] body);
@@ -629,10 +631,14 @@ public str pp(interface(str interfaceName, list[Name] extends, list[ClassItem] m
 //public data TraitDef = trait(str traitName, list[ClassItem] members);
 
 //public data StaticVar = staticVar(str name, OptionExpr defaultValue);
-public str pp(staticVar(str name, SomeExpr(Expr defaultValue))) = "static $<name> = <pp(defaultValue)>";
-public str pp(staticVar(str name, NoExpr())) = "static $<name>";
+public str pp(staticVar(str vname, SomeExpr(Expr defaultValue))) = "static $<vname> = <pp(defaultValue)>";
+public str pp(staticVar(str vname, NoExpr())) = "static $<vname>";
 
 //public data Script = script(list[Stmt] body) | errscript(str err);
 public str pp(script(list[Stmt] body)) = intercalate("\n",[pp(b) | b <- body]);
+public str pp(errscript(str err)) {
+	println("Cannot print an error script as a normal PHP script");
+	return "\n//<err>\n";
+}
 
 public default str pp(node n) { throw "No pretty-printer found for node <n>"; }
