@@ -6,15 +6,15 @@ import lang::php::analysis::signatures::Summaries;
 import lang::php::analysis::signatures::Signatures;
 import lang::php::util::System;
 
-alias CallGraphMap = map[loc caller, set[Callee] callees];
-
 data Callee
 	= functionCallee(str functionName, loc definedAt)
 	| methodCallee(str className, str methodName, loc definedAt)
 	| unknownCallee(str functionOrMethodName)
 	;
 
-public CallGraphMap computeSystemCallGraph(System s) {
+public anno set[Callee] Expr@callees;
+ 
+public System computeSystemCallGraph(System s) {
 	// First, get back all the library functions and methods so we can add
 	// nodes in the call graph for those that are (or may be) used
 	fsum = loadFunctionSummaries();
@@ -54,20 +54,17 @@ public CallGraphMap computeSystemCallGraph(System s) {
 			methodCalleesMap[mn] = { c };
 	}
 	
-	// Now, create the map for the system from caller locations
-	// to possible callees.
-	CallGraphMap cgm = ( );
-	for (l <- s) cgm += computeScriptCallGraph(s[l], functionCalleesMap, methodCalleesMap);
+	// Now, annotate all calls with callee information
+	s = ( l : computeScriptCallGraph(s[l], functionCalleesMap, methodCalleesMap) | l <- s );
 	
-	return cgm;
+	return s;
 }
 
-public CallGraphMap computeScriptCallGraph(Script s, map[str functionName, set[Callee] callees] functionCalleesMap, map[str methodName, set[Callee] callees] methodCalleesMap) {
-	CallGraphMap cgm = ( );
+public Script computeScriptCallGraph(Script s, map[str functionName, set[Callee] callees] functionCalleesMap, map[str methodName, set[Callee] callees] methodCalleesMap) {
 	set[Callee] allFunctions = { *fc | fc <- functionCalleesMap<1> };
 	set[Callee] allMethods = { *mc | mc <- methodCalleesMap<1> };
 	
-	visit(s) {
+	s = visit(s) {
 		case c:call(name(name(fn)),ps) : {
 			if (fn in {"call_user_func","call_user_func_array"}) {
 				// If we have a call_user_func or call_user_func_array, check for a special
@@ -79,58 +76,58 @@ public CallGraphMap computeScriptCallGraph(Script s, map[str functionName, set[C
 				// call_user_func_array, even though we could create those edges as well.
 				if ([scalar(string(fn2))] := ps) {
 					if (fn in functionCalleesMap) {
-						cgm[c@at] = functionCalleesMap[fn]; 
+						insert(c[@callees=functionCalleesMap[fn]]); 
 					} else {
-						cgm[c@at] = { unknownCallee(fn) };
+						insert(c[@callees={ unknownCallee(fn) }]);
 					}
 				} else {
-					cgm[c@at] = allFunctions;
+					insert(c[@callees = allFunctions]);
 				}
 			} else if (fn in functionCalleesMap) {
-				cgm[c@at] = functionCalleesMap[fn]; 
+				insert(c[@callees=functionCalleesMap[fn]]);
 			} else {
-				cgm[c@at] = { unknownCallee(fn) };
+				insert(c[@callees={ unknownCallee(fn) }]);
 			}
 		}
 
 		case mc:methodCall(_,name(name(mn)),_) : {
 			if (mn in methodCalleesMap) {
-				cgm[mc@at] = methodCalleesMap[mn];
+				insert(mc[@callees=methodCalleesMap[mn]]);
 			} else {
-				cgm[mc@at] = { unknownCallee(mn) };
+				insert(mc[@callees={ unknownCallee(mn) }]);
 			}
 		}
 
 		case sc:staticCall(name(name(cn)),name(name(mn)),_) : {
 			if (mn in methodCalleesMap && {_*,mc:methodCallee(cn,mn,_)} := methodCalleesMap[mn]) {
-				cgm[sc@at] = { mc };
+				insert(sc[@callees={ mc }]);
 			} else {
-				cgm[sc@at] = { unknownCallee("<cn>::<mn>") };
+				insert(sc[@callees={ unknownCallee("<cn>::<mn>") }]);
 			}
 		}
 
 		case sc:staticCall(_,name(name(mn)),_) : {
 			if (mn in methodCalleesMap) {
 				// NOTE: To be more accurate, we should filter these to just be static methods.
-				cgm[sc@at] = methodCalleesMap[mn];
+				insert(sc[@callees=methodCalleesMap[mn]]);
 			} else {
-				cgm[sc@at] = { unknownCallee("?::<mn>") };
+				insert(sc[@callees={ unknownCallee("?::<mn>") }]);
 			}
 		}
 		
 		case c:call(_,_) : {
-			cgm[c@at] = allFunctions;
+			insert(c[@callees=allFunctions]);
 		}
 
 		case mc:methodCall(_,_,_) : {
-			cgm[mc@at] = allMethods;
+			insert(mc[@callees=allMethods]);
 		}
 
 		case sc:staticMethodCall(_,_,_) : {
 			// NOTE: To be more accurate, we should filter these to just be static methods.
-			cgm[sc@at] = allMethods;
+			insert(sc[@callees=allMethods]);
 		}
 	}
 	
-	return cgm;
+	return s;
 }
