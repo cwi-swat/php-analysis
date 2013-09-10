@@ -16,7 +16,7 @@ import Set;
 import String;
 import IO;
 
-public void prepareStats(list[tuple[str p, str v, map[str,int] fc, map[str,int] sc, map[str,int] ec]] stats) {
+public void prepareStats(list[tuple[str p, str v, map[str,int] fc, map[str,int] sc, map[str,int] ec]] stats, bool appendToFiles) {
 	oftr = featureOrder();
 	oexp = exprKeyOrder();
 	ostmt = stmtKeyOrder();
@@ -34,8 +34,14 @@ public void prepareStats(list[tuple[str p, str v, map[str,int] fc, map[str,int] 
 		stmtFile += "<i.p>,<i.v>,<intercalate(",",sinfoCounts)>";
 	}
 	
-	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/features.csv|, intercalate("\n",fFile));
-	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv|, intercalate("\n",exprFile));
-	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv|, intercalate("\n",stmtFile));
+	if (appendToFiles) {
+		appendToFile(|project://PHPAnalysis/src/lang/php/extract/csvs/features.csv|, intercalate("\n",fFile));
+		appendToFile(|project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv|, intercalate("\n",exprFile));
+		appendToFile(|project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv|, intercalate("\n",stmtFile));
+	} else {
+		writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/features.csv|, intercalate("\n",fFile));
+		writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv|, intercalate("\n",exprFile));
+		writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv|, intercalate("\n",stmtFile));	
+	}
 }
 

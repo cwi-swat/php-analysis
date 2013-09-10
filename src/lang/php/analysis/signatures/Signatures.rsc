@@ -20,6 +20,8 @@ data SignatureItem
 	| classConstSig(NamePath namepath, Expr e)
 	;
 
+public anno loc SignatureItem@at;
+
 data Signature
 	= fileSignature(loc fileloc, set[SignatureItem] items)
 	;
@@ -31,8 +33,11 @@ public Signature getFileSignature(loc fileloc, Script scr) {
 	classDefs = { c | /ClassDef c := scr };
 	for (class(cn,_,_,_,cis) <- classDefs) {
 		items += classSig(classPath(cn));
-		for (method(mn,_,_,mps,_) <- cis) {
-			items += methodSig(methodPath(cn, mn), size(mps));
+		for (mt:method(mn,_,_,mps,_) <- cis) {
+			if ( (mt@at)? )
+				items += methodSig(methodPath(cn, mn), size(mps))[@at=mt@at];
+			else
+				items += methodSig(methodPath(cn, mn), size(mps));
 		}
 		for(constCI(consts) <- cis, const(name,ce) <- consts) {
 			items += classConstSig(classConstPath(cn, name), ce);
@@ -40,7 +45,13 @@ public Signature getFileSignature(loc fileloc, Script scr) {
 	}
 	
 	// Second, get all top-level functions
-	items += { functionSig(functionPath(fn),size(fps)) | /f:function(fn,_,fps,_) := scr };
+	for (/f:function(fn,_,fps,_) := scr) {
+		if ( (f@at)? ) {
+			items += functionSig(functionPath(fn),size(fps))[@at=f@at];
+		} else {
+			items += functionSig(functionPath(fn),size(fps));
+		}
+	}
 
 	// TODO: We also want to add global variables here, but need to do this in the
 	// right way -- we don't know, at this point, if a name is introduced here for

@@ -359,8 +359,13 @@ Smarty,3.1.10,15396,126
 Smarty,3.1.11,15468,126
 SquirrelMail,1.4.22,36082,276
 Symfony,2.0.12,120317,2137
+WordPress,0.71-gold,11613,54
+WordPress,1.0-platinum,17461,76
+WordPress,1.0.1-miles,17433,75
+WordPress,1.0.2,17466,75
 WordPress,1.2.1,18866,99
 WordPress,1.2.2,20380,100
+WordPress,1.5-strayhorn,22646,123
 WordPress,1.5.1.2,23449,125
 WordPress,1.5.1.1,23444,125
 WordPress,1.5.1,23459,125
@@ -425,6 +430,12 @@ WordPress,3.3,105508,374
 WordPress,3.3.1,105546,374
 WordPress,3.3.2,105622,374
 WordPress,3.4,110190,387
+WordPress,3.4.1,110152,387
+WordPress,3.4.2,110213,387
+WordPress,3.5,112518,425
+WordPress,3.5.1,112625,425
+WordPress,3.5.2,112753,425
+WordPress,3.6,128166,442
 ZendFramework,1.0.0,131123,1330
 ZendFramework,1.0.1,130432,1274
 ZendFramework,1.0.2,134746,1315

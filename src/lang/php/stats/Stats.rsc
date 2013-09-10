@@ -243,6 +243,9 @@ public str getExprKey(ternary(_,_,_)) = "ternary";
 public str getExprKey(staticPropertyFetch(_,_)) = "fetch static property";
 public str getExprKey(scalar(_)) = "scalar";
 public str getExprKey(var(_)) = "var";
+public str getExprKey(listExpr(_)) = "list";
+
+public default str getExprKey(Expr e) { throw "No matching expression for <e>"; }
 
 public list[str] exprKeyOrder() {
 	return [ "array", "fetch array dim", "fetch class const", "assign" ] +
@@ -255,7 +258,7 @@ public list[str] exprKeyOrder() {
 		   [ "clone", "closure", "fetch const", "empty", "suppress", "eval", "exit",
 		     "call", "method call", "static call", "include", "instanceOf", "isSet",
 		     "print", "property fetch", "shell exec", "ternary", "fetch static property",
-		     "scalar", "var" ];
+		     "scalar", "var", "listExpr" ];
 }
 
 public str getOpKey(bitwiseAnd()) = "bitwise and";
