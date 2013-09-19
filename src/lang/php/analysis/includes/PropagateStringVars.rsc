@@ -88,7 +88,7 @@ public Script evalStringVars(Script scr) {
 							exitMappings[n].mappings[vn] = moreThanOne();
 						}
 					} else {
-						exitMappings = ( n : var2String( overdefinedMapping ) | n <- carrier(cfgGraph) );
+						exitMappings = ( n2 : var2String( overdefinedMapping ) | n2 <- carrier(cfgGraph) );
 					}
 				}
 	
@@ -140,8 +140,8 @@ public Script evalStringVars(Script scr) {
 					( l : entryMappings[n] | n <- carrier(cfgGraph), stmtNode(st,l) := n );
 			}
 		}
-	} catch NoSuchKey(_) : {
-		println("We lost a key!");
+	} catch NoSuchKey(k) : {
+		println("We lost a key! <k>");
 		return scr;
 	}
 	
