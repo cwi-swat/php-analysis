@@ -35,13 +35,13 @@ public void prepareStats(list[tuple[str p, str v, map[str,int] fc, map[str,int] 
 	}
 	
 	if (appendToFiles) {
-		appendToFile(|project://PHPAnalysis/src/lang/php/extract/csvs/features.csv|, intercalate("\n",fFile));
-		appendToFile(|project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv|, intercalate("\n",exprFile));
-		appendToFile(|project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv|, intercalate("\n",stmtFile));
+		appendToFile(|rascal://src/lang/php/extract/csvs/features.csv|, intercalate("\n",fFile));
+		appendToFile(|rascal://src/lang/php/extract/csvs/exprs.csv|, intercalate("\n",exprFile));
+		appendToFile(|rascal://src/lang/php/extract/csvs/stmts.csv|, intercalate("\n",stmtFile));
 	} else {
-		writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/features.csv|, intercalate("\n",fFile));
-		writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv|, intercalate("\n",exprFile));
-		writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv|, intercalate("\n",stmtFile));	
+		writeFile(|rascal://src/lang/php/extract/csvs/features.csv|, intercalate("\n",fFile));
+		writeFile(|rascal://src/lang/php/extract/csvs/exprs.csv|, intercalate("\n",exprFile));
+		writeFile(|rascal://src/lang/php/extract/csvs/stmts.csv|, intercalate("\n",stmtFile));	
 	}
 }
 

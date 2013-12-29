@@ -17,7 +17,6 @@ import lang::php::analysis::NamePaths;
 import List;
 import String;
 import Set;
-import Real;
 import Relation;
 import IO;
 import ValueIO;
@@ -26,11 +25,11 @@ import Node;
 import util::Math;
 
 import lang::csv::IO;
-import VVU = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
-import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
-import Feats = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
-import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
-import Versions = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
+import VVU = |csv+rascal://src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
+import Exprs = |csv+rascal://src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
+import Feats = |csv+rascal://src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
+import Sizes = |csv+rascal://src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
+import Versions = |csv+rascal://src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -402,16 +401,16 @@ public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses,
 			 list[tuple[str p, str v, QueryResult qr]] vvsprops,
 			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] loadVVFiles() {
 	return <
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvuses.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvcalls.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvmcalls.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvnews.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvprops.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvcconsts.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvscalls.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvstargets.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvsprops.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|project://PHPAnalysis/src/lang/php/serialized/vvsptargets.bin|) >;
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvuses.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvcalls.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvmcalls.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvnews.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvprops.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvcconsts.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvscalls.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvstargets.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvsprops.bin|),
+	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvsptargets.bin|) >;
 }
 
 // TODO: Change this to generate these list...
@@ -518,11 +517,11 @@ public ICLists includesAnalysisFromBinaries(Corpus corpus) {
 }
 
 public void saveForLater(ICLists res) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/includes.bin|, res);
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/includes.bin|, res);
 }
 
 public ICLists reload() {
-	return readBinaryValueFile(#ICLists, |project://PHPAnalysis/src/lang/php/serialized/includes.bin|); 
+	return readBinaryValueFile(#ICLists, |rascal://src/lang/php/serialized/includes.bin|); 
 }
 
 // NOTE: Technically, field resolved holds info on the number of unresolved includes
@@ -563,11 +562,11 @@ public ICResult calculateIncludeCounts(ICLists res) {
 }
 
 public void saveIncludeCountsForLater(ICResult res) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/includeCounts.bin|, res);
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/includeCounts.bin|, res);
 }
 
 public ICResult reloadIncludeCounts() {
-	return readBinaryValueFile(#ICResult, |project://PHPAnalysis/src/lang/php/serialized/includeCounts.bin|); 
+	return readBinaryValueFile(#ICResult, |rascal://src/lang/php/serialized/includeCounts.bin|); 
 }
 
 public map[tuple[str p, str v], int] includeCounts(Corpus corpus) {
@@ -581,11 +580,11 @@ public map[tuple[str p, str v], int] includeCounts(Corpus corpus) {
 }
 
 public void saveTotalIncludes(map[tuple[str p, str v], int] ti) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/totalIncludes.bin|, ti);
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/totalIncludes.bin|, ti);
 }
 
 public map[tuple[str p, str v], int] loadTotalIncludes() {
-	return readBinaryValueFile(#map[tuple[str p, str v], int], |project://PHPAnalysis/src/lang/php/serialized/totalIncludes.bin|);
+	return readBinaryValueFile(#map[tuple[str p, str v], int], |rascal://src/lang/php/serialized/totalIncludes.bin|);
 }
 
 public str generateIncludeCountsTable(ICResult counts, map[tuple[str p, str v], int] totalIncludes) {
@@ -801,7 +800,7 @@ public void writeHistInfoCSV(HistInfo h) {
 		    '<p>,<f>,<i1>,<i2>,<i3>,<i4>,<i5>,<i6>,<i7>,<i8>,<i9>,<i10><}>
 		    '\n";
 		    
-	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/VarFeatures.csv|, s);
+	writeFile(|rascal://src/lang/php/extract/csvs/VarFeatures.csv|, s);
 }
 
 public str squiglies(HistInfo hi) {
@@ -891,7 +890,7 @@ public str labeledSquigly(rel[str, int] counts, str label) {
 public void featureCountsPerFile(Corpus corpus) {
 	list[str] keyOrder = stmtKeyOrder() + exprKeyOrder() + classItemKeyOrder();
 	str fileHeader = "product,version,file,<intercalate(",",["\\<rascalFriendlyKey(i)>" | i <- keyOrder ])>\n";
-	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv|, fileHeader);
+	writeFile(|rascal://src/lang/php/extract/csvs/FeaturesByFile.csv|, fileHeader);
 	
 	for (product <- corpus) {
 		productAst = loadBinary(product,corpus[product]);
@@ -901,7 +900,7 @@ public void featureCountsPerFile(Corpus corpus) {
 			list[int] infoCounts = [ (f in counts[file]) ? counts[file][f] : 0 | f <- keyOrder ];
 			featureFile += "<product>,<corpus[product]>,<file>,<intercalate(",",infoCounts)>";
 		}
-		appendToFile(|project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv|, intercalate("\n",featureFile) + "\n");	
+		appendToFile(|rascal://src/lang/php/extract/csvs/FeaturesByFile.csv|, intercalate("\n",featureFile) + "\n");	
 	}
 
 }
@@ -909,11 +908,11 @@ public void featureCountsPerFile(Corpus corpus) {
 alias FMap = map[str file, tuple[int \break, int \classDef, int \const, int \continue, int \declare, int \do, int \echo, int \expressionStatementChainRule, int \for, int \foreach, int \functionDef, int \global, int \goto, int \haltCompiler, int \if, int \inlineHTML, int \interfaceDef, int \traitDef, int \label, int \namespace, int \return, int \static, int \switch, int \throw, int \tryCatch, int \unset, int \use, int \while, int \array, int \fetchArrayDim, int \fetchClassConst, int \assign, int \assignWithOperationBitwiseAnd, int \assignWithOperationBitwiseOr, int \assignWithOperationBitwiseXor, int \assignWithOperationConcat, int \assignWithOperationDiv, int \assignWithOperationMinus, int \assignWithOperationMod, int \assignWithOperationMul, int \assignWithOperationPlus, int \assignWithOperationRightShift, int \assignWithOperationLeftShift, int \listAssign, int \refAssign, int \binaryOperationBitwiseAnd, int \binaryOperationBitwiseOr, int \binaryOperationBitwiseXor, int \binaryOperationConcat, int \binaryOperationDiv, int \binaryOperationMinus, int \binaryOperationMod, int \binaryOperationMul, int \binaryOperationPlus, int \binaryOperationRightShift, int \binaryOperationLeftShift, int \binaryOperationBooleanAnd, int \binaryOperationBooleanOr, int \binaryOperationGt, int \binaryOperationGeq, int \binaryOperationLogicalAnd, int \binaryOperationLogicalOr, int \binaryOperationLogicalXor, int \binaryOperationNotEqual, int \binaryOperationNotIdentical, int \binaryOperationLt, int \binaryOperationLeq, int \binaryOperationEqual, int \binaryOperationIdentical, int \unaryOperationBooleanNot, int \unaryOperationBitwiseNot, int \unaryOperationPostDec, int \unaryOperationPreDec, int \unaryOperationPostInc, int \unaryOperationPreInc, int \unaryOperationUnaryPlus, int \unaryOperationUnaryMinus, int \new, int \castToInt, int \castToBool, int \castToFloat, int \castToString, int \castToArray, int \castToObject, int \castToUnset, int \clone, int \closure, int \fetchConst, int \empty, int \suppress, int \eval, int \exit, int \call, int \methodCall, int \staticCall, int \include, int \instanceOf, int \isSet, int \print, int \propertyFetch, int \shellExec, int \ternary, int \fetchStaticProperty, int \scalar, int \var, int \propertyDef, int \classConstDef, int \methodDef, int \traitUse] counts];
 
 public void writeFeatsMap(FMap m) {
-  writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/featsmap.bin|, m);
+  writeBinaryValueFile(|rascal://src/lang/php/serialized/featsmap.bin|, m);
 }
 
 public FMap readFeatsMap() {
-  return readBinaryValueFile(#FMap, |project://PHPAnalysis/src/lang/php/serialized/featsmap.bin|);
+  return readBinaryValueFile(#FMap, |rascal://src/lang/php/serialized/featsmap.bin|);
 }
 
 
@@ -1390,19 +1389,19 @@ public map[int,set[str]] featuresForAllPercents2(FMap fmap, FeatureLattice latti
 }
 
 public void saveCoverageMap(map[int,set[str]] coverageMap) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/coverageMap.bin|, coverageMap);
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/coverageMap.bin|, coverageMap);
 }
 
 public map[int,set[str]] loadCoverageMap() {
-	return readBinaryValueFile(#map[int,set[str]], |project://PHPAnalysis/src/lang/php/serialized/coverageMap.bin|);
+	return readBinaryValueFile(#map[int,set[str]], |rascal://src/lang/php/serialized/coverageMap.bin|);
 }
 
 public void saveFeatureLattice(FeatureLattice fl) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/featureLattice.bin|, fl);
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/featureLattice.bin|, fl);
 }
 
 public FeatureLattice loadFeatureLattice() {
-	return readBinaryValueFile(#FeatureLattice, |project://PHPAnalysis/src/lang/php/serialized/featureLattice.bin|);
+	return readBinaryValueFile(#FeatureLattice, |rascal://src/lang/php/serialized/featureLattice.bin|);
 }
 
 public str coverageGraph(map[int,set[str]] coverageMap) {
@@ -1575,11 +1574,11 @@ public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, m
 alias NotCoveredMap = map[str product, tuple[set[str] notIn80, set[str] notIn90] filesNotCovered];
 
 public void writeNotCoveredInfo(NotCoveredMap notCovered) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/notCovered.bin|, notCovered);
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/notCovered.bin|, notCovered);
 }
 
 public NotCoveredMap readNotCoveredInfo() {
-	return readBinaryValueFile(#NotCoveredMap, |project://PHPAnalysis/src/lang/php/serialized/notCovered.bin|);
+	return readBinaryValueFile(#NotCoveredMap, |rascal://src/lang/php/serialized/notCovered.bin|);
 }
 
 public str coverageComparison(Corpus corpus, NotCoveredMap ncm) {
@@ -1629,11 +1628,11 @@ public EvalUses corpusEvalUses(Corpus corpus) {
 }
 
 public void saveEvalUses(EvalUses evalUses) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/evalUses.bin|, evalUses);
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/evalUses.bin|, evalUses);
 }
 
 public EvalUses loadEvalUses() {
-	return readBinaryValueFile(#EvalUses, |project://PHPAnalysis/src/lang/php/serialized/evalUses.bin|);
+	return readBinaryValueFile(#EvalUses, |rascal://src/lang/php/serialized/evalUses.bin|);
 }
 
 public map[str,set[str]] calculateEvalTransIncludes(Corpus corpus, EvalUses evalUses)
@@ -1743,11 +1742,11 @@ public FunctionUses corpusFunctionUses(Corpus corpus)
 	= { *systemFunctionUses(p, corpus[p], loadBinary(p,corpus[p])) | p <- corpus };
 
 public void saveFunctionUses(FunctionUses functionUses) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/functionUses.bin|, functionUses);
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/functionUses.bin|, functionUses);
 }
 
 public FunctionUses loadFunctionUses() {
-	return readBinaryValueFile(#FunctionUses, |project://PHPAnalysis/src/lang/php/serialized/functionUses.bin|);
+	return readBinaryValueFile(#FunctionUses, |rascal://src/lang/php/serialized/functionUses.bin|);
 }
 
 public void functionUsesByFun(FunctionUses functionUses) {
@@ -1926,19 +1925,19 @@ public rel[str,str,loc,Expr] allCalls(Corpus corpus) {
 }
 
 public void saveAllCalls(rel[str,str,loc,Expr] calls) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/allCalls.bin|, calls);	
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/allCalls.bin|, calls);	
 }
 
 public rel[str,str,loc,Expr] loadAllCalls() {
-	return readBinaryValueFile(#rel[str,str,loc,Expr], |project://PHPAnalysis/src/lang/php/serialized/allCalls.bin|);
+	return readBinaryValueFile(#rel[str,str,loc,Expr], |rascal://src/lang/php/serialized/allCalls.bin|);
 }
 
 public void saveVarargsCalls(rel[str,str,loc,Expr,bool] calls) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/serialized/varargsCalls.bin|, calls);	
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/varargsCalls.bin|, calls);	
 }
 
 public rel[str,str,loc,Expr,bool] loadVarargsCalls() {
-	return readBinaryValueFile(#rel[str,str,loc,Expr,bool], |project://PHPAnalysis/src/lang/php/serialized/varargsCalls.bin|);
+	return readBinaryValueFile(#rel[str,str,loc,Expr,bool], |rascal://src/lang/php/serialized/varargsCalls.bin|);
 }
 
 public map[str product,tuple[int classes, int interfaces] ciCount] classAndInterfaceCount(Corpus corpus) {
@@ -2076,3 +2075,73 @@ public map[str,set[str]] calculateVACallsTransIncludes(Corpus corpus, rel[str,st
 	
 	return transitiveFiles;
 } 
+
+alias TotalRes = map[tuple[str,str],set[str]];
+
+public TotalRes whichHaveSomething(Corpus corpus) {
+	TotalRes impactedFiles = ( <p,corpus[p]> : { } | p <- corpus );
+	
+	// Dynamic includes
+	icl = reload();
+	for (t <- icl) impactedFiles[t] += { l.path | <l,_> <- icl[t].unresolved };
+	println("After adding dynamic includes, up to <( 0 | it + size(impactedFiles[t]) | t <- impactedFiles)> files");
+		
+	// Variable variables
+	< vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets > = loadVVFiles();
+	allvv = vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets;
+	for (t:<p,v> <- toSet(allvv<0,1>)) impactedFiles[t] += { l.l.path | l <- allvv[p,v] };
+	println("After adding variable features, up to <( 0 | it + size(impactedFiles[t]) | t <- impactedFiles)> files");
+	
+	// Overloading
+	mmr = loadMMResults();
+	for (t <- mmr, <sl,gl,isl,usl,cl,scl> := mmr[t]) {
+		impactedFiles[t] += { ci@at.path | ci <- (sl+gl+isl+usl+cl+scl) };
+	}	
+	println("After adding magic methods, up to <( 0 | it + size(impactedFiles[t]) | t <- impactedFiles)> files");
+	
+	// eval and create_function
+	eu = loadEvalUses();
+	fu = loadFunctionUses();
+	cfu = createFunctionUses(fu);
+
+	evalLike = eu + cfu;
+	for (t:<p,v> <- (evalLike<0,1>))
+		impactedFiles[t] += { l.path | <l,_> <- evalLike[p,v] };			
+	println("After adding eval and create_function, up to <( 0 | it + size(impactedFiles[t]) | t <- impactedFiles)> files");
+
+	// variadic
+	va = varargsFunctionUses(fu);
+	for (t:<p,v> <- (va<0,1>))
+		impactedFiles[t] += { l.path | <l,_> <- va[p,v] };			
+	println("After adding variadic, up to <( 0 | it + size(impactedFiles[t]) | t <- impactedFiles)> files");
+		
+	// invocation
+	iv = invokeFunctionUses(fu);
+	for (t:<p,v> <- (iv<0,1>))
+		impactedFiles[t] += { l.path | <l,_> <- iv[p,v] };			
+	println("After adding invocation functions, up to <( 0 | it + size(impactedFiles[t]) | t <- impactedFiles)> files");
+	
+	return impactedFiles;
+}
+
+public void writeMMResults(MMResult mmr) {
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/mmr.bin|, mmr);
+}
+
+public MMResult loadMMResults() {
+	return readBinaryValueFile(#MMResult, |rascal://src/lang/php/serialized/mmr.bin|);
+}
+
+public rel[str p, str v, int fc, int lc, int dc, real perFiles] totalStats(Corpus corpus, TotalRes tr) {
+	rel[str p, str v, int fc, int lc, int dc, real perFiles] res = { };
+	
+	ci = loadCountsCSV();
+	for (p <- corpus) {
+		v = corpus[p];
+		< lineCount, fileCount > = getOneFrom(ci[p,v]);
+		dynCount = size(tr[<p,v>]);
+		res += < p, v, fileCount, lineCount, dynCount, (dynCount*1.000)/fileCount >;
+	}
+	
+	return res;
+}

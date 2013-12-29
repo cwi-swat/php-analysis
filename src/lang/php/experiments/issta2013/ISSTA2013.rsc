@@ -21,7 +21,7 @@ import Set;
 import Map;
 
 import lang::csv::IO;
-import Sizes = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
+import Sizes = |csv+rascal://src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
 
 private Corpus issta13Corpus = (
 	"osCommerce":"2.3.1",

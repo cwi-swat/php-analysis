@@ -268,17 +268,17 @@ public list[tuple[str p, str v, int count, int fileCount]] getSortedCounts() {
 public void writeSortedCounts() {
 	sc = getSortedCounts();
 	scLines = [ "Product,Version,LoC,Files" ] + [ "<i.p>,<i.v>,<i.count>,<i.fileCount>" | i <- sc ];
-	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|, intercalate("\n",scLines));
+	writeFile(|rascal://src/lang/php/extract/csvs/linesOfCode.csv|, intercalate("\n",scLines));
 }
 
 public rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Comments] loadVersionsCSV() {
-	rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Comments] res = readCSV(#rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Comments],|project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv|);
+	rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Comments] res = readCSV(#rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Comments],|rascal://src/lang/php/extract/csvs/Versions.csv|);
 	return res;
 	//return { <r.Product,r.Version,parseDate(r.ReleaseDate,"yyyy-MM-dd"),r.RequiredPHPVersion,r.Comments> | r <-res };  
 }
 
 public rel[str Product,str Version,int Count,int FileCount] loadCountsCSV() {
-	rel[str Product,str Version,int Count,int FileCount] res = readCSV(#rel[str Product,str Version,int Count,int fileCount],|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|);
+	rel[str Product,str Version,int Count,int FileCount] res = readCSV(#rel[str Product,str Version,int Count,int fileCount],|rascal://src/lang/php/extract/csvs/linesOfCode.csv|);
 	return res;
 }
 
@@ -335,6 +335,6 @@ public map[tuple[str product, str version], map[loc l, Script scr]] getLatestTre
 }
 
 public rel[str Product,str PlainText,str Description] loadProductInfoCSV() {
-	rel[str Product,str PlainText,str Description] res = readCSV(#rel[str Product,str PlainText,str Description],|project://PHPAnalysis/src/lang/php/extract/csvs/ProductInfo.csv|);
+	rel[str Product,str PlainText,str Description] res = readCSV(#rel[str Product,str PlainText,str Description],|rascal://src/lang/php/extract/csvs/ProductInfo.csv|);
 	return res;
 }

@@ -27,11 +27,11 @@ public void locsForProducts() {
 	map[loc,int] res = ( );
 	
 	str header = "product, version, file, phplines\n";
-	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv|, header);
+	writeFile(|rascal://src/lang/php/extract/csvs/linesPerFile.csv|, header);
 	
 	for (p <- lv) {
 		res = locsForProduct(p,lv[p]);
-		appendToFile(|project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv|, intercalate("\n",["<p>,<lv[p]>,<l.path>,<res[l]>" | l <- res]) + "\n");
+		appendToFile(|rascal://src/lang/php/extract/csvs/linesPerFile.csv|, intercalate("\n",["<p>,<lv[p]>,<l.path>,<res[l]>" | l <- res]) + "\n");
 	}
 	
 }

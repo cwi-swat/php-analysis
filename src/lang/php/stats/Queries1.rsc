@@ -3,9 +3,9 @@ module lang::php::stats::Queries1
 import Prelude;
 import lang::csv::IO;
 import lang::php::util::Utils;
-import Exprs = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=csvExprs|;
-import Stmts = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/stmts.csv?funname=csvStmts|;
-//import Simlarities = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/similarities.csv?funname=csvSimilarities|;
+import Exprs = |csv+rascal://src/lang/php/extract/csvs/exprs.csv?funname=csvExprs|;
+import Stmts = |csv+rascal://src/lang/php/extract/csvs/stmts.csv?funname=csvStmts|;
+//import Simlarities = |csv+rascal://src/lang/php/extract/csvs/similarities.csv?funname=csvSimilarities|;
 
 import ValueIO;
 import analysis::formalconcepts::FCA;
@@ -229,7 +229,7 @@ void genUsageSimilarity(ProductFeaturesRel features){
     
     
     simLines = [ "product1,version1,product2,version2,distance" ] + [ "<r.product1>,<r.version1>,<r.product2>,<r.version2>,<r.distance>" | r <- res ];
-	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/similarity.csv|, intercalate("\n",simLines));
+	writeFile(|rascal://src/lang/php/extract/csvs/similarity.csv|, intercalate("\n",simLines));
 }
 
 /*
@@ -240,11 +240,11 @@ FormalContext[str,str] convert(ProductFeaturesRel features) =
 	{ <"<f.product>-<f.version>", featureNames[i]> | f <- features, int i <- [firstFeature .. lastFeature], f[i] > 0 };
 
 void makeConcepts(ProductFeaturesRel features){
-  writeTextValueFile(|project://PHPAnalysis/src/lang/php/extract/csvs/fca-latest.txt|, fca(convert(features)));
+  writeTextValueFile(|rascal://src/lang/php/extract/csvs/fca-latest.txt|, fca(convert(features)));
 }
 
 public void analyzeConcepts(){
-  lattice = readTextValueFile(#ConceptLattice[str,str], |project://PHPAnalysis/src/lang/php/extract/csvs/fca-latest.txt|);
+  lattice = readTextValueFile(#ConceptLattice[str,str], |rascal://src/lang/php/extract/csvs/fca-latest.txt|);
   for(c <- top(lattice)){
      println(c[0]);
   }
@@ -259,7 +259,7 @@ Figure mkNode(Concept[str,str] c, str n){
 }
 
 public void drawConcepts(){
-   lattice = readTextValueFile(#ConceptLattice[str,str], |project://PHPAnalysis/src/lang/php/extract/csvs/fca-latest.txt|);
+   lattice = readTextValueFile(#ConceptLattice[str,str], |rascal://src/lang/php/extract/csvs/fca-latest.txt|);
    n = 0;
    objects = ();
    nodes = [];
