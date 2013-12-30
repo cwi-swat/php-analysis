@@ -62,6 +62,9 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	if (addLocationAnnotations) opts += "-l";
 	if (addUniqueIds) opts += "-i";
 	
+	// TESTING: Make file locations relative
+	opts += "-r";
+	
 	PID pid = createProcess(phploc.path, ["-d memory_limit=512M", rgenLoc.path, "-f<l.path>"] + opts, rgenCwd);
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
