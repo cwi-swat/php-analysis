@@ -65,7 +65,6 @@ public Script evalStringVars(Script scr) {
 	// include -- the winnowing is done in a separate conditional, since we don't want
 	// to repeat the logic in the loop if we have multiple includes we can match... 
 	map[Lab,Strings] labStrings = ( );
-	//try {
 		for (np <- cfgs) {
 			dynamicIncludes = { en | en:exprNode(include(ipath,_),_) <- cfgs[np].nodes, scalar(string(str lpath)) !:= ipath };
 			if (size(dynamicIncludes) != 0) {
@@ -140,10 +139,6 @@ public Script evalStringVars(Script scr) {
 					( l : entryMappings[n] | n <- carrier(cfgGraph), stmtNode(st,l) := n );
 			}
 		}
-	//} catch NoSuchKey(_) : {
-	//	println("We lost a key!");
-	//	return scr;
-	//}
 	
 	Expr replaceStr(Expr e, str rs) = bottom-up visit(e) { case str s2repl => rs };
 	

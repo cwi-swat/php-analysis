@@ -172,7 +172,7 @@ public str pp(instanceOf(Expr expr, expr(Expr toCompare))) = "<pp(expr)> instanc
 public str pp(isSet(list[Expr] exprs)) = "isset(<intercalate(",",[pp(e)|e<-exprs])>)";
 
 //	| print(Expr expr)
-public str pp(print(Expr expr)) = "print(<pp(expr)>)";
+public str pp(Expr::print(Expr expr)) = "print(<pp(expr)>)";
 
 //	| propertyFetch(Expr target, NameOrExpr propertyName)
 public str pp(propertyFetch(Expr target, name(Name propertyName))) = "<pp(target)>-\><pp(propertyName)>";

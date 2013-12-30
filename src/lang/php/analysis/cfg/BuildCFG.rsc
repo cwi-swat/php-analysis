@@ -21,6 +21,7 @@ import IO;
 import List;
 import Set;
 import Node;
+import Exception;
 
 // TODOs:
 // 2. Gotos need to be handled by keeping track of which nodes are
@@ -656,7 +657,12 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 		// using "break 1".
 		case \break(noExpr()) : {
 			if (hasBreakLabel(1, lstate)) {
-				edges += flowEdge(finalLabel, getBreakLabel(1, lstate));
+				try {
+					edges += flowEdge(finalLabel, getBreakLabel(1, lstate));
+				} catch EmptyList() : {
+					println("WARNING: Even though we checked the list length it is empty!");
+					edges += flowEdge(finalLabel, getExitNodeLabel(lstate));
+				}
 			} else {
 				println("WARNING: This program breaks beyond the visible break nesting.");
 				edges += flowEdge(finalLabel, getExitNodeLabel(lstate));

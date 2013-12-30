@@ -39,35 +39,35 @@ public anno loc Summary@from;
 data NamePart = libraryConstants();
 
 public set[Summary] loadFunctionSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpFunctions.bin|);
+	return readBinaryValueFile(#set[Summary], |rascal://src/lang/php/analysis/signatures/phpFunctions.bin|);
 }
 
 public void saveFunctionSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpFunctions.bin|, summaries);
+	writeBinaryValueFile(|rascal://src/lang/php/analysis/signatures/phpFunctions.bin|, summaries);
 }
 
 public set[Summary] loadConstantSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpConstants.bin|);
+	return readBinaryValueFile(#set[Summary], |rascal://src/lang/php/analysis/signatures/phpConstants.bin|);
 }
 
 public void saveConstantSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpConstants.bin|, summaries);
+	writeBinaryValueFile(|rascal://src/lang/php/analysis/signatures/phpConstants.bin|, summaries);
 }
 
 public set[Summary] loadClassSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpClasses.bin|);
+	return readBinaryValueFile(#set[Summary], |rascal://src/lang/php/analysis/signatures/phpClasses.bin|);
 }
 
 public void saveClassSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpClasses.bin|, summaries);
+	writeBinaryValueFile(|rascal://src/lang/php/analysis/signatures/phpClasses.bin|, summaries);
 }
 
 public set[Summary] loadMethodSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpMethods.bin|);
+	return readBinaryValueFile(#set[Summary], |rascal://src/lang/php/analysis/signatures/phpMethods.bin|);
 }
 
 public void saveMethodSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpMethods.bin|, summaries);
+	writeBinaryValueFile(|rascal://src/lang/php/analysis/signatures/phpMethods.bin|, summaries);
 }
 
 public set[Summary] loadSummaries() {
