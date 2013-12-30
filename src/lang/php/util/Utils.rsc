@@ -53,7 +53,7 @@ public Script loadPHPFile(loc l) throws AssertionFailed {
 
 public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds) throws AssertionFailed {
 	if (!exists(l)) throw AssertionFailed("Location <l> does not exist");
-	if (l.scheme != "file") throw AssertionFailed("Only file locations are supported");
+	if (l.scheme notin {"file","home"}) throw AssertionFailed("Only file and home locations are supported");
 	if (!isFile(l)) throw AssertionFailed("Location <l> must be a file");
 
 	println("Loading <l.path>");
@@ -98,7 +98,7 @@ public System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) loa
 
 private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) loader, bool addLocationAnnotations, bool addUniqueIds) throws AssertionFailed {
 
-	if ((l.scheme == "file") && !exists(l)) throw AssertionFailed("Location <l> does not exist");
+	if ((l.scheme == "file" || l.scheme == "home") && !exists(l)) throw AssertionFailed("Location <l> does not exist");
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
 	
 	list[loc] entries = [ l + e | e <- listEntries(l) ];
