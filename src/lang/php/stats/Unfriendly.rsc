@@ -1530,7 +1530,7 @@ public void writeIncludeBinaries(Corpus corpus) {
 		version = corpus[product];
 		pt = loadBinary(product,version);
 		pt = resolveIncludes(pt,getCorpusItem(product,corpus[product]));
-		parsedItem = parsedDir + "<product>-<version>-icp.pt";
+		parsedItem = parsedDir.parent + "includes/<product>-<version>-icp.pt";
 		println("Writing binary: <parsedItem>");
 		writeBinaryValueFile(parsedItem, pt);
 	}

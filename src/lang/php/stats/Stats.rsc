@@ -258,7 +258,7 @@ public list[str] exprKeyOrder() {
 		   [ "clone", "closure", "fetch const", "empty", "suppress", "eval", "exit",
 		     "call", "method call", "static call", "include", "instanceOf", "isSet",
 		     "print", "property fetch", "shell exec", "ternary", "fetch static property",
-		     "scalar", "var", "listExpr" ];
+		     "scalar", "var", "list" ];
 }
 
 public str getOpKey(bitwiseAnd()) = "bitwise and";

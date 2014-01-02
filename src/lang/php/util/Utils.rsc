@@ -52,11 +52,11 @@ public Script loadPHPFile(loc l) throws AssertionFailed {
 }
 
 public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds) throws AssertionFailed {
-	if (!exists(l)) throw AssertionFailed("Location <l> does not exist");
-	if (l.scheme notin {"file","home"}) throw AssertionFailed("Only file and home locations are supported");
-	if (!isFile(l)) throw AssertionFailed("Location <l> must be a file");
+	if (!exists(l)) return errscript("Location <l> does not exist");
+	if (l.scheme notin {"file","home"}) return errscript("Only file and home locations are supported");
+	if (!isFile(l)) return errscript("Location <l> must be a file");
 
-	println("Loading <l.path>");
+	//println("Loading <l.path>");
 	
 	list[str] opts = [ ];
 	if (addLocationAnnotations) opts += "-l";
