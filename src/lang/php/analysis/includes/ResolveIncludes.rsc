@@ -19,7 +19,7 @@ import lang::php::util::Utils;
 import lang::php::stats::Stats;
 
 public System resolveIncludes(System sys, loc baseLoc) {
-	sys = inlineMagicConstants(sys);
+	sys = inlineMagicConstants(sys, baseLoc);
 	solve(sys) {
 		sys = evalAllScalarsAndInlineUniques(sys, baseLoc);
 		sys = matchIncludes(sys);
@@ -28,7 +28,7 @@ public System resolveIncludes(System sys, loc baseLoc) {
 }
 
 public System resolveIncludesWithVars(System sys, loc baseLoc) {
-	sys = inlineMagicConstants(sys);
+	sys = inlineMagicConstants(sys, baseLoc);
 	solve(sys) {
 		solve(sys) {
 			sys = matchIncludes(sys);
@@ -51,4 +51,21 @@ public map[str,IncludesInfo] resolveCorpusIncludes(Corpus corpus) {
 		res[product] = < sys, resolved, vpIncludesInitial, vpIncludes >;
 	}
 	return res;
+}
+
+public System resolve(System sys, loc baseLoc) {
+	sys = inlineMagicConstants(sys, baseLoc);
+	igraph = extractIncludeGraph(sys, baseLoc.path);
+	cinfo = getConstInfo(sys);
+	
+	set[IncludeGraphNode] dirtyNodes = igraph.nodes;
+	igTrans = (collapseToNodeGraph(igraph))*;
+	igInverted = invert(igTrans);
+	map[IncludeGraphNode,set[IncludeGraphNode]] reachable = ( n : igTrans[n] | n <- igraph.nodes );
+	map[IncludeGraphNode,set[IncludeGraphNode]] impacts = ( n : igInverted[n] | n <- igraph.nodes );
+
+	while (!isEmpty(dirtyNodes)) {
+		n = getOneFrom(dirtyNodes);
+		nChanged = evalConsts(sys[l],constMap,classConstMap,reachable,sigs);		
+	}
 }
