@@ -24,27 +24,31 @@ import Exception;
 import IO;
 
 @doc{Replace magic constants with their actual values.}
-public Script inlineMagicConstants(Script scr, loc l) {
+public tuple[Script newScript, bool changed] inlineMagicConstants(Script scr, loc l) {
 	// First, replace any magic constants that require context. This includes
 	// __CLASS__, __METHOD__, __FUNCTION__, __NAMESPACE__, and __TRAIT__.
+	bool changed = false;
+	
+	Expr wrapReplace(Expr e) { changed = true; return e; }
+
 	scr = top-down visit(scr) {
 		case c:class(className,_,_,_,members) : {
 			members = bottom-up visit(members) {
-				case s:scalar(classConstant()) => scalar(string(className))[@at=s@at]
+				case s:scalar(classConstant()) => wrapReplace(scalar(string(className))[@at=s@at])
 			}
 			insert(c[members=members]);
 		}
 		
 		case m:method(methodName,_,_,_,body) : {
 			body = bottom-up visit(body) {
-				case s:scalar(methodConstant()) => scalar(string(methodName))[@at=s@at]
+				case s:scalar(methodConstant()) => wrapReplace(scalar(string(methodName))[@at=s@at])
 			}
 			insert(m[body=body]);
 		}
 		
 		case f:function(funcName,_,_,body) : {
 			body = bottom-up visit(body) {
-				case s:scalar(funcConstant()) => scalar(string(funcName))[@at=s@at]
+				case s:scalar(funcConstant()) => wrapReplace(scalar(string(funcName))[@at=s@at])
 			}
 			insert(f[body=body]);
 		}
@@ -56,7 +60,7 @@ public Script inlineMagicConstants(Script scr, loc l) {
 			namespaceName = "";
 			if (someName(name(str nn)) := maybeName) namespaceName = nn;
 			body = bottom-up visit(body) {
-				case s:scalar(namespaceConstant()) => scalar(string(namespaceName))[@at=s@at]
+				case s:scalar(namespaceConstant()) => wrapReplace(scalar(string(namespaceName))[@at=s@at])
 			}
 			insert(n[body=body]);
 		}
@@ -67,28 +71,28 @@ public Script inlineMagicConstants(Script scr, loc l) {
 	// do require context with "", this means they were used outside of a
 	// valid context (e.g., __CLASS__ outside of a class).
 	scr = bottom-up visit(scr) {
-		case s:scalar(classConstant()) => scalar(string(""))[@at=s@at]
-		case s:scalar(methodConstant()) => scalar(string(""))[@at=s@at]
-		case s:scalar(funcConstant()) => scalar(string(""))[@at=s@at]
-		case s:scalar(namespaceConstant()) => scalar(string(""))[@at=s@at]
+		case s:scalar(classConstant()) => wrapReplace(scalar(string(""))[@at=s@at])
+		case s:scalar(methodConstant()) => wrapReplace(scalar(string(""))[@at=s@at])
+		case s:scalar(funcConstant()) => wrapReplace(scalar(string(""))[@at=s@at])
+		case s:scalar(namespaceConstant()) => wrapReplace(scalar(string(""))[@at=s@at])
 
-		case s:scalar(fileConstant()) => scalar(string(l.path))[@at=s@at]
-		case s:scalar(dirConstant()) => scalar(string(l.parent.path))[@at=s@at]
+		case s:scalar(fileConstant()) => wrapReplace(scalar(string(l.path))[@at=s@at])
+		case s:scalar(dirConstant()) => wrapReplace(scalar(string(l.parent.path))[@at=s@at])
 
 		case s:scalar(lineConstant()) : {
 			try {
-				insert(scalar(integer(s@at.begin.line))[@at=s@at]);
+				insert(wrapReplace(scalar(integer(s@at.begin.line))[@at=s@at]));
 			} catch UnavailableInformation() : {
 				println("Tried to extract line number from location <s@at> with no line number information");
 			}
 		}
 	}
-	return scr;
+	return < scr, changed >;
 }
 
 public System inlineMagicConstants(System scripts) {
 	println("INLINING MAGIC CONSTANTS");
-	scripts = ( l : inlineMagicConstants(scripts[l],l) | l <- scripts );
+	scripts = ( l : inlineMagicConstants(scripts[l],l).newScript | l <- scripts );
 	println("INLINING MAGIC CONSTANTS FINISHED");
 	return scripts;
 }
