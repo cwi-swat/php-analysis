@@ -87,29 +87,38 @@ public map[loc fileloc, Script scr] evalAllScalarsAndInlineUniques(map[loc filel
 		// Extract out the signatures. Again, we do this here because the information in the
 		// signatures for constants could change (we could resolve a constant, defined in terms
 		// of another constant, to a specific literal, for instance)
-		println("EXTRACTING FILE SIGNATURES");
-		sigs = getSystemSignatures(scripts);		
-		println("EXTRACTING FILE SIGNATURES FINISHED");
+		println("EXTRACTING SCRIPT CONSTANTS");
+		sigs = getConstantSignatures(scripts);		
+		println("EXTRACTING SCRIPT CONSTANTS FINISHED");
 
-		// Retrieve all defined constants and class constants		
-		allConsts = getAllDefinedConstants(scripts);
+		// Get back information on the constants defined in the system, based on the signatures
+		systemConstDefs = getSystemConstDefs(sigs);
+		constDefLocs = getConstDefLocs(systemConstDefs);
+		classConstDefLocs = getClassConstDefLocs(systemConstDefs);
+		constDefExprs = getConstDefExprs(systemConstDefs);
+		classConstDefExprs = getClassConstDefExprs(systemConstDefs);
 
+		// Get back information on the constants used in the system: this directly queries the scripts
+		systemConstUses = getSystemConstUses(scripts);
+		constUseLocs = getConstUseLocs(systemConstUses);
+		classConstUseLocs = getClassConstUseLocs(systemConstUses);
+		
 		// Fill in the constant map. These are all constants that have a system-wide
 		// unique definition.
 		map[str, Expr] constMap = ( );
-		constMap["DIRECTORY_SEPARATOR"] = scalar(string("/"));
-		constMap["PATH_SEPARATOR"] = scalar(string(":"));
-		constsRel = { < cn, ce > | constSig([global(),const(cn)],ce) <- allConsts<0> }; 
-		constMap += ( cn : ce | cn <- constsRel<0>, size(constsRel[cn]) == 1, ce:scalar(sv) := getOneFrom(constsRel[cn]), encapsed(_) !:= sv );
+		if ("DIRECTORY_SEPARATOR" notin systemConstDefs)
+			constMap["DIRECTORY_SEPARATOR"] = scalar(string("/"));
+		if ("PATH_SEPARATOR" notin systemConstDefs)
+			constMap["PATH_SEPARATOR"] = scalar(string(":"));
+		constMap += ( cn : ce | cn <- constDefExprs, size(constDefExprs[cn]) == 1, ce:scalar(sv) := getOneFrom(constDefExprs[cn]), encapsed(_) !:= sv );  
 
 		// Fill in the class constant map. These are all constants that have a system-wide
 		// unique definition.
 		map[str, map[str, Expr]] classConstMap = ( );
-		classConstsRel = { < cn, con, ce > | constSig([class(cn),const(con)],ce) <- allConsts<0> };
-		for (cn <- classConstsRel<0>) {
-			constsForCn = classConstsRel[cn];
-			mapForCn = (con : ce | con <- constsForCn<0>, size(constsForCn[con]) == 1, ce:scalar(sv) := getOneFrom(constsForCn[con]), encapsed(_) != sv );
-			classConstMap[cn] = mapForCn; 
+		for (cln <- classConstDefExprs) {
+			constsForCln = classConstDefExprs[cln];
+			mapForCn = ( cn : ce | cn <- constsForCln, size(constsForCln[cn]) == 1, ce:scalar(sv) := getOneFrom(constsForCln[cn]), encapsed(_) !:= sv );
+			classConstMap[cln] = mapForCn; 
 		} 
 		
 		// Now, actually do the constant replacement for each script in the system.

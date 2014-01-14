@@ -24,7 +24,7 @@ import Exception;
 import IO;
 
 @doc{Replace magic constants with their actual values.}
-public Script inlineMagicConstants(Script scr, loc l) {
+public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 	// First, replace any magic constants that require context. This includes
 	// __CLASS__, __METHOD__, __FUNCTION__, __NAMESPACE__, and __TRAIT__.
 	scr = top-down visit(scr) {
@@ -60,20 +60,30 @@ public Script inlineMagicConstants(Script scr, loc l) {
 			}
 			insert(n[body=body]);
 		}
+		
+		case n:namespaceHeader(namespaceName) : {
+			;
+			// TODO: This sets the name for the other code in the file.
+			// We need to look at a good way to "fence" these to make
+			// this visible in __NAMESPACE__ occurrences...
+		}
 	}
 	
 	// Now, replace those magic constants that do not require any context,
 	// such as __FILE__ and __DIR__. Also replace the magic constants that
 	// do require context with "", this means they were used outside of a
 	// valid context (e.g., __CLASS__ outside of a class).
+	fileLoc = substring(l.path,size(baseloc.path));
+	dirLoc = substring(l.parent.path,size(baseloc.path));
+	
 	scr = bottom-up visit(scr) {
 		case s:scalar(classConstant()) => scalar(string(""))[@at=s@at]
 		case s:scalar(methodConstant()) => scalar(string(""))[@at=s@at]
 		case s:scalar(funcConstant()) => scalar(string(""))[@at=s@at]
 		case s:scalar(namespaceConstant()) => scalar(string(""))[@at=s@at]
 
-		case s:scalar(fileConstant()) => scalar(string(l.path))[@at=s@at]
-		case s:scalar(dirConstant()) => scalar(string(l.parent.path))[@at=s@at]
+		case s:scalar(fileConstant()) => scalar(string(fileLoc))[@at=s@at]
+		case s:scalar(dirConstant()) => scalar(string(dirLoc))[@at=s@at]
 
 		case s:scalar(lineConstant()) : {
 			try {
@@ -86,9 +96,9 @@ public Script inlineMagicConstants(Script scr, loc l) {
 	return scr;
 }
 
-public System inlineMagicConstants(System scripts) {
+public System inlineMagicConstants(System scripts, loc baseloc) {
 	println("INLINING MAGIC CONSTANTS");
-	scripts = ( l : inlineMagicConstants(scripts[l],l) | l <- scripts );
+	scripts = ( l : inlineMagicConstants(scripts[l],l,baseloc) | l <- scripts );
 	println("INLINING MAGIC CONSTANTS FINISHED");
 	return scripts;
 }

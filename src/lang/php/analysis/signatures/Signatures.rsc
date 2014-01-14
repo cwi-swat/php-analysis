@@ -10,6 +10,7 @@ module lang::php::analysis::signatures::Signatures
 
 import lang::php::analysis::NamePaths;
 import lang::php::ast::AbstractSyntax;
+import lang::php::util::System;
 import List;
 
 data SignatureItem
@@ -64,9 +65,20 @@ public Signature getFileSignature(loc fileloc, Script scr) {
 	
 	return fileSignature(fileloc, items);
 }
+
+public Signature getScriptConstants(loc fileloc, Script scr) {
+	set[SignatureItem] items = 
+		{ classConstSig(classConstPath(cn, name), ce) | /class(cn,_,_,_,cis) := scr, constCI(consts) <- cis, const(name,ce) <- consts } +
+		{ constSig(constPath(cn),e) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e,false)]) := scr };
+	return fileSignature(fileloc, items);
+}
 		
-public map[loc,Signature] getSystemSignatures(map[loc fileloc, Script scr] scripts) {
-	return ( l : getFileSignature(l,scripts[l]) | l <- scripts );
+public map[loc,Signature] getSystemSignatures(System sys) {
+	return ( l : getFileSignature(l,sys[l]) | l <- sys );
+}
+
+public map[loc,Signature] getConstantSignatures(System sys) {
+	return ( l : getScriptConstants(l,sys[l]) | l <- sys );
 }
 
 public rel[SignatureItem, loc] getAllDefinedConstants(map[loc fileloc, Script scr] scripts) {
