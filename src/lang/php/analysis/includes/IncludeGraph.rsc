@@ -2,17 +2,18 @@ module lang::php::analysis::includes::IncludeGraph
 
 import lang::php::ast::AbstractSyntax;
 import lang::php::stats::Stats;
-import analysis::graphs::Graph;
 import lang::php::util::LocUtils;
+import lang::php::analysis::evaluators::AlgebraicSimplification;
+import lang::php::analysis::evaluators::SimulateCalls;
+
+import analysis::graphs::Graph;
 import String;
 import Set;
 import Relation;
 
-data IncludeGraphNode = igNode(str fileName, loc fileLoc) | unknownNode();
+data IncludeGraphNode = igNode(str fileName, loc fileLoc) | unknownNode() | multiNode(set[IncludeGraphNode] alts);
 data IncludeGraphEdge = igEdge(IncludeGraphNode source, IncludeGraphNode target, Expr includeExpr);
-data IncludeGraph = igGraph(set[IncludeGraphNode] nodes, set[IncludeGraphEdge] edges);
-
-public anno set[loc] Expr@possibleIncludes;
+data IncludeGraph = igGraph(map[loc,IncludeGraphNode] nodes, set[IncludeGraphEdge] edges);
 
 public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, str productRoot) {
 	int sizeToRemove = size(productRoot);
@@ -22,24 +23,23 @@ public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, st
 	for (l <- scripts) {
 		includes = fetchIncludeUses(scripts[l]);
 		for (iexp:include(e,itype) <- includes) {
+			solve(e) {
+				e = algebraicSimplification(simulateCalls(e));
+			}
 			if (scalar(string(sp)) := e) {
 				try {
 					iloc = calculateLoc(scripts<0>,l,sp);
-					edgeSet += igEdge(nodeMap[l],nodeMap[iloc],iexp);					
+					edgeSet += igEdge(nodeMap[l],nodeMap[iloc],iexp[expr=e]);					
 				} catch UnavailableLoc(_) : {
-					edgeSet += igEdge(nodeMap[l],unknownNode(),iexp);
+					edgeSet += igEdge(nodeMap[l],unknownNode(),iexp[expr=e]);
 				}
 			} else {
-				if ( (iexp@possibleIncludes)? && size(iexp@possibleIncludes) > 0 ) {
-					edgeSet += { igEdge(nodeMap[l],nodeMap[l2],iexp) | l2 <- iexp@possibleIncludes };
-				} else {
-					edgeSet += igEdge(nodeMap[l],unknownNode(),iexp);
-				}
+				edgeSet += igEdge(nodeMap[l],unknownNode(),iexp[expr=e]);
 			}
 		}
 	}
 	
-	return igGraph(nodeMap<1>,edgeSet);
+	return igGraph(nodeMap,edgeSet);
 }
 
 public Graph[str] collapseToGraph(IncludeGraph ig) {

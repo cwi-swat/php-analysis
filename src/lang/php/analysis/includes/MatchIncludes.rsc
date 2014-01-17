@@ -13,6 +13,7 @@ import lang::php::util::Corpus;
 import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::stats::Stats;
 import lang::php::util::Utils;
+import lang::php::util::System;
 import lang::php::analysis::includes::IncludeGraph;
 import lang::php::pp::PrettyPrinter;
 import Exception;
@@ -23,7 +24,7 @@ import Set;
 import Relation;
 import util::Math;
 
-data FNBits = lit(str s) | fnBit() | goUp() | dirSep();
+data FNBits = lit(str s) | fnBit();
 
 // This function just calls the next function on each script in the map. The bulk of
 // what happens is done in the function below.
@@ -34,97 +35,64 @@ public map[loc fileloc, Script scr] matchIncludes(map[loc fileloc, Script scr] s
 	return scripts;	
 }
 
-// Attempt to resolve includes in the file by first building a pattern, based on the
-// literal and variable parts of the file name, and then trying to find which files
-// could match. We resolve if we only get one hit. Otherwise, we don't resolve, but
-// we could at least reduce the number of possibilities to a more reasonable number.
-//
-//
-// NOTE: The assumption in this code is that other steps to try to simplify the
-// include have already been taken, e.g., constant substitution or algebraic
-// simplification of string concatenations.
-//
-// TODO: Add code to do the latter. For now, if we don't resolve this, we just
-// leave it alone.
-public list[&T] insertSeps(list[&T] l, &T sep) {
-	res = [ l[i],sep | i <- index(l), i != size(l)-1 ];
-	if (size(l) > 0) res = res + last(l);
-	return res;
+private FNBits lastLiteralPart(Expr e) {
+	if (binaryOperation(l,r,concat()) := e) {
+		return lastLiteralPart(r);
+	} else if (scalar(encapsed(el)) := e) {
+		return lastLiteralPart(last(el));
+	} else if (scalar(string("/")) := e) {
+		return fnBit();
+	} else if (scalar(string(s)) := e) {
+		if (trim(s) == "") return fnBit();
+		
+		list[str] parts = split("/",trim(s));
+		lastDotDot = lastIndexOf(parts,"..");
+		lastDot = lastIndexOf(parts,".");
+		lastToUse = max(lastDotDot,lastDot);
+
+		if (lastToUse == -1)
+			return lit(s);
+		else if (lastToUse >= 0 && (lastToUse+1) < size(parts))
+			return lit(intercalate("/",drop(lastToUse+1,parts)));
+		else
+			return fnBit();
+	} else {
+		return fnBit();
+	}
 }
 
-public Script matchIncludes(set[loc] possibleIncludes, Script scr) {
-	list[FNBits] flattenExpr(Expr e) {
-		if (binaryOperation(l,r,concat()) := e) {
-			return flattenExpr(l) + flattenExpr(r);
-		} else if (scalar(encapsed(el)) := e) {
-			return [*flattenExpr(eli) | eli <- el];
-		} else if (scalar(string("/")) := e) {
-			return [ dirSep() ];
-		} else if (scalar(string(s)) := e) {
-			list[str] parts = split("/",s);
-			while([a*,b,"..",c*] := parts) parts = [*a,*c];
-			while([a*,".",c*] := parts) parts = [*a,*c];		
-			return insertSeps([ (p == "..") ? FNBits::goUp() : FNBits::lit(p) | p <- parts ],dirSep());
-		} else {
-			return [ fnBit() ];
-		}
-	}
+private str escaped(str c) = escape(c,("/" : "\\/"));
+
+// TODO: Add support for library includes. This is only an issue were we
+// to match an include that was both a library include and an include in
+// our own system.
+public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphEdge e) {
+	Expr attemptToMatch = e.includeExpr.expr;
 	
-	str fnBits2Str(FNBits fnb) {
-		str escaped(str c) = escape(c,("/" : "\\/"));
-		switch(fnb) {
-			case lit(s) : return intercalate("",[ "[<escaped(c)>]" | c <- tail(split("",s)) ]);
-			case fnBit() : return "\\S+";
-			case goUp() : return "\\S+";
-			case dirSep() : return "\\/";
-		}
-	}
+	// Find the part of the include expression that we may be able to match; this is
+	// the last literal part of the string, after any . or .. path characters (we don't
+	// use them to adjust to path because, in cases like $x../path/to/file, we don't
+	// know what $x is, so we don't know if we can just "walk back" a step, so this
+	// makes the match more conservative)
+	matchItem = lastLiteralPart(attemptToMatch);
 	
-	// Assumption: we have already done the various scalar transformations, so we have made
-	// the includes "as literal as possible". Now, using the information in any string literals
-	// present in the include, we will match against the file names we have in the total
-	// list of includable files.
-	list[Expr] varIncludes = fetchIncludeUsesVarPaths(scr);
-	map[Expr,Expr] replacementMap = ( );
-	map[Expr,set[loc]] possibleIncludesMap = ( );
-	
-	// TODO: We should probably cut the prefix off of all the locations
-	// instead, so we only have to match the part after the install dir.
-	for (i:include(iexp,_) <- varIncludes) {
-		list[FNBits] bits = flattenExpr(iexp);
-		while([a*,fnBit(),fnBit(),b*] := bits) bits = [*a,fnBit(),*b];
-		while([a*,dirSep(),lit(s1),goUp(),b*] := bits) bits = [*a,*b];
-		while([a*,lit(""),b*] := bits) bits = [*a,*b];
-		//while([a*,lit(s1),lit(s2),b*] := bits) bits = [*a,lit("<s1>/<s2>"),*b];
-		list[str] reList = [ fnBits2Str(b) | b <- bits ];
-		str re = "^\\S*" + intercalate("",reList) + "$";
-		//println("Trying regular expression <re>");
-		filteredIncludes = { l | l <- possibleIncludes, rexpMatch(l.path,re) };
-		//println("Found <size(filteredIncludes)> possible includes");
+	// If this is a literal, we can try to match it; if it is an fbBit, it is some
+	// file name piece that we can't use in matching
+	if (lit(s) := matchItem) {
+		// Create  regular expression for s, this is just s with special characters escaped
+		str re = "^\\S*" + intercalate("",[ "[<escaped(c)>]" | c <- tail(split("",s)) ]) + "$";
+
+		// Find any locations that match the regular expression
+		filteredIncludes = { l | l <- sys<0>, rexpMatch(l.path,re) };
+		
 		if (size(filteredIncludes) == 1) {
-			replacementMap[i] = scalar(string(getOneFrom(filteredIncludes).path))[@at=iexp@at];
-		//} else {
-			//println("Could not replace <pp(iexp)> at <iexp@at>, found <size(filteredIncludes)> hits with rexp <re>");
-			//if (size(filteredIncludes) < 4) {
-				//println("With bits: <bits>");
-				//for (fi <- filteredIncludes)
-				//	println("\t<fi.path>");
-				//}
-		} else if (size(filteredIncludes) > 1) {
-			possibleIncludesMap[i] = filteredIncludes;
+			return igEdge(e.source, ig.nodes[getOneFrom(filteredIncludes)], e.includeExpr);
+		} else if (size(filteredIncludes) > 1 && size(filteredIncludes) < size(sys<0>)) {
+			return igEdge(e.source, multiNode({ig.nodes[l] | l <- filteredIncludes}), e.includeExpr);
+		} else {
+			return igEdge(e.source, unknownNode(), e.includeExpr);
 		}
 	}
 	
-	scr = visit(scr) {
-		case i:include(iexp,itype) : {
-			if (i in replacementMap) {
-				insert(include(replacementMap[i],itype)[@at=i@at][@possibleIncludes={}]);
-			} else if (i in possibleIncludesMap) {
-				insert(i[@possibleIncludes=possibleIncludesMap[i]]);
-			} else {
-				insert(i[@possibleIncludes={}]);
-			}
-		}
-	}
-	return scr;
+	return e;
 }

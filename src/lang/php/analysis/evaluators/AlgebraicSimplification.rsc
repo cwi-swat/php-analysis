@@ -25,34 +25,30 @@ public Scalar concatScalars(Scalar sc1:float(real r1), Scalar sc2:float(real r2)
 
 @doc{Perform algebraic simplification over operations formed just with scalars. We could also
      simplify expressions like 0 * e, but would risk discarding any side effects caused by e.}
-public tuple[Script newScript, bool changed] algebraicSimplification(Script scr) {
-	bool changed = false;
-	
-	Expr wrapReplace(Expr e) { changed = true; return e; }
-	
-	scr = bottom-up visit(scr) {
+public Script algebraicSimplification(Script scr) {
+	return bottom-up visit(scr) {
 		case e:binaryOperation(scalar(sc1),scalar(sc2),concat()) : {
 			if (string(_) := sc1 || integer(_) := sc1 || float(_) := sc1) {
 				if (string(_) := sc2 || integer(_) := sc2 || float(_) := sc2) {
-			 		insert(wrapReplace(scalar(concatScalars(sc1,sc2))[@at=e@at]));
+			 		insert(scalar(concatScalars(sc1,sc2))[@at=e@at]);
 			 	}
 			}
 		}
 
 		case e:binaryOperation(scalar(integer(i1)),scalar(integer(i2)),plus()) =>
-			 wrapReplace(scalar(integer(i1+i2))[@at=e@at])
+			 scalar(integer(i1+i2))[@at=e@at]
 			 
 		case e:binaryOperation(scalar(integer(i1)),scalar(integer(i2)),minus()) =>
-			 wrapReplace(scalar(integer(i1-i2))[@at=e@at])
+			 scalar(integer(i1-i2))[@at=e@at]
 			 
 		case e:binaryOperation(scalar(integer(i1)),scalar(integer(i2)),mul()) =>
-			 wrapReplace(scalar(integer(i1*i2))[@at=e@at])
+			 scalar(integer(i1*i2))[@at=e@at]
 			 
 		case e:binaryOperation(scalar(integer(i1)),scalar(integer(i2)),\mod()) =>
-			 wrapReplace(scalar(integer(i1%i2))[@at=e@at])
+			 scalar(integer(i1%i2))[@at=e@at]
 			 
 		case e:binaryOperation(scalar(integer(i1)),scalar(integer(i2)),div()) =>
-			 wrapReplace(scalar(integer(i1/i2))[@at=e@at])
+			 scalar(integer(i1/i2))[@at=e@at]
 			 
 		// If we have an encapsed string that is now fully resolved -- i.e., only
 		// uses literals -- then collapse it into a single string.
@@ -60,10 +56,45 @@ public tuple[Script newScript, bool changed] algebraicSimplification(Script scr)
 			scalarParts = [ e | e <- el, scalar(sp) := e, string(_) := sp || integer(_) := sp || float(_) := sp ];
 			if (size(el) == size(scalarParts)) {
 				res = ( string("") | concatScalars(it,sc) | scalar(sc) <- el );
-				insert(wrapReplace(scalar(res[@at=head(el)@at])[@at=s@at]));
+				insert(scalar(res[@at=head(el)@at])[@at=s@at]);
 			}
 		}
 	}
-	
-	return < scr, changed >;
+}
+
+public Expr algebraicSimplification(Expr expr) {
+	return bottom-up visit(expr) {
+		case e:binaryOperation(scalar(sc1),scalar(sc2),concat()) : {
+			if (string(_) := sc1 || integer(_) := sc1 || float(_) := sc1) {
+				if (string(_) := sc2 || integer(_) := sc2 || float(_) := sc2) {
+			 		insert(scalar(concatScalars(sc1,sc2))[@at=e@at]);
+			 	}
+			}
+		}
+
+		case e:binaryOperation(scalar(integer(i1)),scalar(integer(i2)),plus()) =>
+			 scalar(integer(i1+i2))[@at=e@at]
+			 
+		case e:binaryOperation(scalar(integer(i1)),scalar(integer(i2)),minus()) =>
+			 scalar(integer(i1-i2))[@at=e@at]
+			 
+		case e:binaryOperation(scalar(integer(i1)),scalar(integer(i2)),mul()) =>
+			 scalar(integer(i1*i2))[@at=e@at]
+			 
+		case e:binaryOperation(scalar(integer(i1)),scalar(integer(i2)),\mod()) =>
+			 scalar(integer(i1%i2))[@at=e@at]
+			 
+		case e:binaryOperation(scalar(integer(i1)),scalar(integer(i2)),div()) =>
+			 scalar(integer(i1/i2))[@at=e@at]
+			 
+		// If we have an encapsed string that is now fully resolved -- i.e., only
+		// uses literals -- then collapse it into a single string.
+		case s:scalar(encapsed(el)) : {
+			scalarParts = [ e | e <- el, scalar(sp) := e, string(_) := sp || integer(_) := sp || float(_) := sp ];
+			if (size(el) == size(scalarParts)) {
+				res = ( string("") | concatScalars(it,sc) | scalar(sc) <- el );
+				insert(scalar(res[@at=head(el)@at])[@at=s@at]);
+			}
+		}
+	}
 }

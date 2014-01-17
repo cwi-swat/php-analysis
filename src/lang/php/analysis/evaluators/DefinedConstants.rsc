@@ -90,7 +90,7 @@ public Script evalConsts(loc scriptLoc, Script scr, ConstInfo cinfo, set[Include
 	return scr;
 }
 
-public set[ConstItem] getScriptConsts(Script scr) {
+public set[ConstItem] getScriptConstUses(Script scr) {
 	set[ConstItem] res = { };
 	visit(scr) {
 		case fetchConst(name(s)) :
@@ -100,6 +100,11 @@ public set[ConstItem] getScriptConsts(Script scr) {
 	}
 	return res;
 }
+
+public set[ConstItemExp] getScriptConstDefs(Script scr) =
+	{ classConst(cn, name, ce) | /class(cn,_,_,_,cis) := scr, constCI(consts) <- cis, const(name,ce) <- consts } +
+	{ normalConst(cn, ce) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(ce,false)]) := scr } +
+	{ normalConst(cn, ce) | /Stmt::const(cl) := scr, Const::const(cn,ce) <- cl };
 
 public set[ConstItemExp] getSignatureConsts(Signature sig) {
 	set[ConstItemExp] res = { };
