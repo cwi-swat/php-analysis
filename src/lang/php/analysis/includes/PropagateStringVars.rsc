@@ -15,6 +15,7 @@ import lang::php::analysis::cfg::Label;
 import lang::php::analysis::cfg::FlowEdge;
 import lang::php::analysis::cfg::BuildCFG;
 import lang::php::util::System;
+import lang::php::analysis::includes::IncludeGraph;
 
 import Set;
 import Relation;
@@ -164,4 +165,37 @@ public Script evalStringVars(Script scr) {
 
 public set[NamePath] kills(Expr e) {
 	return { };
+}
+
+public void simpleStringFlow(System sys, loc fileLoc, IncludeGraph igraph) {
+	< lscr, cfgs > = buildCFGsAndScript(sys[fileLoc]);
+	edgesToResolve = { e | e <- igraph.edges, igraph.nodes[fileLoc] == e.source, !(e.target is igNode) };
+	locsToResolve= { e.includeExpr@at | e <- edgesToResolve };
+	
+	for (e <- edgesToResolve) {
+		// Get back the proper CFG
+		cfgsWithInclude = { c | c <- cfgs<1>, /i:include(_,_) := c, i@at == e.includeExpr@at };
+		if (size(cfgsWithInclude) != 1) continue;
+		cfgWithInclude = getOneFrom(cfgsWithInclude);
+		
+		// Using this CFG, find the node for the include we are trying to resolve 
+		g = cfgAsGraph(cfgWithInclude);
+		flipped = invert(g);
+		inode = getOneFrom({ n | n:exprNode(i:include(_,_),_) <- carrier(g), i@at == e.includeExpr@at });
+		
+		// Get the variables out of this expression
+		ivars = { v | /v:var(name(name(_))) := e.includeExpr.expr };
+		
+		// Be reckless -- just see if we can find a def that could possibly reach here
+		map[Expr,Expr] varDefs = ( );
+		for (iv <- ivars) {
+			reachableAssignments = { av | a:assign(iv,av) <- flipped[inode] };
+			if (size(reachableAssignments) == 1)
+				varDefs[iv] = av;
+		}
+		
+		for (vd <- varDefs) {
+			println("Found mapping <pp(vd)> = <pp(varDefs[vd])>");			
+		}
+	}		
 }
