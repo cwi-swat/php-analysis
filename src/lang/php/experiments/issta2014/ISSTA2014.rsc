@@ -6,10 +6,12 @@ import lang::php::util::Utils;
 import lang::php::util::Corpus;
 import lang::php::util::System;
 import lang::php::stats::Stats;
+import lang::php::analysis::includes::IncludeGraph;
 import lang::php::analysis::includes::ResolveIncludes;
 import IO;
 import Set;
 import ValueIO;
+import DateTime;
 
 @doc{The base corpus used in the paper, matching that used for ISSTA}
 private Corpus issta14BaseCorpus = (
@@ -112,4 +114,79 @@ public map[str sysname, lrel[loc fileloc, Expr call] dincs] fetchAllUnresolvedDy
 		res[sys] = incs;
 	}
 	return res;
+}
+
+public void resolveBaseIncludes() {
+	c = getBaseCorpus();
+	for (s <- c) {
+		< sys, igraph, timings > = resolve(loadBinary(s,c[s]),getCorpusItem(s,c[s]));
+		writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-inlined.pt|, sys);		
+		writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|, igraph);		
+		writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-timings.pt|, timings);		
+	}
+}
+
+public rel[str p, str v, loc fileloc, Expr call] allIncludes() {
+	c = getBaseCorpus();
+	rel[str p, str v, loc fileloc, Expr call] res = { };
+	for (s <- c) {
+		sys = loadBinary(s, c[s]);
+		res += { < s, c[s], i@at, i > | /i:include(_,_) := sys };
+	}
+	return res;
+}
+
+public rel[str p, str v, loc fileloc, Expr call] dynamicIncludes(rel[str p, str v, loc fileloc, Expr call] allincs) {
+	return { < s, v, l, i > | < s, v, l, i > <- allincs, include(scalar(string(_)),_) !:= i };
+}
+
+public rel[str p, str v, loc fileloc, Expr call] unresolvedIncludes() {
+	c = getBaseCorpus();
+	rel[str p, str v, loc fileloc, Expr call] res = { };
+	for (s <- c) {
+		println("Loading include graph for <s>-<c[s]>");
+		igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|);
+		for (e <- igraph.edges, !(e.target is igNode), include(scalar(string(_)),_) !:= e.includeExpr)
+			res = res + < s, c[s], e.includeExpr@at, e.includeExpr >;
+	}
+	return res;
+}
+
+public str generateIncludeCountsTable() {
+	rel[str p, str v, loc fileloc, Expr call] allincs = allIncludes();
+	rel[str p, str v, loc fileloc, Expr call] dynincs = dynamicIncludes(allincs);
+	rel[str p, str v, loc fileloc, Expr call] unincs = unresolvedIncludes();
+	
+	lv = getBaseCorpus();
+	ci = loadCountsCSV();
+		
+	str productLine(str p) {
+		v = lv[p];
+		< lineCount, fileCount > = getOneFrom(ci[p,v]);
+		giniC = counts[<p,v>].unresolved.gc;
+		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
+
+		return "<p> & \\numprint{<totalIncludes[<p,v>]>} & \\numprint{<counts[<p,v>].initial.hc>}  & \\numprint{<counts[<p,v>].initial.hc-counts[<p,v>].unresolved.hc>} & \\numprint{<fileCount>}(\\numprint{<counts[<p,v>].unresolved.fc>}) & \\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround \\\\";
+	}
+		
+	res = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table}
+		  '  \\centering
+		  '  \\ra{1.2}
+		  '  \\scriptsize
+		  '  \\begin{tabular}{@{}lrrrrr@{}} \\toprule
+		  '  Product & \\multicolumn{3}{c}{Includes} & Files & Gini \\\\
+		  ' \\cmidrule{2-4} 
+		  '   &  Total & Dynamic & Resolved & &  \\\\ \\midrule<for (p <- sort(toList(lv<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '    <productLine(p)> <}>
+		  '  \\bottomrule
+		  '  \\end{tabular}
+		  '  \\normalsize
+		  '  \\caption{PHP Dynamic Includes.\\label{table-includes}}
+		  '\\end{table}
+		  '\\npfourdigitnosep
+		  '\\npnoaddmissingzero
+		  '";
+	return res;	
 }

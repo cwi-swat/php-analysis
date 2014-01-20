@@ -87,7 +87,7 @@ public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemEx
 	return n[@definedConstants=justDefs][@definingExps=exprs];	
 }
 
-public tuple[IncludeGraph,lrel[str,datetime]] resolve(System sys, loc baseLoc) {
+public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc baseLoc) {
 	lrel[str,datetime] timings = [ < "Starting includes resolution", now() > ];
 	
 	// Inlining magic constants requires context (e.g., the method the __METHOD__
@@ -212,5 +212,5 @@ public tuple[IncludeGraph,lrel[str,datetime]] resolve(System sys, loc baseLoc) {
 		}
 	}
 
-	return < igraph, timings >;
+	return < sys, igraph, timings >;
 }
