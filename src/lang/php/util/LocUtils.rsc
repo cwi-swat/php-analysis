@@ -24,11 +24,13 @@ public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, str path) {
 	while([a*,b,"..",c*] := parts) parts = [*a,*c];
 	while([a*,".",c*] := parts) parts = [*a,*c];
 	if (parts[0] == "") {
+		// This means the first character was a "/", so we have an absolute path
 		newLoc = |file:///| + intercalate("/",parts);
 		if (newLoc in possibleLocs) return newLoc;
 		throw UnavailableLoc(newLoc);
 	} else {
-		newLoc = baseLoc + intercalate("/",parts);
+		// This means the first character was not a "/", so we have a relative path
+		newLoc = baseLoc.parent + intercalate("/",parts);
 		if (newLoc in possibleLocs) return newLoc;
 		throw UnavailableLoc(newLoc);
 	}

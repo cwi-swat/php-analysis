@@ -194,7 +194,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 				if (iexp:include(scalar(string(sp)),_) := e.includeExpr) {
 					try {
 						iloc = calculateLoc(sys<0>,e.source.fileLoc,sp);
-						solvingEdges = solvingEdges + e[targetNode=igraph.nodes[iloc]];
+						solvingEdges = solvingEdges + e[target=igraph.nodes[iloc]];
 					} catch UnavailableLoc(_) : {
 						solvingEdges = solvingEdges + e;
 					}

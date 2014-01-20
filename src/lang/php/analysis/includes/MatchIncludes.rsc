@@ -16,6 +16,7 @@ import lang::php::util::Utils;
 import lang::php::util::System;
 import lang::php::analysis::includes::IncludeGraph;
 import lang::php::pp::PrettyPrinter;
+import lang::php::util::LocUtils;
 import Exception;
 import IO;
 import List;
@@ -68,7 +69,18 @@ private str escaped(str c) = escape(c,("/" : "\\/"));
 // our own system.
 public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphEdge e) {
 	Expr attemptToMatch = e.includeExpr.expr;
-	
+
+	// If the result is a scalar, just try to match it to an actual file; if we
+	// cannot, continue with the more general matching attempt
+	if (scalar(string(sp)) := attemptToMatch) {
+		try {
+			iloc = calculateLoc(sys<0>,e.source.fileLoc,sp);
+			return e[target=ig.nodes[iloc]];					
+		} catch UnavailableLoc(_) : {
+			;
+		}
+	} 
+
 	// Find the part of the include expression that we may be able to match; this is
 	// the last literal part of the string, after any . or .. path characters (we don't
 	// use them to adjust to path because, in cases like $x../path/to/file, we don't

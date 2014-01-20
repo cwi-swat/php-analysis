@@ -116,14 +116,21 @@ public map[str sysname, lrel[loc fileloc, Expr call] dincs] fetchAllUnresolvedDy
 	return res;
 }
 
+public void resolveBaseIncludes(str p, str v) {
+	< sys, igraph, timings > = resolve(loadBinary(p,v),getCorpusItem(p,v));
+	writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<p>-<v>-inlined.pt|, sys);		
+	writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<p>-<v>-igraph.pt|, igraph);		
+	writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<p>-<v>-timings.pt|, timings);		
+}
+
+public void resolveBaseIncludes(str p) {
+	c = getBaseCorpus();
+	resolveBaseIncludes(p, c[p]);
+}
+
 public void resolveBaseIncludes() {
 	c = getBaseCorpus();
-	for (s <- c) {
-		< sys, igraph, timings > = resolve(loadBinary(s,c[s]),getCorpusItem(s,c[s]));
-		writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-inlined.pt|, sys);		
-		writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|, igraph);		
-		writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-timings.pt|, timings);		
-	}
+	for (s <- c) resolveBaseIncludes(s, c[s]);
 }
 
 public rel[str p, str v, loc fileloc, Expr call] allIncludes() {
