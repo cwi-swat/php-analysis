@@ -123,6 +123,13 @@ public void resolveBaseIncludes(str p, str v) {
 	writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<p>-<v>-timings.pt|, timings);		
 }
 
+public tuple[System,IncludeGraph,lrel[str,datetime]] loadSerializedInfo(str p, str v) {
+	sys = readBinaryValueFile(#System, |home:///PHPAnalysis/serialized/includes/<p>-<v>-inlined.pt|);		
+	igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<p>-<v>-igraph.pt|);
+	timings = readBinaryValueFile(#lrel[str,datetime], |home:///PHPAnalysis/serialized/includes/<p>-<v>-timings.pt|);
+	return < sys, igraph, timings >;
+}
+
 public void resolveBaseIncludes(str p) {
 	c = getBaseCorpus();
 	resolveBaseIncludes(p, c[p]);
@@ -155,6 +162,100 @@ public rel[str p, str v, loc fileloc, Expr call] unresolvedIncludes() {
 		igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|);
 		for (e <- igraph.edges, !(e.target is igNode), include(scalar(string(_)),_) !:= e.includeExpr)
 			res = res + < s, c[s], e.includeExpr@at, e.includeExpr >;
+	}
+	return res;
+}
+
+public rel[str p, str v, loc fileloc, Expr call] nonuniqueIncludes() {
+	c = getBaseCorpus();
+	rel[str p, str v, loc fileloc, Expr call] res = { };
+	for (s <- c) {
+		println("Loading include graph for <s>-<c[s]>");
+		igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|);
+		for (e <- igraph.edges, !(e.target is igNode))
+			res = res + < s, c[s], e.includeExpr@at, e.includeExpr >;
+	}
+	return res;
+}
+
+public rel[str p, str v, loc fileloc, Expr call] unknownIncludes() {
+	c = getBaseCorpus();
+	rel[str p, str v, loc fileloc, Expr call] res = { };
+	for (s <- c) {
+		println("Loading include graph for <s>-<c[s]>");
+		igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|);
+		for (e <- igraph.edges, e.target is unknownNode)
+			res = res + < s, c[s], e.includeExpr@at, e.includeExpr >;
+	}
+	return res;
+}
+
+public rel[str p, str v, loc fileloc, Expr call] libraryIncludes() {
+	c = getBaseCorpus();
+	rel[str p, str v, loc fileloc, Expr call] res = { };
+	for (s <- c) {
+		println("Loading include graph for <s>-<c[s]>");
+		igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|);
+		for (e <- igraph.edges, e.target is libNode)
+			res = res + < s, c[s], e.includeExpr@at, e.includeExpr >;
+	}
+	return res;
+}
+
+public rel[str p, str v, loc fileloc, Expr call] libraryIncludes() {
+	c = getBaseCorpus();
+	rel[str p, str v, loc fileloc, Expr call] res = { };
+	for (s <- c) {
+		println("Loading include graph for <s>-<c[s]>");
+		igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|);
+		for (e <- igraph.edges, e.target is libNode)
+			res = res + < s, c[s], e.includeExpr@at, e.includeExpr >;
+	}
+	return res;
+}
+
+public rel[str p, str v, loc fileloc, Expr call, int alts] multiIncludes() {
+	c = getBaseCorpus();
+	rel[str p, str v, loc fileloc, Expr call, int alts] res = { };
+	for (s <- c) {
+		println("Loading include graph for <s>-<c[s]>");
+		igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|);
+		for (e <- igraph.edges, e.target is multiNode)
+			res = res + < s, c[s], e.includeExpr@at, e.includeExpr, size(e.target.alts) >;
+	}
+	return res;
+}
+
+public rel[str p, str v, IncludeGraphEdge igedge] unresWithLiteralPath() {
+	c = getBaseCorpus();
+	rel[str p, str v, IncludeGraphEdge igedge] res = { };
+	for (s <- c) {
+		println("Loading include graph for <s>-<c[s]>");
+		igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|);
+		for (e <- igraph.edges, !(e.target is igNode), include(scalar(string(_)),_) := e.includeExpr)
+			res = res + < s, c[s], e >;
+	}
+	return res;
+}
+
+public map[str p, int c] unresBySystem(rel[str p, str v, IncludeGraphEdge igedge] un) {
+	map[str p, int c] res = ( p : 0 | p <- getBaseCorpus());
+	for (<p,v,e> <- un) res[p] += 1;
+	return res;
+}
+
+public map[str p, int c] unresBySystem() {
+	un = unresWithLiteralPath();
+	return unresBySystem(un);
+}
+
+public rel[loc l, Expr call] setIncludePathCalls() {
+	c = getBaseCorpus();
+	rel[loc l, Expr call] res = { };
+	for (s <- c) {
+		println("Loading system for <s>-<c[s]>");
+		sys = readBinaryValueFile(#System, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-inlined.pt|);
+		res = res + { < cl@at, cl > | /cl:call(name(name("set_include_path")),_) := sys }; 
 	}
 	return res;
 }
