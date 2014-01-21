@@ -37,7 +37,7 @@ private Corpus issta14BaseCorpus = (
 	"Magento":"1.8.1.0");
 
 @doc{The location of the corpus extension, change to your location!}
-private loc includesSystemsLoc = |file:///Users/mhills/Projects/phpsa/includes/systems|;
+private loc includesSystemsLoc = |home:///PHPAnalysis/includesSystems|;
 
 @doc{Retrieve the base corpus}
 public Corpus getBaseCorpus() = issta14BaseCorpus;
@@ -54,7 +54,7 @@ public Corpus getIncludesSystemsCorpus() = getIncludesSystemsCorpus(getIncludesS
 public Corpus getIncludesSystemsCorpus(SysMap smap) = ( s : "HEAD" | s <- smap );
 
 @doc{Build binaries of parsed systems for the extension}
-public void buildESECBinaries(SysMap smap) {
+public void buildExtensionBinaries(SysMap smap) {
 	for (p <- smap) {
 		buildBinaries(p,"HEAD",smap[p]);
 	}

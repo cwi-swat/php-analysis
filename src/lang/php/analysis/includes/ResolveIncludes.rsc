@@ -23,6 +23,7 @@ import lang::php::pp::PrettyPrinter;
 import lang::php::analysis::evaluators::AlgebraicSimplification;
 import lang::php::analysis::evaluators::SimulateCalls;
 import lang::php::util::LocUtils;
+import lang::php::analysis::includes::LibraryIncludes;
 import IO;
 import Set;
 import List;
@@ -97,7 +98,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 	sys = inlineMagicConstants(sys, baseLoc);
 	
 	timings += < "Extracting include graph", now() >;
-	igraph = extractIncludeGraph(sys, baseLoc.path);
+	igraph = extractIncludeGraph(sys, baseLoc.path, getKnownLibraries());
 
 	timings += < "After inlining: <size({e | e <- igraph.edges, e.target is unknownNode})>", now()>;
 	
@@ -109,7 +110,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 		// Decorate the include graph with information on constants
 		timings += < "Decorating nodes with constant definition information", now() >;
 		map[loc,set[ConstItemExp]] loc2consts = ( l : { cdef[e=normalizeConstCase(algebraicSimplification(simulateCalls(cdef.e)))]  | cdef <- getScriptConstDefs(sys[l]) } | l <- sys);
-		igraph.nodes = ( l : decorateNode(igraph.nodes[l],loc2consts) | l <- igraph.nodes );
+		igraph.nodes = ( l : decorateNode(igraph.nodes[l],loc2consts) | l <- igraph.nodes, igraph.nodes[l] is igNode );
 		
 		// Find uniquely defined constants; we require these to be defined with the same scalar expression,
 		// since a constant defined in terms of another constant could differ depending on the include relation
@@ -139,7 +140,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 			timings += <"Building current transitive includes relation", now()>;
 			rel[loc,loc] includesRel = 
 				({ < e.source.fileLoc, e.target.fileLoc > | e <- igraph.edges, e.target is igNode} +
-				{ < e.source.fileLoc, t.fileLoc > | e <- igraph.edges, e.target is multiNode, t <- e.target.alts } +
+				{ < e.source.fileLoc, t.fileLoc > | e <- igraph.edges, e.target is multiNode, t <- e.target.alts, t is igNode } +
 				{ < e.source.fileLoc,l> | e <- igraph.edges, e.target is unknownNode, l <- sys })*;
 			timings += <"Done building transitive includes relation", now()>;
 
@@ -191,7 +192,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 			basicMatched = { e[includeExpr=resolveConstExpr(e.includeExpr,e.source.fileLoc)] | e <- unsolvedEdges };
 			solvingEdges = { };
 			for (e <- basicMatched) {
-				if (iexp:include(scalar(string(sp)),_) := e.includeExpr) {
+				if (iexp:include(scalar(string(sp)),_) := e.includeExpr && size(sp) > 0 && sp[0] in { ".","\\","/"}) {
 					try {
 						iloc = calculateLoc(sys<0>,e.source.fileLoc,sp);
 						solvingEdges = solvingEdges + e[target=igraph.nodes[iloc]];

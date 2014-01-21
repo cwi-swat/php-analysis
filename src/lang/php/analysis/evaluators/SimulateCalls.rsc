@@ -14,7 +14,7 @@ import List;
 import String;
 import Exception;
 
-public set[str] simulatedFunctions() = { "dirname", "MWInit", "strrchr", "substr" };
+private set[str] simulatedFunctions = { "dirname", "MWInit", "strrchr", "substr" };
 
 @doc{Evaluate the PHP dirname function, given a string literal argument.}
 public Expr simulateCall(Expr e) {
@@ -78,7 +78,7 @@ public Expr simulateCall(Expr e) {
 public Script simulateCalls(Script scr) {
 	return bottom-up visit(scr) {
 		case c:call(name(name(s)),ps) : {
-			if (s in simulatedFunctions()) {
+			if (s in simulatedFunctions) {
 				newcall = simulateCall(c);
 				if (c != newcall) insert(newcall);
 			}
@@ -89,7 +89,7 @@ public Script simulateCalls(Script scr) {
 public Expr simulateCalls(Expr expr) {
 	return bottom-up visit(expr) {
 		case c:call(name(name(s)),ps) : {
-			if (s in simulatedFunctions()) {
+			if (s in simulatedFunctions) {
 				newcall = simulateCall(c);
 				if (c != newcall) insert(newcall);
 			}

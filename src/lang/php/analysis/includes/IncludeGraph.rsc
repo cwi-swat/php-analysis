@@ -5,19 +5,20 @@ import lang::php::stats::Stats;
 import lang::php::util::LocUtils;
 import lang::php::analysis::evaluators::AlgebraicSimplification;
 import lang::php::analysis::evaluators::SimulateCalls;
+import lang::php::analysis::includes::LibraryIncludes;
 
 import analysis::graphs::Graph;
 import String;
 import Set;
 import Relation;
 
-data IncludeGraphNode = igNode(str fileName, loc fileLoc) | unknownNode() | multiNode(set[IncludeGraphNode] alts);
+data IncludeGraphNode = igNode(str fileName, loc fileLoc) | libNode(str libName, str libPath) | unknownNode() | multiNode(set[IncludeGraphNode] alts);
 data IncludeGraphEdge = igEdge(IncludeGraphNode source, IncludeGraphNode target, Expr includeExpr);
 data IncludeGraph = igGraph(map[loc,IncludeGraphNode] nodes, set[IncludeGraphEdge] edges);
 
-public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, str productRoot) {
+public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, str productRoot, set[LibItem] libraries) {
 	int sizeToRemove = size(productRoot);
-	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- scripts );
+	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- scripts ) + (|file:///synthesizedLoc/<lib.path>| : libNode(lib.name,lib.path) | lib <- libraries);
 	set[IncludeGraphEdge] edgeSet = { };
 	
 	for (l <- scripts) {
@@ -26,7 +27,7 @@ public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, st
 			solve(e) {
 				e = algebraicSimplification(simulateCalls(e));
 			}
-			if (scalar(string(sp)) := e) {
+			if (scalar(string(sp)) := e && size(sp) > 0 && sp[0] in { ".","\\","/"}) {
 				try {
 					iloc = calculateLoc(scripts<0>,l,sp);
 					edgeSet += igEdge(nodeMap[l],nodeMap[iloc],iexp[expr=e]);					

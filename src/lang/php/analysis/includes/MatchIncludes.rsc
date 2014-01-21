@@ -72,7 +72,7 @@ public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphE
 
 	// If the result is a scalar, just try to match it to an actual file; if we
 	// cannot, continue with the more general matching attempt
-	if (scalar(string(sp)) := attemptToMatch) {
+	if (scalar(string(sp)) := attemptToMatch && size(sp) > 0 && sp[0] in { ".","\\","/"}) {
 		try {
 			iloc = calculateLoc(sys<0>,e.source.fileLoc,sp);
 			return e[target=ig.nodes[iloc]];					
@@ -95,11 +95,11 @@ public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphE
 		str re = "^\\S*" + intercalate("",[ "[<escaped(c)>]" | c <- tail(split("",s)) ]) + "$";
 
 		// Find any locations that match the regular expression
-		filteredIncludes = { l | l <- sys<0>, rexpMatch(l.path,re) };
+		filteredIncludes = { l | l <- ig.nodes<0>, rexpMatch(l.path,re) };
 		
 		if (size(filteredIncludes) == 1) {
 			return igEdge(e.source, ig.nodes[getOneFrom(filteredIncludes)], e.includeExpr);
-		} else if (size(filteredIncludes) > 1 && size(filteredIncludes) < size(sys<0>)) {
+		} else if (size(filteredIncludes) > 1 && size(filteredIncludes) < size(ig.nodes<0>)) {
 			return igEdge(e.source, multiNode({ig.nodes[l] | l <- filteredIncludes}), e.includeExpr);
 		} else {
 			return igEdge(e.source, unknownNode(), e.includeExpr);
