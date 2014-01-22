@@ -19,18 +19,19 @@ data RuntimeException = UnavailableLoc(loc l);
 @doc{Calculate a loc based on the base loc and an addition to the base loc path.
      This also ensures that the resulting loc is one of the possible locs, else
      an exception is thrown.}
-public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, str path) {
+public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str path, bool pathMayBeChanged) {
 	list[str] parts = split("/",path);
 	while([a*,b,"..",c*] := parts) parts = [*a,*c];
 	while([a*,".",c*] := parts) parts = [*a,*c];
 	if (parts[0] == "") {
 		// This means the first character was a "/", so we have an absolute path
-		newLoc = |file:///| + intercalate("/",parts);
+		newLoc = rootLoc + intercalate("/",parts);
 		if (newLoc in possibleLocs) return newLoc;
 		throw UnavailableLoc(newLoc);
 	} else {
 		// This means the first character was not a "/", so we have a relative path
 		newLoc = baseLoc.parent + intercalate("/",parts);
+		if (pathMayBeChanged) throw UnavailableLoc(newLoc);
 		if (newLoc in possibleLocs) return newLoc;
 		throw UnavailableLoc(newLoc);
 	}

@@ -35,7 +35,7 @@ public System resolveIncludes(System sys, loc baseLoc) {
 	sys = inlineMagicConstants(sys, baseLoc);
 	solve(sys) {
 		sys = evalAllScalarsAndInlineUniques(sys, baseLoc);
-		sys = matchIncludes(sys);
+		sys = matchIncludes(sys, baseLoc);
 	}
 	return sys;
 }
@@ -44,7 +44,7 @@ public System resolveIncludesWithVars(System sys, loc baseLoc) {
 	sys = inlineMagicConstants(sys, baseLoc);
 	solve(sys) {
 		solve(sys) {
-			sys = matchIncludes(sys);
+			sys = matchIncludes(sys, baseLoc);
 			sys = evalAllScalarsAndInlineUniques(sys, baseLoc);
 		}
 		sys = evalStringVars(sys);
@@ -69,6 +69,7 @@ public map[str,IncludesInfo] resolveCorpusIncludes(Corpus corpus) {
 //anno set[ConstItemExp] IncludeGraphNode@definedConstants;
 anno set[ConstItem] IncludeGraphNode@definedConstants;
 anno map[ConstItem,Expr] IncludeGraphNode@definingExps;
+anno bool IncludeGraphNode@setsIncludePath;
 
 private set[str] caseInsensitiveConsts = { "TRUE", "FALSE", "NULL" };
 
@@ -81,11 +82,11 @@ public Expr normalizeConstCase(Expr e) {
 	}
 }
 
-public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemExp]] loc2consts) {
+public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemExp]] loc2consts, bool setsip) {
 	constDefs = loc2consts[n.fileLoc];
 	justDefs = { normalConst(cn) | normalConst(cn,_) <- constDefs } + { classConst(cln,cn) | classConst(cln,cn,_) <- constDefs };
 	exprs = ( normalConst(cn) : cne | normalConst(cn,cne) <- constDefs ) + ( classConst(cln,cn) : cne | classConst(cln,cn,cne) <- constDefs );
-	return n[@definedConstants=justDefs][@definingExps=exprs];	
+	return n[@definedConstants=justDefs][@definingExps=exprs][@setsIncludePath=setsip];	
 }
 
 public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc baseLoc) {
@@ -98,19 +99,22 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 	sys = inlineMagicConstants(sys, baseLoc);
 	
 	timings += < "Extracting include graph", now() >;
-	igraph = extractIncludeGraph(sys, baseLoc.path, getKnownLibraries());
+	igraph = extractIncludeGraph(sys, baseLoc, getKnownLibraries());
 
 	timings += < "After inlining: <size({e | e <- igraph.edges, e.target is unknownNode})>", now()>;
 	
-	igraph.edges = { (e.target is igNode) ? e : (matchIncludes(sys, igraph, e)) | e <- igraph.edges };
+	igraph.edges = { (e.target is igNode) ? e : (matchIncludes(sys, igraph, e, baseLoc)) | e <- igraph.edges };
 	unsolvedEdges = { e | e <- igraph.edges, !(e.target is igNode) };
 	timings += < "After initial matching: <size(unsolvedEdges)>", now() >;
 	
 	if (size(unsolvedEdges) > 0) {
+		set[loc] setsIncludePath = { l | l <- sys, /call(name(name("set_include_path")),_) := sys[l] };
+		timings += < "Found <size(setsIncludePath)> locations that set the include path", now() >;
+		
 		// Decorate the include graph with information on constants
 		timings += < "Decorating nodes with constant definition information", now() >;
 		map[loc,set[ConstItemExp]] loc2consts = ( l : { cdef[e=normalizeConstCase(algebraicSimplification(simulateCalls(cdef.e)))]  | cdef <- getScriptConstDefs(sys[l]) } | l <- sys);
-		igraph.nodes = ( l : decorateNode(igraph.nodes[l],loc2consts) | l <- igraph.nodes, igraph.nodes[l] is igNode );
+		igraph.nodes = ( l : decorateNode(igraph.nodes[l],loc2consts, l in setsIncludePath) | l <- igraph.nodes, igraph.nodes[l] is igNode );
 		
 		// Find uniquely defined constants; we require these to be defined with the same scalar expression,
 		// since a constant defined in terms of another constant could differ depending on the include relation
@@ -192,9 +196,9 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 			basicMatched = { e[includeExpr=resolveConstExpr(e.includeExpr,e.source.fileLoc)] | e <- unsolvedEdges };
 			solvingEdges = { };
 			for (e <- basicMatched) {
-				if (iexp:include(scalar(string(sp)),_) := e.includeExpr && size(sp) > 0 && sp[0] in { ".","\\","/"}) {
+				if (iexp:include(scalar(string(sp)),_) := e.includeExpr) {
 					try {
-						iloc = calculateLoc(sys<0>,e.source.fileLoc,sp);
+						iloc = calculateLoc(sys<0>,e.source.fileLoc,baseLoc,sp,size(includesRel[e.source.fileLoc] & setsIncludePath) > 0);
 						solvingEdges = solvingEdges + e[target=igraph.nodes[iloc]];
 					} catch UnavailableLoc(_) : {
 						solvingEdges = solvingEdges + e;
@@ -205,7 +209,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 			}			
 			
 			igraph.edges = igraph.edges - unsolvedEdges + solvingEdges;
-			igraph.edges = { (e.target is igNode) ? e : (matchIncludes(sys, igraph, e)) | e <- igraph.edges };
+			igraph.edges = { (e.target is igNode) ? e : (matchIncludes(sys, igraph, e, baseLoc)) | e <- igraph.edges };
 			unsolvedEdges = { e | e <- igraph.edges, !(e.target is igNode) };
 			timings += < "After constant resolution, unsolved edges remaining: <size(unsolvedEdges)>", now() >;
 			

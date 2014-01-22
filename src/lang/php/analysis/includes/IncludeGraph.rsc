@@ -16,8 +16,8 @@ data IncludeGraphNode = igNode(str fileName, loc fileLoc) | libNode(str libName,
 data IncludeGraphEdge = igEdge(IncludeGraphNode source, IncludeGraphNode target, Expr includeExpr);
 data IncludeGraph = igGraph(map[loc,IncludeGraphNode] nodes, set[IncludeGraphEdge] edges);
 
-public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, str productRoot, set[LibItem] libraries) {
-	int sizeToRemove = size(productRoot);
+public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, loc productRoot, set[LibItem] libraries) {
+	int sizeToRemove = size(productRoot.path);
 	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- scripts ) + (|file:///synthesizedLoc/<lib.path>| : libNode(lib.name,lib.path) | lib <- libraries);
 	set[IncludeGraphEdge] edgeSet = { };
 	
@@ -27,9 +27,9 @@ public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, st
 			solve(e) {
 				e = algebraicSimplification(simulateCalls(e));
 			}
-			if (scalar(string(sp)) := e && size(sp) > 0 && sp[0] in { ".","\\","/"}) {
+			if (scalar(string(sp)) := e) {
 				try {
-					iloc = calculateLoc(scripts<0>,l,sp);
+					iloc = calculateLoc(scripts<0>,l,productRoot,sp,true);
 					edgeSet += igEdge(nodeMap[l],nodeMap[iloc],iexp[expr=e]);					
 				} catch UnavailableLoc(_) : {
 					edgeSet += igEdge(nodeMap[l],unknownNode(),iexp[expr=e]);
