@@ -29,52 +29,66 @@ data FNBits = lit(str s) | fnBit();
 
 // This function just calls the next function on each script in the map. The bulk of
 // what happens is done in the function below.
-public map[loc fileloc, Script scr] matchIncludes(map[loc fileloc, Script scr] scripts) {
+public map[loc fileloc, Script scr] matchIncludes(System sys, loc baseLoc) {
 	println("MATCHING INCLUDE FILE PATTERNS");
-	scripts = ( l : matchIncludes(scripts<0>,scripts[l]) | l <- scripts );
+	sys = ( l : matchIncludes(sys<0>,sys[l],baseLoc) | l <- sys );
 	println("MATCHING INCLUDE FILE PATTERNS FINISHED");
-	return scripts;	
+	return sys;	
 }
 
-private FNBits lastLiteralPart(Expr e) {
+private list[FNBits] fnModel(Expr e) {
 	if (binaryOperation(l,r,concat()) := e) {
-		return lastLiteralPart(r);
+		return [ *fnModel(l), *fnModel(r) ];
 	} else if (scalar(encapsed(el)) := e) {
-		return lastLiteralPart(last(el));
-	} else if (scalar(string("/")) := e) {
-		return fnBit();
+		return [ *fnModel(eli) | eli <- el ];
 	} else if (scalar(string(s)) := e) {
-		if (trim(s) == "") return fnBit();
-		
-		list[str] parts = split("/",trim(s));
-		lastDotDot = lastIndexOf(parts,"..");
-		lastDot = lastIndexOf(parts,".");
-		lastToUse = max(lastDotDot,lastDot);
-
-		if (lastToUse == -1)
-			return lit(s);
-		else if (lastToUse >= 0 && (lastToUse+1) < size(parts))
-			return lit(intercalate("/",drop(lastToUse+1,parts)));
-		else
-			return fnBit();
+		if (trim(s) == "") return [ lit(s) ];
+		list[str] parts = split("/",s);
+		if(size(parts)==0) return [ lit("/") | idx <- [0..size(s)]];
+		res = [ lit("/"), lit(p) | p <- parts ];
+		if (parts[0] != "") res = tail(res);
+		if (last(split("",s)) == "/") res = res + lit("/"); 
+		return res;
 	} else {
-		return fnBit();
+		return [ fnBit() ];
 	}
 }
 
-private str escaped(str c) = escape(c,("/" : "\\/"));
+private str escaped(str c) {
+	if (c notin {".","\\","/"}) return c;
+	return "[<escape(c,("/" : "\\/"))>]";
+}
+
+private str fnMatch(Expr e) {
+	list[FNBits] res = fnModel(e);
+	solve(res) {
+		while([a*,lit("/"),lit(c),lit("/"),lit("."),lit("/"),d*] := res)
+			res = [*a,lit("/"),lit(c),lit("/"),*d];
+		while([a*,lit("/"),lit(c),lit("/"),lit(".."),lit("/"),d*] := res)
+			res = [*a,lit("/"),*d];
+		while([a*,fnBit(),fnBit(),b*] := res)
+			res = [*a,fnBit(),*b];
+	}
+	list[str] toMatch = [];
+	for (ri <- res)
+		if (lit(s) := ri)
+			toMatch = toMatch + [ "<escaped(c)>" | c <- tail(split("",s)) ];
+		else
+			toMatch = toMatch + "\\S*";
+	return intercalate("",toMatch);
+}
 
 // TODO: Add support for library includes. This is only an issue were we
 // to match an include that was both a library include and an include in
 // our own system.
-public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphEdge e) {
+public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphEdge e, loc baseLoc) {
 	Expr attemptToMatch = e.includeExpr.expr;
 
 	// If the result is a scalar, just try to match it to an actual file; if we
 	// cannot, continue with the more general matching attempt
-	if (scalar(string(sp)) := attemptToMatch && size(sp) > 0 && sp[0] in { ".","\\","/"}) {
+	if (scalar(string(sp)) := attemptToMatch) {
 		try {
-			iloc = calculateLoc(sys<0>,e.source.fileLoc,sp);
+			iloc = calculateLoc(sys<0>,e.source.fileLoc,baseLoc,sp,true);
 			return e[target=ig.nodes[iloc]];					
 		} catch UnavailableLoc(_) : {
 			;
@@ -86,25 +100,25 @@ public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphE
 	// use them to adjust to path because, in cases like $x../path/to/file, we don't
 	// know what $x is, so we don't know if we can just "walk back" a step, so this
 	// makes the match more conservative)
-	matchItem = lastLiteralPart(attemptToMatch);
+	//matchItem = lastLiteralPart(attemptToMatch);
 	
 	// If this is a literal, we can try to match it; if it is an fbBit, it is some
 	// file name piece that we can't use in matching
-	if (lit(s) := matchItem) {
-		// Create  regular expression for s, this is just s with special characters escaped
-		str re = "^\\S*" + intercalate("",[ "[<escaped(c)>]" | c <- tail(split("",s)) ]) + "$";
+	//if (lit(s) := matchItem) {
+	// Create  regular expression for s, this is just s with special characters escaped
+	str re = "^\\S*" + fnMatch(attemptToMatch) + "$";
 
-		// Find any locations that match the regular expression
-		filteredIncludes = { l | l <- ig.nodes<0>, rexpMatch(l.path,re) };
-		
-		if (size(filteredIncludes) == 1) {
-			return igEdge(e.source, ig.nodes[getOneFrom(filteredIncludes)], e.includeExpr);
-		} else if (size(filteredIncludes) > 1 && size(filteredIncludes) < size(ig.nodes<0>)) {
-			return igEdge(e.source, multiNode({ig.nodes[l] | l <- filteredIncludes}), e.includeExpr);
-		} else {
-			return igEdge(e.source, unknownNode(), e.includeExpr);
-		}
+	// Find any locations that match the regular expression
+	filteredIncludes = { l | l <- ig.nodes<0>, rexpMatch(l.path,re) };
+	
+	if (size(filteredIncludes) == 1) {
+		return igEdge(e.source, ig.nodes[getOneFrom(filteredIncludes)], e.includeExpr);
+	} else if (size(filteredIncludes) > 1 && size(filteredIncludes) < size(ig.nodes<0>)) {
+		return igEdge(e.source, multiNode({ig.nodes[l] | l <- filteredIncludes}), e.includeExpr);
+	} else {
+		return igEdge(e.source, unknownNode(), e.includeExpr);
 	}
+	//}
 	
 	return e;
 }
