@@ -89,8 +89,34 @@ public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemEx
 	return n[@definedConstants=justDefs][@definingExps=exprs][@setsIncludePath=setsip];	
 }
 
+private set[loc] getEdgeTargets(IncludeGraph igraph, IncludeGraphEdge e) {
+	if (e.target is igNode) return { e.target.fileLoc };
+	if (e.target is unknownNode) return igraph.nodes<0>;
+	if (e.target is multiNode) return { n.fileLoc | n <- multiNode.alts };
+	return { };
+}
+
+private map[loc,set[loc]] reachableCache = ( );
+
+private set[loc] reachable(IncludeGraph igraph, loc l) {
+	if (l in reachableCache) return reachableCache[l];
+	set[loc] res = { l };
+	solve(res) {
+		for (e <- igraph.edges, e.source.fileLoc in res) {
+			if (e.target is unknownNode) {
+				reachableCache[l] = igraph.nodes<0>;
+				return reachableCache[l];
+			}
+			res += getEdgeTargets(igraph,e);
+		}		
+	}
+	reachableCache[l] = res;
+	return res;
+}
+
 public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc baseLoc) {
 	lrel[str,datetime] timings = [ < "Starting includes resolution", now() > ];
+	clearLookupCache();
 	
 	// Inlining magic constants requires context (e.g., the method the __METHOD__
 	// appears in), so we need to do this step before extracting the graph
@@ -142,14 +168,15 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 		bool continueTrying = ( size(unsolvedEdges) > 0 );
 		while(continueTrying) {
 			originalUnsolved = unsolvedEdges;
-			timings += <"Building current transitive includes relation", now()>;
-			rel[loc,loc] includesRel = 
-				({ < e.source.fileLoc, e.target.fileLoc > | e <- igraph.edges, e.target is igNode} +
-				{ < e.source.fileLoc, t.fileLoc > | e <- igraph.edges, e.target is multiNode, t <- e.target.alts, t is igNode } +
-				{ < e.source.fileLoc,l> | e <- igraph.edges, e.target is unknownNode, l <- sys })*;
-			timings += <"Done building transitive includes relation", now()>;
+			reachableCache = ( );
+			//timings += <"Building current transitive includes relation", now()>;
+			//rel[loc,loc] includesRel = 
+			//	({ < e.source.fileLoc, e.target.fileLoc > | e <- igraph.edges, e.target is igNode} +
+			//	{ < e.source.fileLoc, t.fileLoc > | e <- igraph.edges, e.target is multiNode, t <- e.target.alts, t is igNode } +
+			//	{ < e.source.fileLoc,l> | e <- igraph.edges, e.target is unknownNode, l <- sys })*;
+			//timings += <"Done building transitive includes relation", now()>;
 
-			rel[ConstItem,loc] workingList = { };
+			//rel[ConstItem,loc] workingList = { };
 
 			Expr resolveConstExpr(Expr resolveExpr, loc constLoc) {
 				// Get the constants used inside resolveExpr
@@ -164,7 +191,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 
 				for (ci <- usedConstants, ci notin solvedConstants) {
 					cirel = constrel[ci];
-					reachableConstLocs = includesRel[constLoc] & cirel<0>;
+					reachableConstLocs = reachable(igraph,constLoc) & cirel<0>;
 					definingExps = { < rl, rle > | rl <- reachableConstLocs, rle <- cirel[rl] };
 					if (size(definingExps<1>) == 1 && rle:scalar(sv) := getOneFrom(definingExps<1>), encapsed(_) !:= sv) {
 						solvedConstants[ci] = rle; 
@@ -183,8 +210,8 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 			}						 			
 
 			Expr resolveConstants(ConstItem toResolve, Expr resolveExpr, loc constLoc) {
-				if (<toResolve,constLoc> in workingList) return resolveExpr;
-				workingList = workingList + <toResolve,constLoc>;
+				//if (<toResolve,constLoc> in workingList) return resolveExpr;
+				//workingList = workingList + <toResolve,constLoc>;
 
 				resolvedExpr = resolveConstExpr(resolveExpr, constLoc);
 								
@@ -199,7 +226,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 			for (e <- basicMatched) {
 				if (iexp:include(scalar(string(sp)),_) := e.includeExpr) {
 					try {
-						iloc = calculateLoc(sys<0>,e.source.fileLoc,baseLoc,sp,size(includesRel[e.source.fileLoc] & setsIncludePath) > 0);
+						iloc = calculateLoc(sys<0>,e.source.fileLoc,baseLoc,sp,size(reachable(igraph,e.source.fileLoc) & setsIncludePath) > 0);
 						solvingEdges = solvingEdges + e[target=igraph.nodes[iloc]];
 					} catch UnavailableLoc(_) : {
 						solvingEdges = solvingEdges + e;

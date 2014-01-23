@@ -36,6 +36,10 @@ public map[loc fileloc, Script scr] matchIncludes(System sys, loc baseLoc) {
 	return sys;	
 }
 
+private map[str, set[loc]] lookupCacheRE = ( );
+
+public void clearLookupCache() { lookupCacheRE = ( ); }
+
 private list[FNBits] fnModel(Expr e) {
 	if (binaryOperation(l,r,concat()) := e) {
 		return [ *fnModel(l), *fnModel(r) ];
@@ -84,7 +88,7 @@ private str fnMatch(Expr e) {
 // our own system.
 public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphEdge e, loc baseLoc) {
 	Expr attemptToMatch = e.includeExpr.expr;
-
+	
 	// If the result is a scalar, just try to match it to an actual file; if we
 	// cannot, continue with the more general matching attempt
 	if (scalar(string(sp)) := attemptToMatch) {
@@ -108,10 +112,15 @@ public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphE
 	//if (lit(s) := matchItem) {
 	// Create  regular expression for s, this is just s with special characters escaped
 	str re = "^\\S*" + fnMatch(attemptToMatch) + "$";
-
-	// Find any locations that match the regular expression
-	filteredIncludes = { l | l <- ig.nodes<0>, rexpMatch(l.path,re) };
-	
+	set[loc] filteredIncludes = { };
+	if (re in lookupCacheRE) {
+		filteredIncludes = lookupCacheRE[re];
+	} else {	
+		// Find any locations that match the regular expression
+		filteredIncludes = { l | l <- ig.nodes<0>, rexpMatch(l.path,re) };
+		lookupCacheRE[re] = filteredIncludes;
+	}
+		
 	if (size(filteredIncludes) == 1) {
 		return igEdge(e.source, ig.nodes[getOneFrom(filteredIncludes)], e.includeExpr);
 	} else if (size(filteredIncludes) > 1 && size(filteredIncludes) < size(ig.nodes<0>)) {
@@ -119,7 +128,6 @@ public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphE
 	} else {
 		return igEdge(e.source, unknownNode(), e.includeExpr);
 	}
-	//}
 	
 	return e;
 }
