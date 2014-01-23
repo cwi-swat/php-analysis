@@ -61,13 +61,14 @@ private str escaped(str c) {
 
 private str fnMatch(Expr e) {
 	list[FNBits] res = fnModel(e);
+	lastFnBit = lastIndexOf(res, fnBit());
+	if (lastFnBit != -1) res = res[lastFnBit..];
+	
 	solve(res) {
 		while([a*,lit("/"),lit(c),lit("/"),lit("."),lit("/"),d*] := res)
 			res = [*a,lit("/"),lit(c),lit("/"),*d];
 		while([a*,lit("/"),lit(c),lit("/"),lit(".."),lit("/"),d*] := res)
 			res = [*a,lit("/"),*d];
-		while([a*,fnBit(),fnBit(),b*] := res)
-			res = [*a,fnBit(),*b];
 	}
 	list[str] toMatch = [];
 	for (ri <- res)

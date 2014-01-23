@@ -108,7 +108,8 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 	timings += < "After initial matching: <size(unsolvedEdges)>", now() >;
 	
 	if (size(unsolvedEdges) > 0) {
-		set[loc] setsIncludePath = { l | l <- sys, /call(name(name("set_include_path")),_) := sys[l] };
+		set[loc] setsIncludePath = { l | l <- sys, /call(name(name("set_include_path")),_) := sys[l] } + 
+								   { l | l <- sys, /call(name(name("ini_set")),[actualParameter(pe,_)]) := sys[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
 		timings += < "Found <size(setsIncludePath)> locations that set the include path", now() >;
 		
 		// Decorate the include graph with information on constants
