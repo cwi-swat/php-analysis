@@ -131,3 +131,16 @@ public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphE
 	
 	return e;
 }
+
+// TODO: Along with the system, we should also include known libraries here
+public set[loc] matchIncludes(System sys, Expr includeExpr, loc baseLoc) {
+	// Create the regular expression representing the include expression
+	str re = "^\\S*" + fnMatch(includeExpr.expr) + "$";
+
+	// Filter the includes to just return those that match the regular expression
+	set[loc] filteredIncludes = { l | l <- sys<0>, rexpMatch(l.path,re) };
+
+	// Just return the result of applying the regexp match, we may want to do
+	// some caching, etc here in the future	
+	return filteredIncludes;	
+}

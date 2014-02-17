@@ -100,3 +100,37 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 public System inlineMagicConstants(System sys, loc baseloc) {
 	return ( l : inlineMagicConstants(sys[l],l,baseloc) | l <- sys );
 }
+
+public Expr inlineMagicConstants(Expr e, loc baseloc) {
+	e = bottom-up visit(e) {
+		case s:scalar(v:classConstant()) => 
+			scalar(string(v@actualValue))[@at=s@at]
+		when (v@actualValue)?
+		
+		case s:scalar(v:methodConstant()) => 
+			scalar(string(v@actualValue))[@at=s@at]
+		when (v@actualValue)?
+		
+		case s:scalar(v:funcConstant()) => 
+			scalar(string(v@actualValue))[@at=s@at]
+		when (v@actualValue)?
+		
+		case s:scalar(v:namespaceConstant()) => 
+			scalar(string(v@actualValue))[@at=s@at]
+		when (v@actualValue)?
+		
+		case s:scalar(v:fileConstant()) => 
+			scalar(string(substring(v@actualValue,size(baseloc.path))))[@at=s@at]
+		when (v@actualValue)?
+		
+		case s:scalar(v:dirConstant()) => 
+			scalar(string(v@actualValue))[@at=s@at]
+		when (v@actualValue)?
+		
+		case s:scalar(v:lineConstant()) => 
+			scalar(integer(toInt(v@actualValue)))
+		when (v@actualValue)?		
+	}
+	
+	return e;
+}

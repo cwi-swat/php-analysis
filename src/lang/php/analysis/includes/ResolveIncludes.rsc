@@ -71,17 +71,6 @@ anno set[ConstItem] IncludeGraphNode@definedConstants;
 anno map[ConstItem,Expr] IncludeGraphNode@definingExps;
 anno bool IncludeGraphNode@setsIncludePath;
 
-private set[str] caseInsensitiveConsts = { "TRUE", "FALSE", "NULL" };
-
-public Expr normalizeConstCase(Expr e) {
-	return bottom-up visit(e) {
-		case fi:fetchConst(ni:name(s)) : {
-			if (toUpperCase(s) in caseInsensitiveConsts)
-				insert fi[name=ni[name=toUpperCase(s)]];
-		}
-	}
-}
-
 public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemExp]] loc2consts, bool setsip) {
 	constDefs = loc2consts[n.fileLoc];
 	justDefs = { normalConst(cn) | normalConst(cn,_) <- constDefs } + { classConst(cln,cn) | classConst(cln,cn,_) <- constDefs };
