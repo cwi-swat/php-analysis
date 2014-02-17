@@ -36,6 +36,28 @@ private Corpus issta14BaseCorpus = (
 	"DoctrineORM":"2.3.3",
 	"Magento":"1.8.1.0");
 
+private map[str,list[str]] defaultIncludePaths = (
+	"osCommerce" : ["."],
+	"ZendFramework" : [".","/library","/extras/library"],
+	"CodeIgniter" : ["."],
+	"Symfony" : ["."],
+	"SilverStripe" : ["."],
+	"WordPress" : ["."],
+	"Joomla" : ["."],
+	"phpBB" : ["."],
+	"Drupal" : ["."],
+	"MediaWiki" : ["."],
+	"Gallery" : ["."],
+	"SquirrelMail" : ["."],
+	"Moodle" : ["."],
+	"Smarty" : ["."],
+	"Kohana" : ["."],
+	"phpMyAdmin" : ["."],
+	"PEAR" : ["."],
+	"CakePHP" : ["."],
+	"DoctrineORM" : ["."],
+	"Magento" :  ["."]);
+
 @doc{The location of the corpus extension, change to your location!}
 private loc includesSystemsLoc = |home:///PHPAnalysis/includesSystems|;
 
@@ -116,28 +138,29 @@ public map[str sysname, lrel[loc fileloc, Expr call] dincs] fetchAllUnresolvedDy
 	return res;
 }
 
-public void resolveBaseIncludes(str p, str v) {
-	< sys, igraph, timings > = resolve(loadBinary(p,v),getCorpusItem(p,v));
+public void resolveBaseIncludes(str p, str v, list[str] ipath) {
+	< sys, igraph, timings > = resolve(loadBinary(p,v),getCorpusItem(p,v),ipath);
 	writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<p>-<v>-inlined.pt|, sys);		
 	writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<p>-<v>-igraph.pt|, igraph);		
 	writeBinaryValueFile(|home:///PHPAnalysis/serialized/includes/<p>-<v>-timings.pt|, timings);		
 }
+
+public void resolveBaseIncludes(str p) {
+	c = getBaseCorpus();
+	resolveBaseIncludes(p, c[p], defaultIncludePaths[p]);
+}
+
+public void resolveBaseIncludes() {
+	c = getBaseCorpus();
+	for (s <- c) resolveBaseIncludes(s, c[s], defaultIncludePaths[s]);
+}
+
 
 public tuple[System,IncludeGraph,lrel[str,datetime]] loadSerializedInfo(str p, str v) {
 	sys = readBinaryValueFile(#System, |home:///PHPAnalysis/serialized/includes/<p>-<v>-inlined.pt|);		
 	igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<p>-<v>-igraph.pt|);
 	timings = readBinaryValueFile(#lrel[str,datetime], |home:///PHPAnalysis/serialized/includes/<p>-<v>-timings.pt|);
 	return < sys, igraph, timings >;
-}
-
-public void resolveBaseIncludes(str p) {
-	c = getBaseCorpus();
-	resolveBaseIncludes(p, c[p]);
-}
-
-public void resolveBaseIncludes() {
-	c = getBaseCorpus();
-	for (s <- c) resolveBaseIncludes(s, c[s]);
 }
 
 public rel[str p, str v, loc fileloc, Expr call] allIncludes() {
@@ -160,7 +183,7 @@ public rel[str p, str v, loc fileloc, Expr call] unresolvedIncludes() {
 	for (s <- c) {
 		println("Loading include graph for <s>-<c[s]>");
 		igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|);
-		for (e <- igraph.edges, !(e.target is igNode), include(scalar(string(_)),_) !:= e.includeExpr)
+		for (e <- igraph.edges, !(e.target is igNode))
 			res = res + < s, c[s], e.includeExpr@at, e.includeExpr >;
 	}
 	return res;
@@ -232,7 +255,7 @@ public rel[str p, str v, IncludeGraphEdge igedge] unresWithLiteralPath() {
 	for (s <- c) {
 		println("Loading include graph for <s>-<c[s]>");
 		igraph = readBinaryValueFile(#IncludeGraph, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-igraph.pt|);
-		for (e <- igraph.edges, !(e.target is igNode), include(scalar(string(_)),_) := e.includeExpr)
+		for (e <- igraph.edges, !((e.target is igNode) || include(scalar(string(_)),_) := e.includeExpr))
 			res = res + < s, c[s], e >;
 	}
 	return res;

@@ -31,7 +31,7 @@ data FNBits = lit(str s) | fnBit();
 // what happens is done in the function below.
 public map[loc fileloc, Script scr] matchIncludes(System sys, loc baseLoc) {
 	println("MATCHING INCLUDE FILE PATTERNS");
-	sys = ( l : matchIncludes(sys<0>,sys[l],baseLoc) | l <- sys );
+	sys = ( l : matchIncludes(sys<0>,sys[l],baseLoc,[]) | l <- sys );
 	println("MATCHING INCLUDE FILE PATTERNS FINISHED");
 	return sys;	
 }
@@ -49,9 +49,10 @@ private list[FNBits] fnModel(Expr e) {
 		if (trim(s) == "") return [ lit(s) ];
 		list[str] parts = split("/",s);
 		if(size(parts)==0) return [ lit("/") | idx <- [0..size(s)]];
+		if (s[0] == "/" && trim(parts[0]) == "") parts = tail(parts);
 		res = [ lit("/"), lit(p) | p <- parts ];
 		if (parts[0] != "") res = tail(res);
-		if (last(split("",s)) == "/") res = res + lit("/"); 
+		if (s[-1] == "/") res = res + lit("/"); 
 		return res;
 	} else {
 		return [ fnBit() ];
@@ -69,6 +70,8 @@ private str fnMatch(Expr e) {
 	if (lastFnBit != -1) res = res[lastFnBit..];
 	
 	solve(res) {
+		while([lit(".."),a*] := res) res = [*a];
+		while([lit("."), a*] := res) res = [*a];
 		while([a*,lit("/"),lit(c),lit("/"),lit("."),lit("/"),d*] := res)
 			res = [*a,lit("/"),lit(c),lit("/"),*d];
 		while([a*,lit("/"),lit(c),lit("/"),lit(".."),lit("/"),d*] := res)
@@ -86,14 +89,14 @@ private str fnMatch(Expr e) {
 // TODO: Add support for library includes. This is only an issue were we
 // to match an include that was both a library include and an include in
 // our own system.
-public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphEdge e, loc baseLoc) {
+public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphEdge e, loc baseLoc, bool ipMayBeSet, list[str] ipath) {
 	Expr attemptToMatch = e.includeExpr.expr;
 	
 	// If the result is a scalar, just try to match it to an actual file; if we
 	// cannot, continue with the more general matching attempt
 	if (scalar(string(sp)) := attemptToMatch) {
 		try {
-			iloc = calculateLoc(sys<0>,e.source.fileLoc,baseLoc,sp,true);
+			iloc = calculateLoc(sys<0>,e.source.fileLoc,baseLoc,sp,ipMayBeSet,ipath);
 			return e[target=ig.nodes[iloc]];					
 		} catch UnavailableLoc(_) : {
 			;

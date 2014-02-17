@@ -92,7 +92,7 @@ public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemEx
 private set[loc] getEdgeTargets(IncludeGraph igraph, IncludeGraphEdge e) {
 	if (e.target is igNode) return { e.target.fileLoc };
 	if (e.target is unknownNode) return igraph.nodes<0>;
-	if (e.target is multiNode) return { n.fileLoc | n <- multiNode.alts };
+	if (e.target is multiNode) return { n.fileLoc | n <- e.target.alts, n is igNode };
 	return { };
 }
 
@@ -114,7 +114,7 @@ private set[loc] reachable(IncludeGraph igraph, loc l) {
 	return res;
 }
 
-public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc baseLoc) {
+public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc baseLoc, list[str] ipath) {
 	lrel[str,datetime] timings = [ < "Starting includes resolution", now() > ];
 	clearLookupCache();
 	
@@ -129,7 +129,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 
 	timings += < "After inlining: <size({e | e <- igraph.edges, e.target is unknownNode})>", now()>;
 	
-	igraph.edges = { (e.target is igNode) ? e : (matchIncludes(sys, igraph, e, baseLoc)) | e <- igraph.edges };
+	igraph.edges = { (e.target is igNode) ? e : (matchIncludes(sys, igraph, e, baseLoc, true, ipath)) | e <- igraph.edges };
 	unsolvedEdges = { e | e <- igraph.edges, !(e.target is igNode) };
 	timings += < "After initial matching: <size(unsolvedEdges)>", now() >;
 	
@@ -226,7 +226,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 			for (e <- basicMatched) {
 				if (iexp:include(scalar(string(sp)),_) := e.includeExpr) {
 					try {
-						iloc = calculateLoc(sys<0>,e.source.fileLoc,baseLoc,sp,size(reachable(igraph,e.source.fileLoc) & setsIncludePath) > 0);
+						iloc = calculateLoc(sys<0>,e.source.fileLoc,baseLoc,sp,size(reachable(igraph,e.source.fileLoc) & setsIncludePath) > 0,ipath);
 						solvingEdges = solvingEdges + e[target=igraph.nodes[iloc]];
 					} catch UnavailableLoc(_) : {
 						solvingEdges = solvingEdges + e;
@@ -237,7 +237,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 			}			
 			
 			igraph.edges = igraph.edges - unsolvedEdges + solvingEdges;
-			igraph.edges = { (e.target is igNode) ? e : (matchIncludes(sys, igraph, e, baseLoc)) | e <- igraph.edges };
+			igraph.edges = { (e.target is igNode) ? e : (matchIncludes(sys, igraph, e, baseLoc, size(reachable(igraph,e.source.fileLoc) & setsIncludePath) > 0, ipath)) | e <- igraph.edges };
 			unsolvedEdges = { e | e <- igraph.edges, !(e.target is igNode) };
 			timings += < "After constant resolution, unsolved edges remaining: <size(unsolvedEdges)>", now() >;
 			

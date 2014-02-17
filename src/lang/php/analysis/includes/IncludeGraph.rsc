@@ -29,7 +29,7 @@ public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, lo
 			}
 			if (scalar(string(sp)) := e) {
 				try {
-					iloc = calculateLoc(scripts<0>,l,productRoot,sp,true);
+					iloc = calculateLoc(scripts<0>,l,productRoot,sp,true,[]);
 					edgeSet += igEdge(nodeMap[l],nodeMap[iloc],iexp[expr=e]);					
 				} catch UnavailableLoc(_) : {
 					edgeSet += igEdge(nodeMap[l],unknownNode(),iexp[expr=e]);
