@@ -177,6 +177,7 @@ public data StaticVar = staticVar(str name, OptionExpr defaultValue);
 
 public data Script = script(list[Stmt] body) | errscript(str err);
 
+@doc{Stores the location of the node in the original source file.}
 public anno loc ActualParameter@at;
 public anno loc Const@at;
 public anno loc ArrayElement@at;
@@ -204,6 +205,7 @@ public anno loc InterfaceDef@at;
 public anno loc StaticVar@at;
 public anno loc Script@at;
 
+@doc{Stores unique IDs for the AST nodes.}
 public anno str ActualParameter@id;
 public anno str Const@id;
 public anno str ArrayElement@id;
@@ -231,3 +233,5 @@ public anno str InterfaceDef@id;
 public anno str StaticVar@id;
 public anno str Script@id;
 
+@doc{Used to associate the actual compile-time value with magic constants.}
+public anno str Scalar@actualValue;
