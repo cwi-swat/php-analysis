@@ -74,6 +74,9 @@ public loc getCorpusItem(str product, str version) {
 	throw productNotFound(product);
 }
 
+// provide an alias for getCorpusItem, it isn't the most obvious name for what it does
+public loc getSystemLoc(str product, str version) = getCorpusItem(product, version);
+
 public loc getPlugin(str plugin, str version) {
 	if (plugin in plugins<0>) {
 		if (version in plugins[plugin]) {

@@ -20,7 +20,7 @@ data RuntimeException = UnavailableLoc(str unavailablePath);
 @doc{Calculate a loc based on the base loc and an addition to the base loc path.
      This also ensures that the resulting loc is one of the possible locs, else
      an exception is thrown.}
-public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str path, bool pathMayBeChanged, list[str] ipath) {
+public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str path, bool pathMayBeChanged = true, list[str] ipath = []) {
 	qualifiedPath = false;
 	set[str] paths = { };
 	set[loc] matchedLocs = { };

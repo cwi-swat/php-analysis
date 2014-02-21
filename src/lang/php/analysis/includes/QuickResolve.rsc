@@ -23,10 +23,10 @@ private Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 
 public rel[loc,loc] quickResolve(System sys, str p, str v, loc toResolve, loc baseLoc) {
 	IncludesInfo iinfo = loadIncludesInfo(p, v);
-	return quickResolve(sys, p, v, iinfo, toResolve, baseLoc);
+	return quickResolve(sys, iinfo, toResolve, baseLoc);
 }
 
-public rel[loc,loc] quickResolve(System sys, str p, str v, IncludesInfo iinfo, loc toResolve, loc baseLoc) {
+public rel[loc,loc] quickResolve(System sys, IncludesInfo iinfo, loc toResolve, loc baseLoc) {
 	rel[loc,loc] resolved = { };
 
 	Script scr = sys[toResolve];
@@ -45,7 +45,7 @@ public rel[loc,loc] quickResolve(System sys, str p, str v, IncludesInfo iinfo, l
 	unresolved = includes;
 	for (iitem:< _, i > <- includes, scalar(string(s)) := i.expr, size(s) > 0, s[0] in { "\\", "/"}) {
 		try {
-			iloc = calculateLoc(sys<0>,toResolve,baseLoc,s,true);
+			iloc = calculateLoc(sys<0>,toResolve,baseLoc,s);
 			resolved = resolved + <i@at, iloc >;
 			unresolved = domainX(unresolved, {i@at});  
 		} catch UnavailableLoc(_) : {
