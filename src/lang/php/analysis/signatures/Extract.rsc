@@ -60,7 +60,7 @@ public map[NamePath,loc] getLibraryPages(loc startingLoc) {
 			fun:"a"(["text"(str funname)]) <- funs, 
 			str funhref := getAnnotations(fun)["href"], 
 			/function\.<funnamelink:.*>\.php/ := funhref );
-		println("Added <size(funs)> function pages for book <book>");
+		println("Added <size(funs)> function pages for book <bookname>");
 		
 		// Extract out locations of constants pages
 		set[node] constants = { n | /node n <- booktxt, getName(n) == "a", 
@@ -72,7 +72,7 @@ public map[NamePath,loc] getLibraryPages(loc startingLoc) {
 		pathPages += ( [library(bookname),libraryConstants()] : startingLoc.parent + consthref | 
 			const <- constants, 
 			str consthref := getAnnotations(const)["href"] );
-		println("Added <size(constants)> constants pages for book <book>");
+		println("Added <size(constants)> constants pages for book <bookname>");
 
 		// Extract out the class pages; we need this info to find the method pages as well
 		set[node] classes = { n | 
@@ -85,7 +85,7 @@ public map[NamePath,loc] getLibraryPages(loc startingLoc) {
 			class:"a"(["text"(str classname)]) <- classes, 
 			str classhref := getAnnotations(class)["href"], 
 			/class\.<classlinkname:.*>\.php/ := classhref);
-		println("Added <size(classes)> class pages for book <book>");
+		println("Added <size(classes)> class pages for book <bookname>");
 		
 		// For each class, extract out the method pages
 		for (class:"a"(["text"(str cn)]) <- classes) {
