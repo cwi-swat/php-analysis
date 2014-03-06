@@ -26,8 +26,8 @@ public rel[loc,loc] quickResolve(System sys, str p, str v, loc toResolve, loc ba
 	return quickResolve(sys, iinfo, toResolve, baseLoc);
 }
 
-public rel[loc,loc] quickResolve(System sys, IncludesInfo iinfo, loc toResolve, loc baseLoc) {
-	rel[loc,loc] resolved = { };
+public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc toResolve, loc baseLoc) {
+	rel[loc,Expr,loc] resolved = { };
 
 	Script scr = sys[toResolve];
 	includes = { < i@at, i > | /i:include(_,_) := scr };
@@ -46,7 +46,7 @@ public rel[loc,loc] quickResolve(System sys, IncludesInfo iinfo, loc toResolve, 
 	for (iitem:< _, i > <- includes, scalar(string(s)) := i.expr, size(s) > 0, s[0] in { "\\", "/"}) {
 		try {
 			iloc = calculateLoc(sys<0>,toResolve,baseLoc,s);
-			resolved = resolved + <i@at, iloc >;
+			resolved = resolved + <i@at, i, iloc >;
 			unresolved = domainX(unresolved, {i@at});  
 		} catch UnavailableLoc(_) : {
 			;
@@ -59,8 +59,12 @@ public rel[loc,loc] quickResolve(System sys, IncludesInfo iinfo, loc toResolve, 
 	// find files that will never actually be included in practice
 	for (iitem:< _, i > <- unresolved) {
 		possibleMatches = matchIncludes(sys, i, baseLoc);
-		resolved = resolved + { < i@at, l > | l <- possibleMatches }; 
+		resolved = resolved + { < i@at, i, l > | l <- possibleMatches }; 
 	}
 	
 	return resolved;
+}
+
+public rel[loc,loc] quickResolve(System sys, IncludesInfo iinfo, loc toResolve, loc baseLoc) {
+	return (quickResolveExpr(sys, iinfo, toResolve, baseLoc))<0,2>;
 }

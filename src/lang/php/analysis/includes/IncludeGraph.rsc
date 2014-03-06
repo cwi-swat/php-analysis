@@ -1,6 +1,15 @@
+@license{
+  Copyright (c) 2009-2014 CWI
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+}
+@contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::analysis::includes::IncludeGraph
 
 import lang::php::ast::AbstractSyntax;
+import lang::php::util::System;
 import lang::php::stats::Stats;
 import lang::php::util::LocUtils;
 import lang::php::analysis::evaluators::AlgebraicSimplification;
@@ -12,10 +21,30 @@ import String;
 import Set;
 import Relation;
 
-data IncludeGraphNode = igNode(str fileName, loc fileLoc) | libNode(str libName, str libPath) | unknownNode() | multiNode(set[IncludeGraphNode] alts);
-data IncludeGraphEdge = igEdge(IncludeGraphNode source, IncludeGraphNode target, Expr includeExpr);
-data IncludeGraph = igGraph(map[loc,IncludeGraphNode] nodes, set[IncludeGraphEdge] edges);
+data IncludeGraphNode 
+	= igNode(str fileName, loc fileLoc) 
+	| libNode(str libName, str libPath) 
+	| unknownNode() 
+	| multiNode(set[IncludeGraphNode] alts) 
+	| anyNode();
+	
+data IncludeGraphEdge
+	= igEdge(IncludeGraphNode source, IncludeGraphNode target, Expr includeExpr);
 
+data IncludeGraph 
+	= igGraph(map[loc,IncludeGraphNode] nodes, set[IncludeGraphEdge] edges);
+
+public set[loc] getEdgeTargets(IncludeGraph igraph, IncludeGraphEdge edge) {
+	switch(edge.target) {
+		case igNode(_,fl) : return { fl };
+		case libNode(_,_) : return { }; // TODO: Need to somehow encode locs for libraries
+		case unknownNode() : return { };
+		case multiNode(igns) : return { ign.fileLoc | ign <- igns, ign is igNode };
+		case anyNode() : return igraph.nodes<0>;
+	}
+	throw("WARNING: getEdgeLocs missing case for <edge.target>"); 	
+}
+ 
 public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, loc productRoot, set[LibItem] libraries) {
 	int sizeToRemove = size(productRoot.path);
 	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- scripts ) + (|file:///synthesizedLoc/<lib.path>| : libNode(lib.name,lib.path) | lib <- libraries);

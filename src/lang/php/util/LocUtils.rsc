@@ -1,5 +1,5 @@
 @license{
-  Copyright (c) 2009-2011 CWI
+  Copyright (c) 2009-2014 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -17,22 +17,27 @@ import Set;
      in the system.}
 data RuntimeException = UnavailableLoc(str unavailablePath);
 
-@doc{Calculate a loc based on the base loc and an addition to the base loc path.
-     This also ensures that the resulting loc is one of the possible locs, else
-     an exception is thrown.}
+@doc{Calculate the actual location of a path given as a string.}
 public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str path, bool pathMayBeChanged = true, list[str] ipath = []) {
 	qualifiedPath = false;
 	set[str] paths = { };
 	set[loc] matchedLocs = { };
-	
-	// Build the possible paths we need to check: just 1 in the case of a qualified path,
-	// but multiple paths if we are consulting the include path
+
+	// Build the actual path based on the string for the path that we are given.
+	// If the path starts with a \ or / character, it is an absolute path, so
+	// we look it up from the root. If the path starts with a . (including ..)
+	// the path is a relative path, so we will look it up from the base location,
+	// which is the location of the script containing the include. One wrinkle here
+	// is that this is the "top level" script: if A includes B and B includes C,
+	// we use the location of A since the include of C will execute in that context.
+	// If the path does not match one of these two options, we currently fall back
+	// on matching, but TODO: need to improve library matching in the future.	
 	if (size(trim(path)) > 0 && ( path[0] == "/" || path[0] == "\\") ) {
 		paths = { (rootLoc + path).path };
 		qualifiedPath = true;
-	//} else if (size(trim(path)) > 0 && ( path[0] == "." ) ) {
-	//	paths = { (baseLoc.parent + path).path };
-	//	qualifiedPath = true;
+	} else if (size(trim(path)) > 0 && ( path[0] == "." ) ) {
+		paths = { (baseLoc.parent + path).path };
+		qualifiedPath = true;
 	//} else if (size(trim(path)) > 0) {
 	//	paths = { ip + "/" + path | ip <- ipath } + ((baseLoc.parent + path).path); 		
 	} else {

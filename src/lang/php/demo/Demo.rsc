@@ -6,7 +6,7 @@
   http://www.eclipse.org/legal/epl-v10.html
 }
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
-module lang::php::experiments::csmrwcre2014::CSMRWCRE2014
+module lang::php::demo::Demo
 
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Utils;
@@ -138,4 +138,3 @@ public void stuffToDo() {
 	resolved = quickResolve(wp, "WordPress", "3.8.1", wpload, baseLoc);
 	 	
 }
-

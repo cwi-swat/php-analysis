@@ -1,5 +1,5 @@
 @license{
-  Copyright (c) 2009-2011 CWI
+  Copyright (c) 2009-2014 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -89,26 +89,8 @@ private str fnMatch(Expr e) {
 // TODO: Add support for library includes. This is only an issue were we
 // to match an include that was both a library include and an include in
 // our own system.
-public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphEdge e, loc baseLoc, bool ipMayBeSet, list[str] ipath) {
+public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphEdge e, bool ipMayBeSet, list[str] ipath) {
 	Expr attemptToMatch = e.includeExpr.expr;
-	
-	// If the result is a scalar, just try to match it to an actual file; if we
-	// cannot, continue with the more general matching attempt
-	if (scalar(string(sp)) := attemptToMatch) {
-		try {
-			iloc = calculateLoc(sys<0>,e.source.fileLoc,baseLoc,sp,ipMayBeSet,ipath);
-			return e[target=ig.nodes[iloc]];					
-		} catch UnavailableLoc(_) : {
-			;
-		}
-	} 
-
-	// Find the part of the include expression that we may be able to match; this is
-	// the last literal part of the string, after any . or .. path characters (we don't
-	// use them to adjust to path because, in cases like $x../path/to/file, we don't
-	// know what $x is, so we don't know if we can just "walk back" a step, so this
-	// makes the match more conservative)
-	//matchItem = lastLiteralPart(attemptToMatch);
 	
 	// If this is a literal, we can try to match it; if it is an fbBit, it is some
 	// file name piece that we can't use in matching
