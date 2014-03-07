@@ -43,24 +43,11 @@ private Color calculateBoxColor(int featureCount) {
 	return color("red");
 }
 
-@doc{Calculate the color of the box we use to visualize the feature count. This is a relative coloring, based on the total number of features found.}
-private Color calculateBoxColor(int featureCount, int totalCount) {
-	if (totalCount > 0)
-		return colorSteps(color("green"),color("red"),totalCount+1)[featureCount];
-	else
-		return color("green");
-}
-
 @doc{Calculate the number of occurrences in a given file}
 private map[str file, int count] calculateFeatureCounts(System s, lrel[loc fileloc, Expr e] occurrences) {
 	map[str file, int count] res = ( l.path : 0 | l <- s );
 	for (<l,_> <- occurrences,l.path in res) res[l.path] += 1;
 	return res;
-}
-
-@doc{Create a launch link.}
-private FProperty createClicker(loc path) {
-	return onMouseDown(bool (int butnr, map[KeyModifier,bool] modifiers) { loc l = path; edit(l,[]); return true;});
 }
 
 @doc{Create the label for the box.}
@@ -71,12 +58,12 @@ private FProperty createLabel(str filename, int featureCount) =
 private Figure createBox(loc fileLoc, str filename, int fileSize, int featureCount, int totalCount) {
 	boxSize = calculateBoxSize(fileSize);
 	boxLabel = createLabel(filename, featureCount);
-	boxColor = calculateBoxColor(featureCount); //, totalCount);
-	//boxClick = createClicker(fileLoc);
+	boxColor = calculateBoxColor(featureCount);
 	
 	return box(size(boxSize.length,boxSize.width), fillColor(boxColor), boxLabel);
 }
 
+@doc{Calculate the size of each file in terms of number of included statements.}
 public map[str file, int count] calculateFileSizes(System sys) =
 	( l.path : size({ s@at | /Stmt s := sys[l]}) | l <- sys );
 
