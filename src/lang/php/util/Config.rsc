@@ -1,8 +1,12 @@
 module lang::php::util::Config
 
+import IO;
+
 public loc phploc = |file:///usr/bin/php|;
 
-public loc parserLoc = |file:///Users/mhills/Projects/phpsa|;
+public loc parserLoc = exists(|file:///Users/mhills|) ? |file:///Users/mhills/Projects/phpsa| : |file:///Users/ruud/git|;
+	
+public str parserMemLimit = "1024M";
 public loc rgenLoc = parserLoc + "PHP-Parser/lib/Rascal/AST2Rascal.php";
 public loc rgenCwd = parserLoc + "PHP-Parser/lib/Rascal";
 
@@ -14,3 +18,6 @@ public loc countsDir = baseLoc + "serialized/counts";
 
 public bool useBinaries = false;
 
+// parse options
+public bool includePhpDocs = true;
+public bool resolveNamespaces = true;
