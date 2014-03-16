@@ -78,16 +78,16 @@ public str pp(fetchClassConst(name(Name className), str constName)) = "<pp(class
 public str pp(fetchClassConst(expr(Expr className), str constName)) = "$<pp(className)>::<constName>";
 
 //	| assign(Expr assignTo, Expr assignExpr)
-public str pp(assign(Expr assignTo, Expr assignExpr)) = "<pp(assignTo)> = <pp(assignExpr)>";
+public str pp(assign(Expr assignTo, Expr assignExpr)) = "<pp(assignTo@phpdoc)><pp(assignTo)> = <pp(assignExpr)>";
 
 //	| assignWOp(Expr assignTo, Expr assignExpr, Op operation)
-public str pp(assignWOp(Expr assignTo, Expr assignExpr, Op operation)) = "<pp(assignTo)> <pp(operation)>= <pp(assignExpr)>";
+public str pp(assignWOp(Expr assignTo, Expr assignExpr, Op operation)) = "<pp(assignTo@phpdoc)><pp(assignTo)> <pp(operation)>= <pp(assignExpr)>";
 
 //	| listAssign(list[OptionExpr] assignsTo, Expr assignExpr)
 public str pp(listAssign(list[OptionExpr] assignsTo, Expr assignExpr)) = "list(<intercalate(",",[pp(a)|a<-assignsTo])>) = <pp(assignExpr)>";
 
 //	| refAssign(Expr assignTo, Expr assignExpr)
-public str pp(refAssign(Expr assignTo, Expr assignExpr)) = "<pp(assignTo)> =& <pp(assignExpr)>";
+public str pp(refAssign(Expr assignTo, Expr assignExpr)) = "<pp(assignTo@phpdoc)><pp(assignTo)> =& <pp(assignExpr)>";
 
 //	| binaryOperation(Expr left, Expr right, Op operation)
 public str pp(binaryOperation(Expr left, Expr right, Op operation)) = "<pp(left)> <pp(operation)> <pp(right)>";
@@ -583,35 +583,35 @@ public str pp(\final()) = "final";
 public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members)) =
 	"class <className> extends <pp(extends)> {
 	'	<for (m <- members) {>
-	'	<pp(m)><}>
+	'	<pp(m@phpdoc)+pp(m)><}>
 	'}" when isEmpty(modifiers) && isEmpty(implements);
 public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members)) =
 	"class <className> {
-	'	<for (m <- members) {><pp(m)><}>
+	'	<for (m <- members) {><pp(m@phpdoc)+pp(m)><}>
 	'}" when isEmpty(modifiers) && isEmpty(implements);
 public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members)) =
 	"class <className> extends <pp(extends)> implements <intercalate(",",[pp(i)|i<-implements])> {
-	'	<for (m <- members) {><pp(m)><}>
+	'	<for (m <- members) {><pp(m@phpdoc)+pp(m)><}>
 	'}" when isEmpty(modifiers) && !isEmpty(implements);
 public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members)) =
 	"class <className> implements <intercalate(",",[pp(i)|i<-implements])> {
-	'	<for (m <- members) {><pp(m)><}>
+	'	<for (m <- members) {><pp(m@phpdoc)+pp(m)><}>
 	'}" when isEmpty(modifiers) && !isEmpty(implements);
 public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members)) =
 	"<intercalate(" ",[pp(m)|m<-modifiers])> class <className> extends <pp(extends)> {
-	'	<for (m <- members) {><pp(m)><}>
+	'	<for (m <- members) {><pp(m@phpdoc)+pp(m)><}>
 	'}" when !isEmpty(modifiers) && isEmpty(implements);
 public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members)) =
 	"<intercalate(" ",[pp(m)|m<-modifiers])> class <className> {
-	'	<for (m <- members) {><pp(m)><}>
+	'	<for (m <- members) {><pp(m@phpdoc)+pp(m)><}>
 	'}" when !isEmpty(modifiers) && isEmpty(implements);
 public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members)) =
 	"<intercalate(" ",[pp(m)|m<-modifiers])> class <className> extends <pp(extends)> implements <intercalate(",",[pp(i)|i<-implements])> {
-	'	<for (m <- members) {><pp(m)><}>
+	'	<for (m <- members) {><pp(m@phpdoc)+pp(m)><}>
 	'}" when !isEmpty(modifiers) && !isEmpty(implements);
 public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members)) =
 	"<intercalate(" ",[pp(m)|m<-modifiers])> class <className> implements <intercalate(",",[pp(i)|i<-implements])> {
-	'	<for (m <- members) {><pp(m)><}>
+	'	<for (m <- members) {><pp(m@phpdoc)+pp(m)><}>
 	'}" when !isEmpty(modifiers) && !isEmpty(implements);
 	
 //public data InterfaceDef = interface(str interfaceName, 
@@ -640,5 +640,8 @@ public str pp(errscript(str err)) {
 	println("Cannot print an error script as a normal PHP script");
 	return "\n//<err>\n";
 }
+
+// will be used for annotations
+public str pp(str text) = (size(text)>0?text+"\n":"");
 
 public default str pp(node n) { throw "No pretty-printer found for node <n>"; }
