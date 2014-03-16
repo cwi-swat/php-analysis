@@ -126,6 +126,7 @@ public data Stmt
 	| \throw(Expr expr)
 	| tryCatch(list[Stmt] body, list[Catch] catches)
 	| tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
+
 	| unset(list[Expr] unsetVars)
 	| use(list[Use] uses)
 	| \while(Expr cond, list[Stmt] body)
@@ -205,6 +206,34 @@ public anno loc InterfaceDef@at;
 public anno loc StaticVar@at;
 public anno loc Script@at;
 
+@decl{Contains Namespace/Class/Method/Function information.}
+public anno LocationNode ActualParameter@decl;
+public anno LocationNode Const@decl;
+public anno LocationNode ArrayElement@decl;
+public anno LocationNode Name@decl;
+public anno LocationNode NameOrExpr@decl;
+public anno LocationNode CastType@decl;
+public anno LocationNode ClosureUse@decl;
+public anno LocationNode IncludeType@decl;
+public anno LocationNode Expr@decl;
+public anno LocationNode Op@decl;
+public anno LocationNode Param@decl;
+public anno LocationNode Scalar@decl;
+public anno LocationNode Stmt@decl;
+public anno LocationNode Declaration@decl;
+public anno LocationNode Catch@decl;
+public anno LocationNode Case@decl;
+public anno LocationNode ElseIf@decl;
+public anno LocationNode Else@decl;
+public anno LocationNode Use@decl;
+public anno LocationNode ClassItem@decl;
+public anno LocationNode Property@decl;
+public anno LocationNode Modifier@decl;
+public anno LocationNode ClassDef@decl;
+public anno LocationNode InterfaceDef@decl;
+public anno LocationNode StaticVar@decl;
+public anno LocationNode Script@decl;
+
 @doc{Stores unique IDs for the AST nodes.}
 public anno str ActualParameter@id;
 public anno str Const@id;
@@ -232,6 +261,34 @@ public anno str ClassDef@id;
 public anno str InterfaceDef@id;
 public anno str StaticVar@id;
 public anno str Script@id;
+
+@doc{Stores PHPDoc for the AST nodes.}
+public anno str ActualParameter@phpdoc;
+public anno str Const@phpdoc;
+public anno str ArrayElement@phpdoc;
+public anno str Name@phpdoc;
+public anno str NameOrExpr@phpdoc;
+public anno str CastType@phpdoc;
+public anno str ClosureUse@phpdoc;
+public anno str IncludeType@phpdoc;
+public anno str Expr@phpdoc;
+public anno str Op@phpdoc;
+public anno str Param@phpdoc;
+public anno str Scalar@phpdoc;
+public anno str Stmt@phpdoc;
+public anno str Declaration@phpdoc;
+public anno str Catch@phpdoc;
+public anno str Case@phpdoc;
+public anno str ElseIf@phpdoc;
+public anno str Else@phpdoc;
+public anno str Use@phpdoc;
+public anno str ClassItem@phpdoc;
+public anno str Property@phpdoc;
+public anno str Modifier@phpdoc;
+public anno str ClassDef@phpdoc;
+public anno str InterfaceDef@phpdoc;
+public anno str StaticVar@phpdoc;
+public anno str Script@phpdoc;
 
 @doc{Used to associate the actual compile-time value with magic constants.}
 public anno str Scalar@actualValue;
