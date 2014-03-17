@@ -1,6 +1,6 @@
 @license{
 
-  Copyright (c) 2009-2011 CWI
+  Copyright (c) 2009-2014 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -11,9 +11,9 @@ module lang::php::analysis::cfg::Label
 
 import lang::php::ast::AbstractSyntax;
 
-// Labels are added to expressions and statements to give us a
-// shorthand to refer to the various statements, expressions, and
-// sub-statements/sub-expressions in the code.
+@doc{Labels are added to expressions and statements to give us a 
+     shorthand to refer to the various statements, expressions, and
+     sub-statements/sub-expressions in the code.}
 data Lab = lab(int id);
 
 public anno Lab Expr@lab;

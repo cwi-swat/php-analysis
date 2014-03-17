@@ -1,5 +1,5 @@
 @license{
-  Copyright (c) 2009-2013 CWI
+  Copyright (c) 2009-2014 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -37,39 +37,13 @@ import Exception;
 //    needed). For the second, this should be done by adding these as
 //    possible assignments coming out of the entry node for the method.
 
+@doc{Build the CFGs for a single PHP file, given as a location}
 public map[NamePath,CFG] buildCFGs(loc l) {
 	return buildCFGs(loadPHPFile(l));
 }
 
-public map[NamePath,CFG] buildCFGs(Script scr) {
-	lstate = newLabelState();
-	< scrLabeled, lstate > = labelScript(scr, lstate);
-	
-	map[NamePath,CFG] res = ( );
-
-	println("Creating CFG for top-level script");
-	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
-	res[[global()]] = scriptCFG;
-		
-	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,params,body) <- mbrs) {
-		methodNamePath = [class(cname),method(mname)];
-		println("Creating CFG for <cname>::<mname>");
-		< methodCFG, lstate > = createMethodCFG(methodNamePath, m, lstate);
-		res[methodNamePath] = methodCFG;
-	}
-
-	for (/f:function(fname,_,params,body) := scrLabeled) {
-		functionNamePath = [global(),function(fname)];
-		println("Creating CFG for <fname>");
-		< functionCFG, lstate > = createFunctionCFG(functionNamePath, f, lstate);
-		res[functionNamePath] = functionCFG;
-	}
-	 
-	return res;
-}
-
-// TODO: This needs some refactoring...
-public tuple[Script,map[NamePath,CFG]] buildCFGsAndScript(Script scr) {
+@doc{Build the CFGs for a PHP script, returning both the CFGs and the labeled script.}
+public tuple[Script scr, map[NamePath,CFG] cfgs] buildCFGsAndScript(Script scr) {
 	lstate = newLabelState();
 	< scrLabeled, lstate > = labelScript(scr, lstate);
 	
@@ -96,6 +70,10 @@ public tuple[Script,map[NamePath,CFG]] buildCFGsAndScript(Script scr) {
 	return < scrLabeled, res >;
 }
 
+@doc{Build just the CFGs for a PHP script}
+public map[NamePath,CFG] buildCFGs(Script scr) = buildCFGsAndScript(scr).cfgs;
+
+@doc{Strip the label annotations off of the nodes in the script.}
 public Script stripLabels(Script scr) {
 	str labAnno = "lab";
 	return visit(scr) {
@@ -104,24 +82,26 @@ public Script stripLabels(Script scr) {
 	}
 }
 
+@doc{This is similar to buildCFGs, but also collapses nodes into basic blocks. Note: we may start doing this by default.}
 public map[NamePath,CFG] buildCFGsAndBlocks(loc l) {
 	return buildCFGsAndBlocks(loadPHPFile(l));
 }
 
+@doc{This is similar to buildCFGs, but also collapses nodes into basic blocks. Note: we may start doing this by default.}
 public map[NamePath,CFG] buildCFGsAndBlocks(Script scr) {
 	map[NamePath,CFG] res = buildCFGs(scr);
 	for (np <- res) res[np] = createBasicBlocks(res[np]);
 	return res;
 }
 
-public tuple[Script, FlowEdges] generateFlowEdges(Script scr) {
-	< labeled, lstate > = labelScript(scr); 
-	return < labeled, { *internalFlow(b) | b <- labeled.body } + { flowEdge(final(b1),init(b2)) | [_*,b1,b2,_*] := labeled.body } >;
-}
-
+@doc{Retrieve all method declarations from a script.}
 public map[NamePath, ClassItem] getScriptMethods(Script scr) =
 	( [class(cname),method(mname)] : m | /class(cname,_,_,_,mbrs) := scr, m:method(mname,_,_,params,body) <- mbrs );
 
+// TODO: It is possible in PHP to have non-unique or conditional declarations. We may need a way to represent
+// that here, assuming we ever run across it.
+
+@doc{Retrieve all function declarations from a script. Note: this assumes that definitions are unique.}
 public map[NamePath, Stmt] getScriptFunctions(Script scr) =
 	( [global(),function(fname)] : f | /f:function(fname,_,_,_) := scr );
 
@@ -285,7 +265,8 @@ public Lab init(Stmt s) {
 		case \break(someExpr(Expr e)) : return init(e);
 		case \break(noExpr()) : return s@lab;
 
-		// A class def is treated as a unit.
+		// A class def is treated as a unit. Individual methods contained inside have their
+		// own control flow graphs.
 		case classDef(_) : return s@lab;
 
 		// Given a list of constants, the first thing that occurs is the expression that is
@@ -375,6 +356,9 @@ public Lab init(Stmt s) {
 		// body; if not, the namespace declaration itself provides the first label.
 		case namespace(_, list[Stmt] body) : return isEmpty(body) ? s@lab : init(head(body));
 
+		// A namespace without a body is a unit
+		case namespaceHeader(_) : return s@lab;
+		
 		// In a return, if we have an expression it provides the first label; if not, the
 		// statement itself does.
 		case \return(someExpr(Expr returnExpr)) : return init(returnExpr);
@@ -400,6 +384,20 @@ public Lab init(Stmt s) {
 		// just use the label from the statement (the catch clauses would never fire, since
 		// nothing could trigger them in an empty body).
 		case tryCatch(list[Stmt] body, _) : return isEmpty(body) ? s@lab : init(head(body));
+
+		// In a try/catch, the body provides the first label. If the body is empty, we
+		// check the finally clause. If that is empty as well, we use the statement.
+		case tryCatchFinally(list[Stmt] body, _, list[Stmt] finallyBody) : {
+			if (isEmpty(body)) {
+				if (isEmpty(finallyBody)) {
+					return s@lab;
+				} else {
+					return init(head(finallyBody));
+				}	
+			} else {
+				return init(head(body));
+			}
+		}
 
 		// In an unset, the first expression to unset provides the first label. If the list is
 		// empty, the statement itself provides the label.
@@ -561,14 +559,20 @@ public Lab init(Expr e) {
 //
 // we would evaluate a, then b, then a + b, so a + b is the final label. This is
 // also done with statements currently.
+//
+// Is this always correct? Technically, if we know we have a jump in an expression
+// that will always fire, isn't truly the final reachable label. We handle this
+// when we wire up nodes below in the statementJumps check.
 public Lab final(Stmt s) = s@lab;
 public Lab final(Expr e) = e@lab;
 
+@doc{Add internal edges between subexpressions of an expression.}
 public tuple[FlowEdges, LabelState] addExpEdges(FlowEdges edges, LabelState lstate, Expr e) {
 	< eedges, lstate > = internalFlow(e, lstate);
 	return < edges + eedges, lstate >;
 }
 
+@doc{Add internal edges between internal expressions and statements of a statement.}
 public tuple[FlowEdges, LabelState] addStmtEdges(FlowEdges edges, LabelState lstate, Stmt s) {
 	< sedges, lstate > = internalFlow(s, lstate);
 	return < edges + sedges, lstate >;
@@ -591,14 +595,10 @@ public tuple[FlowEdges, LabelState] addExpSeqEdges(FlowEdges edges, LabelState l
 }
 
 // Determine if a statement will flow to the following statement or will jump somewhere else.
-public bool statementJumps(Stmt s) {
-	switch(s) {
-		case \return(_) : return true;
-		case \break(_) : return true;
-		case \continue(_) : return true;
-		default: return false;
-	}
-}
+// Note: this doesn't account for exceptional jumps, TODO: extra support is needed for that.
+// Also, a yield does not count as a jump, since execution will pick up where it left off when
+// the generator gets control back.
+public bool statementJumps(Stmt s) = (s is \return) || (s is \break) || (s is \continue);
 
 // Compute all the internal flow edges in a statement. This models the possible
 // flows through the statement, for instance, from the conditional guard to the
