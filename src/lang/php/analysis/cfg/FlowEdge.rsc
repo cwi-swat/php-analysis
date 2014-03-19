@@ -26,6 +26,8 @@ data FlowEdge
 	| conditionFalseFlowEdge(Lab from, Lab to, list[Expr] whyNots)
 	| iteratorEmptyFlowEdge(Lab from, Lab to, Expr arr)
 	| iteratorNotEmptyFlowEdge(Lab from, Lab to, Expr arr)
+	| escapingBreakEdge(Lab from, Lab to, OptionExpr breakAmount)
+	| escapingContinueEdge(Lab from, Lab to, OptionExpr continueAmount)
 	;
 	
 alias FlowEdges = set[FlowEdge];
@@ -39,3 +41,5 @@ public str printFlowEdgeLabel(conditionFalseFlowEdge(Lab from, Lab to, Expr whyN
 public str printFlowEdgeLabel(conditionFalseFlowEdge(Lab from, Lab to, list[Expr] whyNots)) = "False: <intercalate(",",[pp(w)|w<-whyNots])>";
 public str printFlowEdgeLabel(iteratorEmptyFlowEdge(Lab from, Lab to, Expr arr)) = "Empty";
 public str printFlowEdgeLabel(iteratorNotEmptyFlowEdge(Lab from, Lab to, Expr arr)) = "Not Empty";
+public str printFlowEdgeLabel(escapingBreakEdge(Lab from, Lab to, OptionExpr breakAmount)) = "";
+public str printFlowEdgeLabel(escapingContinueEdge(Lab from, Lab to, OptionExpr continueAmount)) = "";
