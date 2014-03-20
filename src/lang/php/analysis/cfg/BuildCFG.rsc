@@ -1,5 +1,5 @@
 @license{
-  Copyright (c) 2009-2013 CWI
+  Copyright (c) 2009-2014 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -37,39 +37,13 @@ import Exception;
 //    needed). For the second, this should be done by adding these as
 //    possible assignments coming out of the entry node for the method.
 
+@doc{Build the CFGs for a single PHP file, given as a location}
 public map[NamePath,CFG] buildCFGs(loc l) {
 	return buildCFGs(loadPHPFile(l));
 }
 
-public map[NamePath,CFG] buildCFGs(Script scr) {
-	lstate = newLabelState();
-	< scrLabeled, lstate > = labelScript(scr, lstate);
-	
-	map[NamePath,CFG] res = ( );
-
-	println("Creating CFG for top-level script");
-	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
-	res[[global()]] = scriptCFG;
-		
-	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,params,body) <- mbrs) {
-		methodNamePath = [class(cname),method(mname)];
-		println("Creating CFG for <cname>::<mname>");
-		< methodCFG, lstate > = createMethodCFG(methodNamePath, m, lstate);
-		res[methodNamePath] = methodCFG;
-	}
-
-	for (/f:function(fname,_,params,body) := scrLabeled) {
-		functionNamePath = [global(),function(fname)];
-		println("Creating CFG for <fname>");
-		< functionCFG, lstate > = createFunctionCFG(functionNamePath, f, lstate);
-		res[functionNamePath] = functionCFG;
-	}
-	 
-	return res;
-}
-
-// TODO: This needs some refactoring...
-public tuple[Script,map[NamePath,CFG]] buildCFGsAndScript(Script scr) {
+@doc{Build the CFGs for a PHP script, returning both the CFGs and the labeled script.}
+public tuple[Script scr, map[NamePath,CFG] cfgs] buildCFGsAndScript(Script scr) {
 	lstate = newLabelState();
 	< scrLabeled, lstate > = labelScript(scr, lstate);
 	
@@ -96,6 +70,10 @@ public tuple[Script,map[NamePath,CFG]] buildCFGsAndScript(Script scr) {
 	return < scrLabeled, res >;
 }
 
+@doc{Build just the CFGs for a PHP script}
+public map[NamePath,CFG] buildCFGs(Script scr) = buildCFGsAndScript(scr).cfgs;
+
+@doc{Strip the label annotations off of the nodes in the script.}
 public Script stripLabels(Script scr) {
 	str labAnno = "lab";
 	return visit(scr) {
@@ -104,24 +82,26 @@ public Script stripLabels(Script scr) {
 	}
 }
 
+@doc{This is similar to buildCFGs, but also collapses nodes into basic blocks. Note: we may start doing this by default.}
 public map[NamePath,CFG] buildCFGsAndBlocks(loc l) {
 	return buildCFGsAndBlocks(loadPHPFile(l));
 }
 
+@doc{This is similar to buildCFGs, but also collapses nodes into basic blocks. Note: we may start doing this by default.}
 public map[NamePath,CFG] buildCFGsAndBlocks(Script scr) {
 	map[NamePath,CFG] res = buildCFGs(scr);
 	for (np <- res) res[np] = createBasicBlocks(res[np]);
 	return res;
 }
 
-public tuple[Script, FlowEdges] generateFlowEdges(Script scr) {
-	< labeled, lstate > = labelScript(scr); 
-	return < labeled, { *internalFlow(b) | b <- labeled.body } + { flowEdge(final(b1),init(b2)) | [_*,b1,b2,_*] := labeled.body } >;
-}
-
+@doc{Retrieve all method declarations from a script.}
 public map[NamePath, ClassItem] getScriptMethods(Script scr) =
 	( [class(cname),method(mname)] : m | /class(cname,_,_,_,mbrs) := scr, m:method(mname,_,_,params,body) <- mbrs );
 
+// TODO: It is possible in PHP to have non-unique or conditional declarations. We may need a way to represent
+// that here, assuming we ever run across it.
+
+@doc{Retrieve all function declarations from a script. Note: this assumes that definitions are unique.}
 public map[NamePath, Stmt] getScriptFunctions(Script scr) =
 	( [global(),function(fname)] : f | /f:function(fname,_,_,_) := scr );
 
@@ -285,7 +265,8 @@ public Lab init(Stmt s) {
 		case \break(someExpr(Expr e)) : return init(e);
 		case \break(noExpr()) : return s@lab;
 
-		// A class def is treated as a unit.
+		// A class def is treated as a unit. Individual methods contained inside have their
+		// own control flow graphs.
 		case classDef(_) : return s@lab;
 
 		// Given a list of constants, the first thing that occurs is the expression that is
@@ -375,6 +356,9 @@ public Lab init(Stmt s) {
 		// body; if not, the namespace declaration itself provides the first label.
 		case namespace(_, list[Stmt] body) : return isEmpty(body) ? s@lab : init(head(body));
 
+		// A namespace without a body is a unit
+		case namespaceHeader(_) : return s@lab;
+		
 		// In a return, if we have an expression it provides the first label; if not, the
 		// statement itself does.
 		case \return(someExpr(Expr returnExpr)) : return init(returnExpr);
@@ -400,6 +384,20 @@ public Lab init(Stmt s) {
 		// just use the label from the statement (the catch clauses would never fire, since
 		// nothing could trigger them in an empty body).
 		case tryCatch(list[Stmt] body, _) : return isEmpty(body) ? s@lab : init(head(body));
+
+		// In a try/catch, the body provides the first label. If the body is empty, we
+		// check the finally clause. If that is empty as well, we use the statement.
+		case tryCatchFinally(list[Stmt] body, _, list[Stmt] finallyBody) : {
+			if (isEmpty(body)) {
+				if (isEmpty(finallyBody)) {
+					return s@lab;
+				} else {
+					return init(head(finallyBody));
+				}	
+			} else {
+				return init(head(body));
+			}
+		}
 
 		// In an unset, the first expression to unset provides the first label. If the list is
 		// empty, the statement itself provides the label.
@@ -465,7 +463,12 @@ public Lab init(Expr e) {
 		
 		case clone(Expr expr) : return init(expr);
 		
-		case closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static) : return e@lab;
+		// TODO: Add support for closures -- we should probably give them
+		// anonymous names and create independent CFGs for them as well
+		case closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static) : {
+			println("WARNING: Closures not yet fully supported");
+			return e@lab;
+		}
 		
 		case fetchConst(Name name) : return e@lab;
 		
@@ -561,19 +564,26 @@ public Lab init(Expr e) {
 //
 // we would evaluate a, then b, then a + b, so a + b is the final label. This is
 // also done with statements currently.
+//
+// Is this always correct? Technically, if we know we have a jump in an expression
+// that will always fire, isn't truly the final reachable label. We handle this
+// when we wire up nodes below in the statementJumps check.
 public Lab final(Stmt s) = s@lab;
 public Lab final(Expr e) = e@lab;
 
+@doc{Add internal edges between subexpressions of an expression.}
 public tuple[FlowEdges, LabelState] addExpEdges(FlowEdges edges, LabelState lstate, Expr e) {
 	< eedges, lstate > = internalFlow(e, lstate);
 	return < edges + eedges, lstate >;
 }
 
+@doc{Add internal edges between internal expressions and statements of a statement.}
 public tuple[FlowEdges, LabelState] addStmtEdges(FlowEdges edges, LabelState lstate, Stmt s) {
 	< sedges, lstate > = internalFlow(s, lstate);
 	return < edges + sedges, lstate >;
 }
 
+@doc{Add edges between statements given as a sequence, such as in the bodies of other statements.}
 public tuple[FlowEdges, LabelState] addBodyEdges(FlowEdges edges, LabelState lstate, list[Stmt] body) {
 	// Connect the adjacent statements in a statement body. We take care of exceptional control flow
 	// when we handle a specific statement in internalFlow, so here we just are deciding whether to
@@ -585,20 +595,17 @@ public tuple[FlowEdges, LabelState] addBodyEdges(FlowEdges edges, LabelState lst
 	return < edges, lstate >;
 }
 
+@doc{Add edges between expressions that are given as a sequence.}
 public tuple[FlowEdges, LabelState] addExpSeqEdges(FlowEdges edges, LabelState lstate, list[Expr] exps) {
 	for ([_*,e1,e2,_*] := exps) edges += flowEdge(final(e1),init(e2));
 	return < edges, lstate >;
 }
 
 // Determine if a statement will flow to the following statement or will jump somewhere else.
-public bool statementJumps(Stmt s) {
-	switch(s) {
-		case \return(_) : return true;
-		case \break(_) : return true;
-		case \continue(_) : return true;
-		default: return false;
-	}
-}
+// Note: this doesn't account for exceptional jumps, TODO: extra support is needed for that.
+// Also, a yield does not count as a jump, since execution will pick up where it left off when
+// the generator gets control back.
+public bool statementJumps(Stmt s) = (s is \return) || (s is \break) || (s is \continue);
 
 // Compute all the internal flow edges in a statement. This models the possible
 // flows through the statement, for instance, from the conditional guard to the
@@ -621,18 +628,17 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 	FlowEdges edges = { };
 	
 	switch(s) {
-		// TODO: For both break cases, what do we do if there is no surrounding
-		// context to break to? The manual page for break mentions that this exits
-		// the script, at least in the case where this occurs at the top level.
 		case \break(someExpr(Expr e)) : {
-			// Add the internal flow edges for the break expression, plus the
-			// edge from the expression to the statement itself.
+			// Add the internal flow edges for the break expression, plus the edge from 
+			// the expression to the statement itself.
 			< edges, lstate > = addExpEdges(edges, lstate, e);
 			edges += flowEdge(final(e), finalLabel);
 			
-			// Link up the break. If we have no label, it is the same as
-			// "break 1". If we have a numeric label, we jump based on
-			// that. Else, we have to link up each possible break target.
+			// Link up the break. If we have no label, it is the same as "break 1". If we 
+			// have a numeric label, we jump based on that. Else, we have to link up each
+			// possible break target. Note: non-literal breaks are no longer valid as of
+			// PHP version 5.4. Also note that we could break beyond the current nesting
+			// level, in which case we will break completely out to the 
 			// NOTE: "break 0" is the same as "break 1", and is actually
 			// no longer valid as of PHP 5.4.
 			if (scalar(integer(int bl)) := e) {
@@ -644,12 +650,14 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 					edges += flowEdge(finalLabel, getBreakLabel(bl, lstate));
 				} else {
 					println("WARNING: This program breaks beyond the visible break nesting.");
-					edges += flowEdge(finalLabel, getExitNodeLabel(lstate));
+					edges += escapingBreakEdge(finalLabel, getExitNodeLabel(lstate), someExpr(e));
 				}
 			} else {
 				println("WARNING: This program has a break to a non-literal expression. This is no longer allowed in PHP.");
-				for (blabel <- getBreakLabels(lstate))
+				for (blabel <- getBreakLabels(lstate)) {
 					edges += flowEdge(finalLabel, blabel);
+				}
+				edges += escapingBreakEdge(finalLabal, getExitNodeLabel(lstate), someExpr(e));
 			}
 		}
 
@@ -657,18 +665,16 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 		// using "break 1".
 		case \break(noExpr()) : {
 			if (hasBreakLabel(1, lstate)) {
-				try {
-					edges += flowEdge(finalLabel, getBreakLabel(1, lstate));
-				} catch EmptyList() : {
-					println("WARNING: Even though we checked the list length it is empty!");
-					edges += flowEdge(finalLabel, getExitNodeLabel(lstate));
-				}
+				edges += flowEdge(finalLabel, getBreakLabel(1, lstate));
 			} else {
 				println("WARNING: This program breaks beyond the visible break nesting.");
-				edges += flowEdge(finalLabel, getExitNodeLabel(lstate));
+				edges += escapingBreakEdge(finalLabel, getExitNodeLabel(lstate), noExpr());
 			}
 		}
 
+		// NOTE: We have no logic for classDef here, the def is treated as a unit since the
+		// methods are handled separately.
+		
 		// For consts, if we only have one const def, the flow is from that def to the final
 		// statement label. If we have more than one, we have to construct edges between the
 		// final label of each const and the first label of the next, plus from the final
@@ -686,9 +692,6 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			}
 		}
 
-		// TODO: For both continue cases, what do we do if there is no surrounding
-		// context to continue to? The manual page for continue mentions that this exits
-		// the script, at least in the case where this occurs at the top level.
 		case \continue(someExpr(Expr e)) : {
 			// Add the internal flow edges for the continue expression, plus the
 			// edge from the expression to the statement itself.
@@ -709,12 +712,14 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 					edges += flowEdge(finalLabel, getContinueLabel(bl, lstate));
 				} else {
 					println("WARNING: This program continues beyond the visible continue nesting.");
-					edges += flowEdge(finalLabel, getExitNodeLabel(lstate));
+					edges += escapingContinueEdge(finalLabel, getExitNodeLabel(lstate), someExpr(e));
 				}
 			} else {
 				println("WARNING: This program has a continue to a non-literal expression. This is no longer allowed in PHP.");
-				for (blabel <- getContinueLabels(lstate))
+				for (blabel <- getContinueLabels(lstate)) {
 					edges += flowEdge(finalLabel, blabel);
+				}
+				edges += escapingContinueEdge(finalLabel, getExitNodeLabel(lstate), someExpr(e));
 			}
 		}
 
@@ -725,7 +730,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				edges += flowEdge(finalLabel, getContinueLabel(1, lstate));
 			} else {
 				println("WARNING: This program continues beyond the visible continue nesting.");
-				edges += flowEdge(finalLabel, getExitNodeLabel(lstate));
+				edges += escapingContinueEdge(finalLabel, getExitNodeLabel(lstate), someExpr(e));
 			}
 		}
 
@@ -908,6 +913,9 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		}
 
+		// NOTE: We have no logic for function here, the def is treated as a unit since the
+		// function CFG is handled separately.
+
 		case global(list[Expr] exprs) : {
 			// Add edges for each expression in the list, plus add edges between
 			// each adjacent expression.
@@ -921,6 +929,9 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				edges += flowEdge(final(last(exprs)), finalLabel);
 		}
 
+		// TODO: Add support for goto, we haven't done so yet since they aren't used
+		// in any of the PHP code we are looking at so far
+		
 		case \if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, OptionElse elseClause) : {
 			// Add edges for the condition
 			< edges, lstate > = addExpEdges(edges, lstate, cond);
@@ -985,6 +996,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			}
 		}
 
+		// NOTE: inlineHTML has no internal flow
+		
 		case namespace(OptionName nsName, list[Stmt] body) : {
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
 			< edges, lstate > = addBodyEdges(edges, lstate, body);
@@ -993,6 +1006,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				edges += flowEdge(final(last(body)), finalLabel); 
 		}		
 
+		// NOTE: namespaceHeader has no internal flow
+		
 		case \return(someExpr(expr)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
 			edges += { flowEdge(final(expr), finalLabel), flowEdge(finalLabel, getExitNodeLabel(lstate)) };
@@ -1108,11 +1123,46 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// TODO: Anything else here?
 		}
 
+		case tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody) : {
+			// Add all the standard internal edges for the statements in the body
+			// and in the catch bodies. 
+			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
+			for (b <- finallyBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
+			< edges, lstate > = addBodyEdges(edges, lstate, body);
+			< edges, lstate > = addBodyEdges(edges, lstate, finallyBody);
+			for (\catch(_, _, cbody) <- catches, b <- cbody) < edges, lstate > = addStmtEdges(edges, lstate, b);
+			for (\catch(_, _, cbody) <- catches) < edges, lstate > = addBodyEdges(edges, lstate, cbody);
+
+			// Link the end of the main body, and each catch body, to the final label. Note: there
+			// is no flow from the standard body to the exception bodies added by default, it is added
+			// for throws.
+			// TODO: Add the links that would be triggered by expressions -- e.g., a method call could
+			// trigger an exception that is caught here. We need to look at the best way to do this without
+			// degrading to just having exception edges from each expression.
+			if (size(body) > 0 && !statementJumps(last(body)) && size(finallyBody) > 0) {
+				edges += flowEdge(final(last(body)), init(first(finallyBody)));
+			}
+			else if (size(body) > 0 && !statementJumps(last(body)) && size(finallyBody) > 0) {
+				edges += flowEdge(final(last(body)), finalLabel);
+			}
+			for (\catch(_, _, cbody) <- catches, size(cbody) > 0, !statementJumps(last(cbody))) {
+				if (size(finallyBody) > 0) {
+					edges += flowEdge(final(last(cbody)), init(first(finallyBody)));
+				} else {
+					edges += flowEdge(final(last(cbody)), finalLabel);
+				}
+			}
+				
+			// TODO: Anything else here?
+		}
+
 		case unset(list[Expr] unsetVars) : {
 			for (e <- unsetVars) < edges, lstate > = addExpEdges(edges, lstate, e);
 			< edges, lstate > = addExpSeqEdges(edges, lstate, unsetVars);
 		}
 
+		// NOTE: use has no internal flow
+		
 		case \while(Expr cond, list[Stmt] body) : {
 			lstate = pushContinueLabel(init(cond), pushBreakLabel(finalLabel, lstate));
 			
@@ -1131,6 +1181,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			
 			lstate = popContinueLabel(popBreakLabel(lstate));
 		}
+		
+		// NOTE: emptyStmt has no internal flow
 		
 		case block(list[Stmt] body) : {
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
@@ -1257,6 +1309,11 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
 			edges += flowEdge(final(expr), finalLabel);
 		}
+		
+		// TODO: Add support for closures -- we should probably give them
+		// anonymous names and create independent CFGs for them as well
+		
+		// NOTE: fetchConst has no internal flow edges
 		
 		case empty(Expr expr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
@@ -1416,11 +1473,6 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 				   flowEdge(final(elseBranch), finalLabel);
 		}
 
-		case scalar(encapsed(parts)) : {
-			< edges, lstate > = addExpSeqEdges(edges, lstate, parts);
-			edges += flowEdge(final(last(parts)), finalLabel);
-		}
-		
 		case staticPropertyFetch(expr(Expr className), expr(Expr propertyName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
 			< edges, lstate > = addExpEdges(edges, lstate, propertyName);
@@ -1435,6 +1487,11 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		case staticPropertyFetch(expr(Expr className), name(Name propertyName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
 			edges += flowEdge(final(className), finalLabel);
+		}
+		
+		case scalar(encapsed(parts)) : {
+			< edges, lstate > = addExpSeqEdges(edges, lstate, parts);
+			edges += flowEdge(final(last(parts)), finalLabel);
 		}
 		
 		case var(expr(Expr varName)) : {
@@ -1472,6 +1529,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 	return < edges, lstate >;			
 }
 
+// TODO: This isn't a bad idea, but we should do this as we build the CFG,
+// versus patching it up after the fact.
 public tuple[CFGNodes, FlowEdges, LabelState] addJoinNodes(CFGNodes nodes, FlowEdges edges, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
@@ -1501,15 +1560,15 @@ public tuple[CFGNodes, FlowEdges, LabelState] addJoinNodes(CFGNodes nodes, FlowE
 	// a join node. To do this, we will insert the node, and then we
 	// will insert it so all edges to the statement go to this node,
 	// and all edges from this statement go from this node.
+	map[Lab from, Lab to] labMap = ( );
+	
 	for (CFGNode n <- nodes, splitter(n)) {
 		Lab newLabel = incLabel();
-		joiner = joinNode(n.stmt,newLabel)[@lab=newLabel];
-		nodes += joiner;
-		oldLabel = n@lab;
-		edges = visit(edges) {
-			case oldLabel => newLabel
-		}
+		labMap[n@lab] = newLabel;
+		nodes += joinNode(n.stmt,newLabel)[@lab=newLabel];
 	}
-	
+
+	edges = { (e.to in labMap) ? e[to=labMap[e.to]] : e | e <- edges };
+		
 	return < nodes, edges, lstate >;
 }

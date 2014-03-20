@@ -34,6 +34,8 @@ public data IncludeType = include() | includeOnce() | require() | requireOnce();
 
 // NOTE: In PHP, yield is a statement, but it can also be used as an expression.
 // To handle this, we just treat it as an expression. The parser does this as well.
+// TODO: listAssign is deprecated and will be removed in the future, this is now
+// given as an assignment into a listExpr
 public data Expr 
 	= array(list[ArrayElement] items)
 	| fetchArrayDim(Expr var, OptionExpr dim)
