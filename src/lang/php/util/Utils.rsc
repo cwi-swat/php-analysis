@@ -115,9 +115,9 @@ private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) lo
 
 
 	// regex filter exlucdes test/	
-	list[loc] entries = [ l + e | e <- listEntries(l), !isTestFile(e) && !isTestFolder(e) ];
-	list[loc] dirEntries = [ e | e <- entries, isDirectory(e), !isTestFolder(e) ];
-	list[loc] phpEntries = [ e | e <- entries, e.extension in extensions, !isTestFile(e) ];
+	list[loc] entries = [ l + e | e <- listEntries(l)];
+	list[loc] dirEntries = [ e | e <- entries, isDirectory(e)];
+	list[loc] phpEntries = [ e | e <- entries, e.extension in extensions];
 
 	System phpNodes = ( );
 	logMessage("Parsing directory: <l>.", 2);
@@ -354,76 +354,3 @@ public void logMessage(str message, int level) {
 		println("<date> :: <message>");
 	}
 }
-
-public void printInfo() {
-	// short cut function
-	//printInfo("Annotations", "Factory2");
-	printInfo("Annotations", "Minimal");
-}
-
-public void printInfo(str product, str version) {
-	buildBinaries(product, version);
-	System system = loadBinary(product, version);
-	for (loc l<- system)
-		if (/^<name:.*>.php$/ := l.file) 
-			writeTextValueFile(l.parent+"<name>.ppp", pp(system[l]));
-	
-	tree(system);
-	//visit(system) {
-	//	case c:class(_,_,_,_,_): printNodeInfo(c);
-	//	case m:method(_,_,_,_,_): printNodeInfo(m);
-	//}
-}
-
-public void printNodeInfo(ClassDef item) = iprintln(item);
-public void printNodeInfo(ClassItem item) = iprintln(item);
-
-@doc { if the folder is test, tests, Test or Tests, the folder is considered a test folder }
-public bool isTestFolder(loc dirLoc) = isTestFolder(dirLoc.file);
-public bool isTestFolder(str dirName) {
-	if (/^[Tt]{1}est(s)?$/ := dirName)
-		return true;
-	return false;
-}
-
-@doc { if the file end with ...Test.php, the file is considered a test file }
-public bool isTestFile(loc fileLoc) = isTestFile(fileLoc.file);
-public bool isTestFile(str fileName) {
-	if (/^.+Test.php$/ := fileName)
-		return true;
-	return false;
-}
-
-// test functions below
-
-// folder tests
-public test bool testIsTestFolder1() = true == isTestFolder("test");
-public test bool testIsTestFolder2() = true == isTestFolder("tests");
-public test bool testIsTestFolder3() = true == isTestFolder("Test");
-public test bool testIsTestFolder4() = true == isTestFolder("Tests");
-public test bool testIsTestFolder5() = false == isTestFolder("dummy");
-public test bool testIsTestFolder6() = false == isTestFolder("randomFolderTest");
-public test bool testIsTestFolder7() = false == isTestFolder("TestRandomFolder");
-public test bool testIsTestFolder8() = false == isTestFolder("RandomTestFolder");
-public test bool testIsTestFolder9() = false == isTestFolder("100");
-// refactored
-list[loc] validFolders = [|file://somefolder/test|,|file://somefolder/tests|,|file://somefolder/Test|,|file://somefolder/Tests|];
-list[loc] invalidFolders = [|file://somefolder/dummy|, |file://somefolder/randomFolderTest|, |file://somefolder/TestRandomFolder|, |file://somefolder/RandomTestFolder|, |file://somefolder/100|];
-public test bool testIsTestFolderValid() = true == all(dir <- validFolders, isTestFolder(dir));
-public test bool testIsTestFolderInvalid() = true == !any(dir <- invalidFolders, isTestFolder(dir));
-
-// file tests
-public test bool testIsTestFile1() = true == isTestFile("RandomClassTest.php");
-public test bool testIsTestFile2() = true == isTestFile("AnotherClassTest.php");
-public test bool testIsTestFile3() = false == isTestFile("Test.php");
-public test bool testIsTestFile4() = false == isTestFile("randomfile.php");
-public test bool testIsTestFile5() = false == isTestFile("test");
-public test bool testIsTestFile6() = false == isTestFile("Tests");
-public test bool testIsTestFile7() = false == isTestFile("Test");
-public test bool testIsTestFile8() = false == isTestFile("tests");
-public test bool testIsTestFile9() = false == isTestFile("MupltipleTests.php");
-// refactored tests
-list[loc] validFiles = [|file://somefolder/RandomClassTest.php|, |file://somefolder/AnotherClassTest.php|];
-list[loc] invalidFiles = [|file://somefolder/Test.php|, |file://somefolder/randomfile.php|, |file://somefolder/MultipleTests|] + validFolders;
-public test bool testIsTestFileValid() = true == all(dir <- validFiles, isTestFile(dir));
-public test bool testIsTestFileInvalid() = true == !any(dir <- invalidFiles, isTestFile(dir));
