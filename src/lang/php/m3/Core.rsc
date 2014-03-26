@@ -51,7 +51,7 @@ public M3 composePhpM3(loc id, set[M3] models) {
 map[loc, map[loc, Declaration]] methodASTs = ();
 
 
-// hack to make decls work on nodes; visit does recognize the annotations
+// hack to make decls work on nodes; visit does not recognize the annotations
 public anno loc node@at;
 public anno loc node@decl;
 public anno str node@phpdoc;
