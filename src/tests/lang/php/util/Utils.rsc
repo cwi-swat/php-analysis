@@ -1,4 +1,4 @@
-module tests::lang::php::util::Utils
+module \test::lang::php::util::Utils
 
 import lang::php::util::Utils;
 

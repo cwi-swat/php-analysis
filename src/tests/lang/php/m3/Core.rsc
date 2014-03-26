@@ -38,7 +38,7 @@ public test bool findUnknown() = {|php+unknownClass:///Unknown|} == getPossibleC
 
 
 // helpers 
-public loc classTestFolder = analysisLoc + "test/class/";
+public loc classTestFolder = analysisLoc + "src/tests/resources/class/";
 public M3Collection classM3s = createM3sFromDirectory(classTestFolder);
 
 // test createM3sFromDirectory
