@@ -1,5 +1,4 @@
-@license{
-  Copyright (c) 2009-2014 CWI
+@license{ Copyright (c) 2009-2014 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -208,7 +207,7 @@ public anno loc InterfaceDef@at;
 public anno loc StaticVar@at;
 public anno loc Script@at;
 
-@decl{Contains Namespace/Class/Method/Function information.}
+@decl{Contains current Namespace/Class/Interace/Trait/Method/Function information.}
 public anno loc ActualParameter@decl;
 public anno loc Const@decl;
 public anno loc ArrayElement@decl;

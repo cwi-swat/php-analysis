@@ -55,7 +55,7 @@ public Expr parsePHPExpression(str s) {
 
 @doc{Load a single PHP file with location annotations.}
 public Script loadPHPFile(loc l) throws AssertionFailed {
-	return loadPHPFile(l, true, false, true);
+	return loadPHPFile(l, true, false);
 }
 
 @doc{Load a single PHP file, with options for location annotations and unique node ids.}
@@ -66,11 +66,11 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 
 	list[str] opts = [ ];
 	if (addLocationAnnotations) opts += "-l";
-	if (addLocationAnnotations) opts += "-s";
+	if (addLocationAnnotations) opts += "--addDecl";
 	if (addUniqueIds) opts += "-i";
 	if (l.scheme == "home") opts += "-r";
-	if (includePhpDocs) opts += "--phpdoc";
-	if (resolveNamespaces) opts += "--resolve-namespaces";
+	if (includePhpDocs) opts += "--phpdocs";
+	if (resolveNamespaces) opts += "--resolveNames";
 	
 	PID pid = createProcess(phploc.path, ["-d memory_limit="+parserMemLimit, rgenLoc.path, "-f<l.path>"] + opts, rgenCwd);
 	str phcOutput = readEntireStream(pid);
@@ -79,7 +79,7 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
 		if (trim(phcOutput) == "")
 			res = errscript("Parser failed in unknown way");
-		else
+		else 
 			res = readTextValueString(#Script, phcOutput);
 	}
 	if (errscript(err) := res) println("Found error in file <l.path>. Error: <err>");
@@ -120,7 +120,7 @@ private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) lo
 	list[loc] phpEntries = [ e | e <- entries, e.extension in extensions, !isTestFile(e) ];
 
 	System phpNodes = ( );
-	logMessage("[<size(dirEntries)+1>] Parsing directory: <l>.", 2);
+	logMessage("Parsing directory: <l>.", 2);
 	for (e <- phpEntries) {
 		try {
 			Script scr = loader(e, addLocationAnnotations, addUniqueIds);
