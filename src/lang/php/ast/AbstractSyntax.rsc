@@ -263,6 +263,34 @@ public anno str InterfaceDef@id;
 public anno str StaticVar@id;
 public anno str Script@id;
 
+@doc{Stores ScopeInfo information for nodes.}
+public anno node ActualParameter@scope;
+public anno node Const@scope;
+public anno node ArrayElement@scope;
+public anno node Name@scope;
+public anno node NameOrExpr@scope;
+public anno node CastType@scope;
+public anno node ClosureUse@scope;
+public anno node IncludeType@scope;
+public anno node Expr@scope;
+public anno node Op@scope;
+public anno node Param@scope;
+public anno node Scalar@scope;
+public anno node Stmt@scope;
+public anno node Declaration@scope;
+public anno node Catch@scope;
+public anno node Case@scope;
+public anno node ElseIf@scope;
+public anno node Else@scope;
+public anno node Use@scope;
+public anno node ClassItem@scope;
+public anno node Property@scope;
+public anno node Modifier@scope;
+public anno node ClassDef@scope;
+public anno node InterfaceDef@scope;
+public anno node StaticVar@scope;
+public anno node Script@scope;
+
 @doc{Stores PHPDoc for the AST nodes.}
 public anno str ActualParameter@phpdoc;
 public anno str Const@phpdoc;
