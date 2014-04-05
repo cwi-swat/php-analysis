@@ -24,19 +24,17 @@ import Node;
 import Exception;
 
 // TODOs:
-// 2. Gotos need to be handled by keeping track of which nodes are
-//    related to which labels, and then linking these up appropriately.
-//    For now, gotos just fall through to the next statement.
-//
-// 3. Throw statements should be linked to surrounding catch clauses.
-//
 // 4. Initializations of properties in classes, and of parameters with
 //    defaults, both need to be accounted for in the control flow graph.
 //    For the first, this should be done by moving the initializations
 //    into the constructor (if it exists) or adding a constructor (if
 //    needed). For the second, this should be done by adding these as
 //    possible assignments coming out of the entry node for the method.
-
+//
+// * We need edges representing exceptions. We capture explicit throws,
+//   but need to handle exceptions coming from method calls, function
+//   calls, etc.
+//
 @doc{Build the CFGs for a single PHP file, given as a location}
 public map[NamePath,CFG] buildCFGs(loc l) {
 	return buildCFGs(loadPHPFile(l));
@@ -105,6 +103,28 @@ public map[NamePath, ClassItem] getScriptMethods(Script scr) =
 public map[NamePath, Stmt] getScriptFunctions(Script scr) =
 	( [global(),function(fname)] : f | /f:function(fname,_,_,_) := scr );
 
+public tuple[set[CFGNode] nodes, set[FlowEdge] edges] cleanUpGraph(LabelState lstate, set[FlowEdge] edges) {
+	allTargets = { e.to | e <- edges };
+	allSources = { e.from | e <- edges };
+	unusedJoins = { n | n <- lstate.nodes, n is joinNode, n@lab notin allTargets };
+	unusedJoinLabels = { n@lab | n <- unusedJoins };
+	isolatedNodes = { n | n <- lstate.nodes, n@lab notin allTargets, n@lab notin allSources };
+	
+	nodes = (lstate.nodes - unusedJoins) - isolatedNodes; //  - unusedJoins - isolatedNodes;
+	edges = { e | e <- edges, e.from notin unusedJoinLabels };
+
+	return < nodes, edges >;
+}
+
+public set[FlowEdge] removeUnrealizablePaths(set[FlowEdge] edges) {
+	jumpingEdgeNames = { "jumpEdge", "escapingBreakEdge", "escapingContinueEdge", "escapingGotoEdge" };
+	jumpingEdges = { e | e <- edges, getName(e) in jumpingEdgeNames };
+	jumpSources = { e.from | e <- jumpingEdges };
+	unrealizableEdges = { e | e <- edges, e notin jumpingEdges, e.from in jumpSources };
+	
+	return edges - unrealizableEdges;
+}
+
 public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
@@ -119,8 +139,18 @@ public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Label
 		return < cfg([global()], lstate.nodes, { }, cfgEntryNode, cfgExitNode), lstate >;
 	
 	scriptBody = scr.body;
+	sbReduced = visit(scriptBody) {
+		case classDef(_) => emptyStmt()
+		case interfaceDef(_) => emptyStmt()
+		case traitDef(_) => emptyStmt()
+		case function(_,_,_,_) => emptyStmt()
+	}
+	
+	lstate.gotoNodes = ( ln : lstmt@lab | /lstmt:label(ln) := sbReduced ); 
 	
 	// Add all the statements and expressions as CFG nodes
+	// TODO: Remove this, we should only add nodes that correspond to
+	// sources or targets for edges...
 	lstate.nodes += { stmtNode(s, s@lab)[@lab=s@lab] | /Stmt s := scriptBody };
 	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := scriptBody };
 	
@@ -128,12 +158,17 @@ public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Label
 	for (b <- scriptBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
 	< edges, lstate > = addBodyEdges(edges, lstate, scriptBody);
 	if (size(scriptBody) > 0) {
-		edges += flowEdge(cfgEntryNode@lab, init(head(scriptBody)));
-		edges += flowEdge(final(last(scriptBody)), cfgExitNode@lab);
+		edges += { flowEdge(cfgEntryNode@lab, i) | i <- init(head(scriptBody)) };
+		edges += { flowEdge(f, cfgExitNode@lab) | f <- final(last(scriptBody), lstate)};
+		// TODO: Need to be more careful with adding edges, it may be a dup if we have
+		// another type of edge here already
+		//edges += { flowEdge(f, lstate.joinNodes[f]), flowEdge(lstate.joinNodes[f], cfgExitNode@lab) | f <- final(last(scriptBody)), f in lstate.joinNodes };
 	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
 	}
-	nodes = lstate.nodes;
+
+	< nodes, edges > = cleanUpGraph(lstate, edges);
+	edges = removeUnrealizablePaths(edges); 
 	lstate = shrink(lstate);
 
 	//< nodes, edges, lstate > = addJoinNodes(nodes, edges, lstate);
@@ -147,6 +182,8 @@ public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Label
  	return < cfg([global()], nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
+// TODO: The code for functions and methods is very similar, so refactor to remove
+// this duplication...
 public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, ClassItem m, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
@@ -158,6 +195,7 @@ public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Clas
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
     methodBody = m.body;
+	lstate.gotoNodes = ( ln : lstmt@lab | /lstmt:label(ln) := methodBody); 
 	
 	// Add all the statements and expressions as CFG nodes
 	lstate.nodes += { stmtNode(s, s@lab)[@lab=s@lab] | /Stmt s := methodBody };
@@ -175,31 +213,56 @@ public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Clas
 	for (b <- methodBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
 	< edges, lstate > = addBodyEdges(edges, lstate, methodBody);
 
-	for (npi <- notProvided) edges += flowEdge(npi@lab, init(npi.expr));
-	for ([_*,np1,np2,_*] := notProvided) edges += flowEdge(final(np1.expr), np2@lab);
+	// Add initial nodes to represent initializing parameters with default values,
+	// plus add flow edges between these default initializers
+	paramNodes = [ ];
+	for (param(pn,oe,ot,br) <- m.params) {
+		newNode = (someExpr(e) := oe) ? actualNotProvided(pn, e, br)[@lab=incLabel()] : actualProvided(pn, br)[@lab=incLabel()];
+		lstate.nodes = lstate.nodes + newNode;
 
+		if (size(paramNodes) > 0) {
+			edges += flowEdge(last(paramNodes)@lab, newNode@lab);
+		}
+
+		paramNodes = paramNodes + newNode; 
+
+		if (someExpr(e) := oe) {
+			< edges, lstate > += addExpEdges(edges, lstate, e);
+			edges += { flowEdge(fi, newNode@lab) | fi <- final(e, lstate) };
+		}
+	}
+	
 	// Wire up the entry, exit, default init, and body nodes.
-	if (size(notProvided) > 0) {
-		edges += flowEdge(cfgEntryNode@lab, head(notProvided)@lab);
-		if (size(methodBody) > 0) {
-			edges += flowEdge(final(last(notProvided).expr), init(head(methodBody)));
-			edges += flowEdge(final(last(methodBody)), cfgExitNode@lab);
+	if (size(paramNodes) > 0) {
+		if (head(paramNodes) is actualNotProvided) {
+			edges += flowEdge(cfgEntryNode@lab, init(head(paramNodes).expr));
 		} else {
-			edges += flowEdge(final(last(notProvided).expr), cfgExitNode@lab);
+			edges += flowEdge(cfgEntryNode@lab, head(paramNodes)@lab);
+		}
+		
+		if (size(methodBody) > 0) {
+			edges += { flowEdge(last(paramNodes)@lab, i) | i <- init(head(methodBody)) };
+			edges += { flowEdge(fe, cfgExitNode@lab) | fe <- final(last(methodBody), lstate) };
+		} else {
+			edges += flowEdge(last(paramNodes)@lab, cfgExitNode@lab);
 		}
 	} else if (size(methodBody) > 0) {
-		edges += flowEdge(cfgEntryNode@lab, init(head(methodBody)));
-		edges += flowEdge(final(last(methodBody)), cfgExitNode@lab);
+		edges += { flowEdge(cfgEntryNode@lab, i) | i <- init(head(methodBody)) };
+		edges += { flowEdge(fe, cfgExitNode@lab) | fe <- final(last(methodBody), lstate) };
 	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
 	}
 
-	nodes = lstate.nodes;
+
+	< nodes, edges > = cleanUpGraph(lstate, edges);
+	edges = removeUnrealizablePaths(edges); 
 	lstate = shrink(lstate);
 
  	return < cfg(np, nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
+// TODO: The code for functions and methods is very similar, so refactor to remove
+// this duplication...
 public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, Stmt f, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
@@ -211,6 +274,7 @@ public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, 
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
     functionBody = f.body;
+	lstate.gotoNodes = ( ln : lstmt@lab | /lstmt:label(ln) := functionBody); 
 	
 	// Add all the statements and expressions as CFG nodes
 	lstate.nodes += { stmtNode(s, s@lab)[@lab=s@lab] | /Stmt s := functionBody };
@@ -219,179 +283,163 @@ public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, 
 	// Add any initializer expressions from the parameters as CFG nodes
 	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := f.params };
 	
-	// Add initial nodes to represent initializing parameters with default values,
-	// plus add flow edges between these default initializers
-	notProvided = [ actualNotProvided(pn, e, br)[@lab=incLabel()] | param(pn,someExpr(e),_,br) <- f.params ];
-	lstate.nodes += toSet(notProvided);
-
 	set[FlowEdge] edges = { };
 	for (b <- functionBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
 	< edges, lstate > = addBodyEdges(edges, lstate, functionBody);
 
-	for (npi <- notProvided) edges += flowEdge(npi@lab, init(npi.expr));
-	for ([_*,np1,np2,_*] := notProvided) edges += flowEdge(final(np1.expr), np2@lab);
+	// Add initial nodes to represent initializing parameters with default values,
+	// plus add flow edges between these default initializers
+	paramNodes = [ ];
+	for (param(pn,oe,ot,br) <- f.params) {
+		newNode = (someExpr(e) := oe) ? actualNotProvided(pn, e, br)[@lab=incLabel()] : actualProvided(pn, br)[@lab=incLabel()];
+		lstate.nodes = lstate.nodes + newNode;
+
+		if (size(paramNodes) > 0) {
+			edges += flowEdge(last(paramNodes)@lab, newNode@lab);
+		}
+
+		paramNodes = paramNodes + newNode; 
+
+		if (someExpr(e) := oe) {
+			< edges, lstate > += addExpEdges(edges, lstate, e);
+			edges += { flowEdge(fi, newNode@lab) | fi <- final(e, lstate) };
+		}
+	}
 	
 	// Wire up the entry, exit, default init, and body nodes.
-	if (size(notProvided) > 0) {
-		edges += flowEdge(cfgEntryNode@lab, head(notProvided)@lab);
-		if (size(functionBody) > 0) {
-			edges += flowEdge(final(last(notProvided).expr), init(head(functionBody)));
-			edges += flowEdge(final(last(functionBody)), cfgExitNode@lab);
+	if (size(paramNodes) > 0) {
+		if (head(paramNodes) is actualNotProvided) {
+			edges += flowEdge(cfgEntryNode@lab, init(head(paramNodes).expr));
 		} else {
-			edges += flowEdge(final(last(notProvided).expr), cfgExitNode@lab);
+			edges += flowEdge(cfgEntryNode@lab, head(paramNodes)@lab);
+		}
+		
+		if (size(functionBody) > 0) {
+			edges += { flowEdge(last(paramNodes)@lab, i) | i <- init(head(functionBody)) };
+			edges += { flowEdge(fe, cfgExitNode@lab) | fe <- final(last(functionBody), lstate) };
+		} else {
+			edges += flowEdge(last(paramNodes)@lab, cfgExitNode@lab);
 		}
 	} else if (size(functionBody) > 0) {
-		edges += flowEdge(cfgEntryNode@lab, init(head(functionBody)));
-		edges += flowEdge(final(last(functionBody)), cfgExitNode@lab);
+		edges += { flowEdge(cfgEntryNode@lab, i) | i <- init(head(functionBody)) };
+		edges += { flowEdge(fe, cfgExitNode@lab) | fe <- final(last(functionBody), lstate) };
 	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
 	}
 
-	nodes = lstate.nodes;
+	< nodes, edges > = cleanUpGraph(lstate, edges);
+	edges = removeUnrealizablePaths(edges); 
 	lstate = shrink(lstate);
 
  	return < cfg(np, nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
-// Find the initial label for each statement. In the case of a statement with
-// children, this is the label of the first child that is executed. If the 
-// statement is instead viewed as a whole (e.g., a break with no children, or
-// a class definition, which is treated as an unevaluated unit), the initial
-// label is the label of the statement itself.
-public Lab init(Stmt s) {
+// Find the initial label for each statement. We return a set since, in some cases,
+// there may be no initial label available.
+public set[Lab] init(Stmt s) {
 	switch(s) {
 		// If the break statement has an expression, that is the first thing that occurs in
 		// the statement. If not, the break itself is the first thing that occurs.
-		case \break(someExpr(Expr e)) : return init(e);
-		case \break(noExpr()) : return s@lab;
-
-		// A class def is treated as a unit. Individual methods contained inside have their
-		// own control flow graphs.
-		case classDef(_) : return s@lab;
+		case \break(someExpr(Expr e)) : return { init(e) };
+		case \break(noExpr()) : return { s@lab };
 
 		// Given a list of constants, the first thing that occurs is the expression that is
 		// assigned to the first constant in the list.
 		case const(list[Const] consts) : {
-			if (!isEmpty(consts)) 
-				return init(head(consts).constValue);
-			throw "Unexpected AST node: the list of consts should not be empty";
+			return { init(head(consts).constValue) };
 		}
 
 		// If the continue statement has an expression, that is the first thing that occurs in
 		// the statement. If not, the continue itself is the first thing that occurs.
-		case \continue(someExpr(Expr e)) : return init(e);
-		case \continue(noExpr()) : return s@lab;
+		case \continue(someExpr(Expr e)) : return { init(e) };
+		case \continue(noExpr()) : return { s@lab };
 
 		// Given a declaration list, the first thing that occurs is the expression in the first declaration.
 		case declare(list[Declaration] decls, _) : {
-			if (!isEmpty(decls))
-				return init(head(decls).val);
-			throw "Unexpected AST node: the list of declarations should not be empty";
+			return { init(head(decls).val) };
 		}
 
 		// For a do/while loop, the first body statement is the first thing to occur. If the body
 		// is empty, the condition is the first thing that happens.
-		case do(Expr cond, list[Stmt] body) : return isEmpty(body) ? init(cond) : init(head(body));
+		case do(Expr cond, list[Stmt] body) : return isEmpty(body) ? { init(cond) } : init(head(body));
 
 		// Given an echo statement, the first expression in the list is the first thing that occurs.
-		// If this list is empty (this may be an error, TODO: Check to see if this can happen), the
-		// statement itself is the first thing.
-		case echo(list[Expr] exprs) : return isEmpty(exprs) ? s@lab : init(head(exprs));
+		case echo(list[Expr] exprs) : return { init(head(exprs)) };
 
 		// An expression statement is just an expression treated as a statement; just check the
 		// expression.
-		case exprstmt(Expr expr) : return init(expr);
+		case exprstmt(Expr expr) : return { init(expr) };
 
 		// The various parts of the for are optional, so we check in the following order to find
 		// the first item: first inits, than conds, than body, than exprs (which fire after the
 		// body is evaluated).
 		case \for(list[Expr] inits, list[Expr] conds, list[Expr] exprs, list[Stmt] body) : {
 			if (!isEmpty(inits)) {
-				return init(head(inits));
+				return { init(head(inits)) };
 			} else if (!isEmpty(conds)) {
-				return init(head(conds));
+				return { init(head(conds)) };
 			} else if (!isEmpty(body)) {
 				return init(head(body));
 			} else if (!isEmpty(exprs)) {
-				return init(head(exprs));
+				return { init(head(exprs)) };
 			}
-			return s@lab;
 		}
 
 		// In a foreach loop, the array expression is required and is the first thing that is evaluated.
-		case foreach(Expr arrayExpr, _, _, _, _) : return init(arrayExpr);
-
-		// A function declaration is treated as a unit.
-		case function(_, _, _, _) : return s@lab;
+		case foreach(Expr arrayExpr, _, _, _, _) : return { init(arrayExpr) };
 
 		// In a global statement, the first expression to be made global is the first item.
 		case global(list[Expr] exprs) : {
-			if (!isEmpty(exprs))
-				return init(head(exprs));
-			throw "Unexpected AST node: the list of globals should not be empty";
+			return { init(head(exprs)) };
 		}
 
 		// A goto is a unit.
-		case goto(_) : return s@lab;
+		case goto(_) : return { s@lab };
 
 		// Halt compiler is a unit.
-		case haltCompiler(_) : return s@lab;
+		case haltCompiler(_) : return { s@lab };
 
 		// In a conditional, the condition is the first thing that occurs.
-		case \if(Expr cond, _, _, _) : return init(cond);
+		case \if(Expr cond, _, _, _) : return { init(cond) };
 
 		// Inline HTML is a unit.
-		case inlineHTML(_) : return s@lab;
-
-		// An interface definition is a unit.
-		case interfaceDef(_) : return s@lab;
-
-		// A trait definition is a unit.
-		case traitDef(_) : return s@lab;
+		case inlineHTML(_) : return { s@lab };
 
 		// A label is a unit.
-		case label(_) : return s@lab;
+		case label(_) : return { s@lab };
 
 		// If the namespace has a body, the first thing that occurs is the first item in the
-		// body; if not, the namespace declaration itself provides the first label.
-		case namespace(_, list[Stmt] body) : return isEmpty(body) ? s@lab : init(head(body));
+		// body
+		case namespace(_, list[Stmt] body) : if (!isEmpty(body)) return init(head(body));
 
-		// A namespace without a body is a unit
-		case namespaceHeader(_) : return s@lab;
-		
 		// In a return, if we have an expression it provides the first label; if not, the
 		// statement itself does.
-		case \return(someExpr(Expr returnExpr)) : return init(returnExpr);
-		case \return(noExpr()) : return s@lab;
+		case \return(someExpr(Expr returnExpr)) : return { init(returnExpr) };
+		case \return(noExpr()) : return { s@lab };
 
 		// In a static declaration, the first initializer provides the first label. If we
 		// have no initializers, than the statement itself provides the label.
 		case static(list[StaticVar] vars) : {
 			initializers = [ e | staticVar(str name, someExpr(Expr e)) <- vars ];
-			if (isEmpty(initializers))
-				return s@lab;
-			else
-				return init(head(initializers));
+			if (! isEmpty(initializers)) return { init(head(initializers)) };
 		}
 
 		// In a switch statement, the condition provides the first label.
-		case \switch(Expr cond, _) : return init(cond);
+		case \switch(Expr cond, _) : return { init(cond) };
 
 		// In a throw statement, the expression to throw provides the first label.
-		case \throw(Expr expr) : return init(expr);
+		case \throw(Expr expr) : return { init(expr) };
 
 		// In a try/catch, the body provides the first label. If the body is empty, we
 		// just use the label from the statement (the catch clauses would never fire, since
 		// nothing could trigger them in an empty body).
-		case tryCatch(list[Stmt] body, _) : return isEmpty(body) ? s@lab : init(head(body));
+		case tryCatch(list[Stmt] body, _) : if (!isEmpty(body)) return init(head(body));
 
 		// In a try/catch, the body provides the first label. If the body is empty, we
 		// check the finally clause. If that is empty as well, we use the statement.
 		case tryCatchFinally(list[Stmt] body, _, list[Stmt] finallyBody) : {
 			if (isEmpty(body)) {
-				if (isEmpty(finallyBody)) {
-					return s@lab;
-				} else {
+				if (! isEmpty(finallyBody)) {
 					return init(head(finallyBody));
 				}	
 			} else {
@@ -401,21 +449,22 @@ public Lab init(Stmt s) {
 
 		// In an unset, the first expression to unset provides the first label. If the list is
 		// empty, the statement itself provides the label.
-		case unset(list[Expr] unsetVars) : return isEmpty(unsetVars) ? s@lab : init(head(unsetVars));
+		case unset(list[Expr] unsetVars) : return { init(head(unsetVars)) };
 
 		// A use statement is atomic.
-		case use(_) : return s@lab;
+		case use(_) : return { s@lab };
 
 		// In a while loop, the while condition is executed first and thus provides the first label.
-		case \while(Expr cond, _) : return init(cond);	
-		
-		// An empty statement is atomic
-		case emptyStmt() : return s@lab;
+		case \while(Expr cond, _) : return { init(cond) };	
 		
 		// In a block, the first statement provides the first label. If there is no body,
 		// the statement itself provides the label.
-		case block(list[Stmt] body) : return isEmpty(body) ? s@alb : init(head(body));
+		case block(list[Stmt] body) : if (!isEmpty(body)) return init(head(body));
 	}
+	
+	// This handles cases, like interfaceDef, that have no runtime behavior that should
+	// be included in the control flow graph.
+	return { };
 }
 
 // Find the initial label for each expression. In the case of an expression with
@@ -550,26 +599,223 @@ public Lab init(Expr e) {
 	}
 }
 
-// Compute the final label in a statement or expression -- i.e., the final
-// "thing" done in that statement or expression.
-//
-// For now, we make a simplifying assumption to compute the final label of
-// a statement or expression -- the final thing done is actually to evaluate,
-// as a whole, the entire statement or expression. So, the final label is always
-// the label of the entire expression or statement.
-//
-// For instance, given expression
-//
-//	a + b
-//
-// we would evaluate a, then b, then a + b, so a + b is the final label. This is
-// also done with statements currently.
-//
-// Is this always correct? Technically, if we know we have a jump in an expression
-// that will always fire, isn't truly the final reachable label. We handle this
-// when we wire up nodes below in the statementJumps check.
-public Lab final(Stmt s) = s@lab;
-public Lab final(Expr e) = e@lab;
+@doc{Find the label of the final step taken in computing the given statement.}
+public set[Lab] final(Stmt s, LabelState lstate) {
+	if (s@lab in lstate.joinNodes) return { lstate.joinNodes[s@lab] };
+
+	switch(s) {
+		// The final thing a break does is break, so the statement itself
+		// provides the final label.
+		case \break(_) : {
+			return { s@lab };
+		}
+		
+		// We always have at least one const; the final const provides the labels.
+		case const(list[Const] consts) : {
+			return final(last(consts).constValue, lstate);
+		}
+
+		// The final thing a continue does is continue, so the statement itself
+		// provides the final label.
+		case \continue(_) : {
+			return { s@lab };
+		}
+		
+		// The declare body could be empty, or an empty block; if so, the last
+		// decl provides the final labels, otherwise we use the labels from the
+		// final statement in the body
+		case declare(list[Declaration] decls, list[Stmt] body) : {
+			set[Lab] finalLabels = isEmpty(body) ? { } : final(last(body), lstate);
+			if (isEmpty(finalLabels)) finalLabels = final(last(decls).val, lstate);
+			return finalLabels;
+		}
+
+		// The condition is always checked last, so it provides the final labels
+		case do(Expr cond, list[Stmt] body) : {
+			return final(cond, lstate);
+		}
+
+		// We always have at least one expr; the final expr provides the labels.
+		case echo(list[Expr] exprs) : {
+			return { s@lab };
+		}
+
+		// In an expression statement, the expression provides the final labels.
+		case exprstmt(Expr expr) : {
+			return final(expr, lstate);
+		}
+
+		// This is just the reverse of the for logic in init; most items are optional,
+		// so we check the conds, then the increments (which would run before the conds
+		// check to see if we keep going), then the body, then the inits.
+		case \for(list[Expr] inits, list[Expr] conds, list[Expr] exprs, list[Stmt] body) : {
+			set[Lab] finalLabels = isEmpty(conds) ? { } : final(last(conds), lstate);
+			if (isEmpty(finalLabels) && !isEmpty(exprs)) finalLabels = final(last(exprs), lstate);
+			if (isEmpty(finalLabels) && !isEmpty(body)) finalLabels = final(last(body), lstate);
+			if (isEmpty(finalLabels) && !isEmpty(inits)) finalLabels = final(last(inits), lstate);
+			return finalLabels;
+		}
+
+		// We know the asVar will run, so we fall back to that if the body is empty.
+		case foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body) : {
+			set[Lab] finalLabels = isEmpty(body) ? { } : final(last(body), lstate);
+			if (isEmpty(finalLabels)) finalLabels = final(asVar, lstate);
+			return finalLabels;
+		}
+
+		// In a global statement, the last expression provides the labels.
+		case global(list[Expr] exprs) : {
+			return final(last(exprs), lstate);
+		}
+
+		// In a goto statement, the goto jump is the last thing we do, so it provides
+		// the label.
+		case goto(_) : {
+			return { s@lab };
+		}
+		
+		// haltCompiler is treated as a unit
+		case haltCompiler(_) : {
+			return { s@lab };
+		}
+		
+		// In a conditional, we look to each branch for the final labels; if all the
+		// branches are somehow empty, we will look to the if condition instead.
+		case \if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, OptionElse elseClause) : {
+			// The body could be empty			
+			set[Lab] bodyLabels = isEmpty(body) ? { } : final(last(body), lstate);
+			// We may also have no else, or an empty else
+			set[Lab] elseLabels = (someElse(\else(list[Stmt] ebody)) := elseClause && !isEmpty(ebody)) ? final(last(ebody), lstate) : { };
+			set[Lab] finalLabels = elseLabels;
+			
+			// For each elseif, either the body or (if that is empty) the guard provides
+			// the final labels.
+			for (elseIf(Expr econd, list[Stmt] ebody) <- elseIfs) {
+				set[Lab] elseifLabels = isEmpty(ebody) ? { } : final(last(ebody), lstate);
+				if (isEmpty(elseifLabels)) elseifLabels = final(econd, lstate);
+				finalLabels += elseifLabels; 
+			}
+
+			// If the body is empty, or we have no other labels as final labels so far,
+			// meaning no labels from the else or the elseifs (body labels are separate),
+			// the condition is the final part of this construct that runs.
+			if (isEmpty(body) || isEmpty(finalLabels)) finalLabels += final(cond, lstate);
+			
+			// We didn't add body labels in above so the above check would work; now we
+			// can throw them in.
+			finalLabels += bodyLabels;		
+
+			return finalLabels;
+		}
+
+		// Inline HTML provides its own final statement, it is treated as a unit.
+		case inlineHTML(_) : return { s@lab };
+
+		// A label is a unit.
+		case label(_) : return { s@lab };
+
+		// If the namespace has a body, the last thing that occurs is the final item in the
+		// body, else nothing happens at all.
+		case namespace(_, list[Stmt] body) : {
+			if (! isEmpty(body) ) return final(last(body), lstate);
+		}
+
+		// The last thing the return does is actually return, so the statement itself
+		// provides the final label.
+		case \return(_) : {
+			return { s@lab };
+		}
+		
+		// In a static declaration, the final initializer provides the final label.
+		case static(list[StaticVar] vars) : {
+			initializers = [ e | staticVar(str name, someExpr(Expr e)) <- vars ];
+			if (! isEmpty(initializers)) return final(last(initializers), lstate);
+		}
+
+		// The switch statement has such complicated logic, and always uses a join
+		// node, so we won't even bother with trying to compute what could be the
+		// final labels.
+		case \switch(Expr cond, list[Case] cases) : return { s@lab };
+
+		// In a throw statement, the last thing we do is throw, so the statement provides
+		// the final label.
+		case \throw(_) : {
+			return { s@lab };
+		}
+		
+		// In a try/catch, we look at the final statements of the body (the non-exception
+		// case) and of each catch block (the exception cases). We will have separate exception
+		// edges coming out of the various blocks, so we don't try to add those here (those are
+		// not unique to try/catch, we could have uncaught exceptions elsewhere).
+		case tryCatch(list[Stmt] body, list[Catch] catches) : {
+			set[Lab] finalLabels = { *final(last(cbody), lstate) | \catch(_, _, list[Stmt] cbody) <- catches, ! isEmpty(cbody) };
+			if (! isEmpty(body)) {
+				finalLabels += final(last(body), lstate);
+			}
+			return finalLabels;
+		}
+
+		// In a try/catch/finally, the finally clause provides the final statement. If the
+		// finally is empty, we treat it as a try/catch with the same logic used above.
+		case tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody) : {
+			if (! isEmpty(finallyBody)) {
+				return final(last(finallyBody), lstate);
+			} else {
+				list[Stmt] finalStmts = [ final(cbody, lstate) | \catch(_, _, list[Stmt] cbody) <- catches, ! isEmpty(cbody) ];
+				if (! isEmpty(body)) {
+					finalStmts += final(body, lstate);
+				}
+				return { *final(fs, lstate) | fs <- finalStmts };
+			}
+		}
+
+		// In an unset, the last expression to unset provides the final labels.
+		case unset(list[Expr] unsetVars) : {
+			return final(last(unsetVars), lstate);
+		}
+
+		// A use is treated as a unit
+		case use(_) : {
+			return { s@lab };
+		}
+		
+		// In a while loop, the final label is always from the condition, since that will always be
+		// checked after each run of the body to see if we can continue (or to see if we run the body
+		// in the first place).
+		case \while(Expr cond, list[Stmt] body) : {
+			return final(cond, lstate);
+		}
+
+		// For a block, return the label(s) of the last thing done inside the block body (if it is not empty)	
+		case block(list[Stmt] body) : {
+			if (! isEmpty(body) ) return final(last(body), lstate);
+		}
+	}
+	
+	// If we get to here, we have a statement that does nothing, like an empty block, a class definition
+	// (which doesn't really execute), an interface definition, etc. In those cases, we don't return any
+	// labels at all.
+	return {  };
+}
+
+public set[Lab] final(Expr e, LabelState lstate) {
+	if (e@lab in lstate.joinNodes) return { lstate.joinNodes[e@lab] };
+	
+	switch(e) {
+		case ternary(Expr cond, OptionExpr ifBranch, Expr elseBranch) : {
+			if (someExpr(ie) := ifBranch)
+				return final(ie, lstate) + final(elseBranch, lstate);
+			else
+				return final(elseBranch, lstate);
+		}
+	}	
+	
+	// The default is just to return the label for the entire expression; given an
+	// expression like e_1 + e_2, the final step taken is the addition itself,
+	// which is the entire expression. The cases above are thus only for those
+	// expressions that deviate from this.
+	return { e@lab };
+}
 
 @doc{Add internal edges between subexpressions of an expression.}
 public tuple[FlowEdges, LabelState] addExpEdges(FlowEdges edges, LabelState lstate, Expr e) {
@@ -585,34 +831,18 @@ public tuple[FlowEdges, LabelState] addStmtEdges(FlowEdges edges, LabelState lst
 
 @doc{Add edges between statements given as a sequence, such as in the bodies of other statements.}
 public tuple[FlowEdges, LabelState] addBodyEdges(FlowEdges edges, LabelState lstate, list[Stmt] body) {
-	// Connect the adjacent statements in a statement body. We take care of exceptional control flow
-	// when we handle a specific statement in internalFlow, so here we just are deciding whether to
-	// link a statement to the statement that follows it. For instance, a return statement will not
-	// be linked to its successor, since it will always go to the current exit node. We add that label
-	// in internalFlow, so all we do here is just not add a link from the return statement to the
-	// statement that follows it.
-	for ([_*,b1,b2,_*] := body, !statementJumps(b1)) edges += flowEdge(final(b1),init(b2));
+	for ([_*,b1,b2,_*] := body) edges += { flowEdge(f, i) | f <- final(b1, lstate), i <- init(b2) };
 	return < edges, lstate >;
 }
 
 @doc{Add edges between expressions that are given as a sequence.}
 public tuple[FlowEdges, LabelState] addExpSeqEdges(FlowEdges edges, LabelState lstate, list[Expr] exps) {
-	for ([_*,e1,e2,_*] := exps) edges += flowEdge(final(e1),init(e2));
+	for ([_*,e1,e2,_*] := exps) edges += { flowEdge(f, init(e2)) | f <- final(e1, lstate) };
 	return < edges, lstate >;
 }
 
-// Determine if a statement will flow to the following statement or will jump somewhere else.
-// Note: this doesn't account for exceptional jumps, TODO: extra support is needed for that.
-// Also, a yield does not count as a jump, since execution will pick up where it left off when
-// the generator gets control back.
-public bool statementJumps(Stmt s) = (s is \return) || (s is \break) || (s is \continue);
-
 // Compute all the internal flow edges in a statement. This models the possible
-// flows through the statement, for instance, from the conditional guard to the
-// true and false bodies of the conditional and then (at the end) joining control
-// flow back together. Currently, this is modelled by having the final label of
-// each statement be the label of the entire statement itself, with all flow
-// edges exiting to this final label for the given statement.
+// flows through the statement
 //
 // Note: Currently, we always have the statements in the body linked one to
 // the next. This will be patched elsewhere -- if we have a return, we should
@@ -623,8 +853,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 		return lab(lstate.counter); 
 	}
 
-	initLabel = init(s);
-	finalLabel = final(s);
+	initLabels = init(s);
+	finalLabels = final(s, lstate);
 	FlowEdges edges = { };
 	
 	switch(s) {
@@ -632,110 +862,93 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// Add the internal flow edges for the break expression, plus the edge from 
 			// the expression to the statement itself.
 			< edges, lstate > = addExpEdges(edges, lstate, e);
-			edges += flowEdge(final(e), finalLabel);
+			edges += { flowEdge(fe, fl) | fe <- final(e, lstate), fl <- finalLabels, fe != fl };
 			
 			// Link up the break. If we have no label, it is the same as "break 1". If we 
 			// have a numeric label, we jump based on that. Else, we have to link up each
 			// possible break target. Note: non-literal breaks are no longer valid as of
 			// PHP version 5.4. Also note that we could break beyond the current nesting
-			// level, in which case we will break completely out to the 
-			// NOTE: "break 0" is the same as "break 1", and is actually
-			// no longer valid as of PHP 5.4.
+			// level, in which case we will break to the exit node. This can happen if
+			// the break is actually breaking to a label provided in a file that includes
+			// this script.
+			// 
+			// NOTE: "break 0" is the same as "break 1", and is actually no longer valid as
+			// of PHP 5.4. We accept it, but also print a warning.
 			if (scalar(integer(int bl)) := e) {
 				if (bl == 0) {
 					println("WARNING: This program has a break 0, which is no longer valid as of PHP 5.4.");
 					bl = 1;
 				}
 				if (hasBreakLabel(bl, lstate)) {
-					edges += flowEdge(finalLabel, getBreakLabel(bl, lstate));
+					edges += { jumpEdge(fl, getBreakLabel(bl, lstate)) | fl <- finalLabels };
 				} else {
 					println("WARNING: This program breaks beyond the visible break nesting.");
-					edges += escapingBreakEdge(finalLabel, getExitNodeLabel(lstate), someExpr(e));
+					edges += { escapingBreakEdge(fl, getExitNodeLabel(lstate), someExpr(e)) | fl <- finalLabels };
 				}
 			} else {
 				println("WARNING: This program has a break to a non-literal expression. This is no longer allowed in PHP.");
 				for (blabel <- getBreakLabels(lstate)) {
-					edges += flowEdge(finalLabel, blabel);
+					edges += { jumpEdge(fl, blabel) | fl <- finalLabels };
 				}
-				edges += escapingBreakEdge(finalLabal, getExitNodeLabel(lstate), someExpr(e));
+				edges += { escapingBreakEdge(fl, getExitNodeLabel(lstate), someExpr(e)) | fl <- finalLabels };
 			}
 		}
 
-		// This is the no label case (mentioned above), which is the same as
-		// using "break 1".
+		// This is the no label case (mentioned above), which uses the same logic as "break 1"
 		case \break(noExpr()) : {
 			if (hasBreakLabel(1, lstate)) {
-				edges += flowEdge(finalLabel, getBreakLabel(1, lstate));
+				edges += { jumpEdge(fl, getBreakLabel(1, lstate)) | fl <- finalLabels };
 			} else {
 				println("WARNING: This program breaks beyond the visible break nesting.");
-				edges += escapingBreakEdge(finalLabel, getExitNodeLabel(lstate), noExpr());
+				edges += { escapingBreakEdge(fl, getExitNodeLabel(lstate), noExpr()) | fl <- finalLabels };
 			}
 		}
 
-		// NOTE: We have no logic for classDef here, the def is treated as a unit since the
-		// methods are handled separately.
-		
-		// For consts, if we only have one const def, the flow is from that def to the final
-		// statement label. If we have more than one, we have to construct edges between the
-		// final label of each const and the first label of the next, plus from the final
-		// constant to the statement label.
+		// For consts, we add the edges internal to each const expression, plus we link up
+		// the expressions. The final labels are already the final labels for the last
+		// const initializer expression, so we don't need to further link those up here.
 		case const(list[Const] consts) : {
-			if (firstConst:const(_, firstValue) := head(consts), lastConst:const(_,lastValue) := last(consts)) {
-				if (firstConst == lastConst) {
-					< edges, lstate > = addExpEdges(edges, lstate, firstValue);
-					edges += flowEdge(final(firstValue),finalLabel);
-				} else {
-					for (const(_,c) <- consts) < edges, lstate > = addExpEdges(edges, lstate, c);
-					< edges, lstate > = addExpSeqEdges(edges, lstate, [ c | const(_,c) <- consts ]);
-					edges += flowEdge(final(lastValue), finalLabel);
-				}
-			}
+			vals = [ c.constValue | c <- consts ];
+			for (v <- vals) < edges, lstate > = addExpEdges(edges, lstate, v);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, vals);
 		}
 
+		// See the logic above for break, continue does essentially the same thing.
 		case \continue(someExpr(Expr e)) : {
-			// Add the internal flow edges for the continue expression, plus the
-			// edge from the expression to the statement itself.
 			< edges, lstate > = addExpEdges(edges, lstate, e);
-			edges += flowEdge(final(e), finalLabel);
+			edges += { flowEdge(fe, fl) | fe <- final(e, lstate), fl <- finalLabels, fe != fl };
 			
-			// Link up the continue. If we have no label, it is the same as
-			// "continue 1". If we have a numeric label, we jump based on
-			// that. Else, we have to link up each possible continue target.
-			// NOTE: "continue 0" is the same as "continue 1", and is actually
-			// no longer valid as of PHP 5.4.
 			if (scalar(integer(int bl)) := e) {
 				if (bl == 0) {
 					println("WARNING: This program has a continue 0, which is no longer valid as of PHP 5.4.");
 					bl = 1;
 				}
 				if (hasContinueLabel(bl, lstate)) {
-					edges += flowEdge(finalLabel, getContinueLabel(bl, lstate));
+					edges += { jumpEdge(fl, getContinueLabel(bl, lstate)) | fl <- finalLabels };
 				} else {
 					println("WARNING: This program continues beyond the visible continue nesting.");
-					edges += escapingContinueEdge(finalLabel, getExitNodeLabel(lstate), someExpr(e));
+					edges += { escapingContinueEdge(fl, getExitNodeLabel(lstate), someExpr(e)) | fl <- finalLabels };
 				}
 			} else {
 				println("WARNING: This program has a continue to a non-literal expression. This is no longer allowed in PHP.");
 				for (blabel <- getContinueLabels(lstate)) {
-					edges += flowEdge(finalLabel, blabel);
+					edges += { jumpEdge(fl, blabel) | fl <- finalLabels };
 				}
-				edges += escapingContinueEdge(finalLabel, getExitNodeLabel(lstate), someExpr(e));
+				edges += { escapingContinueEdge(fl, getExitNodeLabel(lstate), someExpr(e)) | fl <- finalLabels };
 			}
 		}
 
-		// This is the no label case (mentioned above), which is the same as
-		// using "continue 1".
+		// See the logic above for break
 		case \continue(noExpr()) : {
 			if (hasContinueLabel(1, lstate)) {
-				edges += flowEdge(finalLabel, getContinueLabel(1, lstate));
+				edges += { jumpEdge(fl, getContinueLabel(1, lstate)) | fl <- finalLabels };
 			} else {
 				println("WARNING: This program continues beyond the visible continue nesting.");
-				edges += escapingContinueEdge(finalLabel, getExitNodeLabel(lstate), someExpr(e));
+				edges += { escapingContinueEdge(fl, getExitNodeLabel(lstate), noExpr()) | fl <- finalLabels };
 			}
 		}
 
-		// For declarations, the flow is through the decl expressions, then through
-		// the body, then to the label for this statement.
+		// For declarations, the flow is through the decl expressions, then into the body
 		case declare(list[Declaration] decls, list[Stmt] body) : {
 			for (declaration(_,v) <- decls) < edges, lstate > = addExpEdges(edges, lstate, v);
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
@@ -743,64 +956,67 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			< edges, lstate > = addBodyEdges(edges, lstate, body);
 			        
 			if (size(decls) > 0 && size(body) > 0 && declaration(_,v) := last(decls) && b := head(body))
-				edges += flowEdge(final(v),init(b));
-			if (size(body) > 0 && b := last(body) && !statementJumps(b))
-				edges += flowEdge(final(b),finalLabel);
-			else if (size(decls) > 0 && declaration(_,v) := last(decls) && size(body) == 0)
-				edges += flowEdge(final(v),finalLabel);
+				edges += { flowEdge(fe, i) | fe <- final(v, lstate), i <- init(b), fe != i };
 		}
 
 
-		// For do/while loops, the flow is through the body, then through the condition,
-		// then to both the statement label and the top of the body (backedge).		
+		// For do/while loops, the flow is through the body, then to the condition
+		// then to both the statement label and the top of the body (backedge).
 		case do(Expr cond, list[Stmt] body) : {
+			joinnode = incLabel();
+			lstate.nodes = lstate.nodes + joinNode(joinnode)[@lab=joinnode];
+			
 			// Push the break and continue labels. If we break, we go to the end
 			// of the statement. If we continue, we go to the condition instead.
-			lstate = pushContinueLabel(init(cond), pushBreakLabel(finalLabel, lstate));
+			lstate = pushContinueLabel(init(cond), pushBreakLabel(joinnode, lstate));
 			< edges, lstate > = addExpEdges(edges, lstate, cond);
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
 			< edges, lstate > = addBodyEdges(edges, lstate, body);			
 
 			if (size(body) > 0) {
-				edges += conditionTrueFlowEdge(final(cond),init(head(body)),cond);
-				if (!statementJumps(last(body)))
-					edges += flowEdge(final(last(body)),init(cond));			
+				edges += { conditionTrueFlowEdge(fe,i,cond) | fe <- final(cond, lstate), i <- init(head(body)) };
+				edges += { flowEdge(fe,init(cond)) | fe <- final(last(body), lstate) };			
 			} else {
-				edges += conditionTrueflowEdge(final(cond), init(cond), cond);
+				edges += { conditionTrueflowEdge(fe, init(cond), cond) | fe <- final(cond, lstate) };
 			}
-			edges += conditionFalseFlowEdge(final(cond),finalLabel,cond);
+			edges += { conditionFalseFlowEdge(fc, joinnode, cond) | fc <- final(cond, lstate) };
 			
+			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		} 
 
-		// For echo, the flow is from left to right in the echo expressions, then to the
-		// statement label.
+		// For echo, the flow is from left to right in the echo expressions
 		case echo(list[Expr] exprs) : {
 			for (e <- exprs) < edges, lstate > = addExpEdges(edges, lstate, e);
 			< edges, lstate > = addExpSeqEdges(edges, lstate, exprs);
-			if (size(exprs) > 0)
-				edges += flowEdge(final(last(exprs)), finalLabel);
+			edges += { flowEdge(el, fl) | el <- final(last(exprs), lstate), fl <- finalLabels }; 
 		}
 
-		// For the expression statement, the flow is from the expression to the statement label.
+		// For the expression statement, we need to capture the internal flow of
+		// the expression itself
 		case exprstmt(Expr expr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += flowEdge(final(expr), finalLabel);
 		}
 
 		// Comments are given inline -- flow through a for is complex...
 		case \for(list[Expr] inits, list[Expr] conds, list[Expr] exprs, list[Stmt] body) : {
+			joinnode = incLabel();
+			lstate.nodes = lstate.nodes + joinNode(joinnode)[@lab=joinnode];
+
 			// If we break, we go to the end. If we continue, we go to the first condition,
 			// unless we have none, then we just re-execute the body. If we have an empty
 			// body, we just assign the final label, but this is just so we have something,
 			// since, if the body is empty, we won't find a continue statement in it.
-			lstate = pushBreakLabel(finalLabel, lstate);
+			// NOTE: We will never have more than 1 init label, we return a set since we
+			// may have none. If we have none, this means the body does nothing, so linking
+			// to the join node is equivalent (we won't have a continue anyway).
+			lstate = pushBreakLabel(joinnode, lstate);
 			if (size(conds) > 0)
 				lstate = pushContinueLabel(init(head(conds)), lstate);
-			else if (size(body) > 0)
-				lstate = pushContinueLabel(init(head(body)), lstate);
+			else if (size(body) > 0 && size(init(head(body))) >= 1)
+				lstate = pushContinueLabel(getOneFrom(init(head(body))), lstate);
 			else
-				lstate = pushContinueLabel(finalLabel, lstate);
+				lstate = pushContinueLabel(joinnode, lstate);
 
 			// Add the edges for each expression and statement...
 			for (e <- inits) < edges, lstate > = addExpEdges(edges, lstate, e);
@@ -816,48 +1032,57 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			
 			// The forward edge from the last init
 			if (size(inits) > 0 && size(conds) > 0)
-				edges += flowEdge(final(last(inits)),init(head(conds)));
-			else if (size(inits) > 0 && size(body) > 0)
-				edges += flowEdge(final(last(inits)),init(head(body)));
+				edges += { flowEdge(fi,init(head(conds))) | fi <- final(last(inits), lstate) };
+			else if (size(inits) > 0 && size(body) > 0 && size(init(head(body))) > 0)
+				edges += { flowEdge(fi, fe) | fi <- final(last(inits), lstate), fe <- init(head(body)) };
 			else if (size(inits) > 0 && size(exprs) > 0)
-				edges += flowEdge(final(last(inits)),init(head(exprs)));
+				edges += { flowEdge(fi,init(head(exprs))) | fi <- final(last(inits), lstate) };
 			else if (size(inits) > 0)
-				edges += flowEdge(final(last(inits)), finalLabel);
+				// TODO: In this case, the loop never actually terminates...
+				edges += { flowEdge(fi, joinnode) | fi <- final(last(inits), lstate) };
 				
-			// The forward edge from the last condition
+			// The forward edge from the last condition into the loop body
 			if (size(conds) > 0 && size(body) > 0)
-				edges += conditionTrueFlowEdge(final(last(conds)), init(head(body)), conds);
+				edges += { conditionTrueFlowEdge(fc, fi, conds) | fc <- final(last(conds), lstate), fi <- init(head(body))};
 			else if (size(conds) > 0 && size(exprs) > 0)
-				edges += conditionTrueFlowEdge(final(last(conds)), init(head(exprs)), conds);
+				edges += { conditionTrueFlowEdge(fc, init(head(exprs)), conds) | fc <- final(last(conds), lstate)};
 			else if (size(conds) > 0)
-				edges += conditionTrueFlowEdge(final(last(conds)), finalLabel, conds);
+				edges += { conditionTrueFlowEdge(fc, init(head(conds)), conds) | fc <- final(last(conds), lstate) };
 				
-			// The forward edge from the body
+			// The "false" edge from the last condition
+			if (size(conds) > 0)
+				edges += { conditionFalseFlowEdge(fc, joinnode, conds) | fc <- final(last(conds), lstate) };
+				
+			// The backedge from the body
 			if (size(body) > 0 && size(exprs) > 0)
-				edges += flowEdge(final(last(body)), init(head(exprs)));
+				edges += { flowEdge(fi, init(head(exprs))) | fi <- final(last(body), lstate) };
 			else if (size(body) > 0 && size(conds) > 0)
-				edges += flowEdge(final(last(body)), init(head(conds)));
+				edges += { flowEdge(fi, init(head(conds))) | fi <- final(last(body), lstate) };
 			else if (size(body) > 0)
-				edges += flowEdge(final(last(body)), finalLabel);
+				edges += { flowEdge(fi, fe) | fi <- final(last(body), lstate), fe <- init(head(body)) };
 				
 			// The loop backedge
 			if (size(exprs) > 0 && size(conds) > 0)
-				edges += flowEdge(final(last(exprs)), init(head(conds)));
+				edges += { flowEdge(fe, init(head(conds))) | fe <- final(last(exprs), lstate) };
 			else if (size(exprs) > 0 && size(body) > 0)
-				edges += flowEdge(final(last(exprs)), init(head(body)));
+				edges += { flowEdge(fe, fi) | fe <- final(last(exprs), lstate), fi <- init(head(body)) };
 			else if (size(exprs) > 0)
-				edges += flowEdge(final(last(exprs)), init(head(exprs)));
+				edges += { flowEdge(fe, init(head(exprs))) | fe <- final(last(exprs), lstate) };
 			else if (size(conds) > 0)
-				edges += flowEdge(final(last(conds)), init(head(conds)));
+				edges += { flowEdge(fe, init(head(conds))) | fe <- final(last(conds), lstate) };
 			else if (size(body) > 0)
-				edges += flowEdge(final(last(body)), init(head(body)));
+				edges += { flowEdge(fe, fi) | fe <- final(last(body), lstate), fi <- init(head(body)) };
 			else
-				edges += flowEdge(finalLabel, finalLabel);
+				edges += flowEdge(joinnode, joinnode);
 				
+			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		}
 
 		case foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body) : {
+			joinnode = incLabel();
+			lstate.nodes = lstate.nodes + joinNode(joinnode)[@lab=joinnode];
+
 			// The test to see if there are still elements in the array is implicit in the
 			// control flow, we add this node as an explicit "check point". We also add an
 			// edge from the check to the end of the statement, representing the case where
@@ -867,12 +1092,12 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			testNode = foreachTest(arrayExpr,newLabel)[@lab=newLabel];
 			varNode = foreachAssignValue(asVar,varLabel)[@lab=varLabel];
 			lstate.nodes = lstate.nodes + testNode + varNode;
-			edges += iteratorEmptyFlowEdge(testNode@lab, finalLabel, arrayExpr);
+			edges += iteratorEmptyFlowEdge(testNode@lab, joinnode, arrayExpr);
 			
 			// Add in the edges for break and continue. Continue will go to the test node
 			// that we just added, since that is (essentially) the condition. Break, as
 			// usual, just goes to the end
-			lstate = pushContinueLabel(testNode@lab, pushBreakLabel(finalLabel, lstate));
+			lstate = pushContinueLabel(testNode@lab, pushBreakLabel(joinnode, lstate));
 		
 			// Calculate the internal flow of the array expression and var expression.
 			< edges, lstate > = addExpEdges(edges, lstate, arrayExpr);
@@ -880,7 +1105,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			
 			// Link the array expression to the test, it should go:
 			// array expression -> test -> key var expression or var expression.
-			edges = edges + flowEdge(final(arrayExpr), testNode@lab);
+			edges = edges + { flowEdge(fe, testNode@lab) | fe <- final(arrayExpr, lstate) };
 
 			// Add edges for each element of the body
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
@@ -890,10 +1115,10 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// body back around to the test. Else, just link the value to the test, this
 			// would model the case where we just keep assigning new key/value pairs until
 			// we exhaust the array.
-			edges += flowEdge(final(asVar), varLabel);
+			edges += { flowEdge(fe, varLabel) | fe <- final(asVar, lstate) };
 			if (size(body) > 0) {
-				edges += flowEdge(varLabel, init(head(body)));
-				edges += flowEdge(final(last(body)), testNode@lab);
+				edges += { flowEdge(varLabel, fi) | fi <- init(head(body)) };
+				edges += { flowEdge(fe, testNode@lab) | fe <- final(last(body), lstate) };
 			} else {
 				edges += flowEdge(varLabel, testNode@lab);
 			}
@@ -905,34 +1130,35 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				Lab keyLabel = incLabel();
 				keyNode = foreachAssignKey(keyexp,keyLabel)[@lab=keyLabel];
 				lstate.nodes = lstate.nodes + keyNode;
-				edges += { iteratorNotEmptyFlowEdge(testNode@lab, init(keyexp), arrayExpr), flowEdge(final(keyexp),keyLabel), flowEdge(keyLabel,init(asVar)) };
+				edges = edges +
+					{ iteratorNotEmptyFlowEdge(testNode@lab, init(keyexp), arrayExpr), flowEdge(keyLabel,init(asVar)) } +
+					{ flowEdge(fe,keyLabel) | fe <- final(keyexp, lstate) } ;
 			} else {
 				edges += iteratorNotEmptyFlowEdge(testNode@lab, init(asVar), arrayExpr);
 			}
 			
+			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		}
-
-		// NOTE: We have no logic for function here, the def is treated as a unit since the
-		// function CFG is handled separately.
 
 		case global(list[Expr] exprs) : {
 			// Add edges for each expression in the list, plus add edges between
 			// each adjacent expression.
 			for (e <- exprs) < edges, lstate > = addExpEdges(edges, lstate, e);
 			< edges, lstate > = addExpSeqEdges(edges, lstate, exprs);
-
-			// If we have at least one expression, add an edge from the last expression
-			// to the end of the statement. If we have no expressions, this would add a
-			// self-loop, so in that case we add no edge (the construct does not loop).
-			if (size(exprs) > 0)
-				edges += flowEdge(final(last(exprs)), finalLabel);
 		}
 
-		// TODO: Add support for goto, we haven't done so yet since they aren't used
-		// in any of the PHP code we are looking at so far
+		case goto(str gotoLabel) : {
+			if (gotoLabel in lstate.gotoNodes)
+				edges += { jumpEdge(fl, lstate.gotoNodes[gotoLabel]) | fl <- finalLabels };
+			else
+				edges += { escapingGotoEdge(fl, getExitNodeLabel(lstate), gotoLabel) | fl <- finalLabels };		
+		}
 		
 		case \if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, OptionElse elseClause) : {
+			joinnode = incLabel();
+			lstate.nodes = lstate.nodes + joinNode(joinnode)[@lab=joinnode];
+
 			// Add edges for the condition
 			< edges, lstate > = addExpEdges(edges, lstate, cond);
 			
@@ -956,11 +1182,14 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// Now, add the edges that model the flow through the if. First, if
 			// we have a true body, flow goes through the body and out the other
 			// side. If we have no body in this case, flow just goes to the end. 
-			if (size(body) > 0) {
-				edges += conditionTrueFlowEdge(final(cond), init(head(body)), cond);
-				if (!statementJumps(last(body))) edges += flowEdge(final(last(body)), finalLabel);
+			// NOTE: Reminder, with init of a stmt, we always have 1 element unless
+			// it is empty, in which case we have 0 (in which case we want the else
+			// behavior here anyway)
+			if (size(body) > 0 && size(init(head(body))) == 1) {
+				edges += { conditionTrueFlowEdge(fe, getOneFrom(init(head(body))), cond) | fe <- final(cond, lstate) };
+				edges += { flowEdge(fe, joinnode) | fe <- final(last(body), lstate) };
 			} else {
-				edges += conditionTrueFlowEdge(final(cond), finalLabel, cond);
+				edges += { conditionTrueFlowEdge(fe, joinnode, cond) | fe <- final(cond, lstate) };
 			}
 
 			// Next, we need the flow from condition to condition, and into
@@ -969,15 +1198,15 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			for (elseIf(e,ebody) <- elseIfs) {
 				// We have a false flow edge from the last condition to the current condition.
 				// We can only get here if each prior condition was false.
-				edges += conditionFalseFlowEdge(final(last(falseConds)), init(e), falseConds);
+				edges += { conditionFalseFlowEdge(fe, init(e), falseConds) | fe <- final(last(falseConds), lstate) };
 
 				// As above, we then flow from the condition (if it is true) into the body and then
 				// through the body, or we just flow to the end if there is no body.
-				if (size(ebody) > 0) {
-					edges += conditionTrueFlowEdge(final(e), init(head(ebody)), e, falseConds);
-					if (!statementJumps(last(ebody))) edges += flowEdge(final(last(ebody)), finalLabel);
+				if (size(ebody) > 0 && size(init(head(ebody))) == 1) {
+					edges += { conditionTrueFlowEdge(fe, getOneFrom(init(head(ebody))), e, falseConds) | fe <- final(e, lstate) };
+					edges += { flowEdge(fe, joinnode) | fe <- final(last(ebody), lstate) };
 				} else {
-					edges += conditionTrueFlowEdge(final(e), finalLabel, e, falseConds);
+					edges += { conditionTrueFlowEdge(fe, joinnode, e, falseConds) | fe <- final(e, lstate) };
 				}
 					
 				falseConds += e;
@@ -986,51 +1215,51 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// Finally, if we have an else, we model flow into and through the else. If we have
 			// no else, we instead have to add edges from the last false condition directly to
 			// the end.
-			if (someElse(\else(ebody)) := elseClause) {
+			if (someElse(\else(ebody)) := elseClause && size(ebody) > 0 && size(init(head(ebody))) == 1) {
 				if (size(ebody) > 0) {
-					edges += conditionFalseFlowEdge(final(last(falseConds)), init(head(ebody)), falseConds);
-					if (!statementJumps(last(ebody))) edges += flowEdge(final(last(ebody)), finalLabel);
+					edges += { conditionFalseFlowEdge(fe, getOneFrom(init(head(ebody))), falseConds) | fe <- final(last(falseConds), lstate) };
+					edges += { flowEdge(fe, joinnode) | fe <- final(last(ebody), lstate) };
 				}				
 			} else {
-				edges += conditionFalseFlowEdge(final(last(falseConds)), finalLabel, falseConds);
+				edges += { conditionFalseFlowEdge(fe, joinnode, falseConds) | fe <- final(last(falseConds), lstate) };
 			}
+
+			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 		}
 
-		// NOTE: inlineHTML has no internal flow
-		
 		case namespace(OptionName nsName, list[Stmt] body) : {
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
 			< edges, lstate > = addBodyEdges(edges, lstate, body);
-
-			if (size(body) > 0)
-				edges += flowEdge(final(last(body)), finalLabel); 
 		}		
 
-		// NOTE: namespaceHeader has no internal flow
-		
 		case \return(someExpr(expr)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += { flowEdge(final(expr), finalLabel), flowEdge(finalLabel, getExitNodeLabel(lstate)) };
+			edges = edges + 
+				{ flowEdge(fe, fl) | fe <- final(expr, lstate), fl <- finalLabels } + 
+				{ jumpEdge(fl, getExitNodeLabel(lstate)) | fl <- finalLabels };
 		}
 
 		case \return(noExpr()) : {
-			edges = edges + flowEdge(finalLabel, getExitNodeLabel(lstate));
+			edges = edges + { jumpEdge(fl, getExitNodeLabel(lstate)) | fl <- finalLabels };
 		}
 		
 		case static(list[StaticVar] vars) : {
 			varExps = [ e | v:staticVar(str name, someExpr(Expr e)) <- vars ];
 			for (e <- varExps) < edges, lstate > = addExpEdges(edges, lstate, e);
 			< edges, lstate > = addExpSeqEdges(edges, lstate, varExps);
-			if (size(varExps) > 0)
-				edges += flowEdge(final(last(varExps)), finalLabel); 
 		}
 
 		case \switch(Expr cond, list[Case] cases) : {
+			// We synthesize a join node to give all the cases somwewhere to come back
+			// together at the end.
+			joinnode = incLabel();
+			lstate.nodes = lstate.nodes + joinNode(joinnode)[@lab=joinnode];
+
 			// Both break and continue will go to the end of the statement, add the
 			// labels here to account for any we find in the case bodies.
-			lstate = pushContinueLabel(finalLabel,pushBreakLabel(finalLabel, lstate));
+			lstate = pushContinueLabel(joinnode,pushBreakLabel(joinnode, lstate));
 			
-			// Add all the standard edges for the conditions and statement bodies			
+			// Add all the standard edges inside the conditions and statement bodies			
 			< edges, lstate > = addExpEdges(edges, lstate, cond);
 			for (\case(e,body) <- cases) {
 				if (someExpr(ccond) := e) < edges, lstate > = addExpEdges(edges, lstate, ccond);
@@ -1038,70 +1267,127 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				< edges, lstate > = addBodyEdges(edges, lstate, body);
 			}
 						
-			// Reorder the cases to make sure default cases are at the end
-			nonDefaultCases = [ c | c:\case(someExpr(_),_) <- cases ];
-			defaultCases = [ c | c:\case(noExpr(),_) <- cases ];
-			
-			if (size(defaultCases) > 1)
-				println("WARNING: We should only have 1 default case, the others will not be tried (cases at lines <intercalate(",",["<c@at.begin.line>" | c <- defaultCases])>)");
-			cases = nonDefaultCases + defaultCases;
-			
-			// Link the switch condition expression to the first case. For a non-default case, this
-			// links to the condition. For a default case, this links to the body. If there is no
-			// default body, this links directly to the end. Note: the only way the default case
-			// will be first is if there are no non-default cases.
-			if (size(cases) > 0 && \case(someExpr(e),b) := head(cases)) {
-				edges += flowEdge(final(cond), init(e));
-			} else if (size(cases) > 0 && \case(noExpr(),b) := head(cases) && size(b) > 0) {
-				edges += flowEdge(final(cond), init(head(b)));
-			} else {
-				edges += flowEdge(final(cond), finalLabel);
+			// The behavior of PHP is that each case condition is executed in turn until
+			// a matching condition is found. So, we link each together, one after the
+			// other, representing the "false" path through all the conditions (i.e.,
+			// if the condition is false, the behavior is to then try the next condition).
+			set[Lab] lastLabels = final(cond, lstate);
+			for (\case(someExpr(e),b) <- cases) {
+				if (lastLabels == final(cond, lstate)) {
+					edges += { flowEdge(fc, init(e)) | fc <- lastLabels };
+				} else {
+					edges += { conditionFalseFlowEdge(fc, init(e), binaryOperation(cond,e,equal())) | fc <- lastLabels };
+				}
+				lastLabels = final(e, lstate); 
 			}
 			
-			// Link each case condition with the body of the case
-			for (\case(someExpr(e),b) <- cases, size(b) > 0) edges += conditionTrueFlowEdge(final(e),init(head(b)),binaryOperation(cond,e,equal()));
-			
-			// If there is no body, instead link the case condition with the next case condition
-			for ([_*,\case(someExpr(e),b),\case(someExpr(e2),b2),_*] := cases, size(b) == 0)
-				edges += conditionTrueFlowEdge(final(e),init(e2),binaryOperation(cond,e,equal()));
-			
-			// Corner case, if the last non-default condition has no body, link it to the default body
-			// (if there is one) or the final label
-			if ([_*,\case(someExpr(e),b),\case(noExpr(),b2),_*] := cases, size(b) == 0) {
-				if (size(b2) == 0)
-					edges += conditionTrueFlowEdge(final(e),finalLabel,binaryOperation(cond,e,equal()));
-				else
-					edges += conditionTrueFlowEdge(final(e),init(head(b2)),binaryOperation(cond,e,equal()));
+			// If we have no defaults, the last condition will "fall through" to the join
+			// node when it is false, since it has nowhere else to go. Note that we make 
+			// sure we have a last case condition as well; the situation where we have no
+			// defaults and no other cases is handled below.
+			defaults = [ i | i <- index(cases), \case(noExpr(),_) := cases[i] ];
+			if (size(defaults) == 0  && lastLabels != final(cond, lstate) && size(lastLabels) > 0 && \case(someExpr(e),_) := last(cases)) {
+				edges += { conditionFalseFlowEdge(fc, joinnode, binaryOperation(cond,e,equal())) | fc <- lastLabels };
 			}
 			
-			// For each case, link together the case condition with the next case condition, representing
-			// the situation where the case condition is tried but fails.  This also has the same corner
-			// case as above, for transferring control to the default, plus a case where there is no default.
-			edges += { conditionFalseFlowEdge(final(e1),init(e2),binaryOperation(cond,e1,equal())) | [_*,\case(someExpr(e1),b1),\case(someExpr(e2),b2),_*] := cases};
-			if ([_*,\case(someExpr(e1),b1),\case(noExpr(),b2),_*] := cases) {
-				if (size(b2) > 0)
-					edges += conditionFalseFlowEdge(final(e1),init(head(b2)),binaryOperation(cond,e1,equal()));
-				else
-					edges += conditionFalseFlowEdge(final(e1),finalLabel,binaryOperation(cond,e1,equal()));
-			}
-			if ([_*,\case(someExpr(e1),b1)] := cases)
-				edges += conditionFalseFlowEdge(final(e1), finalLabel, binaryOperation(cond,e1,equal()));
-			
-			// For each case, link together the last body element with the final label or, if the
-			// body is empty, link together the case condition with the final label
-			for (\case(e,b) <- cases, size(b) > 0, !statementJumps(last(b))) edges += flowEdge(final(last(b)), finalLabel);
-			for (\case(someExpr(e),b) <- cases, size(b) == 0) edges += flowEdge(final(e), finalLabel);
+			// If we had no cases with conditions, and we have no default, the behavior
+			// would be to go from the switch condition to the end, so link it to the
+			// join node in this case. Note that we don't have a true or false edge, this
+			// is an unconditional edge in this case.
+			if (size(cases) == 0)
+				edges += { flowEdge(fc, joinnode) | fc <- final(cond, lstate) };
 
+			// Link up the case conditions with the body of the case that would run. To do
+			// so, we link the condition with the next case body. Note: there may not be a
+			// next case body. This is handled below. Also note: we can have multiple defaults.
+			// If a true case falls through to a default, it will run it, even if it is not
+			// the last one.
+			set[Expr] exprsToLink = { };
+			for (\case(oe,b) <- cases) {
+				if (someExpr(e) := oe) {
+					exprsToLink += e;
+				}
+				if (size(b) > 0) {
+					edges += { conditionTrueFlowEdge(fl,bl,binaryOperation(cond,ei,equal())) | ei <- exprsToLink, fl <- final(ei,lstate), bl <- init(head(b)) };
+					exprsToLink = { };
+				}
+			}
+
+			// If we still have exprsToLink, this means we have no body that they will run. Link
+			// the true edges for these conditions to the join node.
+			for (e <- exprsToLink) {
+				edges += { conditionTrueFlowEdge(fl,joinnode,binaryOperation(cond,ei,equal())) | ei <- exprsToLink, fl <- final(ei,lstate) };
+			}
+			
+			// Find the default body that would run for the default case. If multiple default
+			// cases exist, we use only the last. The body is either the body of the default
+			// itself or the body that it would fall through to, if no default body is provided.			
+			set[Lab] defaultLabels = { };
+			if (size(defaults) > 0) {
+				lastDefault = last(defaults);
+				if (\case(noExpr(),b) := cases[lastDefault] && size(b) > 0) {
+					defaultLabels = init(head(b));
+				} else {
+					followingBodies = [ i | i <- index(cases), i > lastDefault, \case(someExpr(_),b) := cases[i], size(b) > 0];
+					if (size(followingBodies) > 0 && \case(someExpr(_),b) := cases[head(followingBodies)]) {
+						defaultLabels = init(head(b));
+					}
+				}
+			}
+
+			// Link to the default. This is done if the last condition is false. If there are no case conditions,
+			// we link from the switch condition unconditionally.
+			if (size(defaultLabels) > 0) {
+				caseGuards = [ e | \case(someExpr(e),b) <- cases ];
+				if (size(caseGuards) > 0) {
+					edges += { conditionFalseFlowEdge(el,bl,binaryOperation(cond,last(caseGuards),equal())) | el <- final(last(caseGuards), lstate), bl <- defaultLabels };
+				} else {
+					edges += { flowEdge(el,bl) | el <- final(cond), bl <- defaultLabels };
+				}
+			}
+						
+			// For each case, we need to simulate fall-thru. We will use a basic check here.
+			// If the case body is not empty, and the last statement is a break or continue,
+			// we will not add the edge, otherwise we do. Note: we could have a break or
+			// continue in the middle, with the code after being dead, but we are not checking
+			// for that here; this means the CFG could have paths that are not achievable in
+			// the program, but this is the case anyway.
+			set[Lab] fallThruLabels = { };
+			for (\case(_,b) <- cases, size(b) > 0) {
+				if (size(fallThruLabels) > 0) {
+					edges += { flowEdge(fl,bl) | fl <- fallThruLabels, bl <- init(head(b)) }; 
+				}
+				if (lb := last(b), (lb is \break || lb is \continue || lb is \return || lb is goto)) {
+					fallThruLabels = { };
+				} else {
+					fallThruLabels = final(last(b), lstate);
+				}
+			}
+			 
+			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		}
 
 		case \throw(Expr expr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			// TODO: This actually needs to instead transfer control to surrounding catches
-			edges += flowEdge(final(expr), finalLabel);
+			edges += { flowEdge(fe, fl) | fe <- final(expr, lstate), fl <- finalLabels };
+			edges += { jumpEdge(fl, cl) | fl <- finalLabels, cl <- lstate.catchHandlers<1> };
+			edges += { jumpEdge(fl, getExitNodeLabel(lstate)) | fl <- finalLabels }; 
 		}
 
 		case tryCatch(list[Stmt] body, list[Catch] catches) : {
+			joinnode = incLabel();
+			lstate.nodes = lstate.nodes + joinNode(joinnode)[@lab=joinnode];
+
+			oldHandlers = lstate.catchHandlers;
+			for(\catch(name(xt),_,cbody) <- catches) {
+				if (size(cbody) > 0 && size(init(head(cbody))) > 0) {
+					lstate.catchHandlers[xt] = getOneFrom(init(head(cbody)));
+				} else {
+					lstate.catchHandlers[xt] = joinnode;
+				}	
+			}			
+			
 			// Add all the standard internal edges for the statements in the body
 			// and in the catch bodies. 
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
@@ -1112,18 +1398,30 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// Link the end of the main body, and each catch body, to the final label. Note: there
 			// is no flow from the standard body to the exception bodies added by default, it is added
 			// for throws.
-			// TODO: Add the links that would be triggered by expressions -- e.g., a method call could
-			// trigger an exception that is caught here. We need to look at the best way to do this without
-			// degrading to just having exception edges from each expression.
-			if (size(body) > 0 && !statementJumps(last(body)))
-				edges += flowEdge(final(last(body)), finalLabel);
-			for (\catch(_, _, cbody) <- catches, size(cbody) > 0, !statementJumps(last(cbody)))
-				edges += flowEdge(final(last(cbody)), finalLabel);
+			if (size(body) > 0)
+				edges += { flowEdge(fl, joinnode) | fl <- final(last(body), lstate) };
+			for (\catch(_, _, cbody) <- catches, size(cbody) > 0)
+				edges += { flowEdge(fl, joinnode) | fl <- final(last(cbody), lstate) };
 				
-			// TODO: Anything else here?
+			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			lstate.catchHandlers = oldHandlers;
 		}
 
 		case tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody) : {
+			joinnode = incLabel();
+			lstate.nodes = lstate.nodes + joinNode(joinnode)[@lab=joinnode];
+
+			oldHandlers = lstate.catchHandlers;
+			for(\catch(name(xt),_,cbody) <- catches) {
+				if (size(cbody) > 0 && size(init(head(cbody))) > 0) {
+					lstate.catchHandlers[xt] = getOneFrom(init(head(cbody)));
+				} else if (size(finallyBody) > 0 && size(init(head(finallyBody))) > 0) {
+					lstate.catchHandlers[xt] = getOneFrom(init(head(finallyBody)));
+				} else {
+					lstate.catchHandlers[xt] = joinnode;
+				}	
+			}			
+
 			// Add all the standard internal edges for the statements in the body
 			// and in the catch bodies. 
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
@@ -1133,27 +1431,23 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			for (\catch(_, _, cbody) <- catches, b <- cbody) < edges, lstate > = addStmtEdges(edges, lstate, b);
 			for (\catch(_, _, cbody) <- catches) < edges, lstate > = addBodyEdges(edges, lstate, cbody);
 
-			// Link the end of the main body, and each catch body, to the final label. Note: there
-			// is no flow from the standard body to the exception bodies added by default, it is added
-			// for throws.
-			// TODO: Add the links that would be triggered by expressions -- e.g., a method call could
-			// trigger an exception that is caught here. We need to look at the best way to do this without
-			// degrading to just having exception edges from each expression.
-			if (size(body) > 0 && !statementJumps(last(body)) && size(finallyBody) > 0) {
-				edges += flowEdge(final(last(body)), init(first(finallyBody)));
+			// Link the end of the main body, and each catch body, to the final label.
+			if (size(body) > 0 && size(finallyBody) > 0) {
+				edges += { flowEdge(fl, fi) | fl <- final(last(body), lstate), fi <- init(first(finallyBody)) };
 			}
-			else if (size(body) > 0 && !statementJumps(last(body)) && size(finallyBody) > 0) {
-				edges += flowEdge(final(last(body)), finalLabel);
+			else if (size(body) > 0 && size(finallyBody) > 0) {
+				edges += { flowEdge(fl, joinnode) | fl <- final(last(body), lstate) };
 			}
-			for (\catch(_, _, cbody) <- catches, size(cbody) > 0, !statementJumps(last(cbody))) {
+			for (\catch(_, _, cbody) <- catches, size(cbody) > 0) {
 				if (size(finallyBody) > 0) {
-					edges += flowEdge(final(last(cbody)), init(first(finallyBody)));
+					edges += { flowEdge(fl, fi) | fl <- final(last(cbody), lstate), fi <- init(first(finallyBody)) };
 				} else {
-					edges += flowEdge(final(last(cbody)), finalLabel);
+					edges += { flowEdge(fl, joinnode) | fl <- final(last(cbody), lstate) };
 				}
 			}
 				
-			// TODO: Anything else here?
+			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			lstate.catchHandlers = oldHandlers;
 		}
 
 		case unset(list[Expr] unsetVars) : {
@@ -1161,35 +1455,34 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			< edges, lstate > = addExpSeqEdges(edges, lstate, unsetVars);
 		}
 
-		// NOTE: use has no internal flow
-		
 		case \while(Expr cond, list[Stmt] body) : {
-			lstate = pushContinueLabel(init(cond), pushBreakLabel(finalLabel, lstate));
+			joinnode = incLabel();
+			lstate.nodes = lstate.nodes + joinNode(joinnode)[@lab=joinnode];
+
+			lstate = pushContinueLabel(init(cond), pushBreakLabel(joinnode, lstate));
 			
 			< edges, lstate > = addExpEdges(edges, lstate, cond);
 			
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
 			< edges, lstate > = addBodyEdges(edges, lstate, body);
 
-			edges += conditionFalseFlowEdge(final(cond), finalLabel, cond);
+			edges += { conditionFalseFlowEdge(fe, joinnode, cond) | fe <- final(cond, lstate) };
 				    
 			if (size(body) > 0) {
-				edges += { conditionTrueFlowEdge(final(cond), init(head(body)), cond), flowEdge(final(last(body)), init(cond)) };
+				edges = edges + 
+					{ conditionTrueFlowEdge(fc, fi, cond) | fc <- final(cond, lstate), fi <- init(head(body)) } + 
+					{ flowEdge(fb, init(cond)) | fb <- final(last(body), lstate)  };
 			} else {
-				edges += conditionTrueFlowEdge(final(cond), init(cond), cond);
+				edges += { conditionTrueFlowEdge(fe, init(cond), cond) | fe <- final(cond, lstate) };
 			}
 			
+			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate = popContinueLabel(popBreakLabel(lstate));
 		}
-		
-		// NOTE: emptyStmt has no internal flow
 		
 		case block(list[Stmt] body) : {
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
 			< edges, lstate > = addBodyEdges(edges, lstate, body);
-			if (size(body) > 0) {
-				edges += flowEdge(final(last(body)), finalLabel);
-			}		
 		}
 	}
 	
@@ -1199,9 +1492,26 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 // Compute all the internal flow edges for an expression. We pass around the label
 // state in case we need to construct new labels.
 public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
+	Lab incLabel() { 
+		lstate.counter += 1; 
+		return lab(lstate.counter); 
+	}
+
 	initLabel = init(e);
-	finalLabel = final(e);
+	finalLabels = final(e, lstate);
 	FlowEdges edges = { };
+	
+	set[FlowEdge] makeEdges(set[Lab] s1, Lab v1) {
+		return { flowEdge(si,v1) | si <- s1 };
+	}
+	
+	set[FlowEdge] makeEdges(set[Lab] s1, set[Lab] s2) {
+		return { flowEdge(si,sj) | si <- s1, sj <- s2 };
+	}
+	
+	set[FlowEdge] makeEdges(Lab v1, set[Lab] s2) {
+		return { flowEdge(v1,sj) | sj <- s2 };
+	}
 	
 	switch(e) {
 		case array(list[ArrayElement] items) : {
@@ -1212,45 +1522,45 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			}
 
 			for (arrayElement(someExpr(kv),v1,_) <- items)
-					edges += flowEdge(final(kv), init(v1));
+					edges += makeEdges(final(kv, lstate), init(v1));
 
 			for ([_*,arrayElement(k1,v1,_),arrayElement(k2,v2,_),_*] := items) {
 				if (someExpr(kv) := k2)
-					edges += flowEdge(final(v1), init(kv));
+					edges += makeEdges(final(v1, lstate), init(kv));
 				else
-					edges += flowEdge(final(v1), init(v2));
+					edges += makeEdges(final(v1, lstate), init(v2));
 			}
 
 			if (size(items) > 0, arrayElement(_,val,_) := last(items))
-				edges += flowEdge(final(val), finalLabel);
+				edges += makeEdges(final(val, lstate), finalLabels);
 		}
 		
 		case fetchArrayDim(Expr var, someExpr(Expr dim)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, var);
 			< edges, lstate > = addExpEdges(edges, lstate, dim);
-			edges = edges + flowEdge(final(var), init(dim)) + flowEdge(final(dim),finalLabel);
+			edges = edges + makeEdges(final(var, lstate), init(dim)) + makeEdges(final(dim, lstate),finalLabels);
 		}
 		
 		case fetchArrayDim(Expr var, noExpr()) : {
 			< edges, lstate > = addExpEdges(edges, lstate, var);
-			edges += flowEdge(final(var), finalLabel);
+			edges += makeEdges(final(var, lstate), finalLabels);
 		}
 		
 		case fetchClassConst(expr(Expr className), str constName) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
-			edges += flowEdge(final(className), finalLabel);
+			edges += makeEdges(final(className, lstate), finalLabels);
 		}
 		
 		case assign(Expr assignTo, Expr assignExpr) : { 
 			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
 			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
-			edges = edges + flowEdge(final(assignExpr), init(assignTo)) + flowEdge(final(assignTo), finalLabel);
+			edges = edges + makeEdges(final(assignExpr, lstate), init(assignTo)) + makeEdges(final(assignTo, lstate), finalLabels);
 		}
 		
 		case assignWOp(Expr assignTo, Expr assignExpr, Op operation) : {
 			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
 			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
-			edges = edges + flowEdge(final(assignExpr), init(assignTo)) + flowEdge(final(assignTo), finalLabel);
+			edges = edges + makeEdges(final(assignExpr, lstate), init(assignTo)) + makeEdges(final(assignTo, lstate), finalLabels);
 		}
 		
 		case listAssign(list[OptionExpr] assignsTo, Expr assignExpr) : {
@@ -1261,26 +1571,26 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			< edges, lstate > = addExpSeqEdges(edges, lstate, listExps);
 			
 			if (size(listExps) > 0)
-				edges += flowEdge(final(last(listExps)), finalLabel);
+				edges += makeEdges(final(last(listExps), lstate), finalLabels);
 			else
-				edges += flowEdge(final(assignExpr), finalLabel);
+				edges += makeEdges(final(assignExpr, lstate), finalLabels);
 		}
 		
 		case refAssign(Expr assignTo, Expr assignExpr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
 			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
-			edges = edges + flowEdge(final(assignExpr), init(assignTo)) + flowEdge(final(assignTo), finalLabel);
+			edges = edges + makeEdges(final(assignExpr, lstate), init(assignTo)) + makeEdges(final(assignTo, lstate), finalLabels);
 		}
 		
 		case binaryOperation(Expr left, Expr right, Op operation) : { 
 			< edges, lstate > = addExpEdges(edges, lstate, left);
 			< edges, lstate > = addExpEdges(edges, lstate, right);
-			edges = edges + flowEdge(final(left), init(right)) + flowEdge(final(right), finalLabel);
+			edges = edges + makeEdges(final(left, lstate), init(right)) + makeEdges(final(right, lstate), finalLabels);
 		}
 		
 		case unaryOperation(Expr operand, Op operation) : {
 			< edges, lstate > = addExpEdges(edges, lstate, operand); 
-			edges = edges + flowEdge(final(operand), finalLabel);
+			edges = edges + makeEdges(final(operand, lstate), finalLabels);
 		}
 		
 		case new(NameOrExpr className, list[ActualParameter] parameters) : {
@@ -1290,24 +1600,24 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			if (expr(Expr cn) := className) {
 				< edges, lstate > = addExpEdges(edges, lstate, cn);
 				if (size(parameters) > 0) {
-					edges += flowEdge(final(cn), init(head(parameters).expr));
-					edges += flowEdge(final(last(parameters).expr), finalLabel);
+					edges += makeEdges(final(cn, lstate), init(head(parameters).expr));
+					edges += makeEdges(final(last(parameters).expr, lstate), finalLabels);
 				} else {
-					edges += flowEdge(final(cn), finalLabel);
+					edges += makeEdges(final(cn, lstate), finalLabels);
 				}
 			} else if (size(parameters) > 0) {
-				edges += flowEdge(final(last(parameters).expr), finalLabel);
+				edges += makeEdges(final(last(parameters).expr, lstate), finalLabels);
 			}
 		}
 		
 		case cast(CastType castType, Expr expr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += flowEdge(final(expr), finalLabel);
+			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 		
 		case clone(Expr expr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += flowEdge(final(expr), finalLabel);
+			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 		
 		// TODO: Add support for closures -- we should probably give them
@@ -1317,22 +1627,22 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		
 		case empty(Expr expr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += flowEdge(final(expr), finalLabel);
+			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 		
 		case suppress(Expr expr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += flowEdge(final(expr), finalLabel);
+			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 		
 		case eval(Expr expr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += flowEdge(final(expr), finalLabel);
+			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 		
 		case exit(someExpr(Expr exitExpr)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, exitExpr);
-			edges += flowEdge(final(exitExpr), finalLabel);
+			edges += makeEdges(final(exitExpr, lstate), finalLabels);
 		}
 		
 		case call(NameOrExpr funName, list[ActualParameter] parameters) : {
@@ -1342,14 +1652,14 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			if (expr(Expr fn) := funName) {
 				< edges, lstate > = addExpEdges(edges, lstate, fn);
 				if (size(parameters) > 0) {
-					edges += flowEdge(final(fn), init(head(parameters).expr));
-					edges += flowEdge(final(last(parameters).expr),finalLabel);
+					edges += makeEdges(final(fn, lstate), init(head(parameters).expr));
+					edges += makeEdges(final(last(parameters).expr, lstate),finalLabels);
 				} else {
-					edges += flowEdge(final(fn),finalLabel);
+					edges += makeEdges(final(fn, lstate),finalLabels);
 				}
 			} else {
 				if (size(parameters) > 0)
-					edges += flowEdge(final(last(parameters).expr), finalLabel);
+					edges += makeEdges(final(last(parameters).expr, lstate), finalLabels);
 			}
 		}
 		
@@ -1361,17 +1671,17 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			
 			if (expr(Expr mn) := methodName) {
 				< edges, lstate > = addExpEdges(edges, lstate, mn);
-				edges += flowEdge(final(target),init(mn));
+				edges += makeEdges(final(target, lstate),init(mn));
 				if (size(parameters) > 0) {
-					edges += flowEdge(final(mn),init(head(parameters).expr));
+					edges += makeEdges(final(mn, lstate),init(head(parameters).expr));
 				} else {
-					edges += flowEdge(final(mn), finalLabel);
+					edges += makeEdges(final(mn, lstate), finalLabels);
 				}
 			} else {
 				if (size(parameters) > 0) {
-					edges += flowEdge(final(target), init(head(parameters).expr));
+					edges += makeEdges(final(target, lstate), init(head(parameters).expr));
 				} else {
-					edges += flowEdge(final(target), finalLabel);
+					edges += makeEdges(final(target, lstate), finalLabels);
 				}
 			}
 		}
@@ -1384,23 +1694,23 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			if (expr(Expr tn) := staticTarget) {
 				< edges, lstate > = addExpEdges(edges, lstate, tn);
 				if (expr(Expr mn) := methodName)
-					edges += flowEdge(final(tn),init(mn));
+					edges += makeEdges(final(tn, lstate),init(mn));
 				else if (size(parameters) > 0)
-					edges += flowEdge(final(tn),init(head(parameters).expr));
+					edges += makeEdges(final(tn, lstate),init(head(parameters).expr));
 				else
-					edges += flowEdge(final(tn),finalLabel);
+					edges += makeEdges(final(tn, lstate),finalLabels);
 			}
 
 			if (expr(Expr mn) := methodName) {
 				< edges, lstate > = addExpEdges(edges, lstate, mn);
 				if (size(parameters) > 0)
-					edges += flowEdge(final(mn),init(head(parameters).expr));
+					edges += makeEdges(final(mn, lstate),init(head(parameters).expr));
 				else
-					edges += flowEdge(final(mn),finalLabel);
+					edges += makeEdges(final(mn, lstate),finalLabels);
 			}
 
 			if (size(parameters) > 0) {
-				edges += flowEdge(final(last(parameters).expr), finalLabel);
+				edges += makeEdges(final(last(parameters).expr, lstate), finalLabels);
 			}
 
 		}
@@ -1408,119 +1718,130 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		
 		case include(Expr expr, IncludeType includeType) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += flowEdge(final(expr), finalLabel);
+			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 		
 		case instanceOf(Expr expr, expr(Expr toCompare)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
 			< edges, lstate > = addExpEdges(edges, lstate, toCompare);
-			edges = edges + flowEdge(final(expr),init(toCompare)) + flowEdge(final(toCompare),finalLabel);
+			edges = edges + makeEdges(final(expr, lstate),init(toCompare)) + makeEdges(final(toCompare, lstate),finalLabels);
 		}
 		
 		case instanceOf(Expr expr, name(Name toCompare)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += flowEdge(final(expr), finalLabel);
+			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 
 		case isSet(list[Expr] exprs) : {
 			for (ex <- exprs) < edges, lstate > = addExpEdges(edges, lstate, ex);
 			< edges, lstate > = addExpSeqEdges(edges, lstate, exprs);
 			if (size(exprs) > 0)
-				edges += flowEdge(final(last(exprs)), finalLabel);
+				edges += makeEdges(final(last(exprs), lstate), finalLabels);
 		}
 		
 		case print(Expr expr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += flowEdge(final(expr), finalLabel);
+			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 		
 		case propertyFetch(Expr target, expr(Expr propertyName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, target);
 			< edges, lstate > = addExpEdges(edges, lstate, propertyName);
-			edges = edges + flowEdge(final(target),init(propertyName)) + flowEdge(final(propertyName),finalLabel);
+			edges = edges + makeEdges(final(target, lstate),init(propertyName)) + makeEdges(final(propertyName, lstate),finalLabels);
 		}
 		
 		case propertyFetch(Expr target, name(Name propertyName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, target);
-			edges += flowEdge(final(target), finalLabel);
+			edges += makeEdges(final(target, lstate), finalLabels);
 		}
 
 		case shellExec(list[Expr] parts) : {
 			for (ex <- parts) < edges, lstate > = addExpEdges(edges, lstate, ex);
 			< edges, lstate > = addExpSeqEdges(edges, lstate, parts);
 			if (size(parts) > 0)
-				edges += flowEdge(final(last(parts)), finalLabel);
+				edges += makeEdges(final(last(parts), lstate), finalLabels);
 		}
 
 		case ternary(Expr cond, someExpr(Expr ifBranch), Expr elseBranch) : {
+			joinnode = incLabel();
+			lstate.nodes = lstate.nodes + joinNode(joinnode)[@lab=joinnode];
+
 			< edges, lstate > = addExpEdges(edges, lstate, cond);
 			< edges, lstate > = addExpEdges(edges, lstate, ifBranch);
 			< edges, lstate > = addExpEdges(edges, lstate, elseBranch);
 
 			edges = edges +  
-				   conditionTrueFlowEdge(final(cond),init(ifBranch),cond) + 
-				   conditionFalseFlowEdge(final(cond),init(elseBranch),cond) +
-				   flowEdge(final(ifBranch), finalLabel) + flowEdge(final(elseBranch), finalLabel);
+				   { conditionTrueFlowEdge(fe,init(ifBranch),cond),  
+				   conditionFalseFlowEdge(fe,init(elseBranch),cond) | fe <- final(cond, lstate) } +
+				   { flowEdge(fe, joinnode) | fe <- final(ifBranch, lstate) } +
+				   { flowEdge(fe, joinnode) | fe <- final(elseBranch, lstate) };
+
+			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 		}
 		
 		case ternary(Expr cond, noExpr(), Expr elseBranch) : {
+			joinnode = incLabel();
+			lstate.nodes = lstate.nodes + joinNode(joinnode)[@lab=joinnode];
+
 			< edges, lstate > = addExpEdges(edges, lstate, cond);
 			< edges, lstate > = addExpEdges(edges, lstate, elseBranch);
 
 			edges = edges + 
-				   conditionFalseFlowEdge(final(cond), init(elseBranch),cond) +
-				   conditionTrueFlowEdge(final(cond), finalLabel,cond) + 
-				   flowEdge(final(elseBranch), finalLabel);
+				   { conditionFalseFlowEdge(fe,init(elseBranch),cond) | fe <- final(cond, lstate) } +
+				   { conditionTrueFlowEdge(fe, joinnode, cond) | fe <- final(cond, lstate) } +
+				   { flowEdge(fe, joinnode) | fe <- final(elseBranch, lstate) };
+
+			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 		}
 
 		case staticPropertyFetch(expr(Expr className), expr(Expr propertyName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
 			< edges, lstate > = addExpEdges(edges, lstate, propertyName);
-			edges = edges + flowEdge(final(className),init(propertyName)) + flowEdge(final(propertyName), finalLabel);
+			edges = edges + makeEdges(final(className, lstate),init(propertyName)) + makeEdges(final(propertyName, lstate), finalLabels);
 		}
 
 		case staticPropertyFetch(name(Name className), expr(Expr propertyName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, propertyName);
-			edges += flowEdge(final(propertyName), finalLabel);
+			edges += makeEdges(final(propertyName, lstate), finalLabels);
 		}
 
 		case staticPropertyFetch(expr(Expr className), name(Name propertyName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
-			edges += flowEdge(final(className), finalLabel);
+			edges += makeEdges(final(className, lstate), finalLabels);
 		}
 		
 		case scalar(encapsed(parts)) : {
 			< edges, lstate > = addExpSeqEdges(edges, lstate, parts);
-			edges += flowEdge(final(last(parts)), finalLabel);
+			edges += makeEdges(final(last(parts), lstate), finalLabels);
 		}
 		
 		case var(expr(Expr varName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, varName);
-			edges += flowEdge(final(varName), finalLabel);
+			edges += makeEdges(final(varName, lstate), finalLabels);
 		}
 		
 		case yield(someExpr(k), noExpr()) : {
 			< edges, lstate > = addExpEdges(edges, lstate, k);
-			edges += flowEdge(final(k), finalLabel);
+			edges += makeEdges(final(k, lstate), finalLabels);
 		}
 
 		case yield(noExpr(), someExpr(v)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, v);
-			edges += flowEdge(final(v), finalLabel);
+			edges += makeEdges(final(v, lstate), finalLabels);
 		}
 
 		case yield(someExpr(k), someExpr(v)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, k);
 			< edges, lstate > = addExpEdges(edges, lstate, v);
-			edges += flowEdge(final(k), init(v));
-			edges += flowEdge(final(v), finalLabel);
+			edges += makeEdges(final(k, lstate), init(v));
+			edges += makeEdges(final(v, lstate), finalLabels);
 		}
 		
 		case listExpr(exprs) : {
 			actualExprs = [ ei | someExpr(ei) <- exprs ];
 			if (size(actualExprs) > 0) {
 				< edges, lstate > = addExpSeqEdges(edges, lstate, actualExprs);
-				edges += flowEdge(final(last(actualExprs)), finalLabel);
+				edges += makeEdges(final(last(actualExprs), lstate), finalLabels);
 			}
 		}
 		
@@ -1538,7 +1859,7 @@ public tuple[CFGNodes, FlowEdges, LabelState] addJoinNodes(CFGNodes nodes, FlowE
 	}
 
 	bool splitter(CFGNode n) {
-		if (stmtNode(s,l) := n, init(s) != final(s)) {
+		if (stmtNode(s,l) := n, init(s) != final(s, lstate)) {
 			switch(s) {
 				case declare(_,_) : return true;
 				case do(_,_) : return true;

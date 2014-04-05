@@ -35,7 +35,8 @@ data CFGNode
 	| foreachTest(Expr expr, Lab l)
 	| foreachAssignKey(Expr expr, Lab l)
 	| foreachAssignValue(Expr expr, Lab l)
-	| joinNode(Stmt stmt, Lab l)
+	| joinNode(Lab l)
+	| actualProvided(str paramName, bool refAssign)
 	| actualNotProvided(str paramName, Expr expr, bool refAssign)
 	;
 
@@ -54,7 +55,7 @@ public str printCFGNode(scriptExit()) = "Exit";
 public str printCFGNode(foreachTest(Expr expr, Lab l)) = "Iteration Test";
 public str printCFGNode(foreachAssignKey(Expr expr, Lab l)) = "Assign Foreach Key <pp(expr)>";
 public str printCFGNode(foreachAssignValue(Expr expr, Lab l)) = "Assign Foreach Value <pp(expr)>";
-public str printCFGNode(joinNode(Stmt stmt, Lab l)) = "join";
+public str printCFGNode(joinNode(Lab l)) = "join";
 public str printCFGNode(stmtNode(Stmt s, Lab l)) {
 	switch(s) {
 		case classDef(ClassDef cd) : return "Class <cd.className>";
@@ -63,6 +64,7 @@ public str printCFGNode(stmtNode(Stmt s, Lab l)) {
 	}
 }
 public str printCFGNode(exprNode(Expr e, Lab l)) = pp(e);
+public str printCFGNode(actualProvided(str paramName, bool refAssign)) = "Arbitrary Value <paramName> <refAssign ? "?" : "">= unknown";
 public str printCFGNode(actualNotProvided(str paramName, Expr expr, bool refAssign)) = "Default Value <paramName> <refAssign ? "?" : "">= <pp(expr)>";
 
 @doc{Convert the CFG into a Rascal Graph, based on flow edge information}

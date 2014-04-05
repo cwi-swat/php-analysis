@@ -18,7 +18,7 @@ import List;
 @doc{The labeling state keeps track of information needed during the labeling and edge computation operations.}
 data LabelState 
 	= ls(int counter) 
-	| ls(int counter, CFGNode entryNode, CFGNode exitNode, set[CFGNode] nodes, list[Lab] breakLabels, list[Lab] continueLabels)
+	| ls(int counter, CFGNode entryNode, CFGNode exitNode, set[CFGNode] nodes, list[Lab] breakLabels, list[Lab] continueLabels, map[Lab,Lab] joinNodes, map[str,Lab] gotoNodes, map[str,Lab] catchHandlers)
 	;
 
 @doc{Initialize the label state}	
@@ -26,7 +26,7 @@ public LabelState newLabelState() = ls(0);
 
 @doc{Expand the label state to include entry and exit information.}
 public LabelState addEntryAndExit(LabelState lstate, CFGNode entryNode, CFGNode exitNode) {
-	return ls(lstate.counter, entryNode, exitNode, { entryNode, exitNode }, [ ], [ ]);
+	return ls(lstate.counter, entryNode, exitNode, { entryNode, exitNode }, [ ], [ ], ( ), ( ), ( ));
 }
 
 @doc{Throw away the entry and exit information, leaving just the counter.}
@@ -41,7 +41,7 @@ public list[Lab] getBreakLabels(LabelState lstate) = lstate.breakLabels;
 public Lab getBreakLabel(int n, LabelState lstate) = lstate.breakLabels[n-1]; 
 
 @doc{Check to see if the given break target is available; it may not be if this code is included and breaks into surrounding code.}
-public bool hasBreakLabel(int n, LabelState lstate) = size(lstate.breakLabels) <= n;
+public bool hasBreakLabel(int n, LabelState lstate) = size(lstate.breakLabels) <= n && size(lstate.breakLabels) > 0;
 
 @doc{Push a new break label onto the stack}
 public LabelState pushBreakLabel(Lab l, LabelState lstate) {
@@ -62,7 +62,7 @@ public list[Lab] getContinueLabels(LabelState lstate) = lstate.continueLabels;
 public Lab getContinueLabel(int n, LabelState lstate) = lstate.continueLabels[n-1]; 
 
 @doc{Check to see if the given continue target is available; it may not be if this code is included and continues into surrounding code.}
-public bool hasContinueLabel(int n, LabelState lstate) = size(lstate.continueLabels) <= n;
+public bool hasContinueLabel(int n, LabelState lstate) = size(lstate.continueLabels) <= n && size(lstate.continueLabels) > 0;
 
 @doc{Push a new continue label onto the stack}
 public LabelState pushContinueLabel(Lab l, LabelState lstate) {
