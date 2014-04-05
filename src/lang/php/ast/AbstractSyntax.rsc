@@ -1,5 +1,4 @@
-@license{
-  Copyright (c) 2009-2014 CWI
+@license{ Copyright (c) 2009-2014 CWI
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -128,6 +127,7 @@ public data Stmt
 	| \throw(Expr expr)
 	| tryCatch(list[Stmt] body, list[Catch] catches)
 	| tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
+
 	| unset(list[Expr] unsetVars)
 	| use(list[Use] uses)
 	| \while(Expr cond, list[Stmt] body)
@@ -207,6 +207,34 @@ public anno loc InterfaceDef@at;
 public anno loc StaticVar@at;
 public anno loc Script@at;
 
+@decl{Contains current Namespace/Class/Interace/Trait/Method/Function information.}
+public anno loc ActualParameter@decl;
+public anno loc Const@decl;
+public anno loc ArrayElement@decl;
+public anno loc Name@decl;
+public anno loc NameOrExpr@decl;
+public anno loc CastType@decl;
+public anno loc ClosureUse@decl;
+public anno loc IncludeType@decl;
+public anno loc Expr@decl;
+public anno loc Op@decl;
+public anno loc Param@decl;
+public anno loc Scalar@decl;
+public anno loc Stmt@decl;
+public anno loc Declaration@decl;
+public anno loc Catch@decl;
+public anno loc Case@decl;
+public anno loc ElseIf@decl;
+public anno loc Else@decl;
+public anno loc Use@decl;
+public anno loc ClassItem@decl;
+public anno loc Property@decl;
+public anno loc Modifier@decl;
+public anno loc ClassDef@decl;
+public anno loc InterfaceDef@decl;
+public anno loc StaticVar@decl;
+public anno loc Script@decl;
+
 @doc{Stores unique IDs for the AST nodes.}
 public anno str ActualParameter@id;
 public anno str Const@id;
@@ -234,6 +262,62 @@ public anno str ClassDef@id;
 public anno str InterfaceDef@id;
 public anno str StaticVar@id;
 public anno str Script@id;
+
+@doc{Stores ScopeInfo information for nodes.}
+public anno node ActualParameter@scope;
+public anno node Const@scope;
+public anno node ArrayElement@scope;
+public anno node Name@scope;
+public anno node NameOrExpr@scope;
+public anno node CastType@scope;
+public anno node ClosureUse@scope;
+public anno node IncludeType@scope;
+public anno node Expr@scope;
+public anno node Op@scope;
+public anno node Param@scope;
+public anno node Scalar@scope;
+public anno node Stmt@scope;
+public anno node Declaration@scope;
+public anno node Catch@scope;
+public anno node Case@scope;
+public anno node ElseIf@scope;
+public anno node Else@scope;
+public anno node Use@scope;
+public anno node ClassItem@scope;
+public anno node Property@scope;
+public anno node Modifier@scope;
+public anno node ClassDef@scope;
+public anno node InterfaceDef@scope;
+public anno node StaticVar@scope;
+public anno node Script@scope;
+
+@doc{Stores PHPDoc for the AST nodes.}
+public anno str ActualParameter@phpdoc;
+public anno str Const@phpdoc;
+public anno str ArrayElement@phpdoc;
+public anno str Name@phpdoc;
+public anno str NameOrExpr@phpdoc;
+public anno str CastType@phpdoc;
+public anno str ClosureUse@phpdoc;
+public anno str IncludeType@phpdoc;
+public anno str Expr@phpdoc;
+public anno str Op@phpdoc;
+public anno str Param@phpdoc;
+public anno str Scalar@phpdoc;
+public anno str Stmt@phpdoc;
+public anno str Declaration@phpdoc;
+public anno str Catch@phpdoc;
+public anno str Case@phpdoc;
+public anno str ElseIf@phpdoc;
+public anno str Else@phpdoc;
+public anno str Use@phpdoc;
+public anno str ClassItem@phpdoc;
+public anno str Property@phpdoc;
+public anno str Modifier@phpdoc;
+public anno str ClassDef@phpdoc;
+public anno str InterfaceDef@phpdoc;
+public anno str StaticVar@phpdoc;
+public anno str Script@phpdoc;
 
 @doc{Used to associate the actual compile-time value with magic constants.}
 public anno str Scalar@actualValue;
