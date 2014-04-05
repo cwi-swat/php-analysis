@@ -91,7 +91,7 @@ public M3Collection getM3CollectionForSystem(System system) {
 			case c:class(_,_,_,list[Name] implements,_):
 			{
 				for (name <- [n | name(n) <- implements]) {
-					set[loc] possibleImplements = getPossibleClassesInM3(m3s[l], name);
+					set[loc] possibleImplements = getPossibleInterfacesInM3(m3s[l], name);
 					m3s[l]@implements += {<c@decl, impl> | impl <- possibleImplements};
 				}
 			}	
@@ -146,6 +146,15 @@ public set[loc] getPossibleClassesInM3(M3 m3, str className) {
 			locs += name.qualifiedName;
 				
 	return isEmpty(locs) ? {|php+unknownClass:///| + className} : locs;
+}
+public set[loc] getPossibleInterfacesInM3(M3 m3, str className) {
+	set[loc] locs = {};
+	
+	for (name <- m3@names) 
+		if (name.simpleName == className && isInterface(name.qualifiedName))
+			locs += name.qualifiedName;
+				
+	return isEmpty(locs) ? {|php+unknownInterface:///| + className} : locs;
 }
 
 public set[loc] getPossibleClassesInSystem(M3Collection m3map, str className) {
