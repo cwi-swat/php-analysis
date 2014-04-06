@@ -31,9 +31,19 @@ import Exception;
 //    needed). For the second, this should be done by adding these as
 //    possible assignments coming out of the entry node for the method.
 //
+// UPDATE: This is done for parameters with defaults, but still needs
+//   to be done for class properties.
+//
+// * We currently don't catch cases where gotos jump into a loop or
+//   switch from outside. These are disallowed by PHP, so they don't
+//   correspond to possible (executable) programs, but we should catch
+//   those cases here during CFG construction.
+//
 // * We need edges representing exceptions. We capture explicit throws,
 //   but need to handle exceptions coming from method calls, function
-//   calls, etc.
+//   calls, etc. NOTE: most PHP code uses the old error mechanism,
+//   which doesn't throw exceptions unless explicit error handlers that
+//   convert these to exceptions have been added.
 //
 @doc{Build the CFGs for a single PHP file, given as a location}
 public map[NamePath,CFG] buildCFGs(loc l) {
@@ -108,7 +118,7 @@ public tuple[set[CFGNode] nodes, set[FlowEdge] edges] cleanUpGraph(LabelState ls
 	allSources = { e.from | e <- edges };
 	unusedJoins = { n | n <- lstate.nodes, n is joinNode, n@lab notin allTargets };
 	unusedJoinLabels = { n@lab | n <- unusedJoins };
-	isolatedNodes = { n | n <- lstate.nodes, n@lab notin allTargets, n@lab notin allSources };
+	isolatedNodes = { n | n <- lstate.nodes, /Exit/ !:= getName(n), n@lab notin allTargets, n@lab notin allSources };
 	
 	nodes = (lstate.nodes - unusedJoins) - isolatedNodes; //  - unusedJoins - isolatedNodes;
 	edges = { e | e <- edges, e.from notin unusedJoinLabels };
@@ -177,7 +187,7 @@ public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Label
 	// the nested nodes from inside functions and methods as well. Here, we
 	// discard these.
 	labels = { e.from, e.to | e <- edges };
-	nodes = { n | n <- nodes, n@lab in labels };
+	nodes = { n | n <- nodes, n@lab in labels } + { cfgEntryNode, cfgExitNode };
 	
  	return < cfg([global()], nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
@@ -981,7 +991,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			}
 			edges += { conditionFalseFlowEdge(fc, joinnode, cond) | fc <- final(cond, lstate) };
 			
-			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			for (fl <- (finalLabels+s@lab), fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		} 
 
@@ -1075,7 +1085,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			else
 				edges += flowEdge(joinnode, joinnode);
 				
-			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			for (fl <- (finalLabels+s@lab), fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		}
 
@@ -1137,7 +1147,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				edges += iteratorNotEmptyFlowEdge(testNode@lab, init(asVar), arrayExpr);
 			}
 			
-			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			for (fl <- (finalLabels+s@lab), fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		}
 
@@ -1224,7 +1234,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				edges += { conditionFalseFlowEdge(fe, joinnode, falseConds) | fe <- final(last(falseConds), lstate) };
 			}
 
-			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			for (fl <- (finalLabels+s@lab), fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 		}
 
 		case namespace(OptionName nsName, list[Stmt] body) : {
@@ -1364,7 +1374,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				}
 			}
 			 
-			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			for (fl <- (finalLabels+s@lab), fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		}
 
@@ -1403,7 +1413,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			for (\catch(_, _, cbody) <- catches, size(cbody) > 0)
 				edges += { flowEdge(fl, joinnode) | fl <- final(last(cbody), lstate) };
 				
-			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			for (fl <- (finalLabels+s@lab), fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate.catchHandlers = oldHandlers;
 		}
 
@@ -1446,7 +1456,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				}
 			}
 				
-			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			for (fl <- (finalLabels+s@lab), fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate.catchHandlers = oldHandlers;
 		}
 
@@ -1476,7 +1486,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				edges += { conditionTrueFlowEdge(fe, init(cond), cond) | fe <- final(cond, lstate) };
 			}
 			
-			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			for (fl <- (finalLabels+s@lab), fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 			lstate = popContinueLabel(popBreakLabel(lstate));
 		}
 		
@@ -1776,7 +1786,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 				   { flowEdge(fe, joinnode) | fe <- final(ifBranch, lstate) } +
 				   { flowEdge(fe, joinnode) | fe <- final(elseBranch, lstate) };
 
-			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			for (fl <- (finalLabels+e@lab), fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 		}
 		
 		case ternary(Expr cond, noExpr(), Expr elseBranch) : {
@@ -1791,7 +1801,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 				   { conditionTrueFlowEdge(fe, joinnode, cond) | fe <- final(cond, lstate) } +
 				   { flowEdge(fe, joinnode) | fe <- final(elseBranch, lstate) };
 
-			for (fl <- finalLabels, fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
+			for (fl <- (finalLabels+e@lab), fl notin lstate.joinNodes) lstate.joinNodes[fl] = joinnode;
 		}
 
 		case staticPropertyFetch(expr(Expr className), expr(Expr propertyName)) : {
