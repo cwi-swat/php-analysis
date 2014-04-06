@@ -36,9 +36,12 @@ public CFG createBasicBlocks(CFG g) {
 	
 	// First, identify all the basic block "headers". The headers are either merge points
 	// (the first line), jump targets from split points (the second line), or the entry
-	// node for the function/method/script (last line). 
+	// node for the function/method/script (last line). We also treat all join nodes
+	// as headers, since these tend to be jump targets (this is a judgement call, since
+	// in some cases there is only one incoming edge). 
 	headerNodes = { n | n <- (g.nodes - entryNode), size(backwards[n]) > 1 } + 
 				  { n | n <- (g.nodes - entryNode), size(backwards[n]) == 1, size(forwards[backwards[n]]) > 1 } +
+				  { n | n <- (g.nodes - entryNode), n is joinNode } +
 				  entryNode;
 	
 	// Now, for each header node, add in all the reachable nodes until we find
@@ -96,7 +99,8 @@ public CFG createBasicBlocks(CFG g) {
 		missingNodes = g.nodes - blockNodes;
 		for (n <- missingNodes)
 			println("Missing node for <printNamePath(g.item)>: <printCFGNode(n)>");
-		throw "Error in conversion to basic blocks, expected <size(g.nodes)> nodes but only found <size(blockNodes)> nodes";
+		// NOTE: no longer throwing, this can happen when we have code that isn't actually reachable
+		//throw "Error in conversion to basic blocks, expected <size(g.nodes)> nodes but only found <size(blockNodes)> nodes";
 	}
 		
 	return cfg(g.item, basicBlocks, blockEdges, blockEntryNode(), blockExitNode());
