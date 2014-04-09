@@ -46,12 +46,12 @@ import Exception;
 //   convert these to exceptions have been added.
 //
 @doc{Build the CFGs for a single PHP file, given as a location}
-public map[NamePath,CFG] buildCFGs(loc l) {
-	return buildCFGs(loadPHPFile(l));
+public map[NamePath,CFG] buildCFGs(loc l, bool buildBasicBlocks=true) {
+	return buildCFGs(loadPHPFile(l), buildBasicBlocks=buildBasicBlocks);
 }
 
 @doc{Build the CFGs for a PHP script, returning both the CFGs and the labeled script.}
-public tuple[Script scr, map[NamePath,CFG] cfgs] buildCFGsAndScript(Script scr) {
+public tuple[Script scr, map[NamePath,CFG] cfgs] buildCFGsAndScript(Script scr, bool buildBasicBlocks=true) {
 	lstate = newLabelState();
 	< scrLabeled, lstate > = labelScript(scr, lstate);
 	
@@ -75,11 +75,15 @@ public tuple[Script scr, map[NamePath,CFG] cfgs] buildCFGsAndScript(Script scr) 
 		res[functionNamePath] = functionCFG;
 	}
 	 
+	if (buildBasicBlocks) {
+		res = ( np : createBasicBlocks(res[np]) | np <- res );
+	}
+	 
 	return < scrLabeled, res >;
 }
 
 @doc{Build just the CFGs for a PHP script}
-public map[NamePath,CFG] buildCFGs(Script scr) = buildCFGsAndScript(scr).cfgs;
+public map[NamePath,CFG] buildCFGs(Script scr, bool buildBasicBlocks=true) = buildCFGsAndScript(scr, buildBasicBlocks=buildBasicBlocks).cfgs;
 
 @doc{Strip the label annotations off of the nodes in the script.}
 public Script stripLabels(Script scr) {
@@ -88,18 +92,6 @@ public Script stripLabels(Script scr) {
 		case Expr e => delAnnotation(e, labAnno) when (e@lab)?
 		case Stmt s => delAnnotation(s, labAnno) when (s@lab)?
 	}
-}
-
-@doc{This is similar to buildCFGs, but also collapses nodes into basic blocks. Note: we may start doing this by default.}
-public map[NamePath,CFG] buildCFGsAndBlocks(loc l) {
-	return buildCFGsAndBlocks(loadPHPFile(l));
-}
-
-@doc{This is similar to buildCFGs, but also collapses nodes into basic blocks. Note: we may start doing this by default.}
-public map[NamePath,CFG] buildCFGsAndBlocks(Script scr) {
-	map[NamePath,CFG] res = buildCFGs(scr);
-	for (np <- res) res[np] = createBasicBlocks(res[np]);
-	return res;
 }
 
 @doc{Retrieve all method declarations from a script.}
