@@ -29,6 +29,7 @@ public str printCFGNode(basicBlock(list[CFGNode] nodes))
 
 public CFG createBasicBlocks(CFG g) {
 	entryNode = getEntryNode(g);
+	exitNode = getExitNode(g);
 	forwards = cfgAsGraph(g);
 	backwards = invert(forwards);
 	basicBlocks = { };
@@ -42,8 +43,8 @@ public CFG createBasicBlocks(CFG g) {
 	headerNodes = { n | n <- (g.nodes - entryNode), size(backwards[n]) > 1 } + 
 				  { n | n <- (g.nodes - entryNode), size(backwards[n]) == 1, size(forwards[backwards[n]]) > 1 } +
 				  { n | n <- (g.nodes - entryNode), n is joinNode } +
-				  { getExitNode(g) } +
 				  forwards[entryNode] +
+				  exitNode +
 				  entryNode;
 	
 	// Now, for each header node, add in all the reachable nodes until we find
