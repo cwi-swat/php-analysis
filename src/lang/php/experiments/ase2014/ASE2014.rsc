@@ -106,6 +106,22 @@ public map[int hits, int includes] computeQuickResolveCounts(str p, str v) {
 	return res;
 }
 
+public map[tuple[str p, str v] s, map[int hits, int includes] res] computeQuickResolveCounts(Corpus corpus) {
+	map[tuple[str p, str v] s, map[int hits, int includes] res] res = ( );
+	for (p <- corpus, v := corpus[p]) {
+		res[<p,v>] = computeQuickResolveCounts(p,v);
+	}
+	return res;
+}
+
+public void saveQuickResolveCounts(map[tuple[str p, str v] s, map[int hits, int includes] res] counts) {
+	writeBinaryValueFile(infoLoc + "qr-summary.bin", counts);
+}
+
+public map[tuple[str p, str v] s, map[int hits, int includes] res] loadQuickResolveCounts() {
+	return readBinaryValueFile(#map[tuple[str p, str v] s, map[int hits, int includes] res], infoLoc + "qr-summary.bin");
+}
+ 
 @doc{The location of the corpus extension, change to your location!}
 private loc includesSystemsLoc = |home:///PHPAnalysis/includesSystems|;
 
