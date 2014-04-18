@@ -9,10 +9,23 @@ import lang::php::stats::Stats;
 import lang::php::analysis::includes::IncludeGraph;
 import lang::php::analysis::includes::IncludesInfo;
 import lang::php::analysis::includes::QuickResolve;
+import  lang::php::analysis::includes::LibraryIncludes;
 import IO;
 import Set;
+import List;
+import String;
 import ValueIO;
 import DateTime;
+import util::Math;
+
+private map[str,set[str]] extensions = (
+	//"Symfony" : { "php", "inc", "cache", "map", "phar", "dist" }
+	);
+
+private set[str] getExtensions(str p) {
+	if (p in extensions) return extensions[p];
+	return { "php", "inc" };
+}
 
 @doc{The base corpus used in the ASE 2014 submission.}
 private Corpus ase14BaseCorpus = (
@@ -36,6 +49,19 @@ private Corpus ase14BaseCorpus = (
 	"CakePHP":"2.4.4",
 	"DoctrineORM":"2.3.3",
 	"Magento":"1.8.1.0");
+
+private map[str,set[loc]] usedLibs = (
+	"MediaWiki" : getStandardLibraries("PearMail", "PearMailMime", "PHPUnit"),
+	"CakePHP" : getStandardLibraries("PHPUnit"),
+	"SilverStripe" : getStandardLibraries("PHPUnit", "Benchmark", "CodeCoverage"),
+	"Joomla" : getStandardLibraries("PearCache", "PearCacheLite"),
+	"SquirrelMail" : getStandardLibraries("PearDB"),
+	"Kohana" : getStandardLibraries("PHPUnit"),
+	"phpMyAdmin" : getStandardLibraries("PearSOAP", "PearOpenID", "PearCrypt"),
+	"PEAR" : getStandardLibraries("PearArchiveTar", "PearBase", "PearStructuresGraph", "PearConsoleGetopt", "PearXMLUtil", "PearCommandPackaging"),
+	"Magento" : getStandardLibraries("PearBase","PearPackageFileManager","PearPackageFileManager2", "PearNetDIME", "PearXMLUtil"),
+	"ZendFramework" : getStandardLibraries("PHPUnit", "PHPUnitDB", "PHPUnitException" )
+);
 
 @doc{Library paths for the various applications, based on the installation instructions}
 private map[str,list[str]] defaultIncludePaths = (
@@ -63,6 +89,13 @@ private map[str,list[str]] defaultIncludePaths = (
 @doc{The location of serialized quick resolve information}
 private loc infoLoc = baseLoc + "serialized/quickResolved";
 
+@doc{Build the corpus files.}
+public void buildCorpus(Corpus corpus) {
+	for (p <- corpus, v := corpus[p]) {
+		buildBinaries(p,v,extensions=getExtensions(p));
+	}
+}
+
 @doc{Run the quick resolve over the entire base corpus}
 public void doQuickResolve() {
 	doQuickResolve(getBaseCorpus());
@@ -76,7 +109,7 @@ public void doQuickResolve(Corpus corpus) {
 		rel[loc,loc,loc] res = { };
 		for (l <- pt) {
 			println("Resolving for <l>");
-			qr = quickResolve(pt, iinfo, l, getCorpusItem(p,v));
+			qr = quickResolve(pt, iinfo, l, getCorpusItem(p,v) libs = (p in usedLibs) ? usedLibs[p] : { });
 			res = res + { < l, ll, lr > | < ll, lr > <- qr };
 		}
 		writeBinaryValueFile(infoLoc + "<p>-<v>-qr.bin", res);
@@ -121,7 +154,49 @@ public void saveQuickResolveCounts(map[tuple[str p, str v] s, map[int hits, int 
 public map[tuple[str p, str v] s, map[int hits, int includes] res] loadQuickResolveCounts() {
 	return readBinaryValueFile(#map[tuple[str p, str v] s, map[int hits, int includes] res], infoLoc + "qr-summary.bin");
 }
- 
+
+public str createQuickResolveCountsTable() {
+	counts = loadQuickResolveCounts();
+	corpus = getBaseCorpus();
+	
+	str headerLine() {
+		return "System & Includes & Unique & Missing & Any & Average \\\\ \\midrule";
+	}
+	
+	str productLine(str p, str v) {
+		map[int hits, int includes] m = counts[<p,v>];
+		total = ( 0 | it + m[h] | h <- m<0> );
+		pt = loadBinary(p,v);
+		dyn = size([ i | /i:include(ip,_) := pt, scalar(sv) := ip, encapsed(_) !:= sv ]);
+		unique = (1 in m) ? m[1] : 0;
+		missing = (0 in m) ? m[0] : 0;
+		files = size(pt<0>);
+		threshold = floor(files * 0.9);
+		anyinc = ( 0 | it + m[h] | h <- m<0>, h >= threshold );
+		denom = ( 0 | it + m[h] | h <- m<0>, h > 1, h < threshold );
+		avg = (denom == 0) ? 0 : ( ( 0 | it + (m[h] * h) | h <- m<0>, h > 1, h < threshold ) * 1.000 / denom);
+							
+		return "<p> & \\numprint{<total>} & \\numprint{<unique>} & \\numprint{<missing>} & \\numprint{<anyinc>} & \\nprounddigits{2} \\numprint{<avg>} \\npnoround \\\\";
+	}
+
+	res = "\\npaddmissingzero
+		  '\\npfourdigitsep
+		  '\\begin{table}
+		  '\\centering
+		  '\\ra{1.0}
+		  '\\resizebox{\\columnwidth}{!}{%
+		  '\\begin{tabular}{@{}lrrrrr@{}} \\toprule 
+		  '<headerLine()> <for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
+		  '  <productLine(p,corpus[p])> <}>
+		  '\\bottomrule
+		  '\\end{tabular}
+		  '}
+		  '\\caption{File-Level Resolution.\\label{table-quick}}
+		  '\\end{table}
+		  '";
+	return res;
+}
+
 @doc{The location of the corpus extension, change to your location!}
 private loc includesSystemsLoc = |home:///PHPAnalysis/includesSystems|;
 
