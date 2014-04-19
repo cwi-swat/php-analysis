@@ -26,6 +26,7 @@ import String;
 import Map;
 import Node;
 import List;
+import Traversal;
 
 import util::FileSystem;
 import demo::common::Crawl;
@@ -36,13 +37,15 @@ anno rel[loc from, loc to] M3@extends;      // classes extending classes and int
 anno rel[loc from, loc to] M3@implements;   // classes implementing interfaces
 anno rel[loc pos, str phpDoc] M3@phpDoc;    // Multiline php comments /** ... */
 
+public loc globalNamespace = |php+namespace:///|;
+
 public M3 composePhpM3(loc id, set[M3] models) {
   m = composeM3(id, models);
   
-  m@extends = {*model@extends | model <- models};
-  m@implements = {*model@implements | model <- models};
-  m@annotations = {*model@annotations | model <- models};
-  m@phpDoc = {*model@phpDoc | model <- models};
+  m@extends 	= {*model@extends 		| model <- models};
+  m@implements 	= {*model@implements 	| model <- models};
+  m@annotations = {*model@annotations 	| model <- models};
+  m@phpDoc 		= {*model@phpDoc 		| model <- models};
   
   return m;
 }
@@ -56,12 +59,10 @@ public anno node node@scope;
 @doc{
 Synopsis: globs for jars, class files and java files in a directory and tries to compile all source files into an [$analysis/m3] model
 }
-public M3Collection createM3sFromDirectory(loc project) {
-    if (!(isDirectory(project)))
-      throw "<project> is not a valid directory";
+public M3Collection createM3sFromDirectory(loc l) {
+	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
     
-    System system = loadPHPFiles(project);
-    
+    System system = loadPHPFiles(l);
     return getM3CollectionForSystem(system);
 }
 
@@ -71,13 +72,24 @@ public M3Collection getM3CollectionForSystem(System system) {
 	// fill declarations
 	for (l <- system) {
 		visit (system[l]) {
-			case node n:
+			case node n: {
 				if ( (n@at)? && (n@decl)? ) {
 					m3s[l]@declarations += {<n@decl, n@at>};
 					m3s[l]@names += {<n@decl.file, n@decl>};
 				}
+			}
+	   	}
+	   	// if there are no namespaces, add global namespace
+	   	if (isEmpty({ ns | <ns,_> <- m3s[l]@declarations, isNamespace(ns) })) {
+			m3s[l]@declarations += {<globalNamespace, l>};
 	   	}
 	}	
+	
+	// fill containtment with declarations
+	for (l <- system) {
+		m3s[l] = fillContainment(m3s[l], system[l]);
+	}	
+	
 	
 	// fill extends and implements, by trying to look up class names
 	for (l <- system) {
@@ -117,13 +129,169 @@ public M3Collection getM3CollectionForSystem(System system) {
 		}	
 	}
 
-	// fill usage
+	// fill containment, for now only for compilationMethod, Class/Interface/Trait, Method, field
 	for (l <- system) {
 		visit (system[l]) {
-			case elm:var(name(name(name))): m3s[l]@uses += {<elm@at, decl> | decl <- findVarInM3UsingScopeInfo(m3s[l], name, elm)};
+			case _: ;
+		}
+	}
+
+	// fill uses, first for class instantiations
+	// also fill types relation
+	for (l <- system) {
+		visit (system[l]) {
+			/* new(NameOrExpr className, list[ActualParameter] parameters) */
+			case n:new(c:expr(className), params): {
+				println("Warning: dynamic class instantiation is not supported");
+				m3s[l]@uses += {<n@at, emptyId>};
+			}
+			case n:new(name(c:name(className)), params): {
+				set[loc] classDecls = findClassDeclaration(m3s[l], className);
+				m3s[l]@uses += {<c@at, decl> | decl <- classDecls};
+				// fill types
+			}
+		}
+	}
+
+	// fill uses, now for other elements	
+	for (l <- system) {
+		visit (system[l]) {
+			/* example: $target->name; || $target->$expr; */
+			case propertyFetch(target, property): {
+				m3s[l]@uses += {<property@at, decl> | decl <- {}};
+				//m3s[l]@uses += {<property@at, decl> | decl <- findClassPoperty(m3s[l], target, property)};
+			} 
 		}
 	}   	
 	return m3s;
+}
+
+public M3 addUsageForNode(M3 m3, Expr elm) {
+	set decl = "";
+	m3@uses += {<elm@at, decl> | decl <- decls};
+
+}
+
+@doc { recursively fill containment }
+public M3 fillContainment(M3 m3, Script script) {
+	// use this to test one m3
+	if (m3.id != |file:///Users/ruud/test/containment.php| &&
+		m3.id != |file:///Users/ruud/test/containment2.php|) {
+		iprintln("<m3.id> skipped");
+		return m3;
+	}
+	loc currNs = globalNamespace;
+	top-down-break visit (script.body) {
+		case Stmt stmt: m3 = fillContainment(m3, stmt, currNs);
+	}
+	// this commented line kills the script
+   	//return m3;
+}
+
+public M3 fillContainment(M3 m3, Stmt statement, loc currNs) {
+	top-down-break visit (statement) {
+		case ns:namespace(_,body): {
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, ns@decl);
+		}
+		case ns:namespaceHeader(_): {
+			// set the current namespace to this one.
+			currNs = ns@decl;
+			fail; // continue the visit
+		}
+		case c:class(_,_,_,_,body): {
+			println("<currNs> \> <c@decl>");
+			m3@containment += { <currNs, c@decl> };
+			
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, c@decl, currNs);
+		}
+		case i:interface(_,_,body): {
+			println("<currNs> \> <i@decl>");
+			m3@containment += { <currNs, i@decl> };
+			
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, i@decl, currNs);
+		}
+		case t:trait(_,body): {
+			println("<currNs> \> <t@decl>");
+			m3@containment += { <currNs, t@decl> };
+			
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, t@decl, currNs);
+		}
+		case f:function(_,_,params,body): { 
+			println("<currNs> \> <f@decl>");
+			m3@containment += { <currNs, f@decl> };
+			
+			for (p <- params)
+				m3@containment += { <f@decl, p@decl> };
+				
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, currNs);
+		}
+		case e:exprstmt(expr): {
+			// variables are not handled correctly yet.
+			loc ref = (statement@decl)? ? statement@decl : currNs;
+			m3 = fillContainment(m3, expr, ref, currNs);
+		}
+	}
+	return m3;
+}
+
+public M3 fillContainment(M3 m3, ClassItem c, loc declRef, loc currNs) {
+	top-down-break visit (c) {
+		case property(_,ps): {
+			for (p <- ps) {	
+				println("<declRef> \> <p@decl>");
+				m3@containment += { <declRef, p@decl> };
+			}
+		}
+		case constCI(cs): {
+			for (c_ <- cs) {
+				println("<declRef> \> <c_@decl>");
+				m3@containment += { <declRef, c_@decl> };
+			}
+		}
+		case m:method(_,_,_,params,body): {
+			println("<declRef> \> <m@decl>");
+			m3@containment += { <declRef, m@decl> };
+			
+			for (p <- params)
+				m3@containment += { <m@decl, p@decl> };
+				
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, currNs);
+		}
+	}
+	return m3;
+}
+
+public M3 fillContainment(M3 m3, Expr e, loc declRef, loc currNs) {
+	top-down-break visit (e) {
+		case v:var(_): {
+			println("<declRef> \> <v@decl>");
+			m3@containment += { <declRef, v@decl> };
+		}
+	}
+	
+	return m3;
+}
+
+@doc {	search in declarations for classNames }
+public set[loc] findClassDeclaration(M3 m3, str className) {
+	// todo check name space
+	set[loc] decls = { decl | <name,decl> <- m3@names, name == className, isClass(decl)};
+	if (isEmpty(decls)) {
+		decls += |php+unresolvedClass:///-/| + className;
+	}
+	return decls;
+}
+public loc findClassPoperty(M3 m3, target, property) {
+	// resolve the class type of target
+	// resolve the property declaration	
+	// todo: this is a simple implementation which only handles $var->prop;
+	
 }
 
 public set[loc] findVarInM3UsingScopeInfo(M3 m3, str name, Expr elm) {
