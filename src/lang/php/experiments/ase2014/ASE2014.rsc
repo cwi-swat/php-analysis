@@ -60,7 +60,8 @@ private map[str,set[loc]] usedLibs = (
 	"phpMyAdmin" : getStandardLibraries("PearSOAP", "PearOpenID", "PearCrypt"),
 	"PEAR" : getStandardLibraries("PearArchiveTar", "PearBase", "PearStructuresGraph", "PearConsoleGetopt", "PearXMLUtil", "PearCommandPackaging"),
 	"Magento" : getStandardLibraries("PearBase","PearPackageFileManager","PearPackageFileManager2", "PearNetDIME", "PearXMLUtil"),
-	"ZendFramework" : getStandardLibraries("PHPUnit", "PHPUnitDB", "PHPUnitException" )
+	"ZendFramework" : getStandardLibraries("PHPUnit", "PHPUnitDB", "PHPUnitException" ),
+	"Moodle" : getStandardLibraries("PEARBase", "PHPUnit")
 );
 
 @doc{Library paths for the various applications, based on the installation instructions}
