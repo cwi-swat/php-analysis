@@ -9,7 +9,7 @@ import lang::php::stats::Stats;
 import lang::php::analysis::includes::IncludeGraph;
 import lang::php::analysis::includes::IncludesInfo;
 import lang::php::analysis::includes::QuickResolve;
-import  lang::php::analysis::includes::LibraryIncludes;
+import lang::php::analysis::includes::LibraryIncludes;
 import IO;
 import Set;
 import List;
@@ -108,10 +108,15 @@ public void doQuickResolve(Corpus corpus) {
 		pt = loadBinary(p,v);
 		IncludesInfo iinfo = loadIncludesInfo(p, v);
 		rel[loc,loc,loc] res = { };
+		println("Resolving for <size(pt<0>)> files");
+		counter = 0;
 		for (l <- pt) {
-			println("Resolving for <l>");
 			qr = quickResolve(pt, iinfo, l, getCorpusItem(p,v) libs = (p in usedLibs) ? usedLibs[p] : { });
 			res = res + { < l, ll, lr > | < ll, lr > <- qr };
+			counter += 1;
+			if (counter % 100 == 0) {
+				println("Resolved <counter> files");
+			}
 		}
 		writeBinaryValueFile(infoLoc + "<p>-<v>-qr.bin", res);
 	}
