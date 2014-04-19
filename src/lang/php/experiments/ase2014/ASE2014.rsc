@@ -61,7 +61,7 @@ private map[str,set[loc]] usedLibs = (
 	"PEAR" : getStandardLibraries("PearArchiveTar", "PearBase", "PearStructuresGraph", "PearConsoleGetopt", "PearXMLUtil", "PearCommandPackaging"),
 	"Magento" : getStandardLibraries("PearBase","PearPackageFileManager","PearPackageFileManager2", "PearNetDIME", "PearXMLUtil"),
 	"ZendFramework" : getStandardLibraries("PHPUnit", "PHPUnitDB", "PHPUnitException" ),
-	"Moodle" : getStandardLibraries("PEARBase", "PHPUnit", "PHPUnitDB")
+	"Moodle" : getStandardLibraries("PearBase", "PHPUnit", "PHPUnitDB")
 );
 
 @doc{Library paths for the various applications, based on the installation instructions}
@@ -166,23 +166,24 @@ public str createQuickResolveCountsTable() {
 	corpus = getBaseCorpus();
 	
 	str headerLine() {
-		return "System & Includes & Unique & Missing & Any & Average \\\\ \\midrule";
+		return "System & Includes & Dynamic & Unique & Missing & Any & Other & Average \\\\ \\midrule";
 	}
 	
 	str productLine(str p, str v) {
 		map[int hits, int includes] m = counts[<p,v>];
 		total = ( 0 | it + m[h] | h <- m<0> );
 		pt = loadBinary(p,v);
-		dyn = size([ i | /i:include(ip,_) := pt, scalar(sv) := ip, encapsed(_) !:= sv ]);
+		dyn = total - size([ i | /i:include(ip,_) := pt, scalar(sv) := ip, encapsed(_) !:= sv ]);
 		unique = (1 in m) ? m[1] : 0;
 		missing = (0 in m) ? m[0] : 0;
 		files = size(pt<0>);
 		threshold = floor(files * 0.9);
 		anyinc = ( 0 | it + m[h] | h <- m<0>, h >= threshold );
+		other = total - unique - anyinc;
 		denom = ( 0 | it + m[h] | h <- m<0>, h > 1, h < threshold );
 		avg = (denom == 0) ? 0 : ( ( 0 | it + (m[h] * h) | h <- m<0>, h > 1, h < threshold ) * 1.000 / denom);
 							
-		return "<p> & \\numprint{<total>} & \\numprint{<unique>} & \\numprint{<missing>} & \\numprint{<anyinc>} & \\nprounddigits{2} \\numprint{<avg>} \\npnoround \\\\";
+		return "<p> & \\numprint{<total>} & \\numprint{<dyn>} & \\numprint{<unique>} & \\numprint{<missing>} & \\numprint{<anyinc>} & \\numprint{<other>} & \\nprounddigits{2} \\numprint{<avg>} \\npnoround \\\\";
 	}
 
 	res = "\\npaddmissingzero
@@ -191,7 +192,7 @@ public str createQuickResolveCountsTable() {
 		  '\\centering
 		  '\\ra{1.0}
 		  '\\resizebox{\\columnwidth}{!}{%
-		  '\\begin{tabular}{@{}lrrrrr@{}} \\toprule 
+		  '\\begin{tabular}{@{}lrrrrrrr@{}} \\toprule 
 		  '<headerLine()> <for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '  <productLine(p,corpus[p])> <}>
 		  '\\bottomrule
