@@ -20,6 +20,6 @@ public loc countsDir = baseLoc + "serialized/counts";
 public bool useBinaries = false;
 
 // parse options
-public bool includePhpDocs = true;
-public bool includeLocationInfo = true;
-public bool resolveNamespaces = true;
+public bool includePhpDocs = false;
+public bool includeLocationInfo = false;
+public bool resolveNamespaces = false;

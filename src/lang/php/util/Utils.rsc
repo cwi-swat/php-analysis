@@ -64,9 +64,11 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	if (l.scheme notin {"file","home"}) return errscript("Only file and home locations are supported");
 	if (!isFile(l)) return errscript("Location <l> must be a file");
 
+	logMessage("Loading file <l>", 2);
+	
 	list[str] opts = [ ];
 	if (addLocationAnnotations) opts += "-l";
-	if (addLocationAnnotations) opts += "--addDecl";
+	if (includeLocationInfo) opts += "--addDecl";
 	if (addUniqueIds) opts += "-i";
 	if (l.scheme == "home") opts += "-r";
 	if (includePhpDocs) opts += "--phpdocs";
@@ -88,12 +90,7 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 }
 
 @doc{Load all PHP files at a given directory location, with options for location annotations and unique node ids.}
-public System loadPHPFiles(loc l, bool addLocationAnnotations = true, bool addUniqueIds = false) throws AssertionFailed {
-	return loadPHPFiles(l, {"php", "inc"}, loadPHPFile, addLocationAnnotations, addUniqueIds);
-}
-
-@doc{Load all PHP files at a given directory location, with options for which extensions are PHP files, location annotations and unique node ids.}
-public System loadPHPFiles(loc l, set[str] extensions, bool addLocationAnnotations = true, bool addUniqueIds = false) throws AssertionFailed {
+public System loadPHPFiles(loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) throws AssertionFailed {
 	return loadPHPFiles(l, extensions, loadPHPFile, addLocationAnnotations, addUniqueIds);
 }
 
@@ -112,7 +109,6 @@ private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) lo
 
 	if ((l.scheme == "file" || l.scheme == "home") && !exists(l)) throw AssertionFailed("Location <l> does not exist");
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
-
 
 	// regex filter exlucdes test/	
 	list[loc] entries = [ l + e | e <- listEntries(l)];
@@ -144,17 +140,29 @@ public System loadProduct(str product, str version, bool addLocationAnnotations 
 }
 
 @doc{Build the serialized ASTs for a specific system at a specific location}
-public void buildBinaries(str product, str version, loc l, bool addLocationAnnotations, bool addUniqueIds) {
+public void buildBinaries(str product, str version, loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) {
 	logMessage("Parsing <product>-<version>. \>\> Location: <l>.", 1);
-	files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds);
+	files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 	
 	loc binLoc = parsedDir + "<product>-<version>.pt";
 	writeBinaryValueFile(binLoc, files);
 }
 
 @doc{Build the serialized ASTs for a specific system at the default location}
-public void buildBinaries(str product, str version, bool addLocationAnnotations = true, bool addUniqueIds = false) {
-	buildBinaries(product, version, getCorpusItem(product,version), addLocationAnnotations, addUniqueIds);
+public void buildBinaries(str product, str version, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) {
+	buildBinaries(product, version, getCorpusItem(product,version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+}
+
+@doc{Build the serialized ASTs for all versions of a specific product (e.g., WordPress)}
+public void buildBinaries(str product, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) {
+	for (version <- getVersions(product))
+		buildBinaries(product, version, getCorpusItem(product, version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+}
+
+@doc{Build the serialized ASTs for all product/version combos in the corpus}
+public void buildBinaries(bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) {
+	for (product <- getProducts(), version <- getVersions(product))
+		buildBinaries(product, version, getCorpusItem(product,version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 }
 
 @doc{Build the serialized ASTs for a specific system if they have not been built already}
@@ -166,22 +174,10 @@ public void buildMissingBinaries(str product, str version, bool addLocationAnnot
 	}
 }
 
-@doc{Build the serialized ASTs for all versions of a specific product (e.g., WordPress)}
-public void buildBinaries(str product, bool addLocationAnnotations = true, bool addUniqueIds = false) {
-	for (version <- getVersions(product))
-		buildBinaries(product, version, getCorpusItem(product, version), addLocationAnnotations, addUniqueIds);
-}
-
 @doc{Build the serialized ASTs for all versions of a specific product (e.g., WordPress) where these serialized ASTs are missing}
 public void buildMissingBinaries(str product, bool addLocationAnnotations = true, bool addUniqueIds = false) {
 	for (version <- getVersions(product))
 		buildMissingBinaries(product, version, getCorpusItem(product, version), addLocationAnnotations, addUniqueIds);
-}
-
-@doc{Build the serialized ASTs for all product/version combos in the corpus}
-public void buildBinaries(bool addLocationAnnotations = true, bool addUniqueIds = false) {
-	for (product <- getProducts(), version <- getVersions(product))
-		buildBinaries(product, version, getCorpusItem(product,version), addLocationAnnotations, addUniqueIds);
 }
 
 @doc{Build the serialized ASTs for all product/version combos in the corpus where these serialized ASTs are missing }
@@ -345,7 +341,7 @@ public rel[str Product,str PlainText,str Description] loadProductInfoCSV() {
 	Log level 1 => main logging;
 	Log level 2 => debug logging;
 }
-private int logLevel = 2;
+private int logLevel = 0;
 
 @doc { }
 public void logMessage(str message, int level) {

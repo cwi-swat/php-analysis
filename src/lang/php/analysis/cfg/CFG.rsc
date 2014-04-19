@@ -78,7 +78,7 @@ public bool isEntryNode(CFGNode n) = (n is functionEntry) || (n is methodEntry) 
 
 @doc{Get the unique entry node for the CFG.}
 public CFGNode getEntryNode(CFG g) {
-	if (g has entryNode) g.entryNode;
+	if (g has entryNode) return g.entryNode;
 	entryNodes = { n | n <- g.nodes, isEntryNode(n) };
 	if (size(entryNodes) == 1)
 		return getOneFrom(entryNodes);
@@ -90,7 +90,7 @@ public bool isExitNode(CFGNode n) = (n is functionExit) || (n is methodExit) || 
 
 @doc{Get the unique exit node for the CFG.}
 public CFGNode getExitNode(CFG g) {
-	if (g has exitNode) g.exitNode;
+	if (g has exitNode) return g.exitNode;
 	exitNodes = { n | n <- g.nodes, isExitNode(n) };
 	if (size(exitNodes) == 1)
 		return getOneFrom(exitNodes);

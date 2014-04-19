@@ -70,8 +70,12 @@ private str fnMatch(Expr e) {
 	if (lastFnBit != -1) res = res[lastFnBit..];
 	
 	solve(res) {
+		while([lit(".."),lit("/"),a*] := res) res = [*a];
+		while([lit("."),lit("/"),a*] := res) res = [*a];
 		while([lit(".."),a*] := res) res = [*a];
 		while([lit("."), a*] := res) res = [*a];
+		while([a*,lit("/"),lit("/"),b*] := res)
+			res = [*a,lit("/"),*b];
 		while([a*,lit("/"),lit(c),lit("/"),lit("."),lit("/"),d*] := res)
 			res = [*a,lit("/"),lit(c),lit("/"),*d];
 		while([a*,lit("/"),lit(c),lit("/"),lit(".."),lit("/"),d*] := res)
@@ -118,12 +122,12 @@ public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphE
 }
 
 // TODO: Along with the system, we should also include known libraries here
-public set[loc] matchIncludes(System sys, Expr includeExpr, loc baseLoc) {
+public set[loc] matchIncludes(System sys, Expr includeExpr, loc baseLoc, set[loc] libs = { }) {
 	// Create the regular expression representing the include expression
 	str re = "^\\S*" + fnMatch(includeExpr.expr) + "$";
 
 	// Filter the includes to just return those that match the regular expression
-	set[loc] filteredIncludes = { l | l <- sys<0>, rexpMatch(l.path,re) };
+	set[loc] filteredIncludes = { l | l <- (sys<0> + libs), rexpMatch(l.path,re) }; 
 
 	// Just return the result of applying the regexp match, we may want to do
 	// some caching, etc here in the future	
