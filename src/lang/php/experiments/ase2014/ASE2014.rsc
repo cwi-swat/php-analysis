@@ -61,7 +61,7 @@ private map[str,set[loc]] usedLibs = (
 	"PEAR" : getStandardLibraries("PearArchiveTar", "PearBase", "PearStructuresGraph", "PearConsoleGetopt", "PearXMLUtil", "PearCommandPackaging"),
 	"Magento" : getStandardLibraries("PearBase","PearPackageFileManager","PearPackageFileManager2", "PearNetDIME", "PearXMLUtil"),
 	"ZendFramework" : getStandardLibraries("PHPUnit", "PHPUnitDB", "PHPUnitException" ),
-	"Moodle" : getStandardLibraries("PEARBase", "PHPUnit")
+	"Moodle" : getStandardLibraries("PEARBase", "PHPUnit", "PHPUnitDB")
 );
 
 @doc{Library paths for the various applications, based on the installation instructions}
