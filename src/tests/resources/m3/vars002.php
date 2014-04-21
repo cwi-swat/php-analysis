@@ -33,3 +33,7 @@ $global9 *= $var;
 $global10 += $var;
 $global11 <<= "globalScope";
 $global12 >>= 1;
+$global13++;
+$global14--;
+++$global15;
+--$global16;

@@ -198,28 +198,24 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 			fail; // continue the visit
 		}
 		case c:class(_,_,_,_,body): {
-			//println("<currNs> \> <c@decl>");
 			m3@containment += { <currNs, c@decl> };
 			
 			for (stmt <- body)
 				m3 = fillContainment(m3, stmt, c, currNs);
 		}
 		case i:interface(_,_,body): {
-			//println("<currNs> \> <i@decl>");
 			m3@containment += { <currNs, i@decl> };
 			
 			for (stmt <- body)
 				m3 = fillContainment(m3, stmt, i, currNs);
 		}
 		case t:trait(_,body): {
-			//println("<currNs> \> <t@decl>");
 			m3@containment += { <currNs, t@decl> };
 			
 			for (stmt <- body)
 				m3 = fillContainment(m3, stmt, t, currNs);
 		}
 		case f:function(_,_,params,body): { 
-			//println("<currNs> \> <f@decl>");
 			m3@containment += { <currNs, f@decl> };
 			
 			for (p <- params)
@@ -240,18 +236,15 @@ public M3 fillContainment(M3 m3, ClassItem c, node parent, loc currNs) {
 	top-down-break visit (c) {
 		case property(_,ps): {
 			for (p <- ps) {	
-				//println("<declRef> \> <p@decl>");
 				m3@containment += { <parent@decl, p@decl> };
 			}
 		}
 		case constCI(cs): {
 			for (c_ <- cs) {
-				//println("<declRef> \> <c_@decl>");
 				m3@containment += { <parent@decl, c_@decl> };
 			}
 		}
 		case m:method(_,_,_,params,body): {
-			//println("<declRef> \> <m@decl>");
 			m3@containment += { <parent@decl, m@decl> };
 			
 			for (p <- params)
@@ -268,7 +261,6 @@ public M3 fillContainment(M3 m3, Expr e, node parent, loc currNs) {
 	top-down visit (e) {
 		case v:var(_): {
 			if ( (v@decl)? ) {
-				//println("<declRef> \> <v@decl>");
 				if ( (parent@decl)? ) {
 					m3@containment += { <parent@decl, v@decl> };
 				} else {
@@ -279,10 +271,6 @@ public M3 fillContainment(M3 m3, Expr e, node parent, loc currNs) {
 	}
 	
 	return m3;
-}
-
-public loc getParentDeclarationForVariable(Expr e) {
-
 }
 
 @doc {	search in declarations for classNames }
