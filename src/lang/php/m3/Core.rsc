@@ -26,7 +26,6 @@ import String;
 import Map;
 import Node;
 import List;
-import Traversal;
 
 import util::FileSystem;
 import demo::common::Crawl;
