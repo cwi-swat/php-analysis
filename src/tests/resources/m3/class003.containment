@@ -1,0 +1,34 @@
+{
+	<|php+namespace:///A|,      |php+class:///A/C|>,
+	<|php+namespace:///A::B|,   |php+class:///A::B/C|>,
+
+	<|php+class:///A/C|, 		|php+constant:///A/C/c|>,
+	<|php+class:///A/C|, 		|php+field:///A/C/pub|>,
+	<|php+class:///A/C|, 		|php+field:///A/C/priv|>,
+	<|php+class:///A/C|, 		|php+field:///A/C/pro|>,
+	<|php+class:///A/C|, 		|php+method:///A/C/pubFunc|>,
+	<|php+class:///A/C|, 		|php+method:///A/C/privFunc|>,
+	<|php+class:///A/C|, 		|php+method:///A/C/proFunc|>,
+
+	<|php+method:///A/C/pubFunc|,   |php+parameter:///A/C/pubFunc/param1|>,
+	<|php+method:///A/C/pubFunc|,   |php+parameter:///A/C/pubFunc/param2|>,
+	<|php+method:///A/C/privFunc|,  |php+parameter:///A/C/privFunc/param1|>,
+	<|php+method:///A/C/privFunc|,  |php+parameter:///A/C/privFunc/param2|>,
+	<|php+method:///A/C/proFunc|,   |php+parameter:///A/C/proFunc/param1|>,
+	<|php+method:///A/C/proFunc|,   |php+parameter:///A/C/proFunc/param2|>,
+
+	<|php+class:///A::B/C|, 		|php+constant:///A::B/C/c|>,
+	<|php+class:///A::B/C|, 		|php+field:///A::B/C/pub|>,
+	<|php+class:///A::B/C|, 		|php+field:///A::B/C/priv|>,
+	<|php+class:///A::B/C|, 		|php+field:///A::B/C/pro|>,
+	<|php+class:///A::B/C|, 		|php+method:///A::B/C/pubFunc|>,
+	<|php+class:///A::B/C|, 		|php+method:///A::B/C/privFunc|>,
+	<|php+class:///A::B/C|, 		|php+method:///A::B/C/proFunc|>,
+	
+	<|php+method:///A::B/C/pubFunc|,   |php+parameter:///A::B/C/pubFunc/param1|>,
+	<|php+method:///A::B/C/pubFunc|,   |php+parameter:///A::B/C/pubFunc/param2|>,
+	<|php+method:///A::B/C/privFunc|,  |php+parameter:///A::B/C/privFunc/param1|>,
+	<|php+method:///A::B/C/privFunc|,  |php+parameter:///A::B/C/privFunc/param2|>,
+	<|php+method:///A::B/C/proFunc|,   |php+parameter:///A::B/C/proFunc/param1|>,
+	<|php+method:///A::B/C/proFunc|,   |php+parameter:///A::B/C/proFunc/param2|>
+}

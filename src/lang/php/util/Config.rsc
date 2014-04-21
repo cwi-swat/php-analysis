@@ -2,9 +2,9 @@ module lang::php::util::Config
 
 import IO;
 
-public loc phploc = |file:///usr/bin/php|;
+public loc phploc = |file:///usr/local/php5/bin/php|;
 
-public loc parserLoc = exists(|file:///Users/mhills|) ? |file:///Users/mhills/Projects/phpsa| : |file:///Users/ruud/git|;
+public loc parserLoc = |file:///Users/ruud/git|;
 public loc analysisLoc = |file:///Users/ruud/git/php-analysis/|;
 	
 public str parserMemLimit = "1024M";

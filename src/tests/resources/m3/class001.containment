@@ -1,0 +1,7 @@
+{
+	<|php+namespace:///|, |php+class:///X|>,
+	<|php+namespace:///|, |php+class:///Y|>,
+
+	<|php+class:///X|, 		|php+method:///X/getX|>,
+	<|php+class:///Y|, 		|php+method:///Y/getY|>
+}

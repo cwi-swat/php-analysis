@@ -94,19 +94,23 @@ public M3Collection getM3CollectionForSystem(System system) {
 	// fill extends and implements, by trying to look up class names
 	for (l <- system) {
 		visit (system[l]) {
-			case c:class(_,_,someName(name(name)),_,_): 
-			{
+			case c:class(_,_,someName(name(name)),_,_): {
 				set[loc] possibleExtends = getPossibleClassesInM3(m3s[l], name);
 				m3s[l]@extends += {<c@decl, ext> | ext <- possibleExtends};
 				fail; // continue this visit, a class can have extends and implements.
 			}
-			case c:class(_,_,_,list[Name] implements,_):
-			{
+			case c:class(_,_,_,list[Name] implements,_): {
 				for (name <- [n | name(n) <- implements]) {
 					set[loc] possibleImplements = getPossibleInterfacesInM3(m3s[l], name);
 					m3s[l]@implements += {<c@decl, impl> | impl <- possibleImplements};
 				}
 			}	
+			case c:interface(_,list[Name] implements,_): {
+				for (name <- [n | name(n) <- implements]) {
+					set[loc] possibleImplements = getPossibleInterfacesInM3(m3s[l], name);
+					m3s[l]@implements += {<c@decl, impl> | impl <- possibleImplements};
+				}
+			}
 	   	}
 	}	
 	
@@ -174,25 +178,19 @@ public M3 addUsageForNode(M3 m3, Expr elm) {
 
 @doc { recursively fill containment }
 public M3 fillContainment(M3 m3, Script script) {
-	// use this to test one m3
-	if (m3.id != |file:///Users/ruud/test/containment.php| &&
-		m3.id != |file:///Users/ruud/test/containment2.php|) {
-		iprintln("<m3.id> skipped");
-		return m3;
-	}
 	loc currNs = globalNamespace;
 	top-down-break visit (script.body) {
-		case Stmt stmt: m3 = fillContainment(m3, stmt, currNs);
+		case Stmt stmt: m3 = fillContainment(m3, stmt, script, currNs);
 	}
 	// this commented line kills the script
-   	//return m3;
+   	return m3;
 }
 
-public M3 fillContainment(M3 m3, Stmt statement, loc currNs) {
+public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 	top-down-break visit (statement) {
 		case ns:namespace(_,body): {
 			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, ns@decl);
+				m3 = fillContainment(m3, stmt, ns, ns@decl);
 		}
 		case ns:namespaceHeader(_): {
 			// set the current namespace to this one.
@@ -200,82 +198,91 @@ public M3 fillContainment(M3 m3, Stmt statement, loc currNs) {
 			fail; // continue the visit
 		}
 		case c:class(_,_,_,_,body): {
-			println("<currNs> \> <c@decl>");
+			//println("<currNs> \> <c@decl>");
 			m3@containment += { <currNs, c@decl> };
 			
 			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, c@decl, currNs);
+				m3 = fillContainment(m3, stmt, c, currNs);
 		}
 		case i:interface(_,_,body): {
-			println("<currNs> \> <i@decl>");
+			//println("<currNs> \> <i@decl>");
 			m3@containment += { <currNs, i@decl> };
 			
 			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, i@decl, currNs);
+				m3 = fillContainment(m3, stmt, i, currNs);
 		}
 		case t:trait(_,body): {
-			println("<currNs> \> <t@decl>");
+			//println("<currNs> \> <t@decl>");
 			m3@containment += { <currNs, t@decl> };
 			
 			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, t@decl, currNs);
+				m3 = fillContainment(m3, stmt, t, currNs);
 		}
 		case f:function(_,_,params,body): { 
-			println("<currNs> \> <f@decl>");
+			//println("<currNs> \> <f@decl>");
 			m3@containment += { <currNs, f@decl> };
 			
 			for (p <- params)
 				m3@containment += { <f@decl, p@decl> };
 				
 			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, currNs);
+				m3 = fillContainment(m3, stmt, f, currNs);
 		}
 		case e:exprstmt(expr): {
-			// variables are not handled correctly yet.
-			loc ref = (statement@decl)? ? statement@decl : currNs;
-			m3 = fillContainment(m3, expr, ref, currNs);
+			// find the function, class, or namespace scope.
+			m3 = fillContainment(m3, expr, parent, currNs);
 		}
 	}
 	return m3;
 }
 
-public M3 fillContainment(M3 m3, ClassItem c, loc declRef, loc currNs) {
+public M3 fillContainment(M3 m3, ClassItem c, node parent, loc currNs) {
 	top-down-break visit (c) {
 		case property(_,ps): {
 			for (p <- ps) {	
-				println("<declRef> \> <p@decl>");
-				m3@containment += { <declRef, p@decl> };
+				//println("<declRef> \> <p@decl>");
+				m3@containment += { <parent@decl, p@decl> };
 			}
 		}
 		case constCI(cs): {
 			for (c_ <- cs) {
-				println("<declRef> \> <c_@decl>");
-				m3@containment += { <declRef, c_@decl> };
+				//println("<declRef> \> <c_@decl>");
+				m3@containment += { <parent@decl, c_@decl> };
 			}
 		}
 		case m:method(_,_,_,params,body): {
-			println("<declRef> \> <m@decl>");
-			m3@containment += { <declRef, m@decl> };
+			//println("<declRef> \> <m@decl>");
+			m3@containment += { <parent@decl, m@decl> };
 			
 			for (p <- params)
 				m3@containment += { <m@decl, p@decl> };
 				
 			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, currNs);
+				m3 = fillContainment(m3, stmt, m, currNs);
 		}
 	}
 	return m3;
 }
 
-public M3 fillContainment(M3 m3, Expr e, loc declRef, loc currNs) {
-	top-down-break visit (e) {
+public M3 fillContainment(M3 m3, Expr e, node parent, loc currNs) {
+	top-down visit (e) {
 		case v:var(_): {
-			println("<declRef> \> <v@decl>");
-			m3@containment += { <declRef, v@decl> };
+			if ( (v@decl)? ) {
+				//println("<declRef> \> <v@decl>");
+				if ( (parent@decl)? ) {
+					m3@containment += { <parent@decl, v@decl> };
+				} else {
+					m3@containment += { <currNs, v@decl> };
+				}
+			}
 		}
 	}
 	
 	return m3;
+}
+
+public loc getParentDeclarationForVariable(Expr e) {
+
 }
 
 @doc {	search in declarations for classNames }
