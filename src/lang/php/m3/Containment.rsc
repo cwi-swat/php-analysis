@@ -26,6 +26,8 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 			currNs = ns@decl;
 			fail; // continue the visit
 		}
+	
+		// class/trait/interface/function set the parent node	
 		case classDef(c:class(_,_,_,_,body)): {
 			println("class: <currNs> \>\> <c@decl>");
 			m3@containment += { <currNs, c@decl> };
@@ -60,6 +62,76 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 				m3 = fillContainment(m3, stmt, f, currNs);
 			}
 		}
+	
+		// rest of the statements do not change the parent element
+		
+		// break and continue: needed for php < 5.4:
+		// php > 5.4: Removed the ability to pass in variables (e.g., $num = 2; break $num;) as the numerical argument.
+		case \break(optionExpr): {
+			m3 = fillContainment(m3, optionExpr, parent, currNs);
+		}
+		
+		case \continue(optionExpr): {
+			m3 = fillContainment(m3, optionExpr, parent, currNs);
+		}
+		
+		case const(consts): {
+			for (const <- consts) {
+				if ( (parent@decl)? ) {
+					m3@containment += { <parent@decl, const@decl> };
+				} else {
+					m3@containment += { <currNs, const@decl> };
+				}
+			}
+		
+		}
+		
+		case declare(_,body): {
+			for (stmt <- body) {
+				m3 = fillContainment(m3, stmt, parent, currNs);
+			}
+		}
+		
+		case do(cond, body): {
+			m3 = fillContainment(m3, cond, parent, currNs);
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, parent, currNs);
+		}
+		
+		case \while(cond, body): {
+			m3 = fillContainment(m3, cond, parent, currNs);
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, parent, currNs);
+		}
+		
+		case \for(inits, conds, exprs, body): {
+			for (init <- inits)
+				m3 = fillContainment(m3, init, parent, currNs);
+			for (cond <- conds)
+				m3 = fillContainment(m3, cond, parent, currNs);
+			for (expr <- exprs)
+				m3 = fillContainment(m3, expr, parent, currNs);
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, parent, currNs);
+		}
+		
+		case foreach(expr, keyvar, _, asVar, body): {
+			m3 = fillContainment(m3, expr, parent, currNs);
+			m3 = fillContainment(m3, keyvar, parent, currNs);
+			m3 = fillContainment(m3, cond, parent, currNs);
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, parent, currNs);
+		}
+		
+		case \switch(cond, cases): {
+			m3 = fillContainment(m3, cond, parent, currNs);
+			for (case_ <- cases) {
+				m3 = fillContainment(m3, case_.cond, parent, currNs);
+				for (stmt <- case_.body)
+					m3 = fillContainment(m3, stmt, parent, currNs);
+			}
+		}
+		
 		case \if(expr, body, elseIfs, elseClause): {
 			m3 = fillContainment(m3, expr, parent, currNs);
 			
@@ -76,45 +148,29 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 			
 			m3 = fillContainment(m3, elseClause, parent, currNs);
 		}
-		case \for(inits, conds, exprs, body): {
-			for (init <- inits)
-				m3 = fillContainment(m3, init, parent, currNs);
-			for (cond <- conds)
-				m3 = fillContainment(m3, cond, parent, currNs);
+		
+		case echo(exprs): {
 			for (expr <- exprs)
 				m3 = fillContainment(m3, expr, parent, currNs);
-			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, parent, currNs);
 		}
-		case do(cond, body): {
-			m3 = fillContainment(m3, cond, parent, currNs);
-			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, parent, currNs);
+		
+		// global (not implemented)
+		
+		case \return(optionExpr): {
+				m3 = fillContainment(m3, optionExpr, parent, currNs);
 		}
-		case \while(cond, body): {
-			m3 = fillContainment(m3, cond, parent, currNs);
-			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, parent, currNs);
-		}
-		case foreach(expr, keyvar, _, asVar, body): {
-			m3 = fillContainment(m3, expr, parent, currNs);
-			m3 = fillContainment(m3, keyvar, parent, currNs);
-			m3 = fillContainment(m3, cond, parent, currNs);
-			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, parent, currNs);
-		}
-		case \switch(cond, cases): {
-			m3 = fillContainment(m3, cond, parent, currNs);
-			for (case_ <- cases) {
-				m3 = fillContainment(m3, case_.cond, parent, currNs);
-				for (stmt <- case_.body)
-					m3 = fillContainment(m3, stmt, parent, currNs);
+				
+		case static(vars): {
+			for (var <- vars) {
+				if ( (parent@decl)? ) {
+					m3@containment += { <parent@decl, var@decl> };
+				} else {
+					m3@containment += { <currNs, var@decl> };
+				}	
+				m3 = fillContainment(m3, var.defaultValue, parent, currNs);
+				println("ssdf");
 			}
 		}
-		// const??
-		// global
-		case \return(optionExpr):
-				m3 = fillContainment(m3, optionExpr, parent, currNs);
 				
 		case tryCatch(body, catches): {
 			for (stmt <- body)
@@ -144,10 +200,6 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 		case \throw(expr):
 			m3 = fillContainment(m3, expr, parent, currNs);
 		
-		case echo(exprs): {
-			for (expr <- exprs)
-				m3 = fillContainment(m3, expr, parent, currNs);
-		}
 		
 		case exprstmt(expr): {
 			// find the function, class, or namespace scope.
