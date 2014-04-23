@@ -2,6 +2,7 @@ module tests::lang::php::m3::Core
 
 import analysis::m3::Core;
 import lang::php::m3::Core;
+import lang::php::m3::Containment;
 import lang::php::util::Config;
 import lang::php::ast::AbstractSyntax;
 
@@ -81,10 +82,10 @@ public test bool testContainment() {
 			rel[loc from, loc to] expectedContainment = readTextValueFile(#rel[loc,loc], f);
 			loc phpFileName = testFolder+"<f.file[0..-12]>.php";
 			if (m3s[phpFileName]@containment != expectedContainment) {
-				iprintln("Test failed for file: `<phpFileName.file>`, `<f.file>` (test stopped)");
-				iprintln("Not in expected/actual:");
-				iprintln(m3s[phpFileName]@containment - expectedContainment);
-				iprintln(expectedContainment - m3s[phpFileName]@containment);
+				println("Test failed for file: `<phpFileName.file>`, `<f.file>` (test stopped)");
+				println("Not in expected/actual:");
+				println(m3s[phpFileName]@containment - expectedContainment);
+				println(expectedContainment - m3s[phpFileName]@containment);
 				return false;
 			}
 		}

@@ -18,6 +18,8 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::util::Utils;
 import lang::php::util::System;
 
+import lang::php::m3::Containment;
+
 import IO;
 import String;
 import Relation;
@@ -173,103 +175,6 @@ public M3 addUsageForNode(M3 m3, Expr elm) {
 	set decl = "";
 	m3@uses += {<elm@at, decl> | decl <- decls};
 
-}
-
-@doc { recursively fill containment }
-public M3 fillContainment(M3 m3, Script script) {
-	loc currNs = globalNamespace;
-	top-down-break visit (script.body) {
-		case Stmt stmt: m3 = fillContainment(m3, stmt, script, currNs);
-	}
-	// this commented line kills the script
-   	return m3;
-}
-
-public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
-	top-down-break visit (statement) {
-		case ns:namespace(_,body): {
-			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, ns, ns@decl);
-		}
-		case ns:namespaceHeader(_): {
-			// set the current namespace to this one.
-			currNs = ns@decl;
-			fail; // continue the visit
-		}
-		case c:class(_,_,_,_,body): {
-			m3@containment += { <currNs, c@decl> };
-			
-			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, c, currNs);
-		}
-		case i:interface(_,_,body): {
-			m3@containment += { <currNs, i@decl> };
-			
-			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, i, currNs);
-		}
-		case t:trait(_,body): {
-			m3@containment += { <currNs, t@decl> };
-			
-			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, t, currNs);
-		}
-		case f:function(_,_,params,body): { 
-			m3@containment += { <currNs, f@decl> };
-			
-			for (p <- params)
-				m3@containment += { <f@decl, p@decl> };
-				
-			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, f, currNs);
-		}
-		case e:exprstmt(expr): {
-			// find the function, class, or namespace scope.
-			m3 = fillContainment(m3, expr, parent, currNs);
-		}
-	}
-	return m3;
-}
-
-public M3 fillContainment(M3 m3, ClassItem c, node parent, loc currNs) {
-	top-down-break visit (c) {
-		case property(_,ps): {
-			for (p <- ps) {	
-				m3@containment += { <parent@decl, p@decl> };
-			}
-		}
-		case constCI(cs): {
-			for (c_ <- cs) {
-				m3@containment += { <parent@decl, c_@decl> };
-			}
-		}
-		case m:method(_,_,_,params,body): {
-			m3@containment += { <parent@decl, m@decl> };
-			
-			for (p <- params)
-				m3@containment += { <m@decl, p@decl> };
-				
-			for (stmt <- body)
-				m3 = fillContainment(m3, stmt, m, currNs);
-		}
-	}
-	return m3;
-}
-
-public M3 fillContainment(M3 m3, Expr e, node parent, loc currNs) {
-	top-down visit (e) {
-		case v:var(_): {
-			if ( (v@decl)? ) {
-				if ( (parent@decl)? ) {
-					m3@containment += { <parent@decl, v@decl> };
-				} else {
-					m3@containment += { <currNs, v@decl> };
-				}
-			}
-		}
-	}
-	
-	return m3;
 }
 
 @doc {	search in declarations for classNames }

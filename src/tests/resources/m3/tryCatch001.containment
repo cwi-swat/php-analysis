@@ -1,0 +1,16 @@
+{
+    <|php+namespace:///|,   |php+variable:///a|>,
+    <|php+namespace:///|,   |php+variable:///b|>,
+
+    <|php+namespace:///|,   |php+function:///c|>,
+    <|php+function:///c|,   |php+variable:///c/d|>,
+    <|php+function:///c|,   |php+variable:///c/e|>,
+
+    <|php+namespace:///|,   |php+class:///f|>,
+    <|php+class:///f|,      |php+method:///f/g|>,
+    <|php+method:///f/g|,   |php+variable:///f/g/h|>,
+    <|php+method:///f/g|,   |php+variable:///f/g/i|>,
+    <|php+method:///f/g|,   |php+variable:///f/g/j|>,
+    <|php+method:///f/g|,   |php+variable:///f/g/k|>
+}
+
