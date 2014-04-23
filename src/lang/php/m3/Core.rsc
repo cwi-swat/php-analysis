@@ -80,8 +80,8 @@ public M3Collection getM3CollectionForSystem(System system) {
 				}
 			}
 	   	}
-	   	// if there are no namespaces, add global namespace
-	   	if (isEmpty({ ns | <ns,_> <- m3s[l]@declarations, isNamespace(ns) })) {
+	   	// if there are no namespaces, or no declarations at all, add global namespace
+	   	if (!(m3s[l]@declarations)? || isEmpty({ ns | <ns,_> <- m3s[l]@declarations, isNamespace(ns) })) {
 			m3s[l]@declarations += {<globalNamespace, l>};
 	   	}
 	}	

@@ -115,6 +115,7 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 		// global
 		case \return(optionExpr):
 				m3 = fillContainment(m3, optionExpr, parent, currNs);
+				
 		case tryCatch(body, catches): {
 			for (stmt <- body)
 				m3 = fillContainment(m3, stmt, parent, currNs);
@@ -125,6 +126,7 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 				}
 			}
 		}
+		
 		case tryCatchFinally(body, catches, finallyBody): {
 			for (stmt <- body)
 				m3 = fillContainment(m3, stmt, parent, currNs);
@@ -138,16 +140,23 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 			for (stmt <- finallyBody)
 				m3 = fillContainment(m3, stmt, parent, currNs);
 		}
-		// throw?
-		// tryCatchFinally
-		// while
+		
+		case \throw(expr):
+			m3 = fillContainment(m3, expr, parent, currNs);
+		
 		case echo(exprs): {
 			for (expr <- exprs)
 				m3 = fillContainment(m3, expr, parent, currNs);
 		}
+		
 		case exprstmt(expr): {
 			// find the function, class, or namespace scope.
 			m3 = fillContainment(m3, expr, parent, currNs);
+		}
+		
+		case block(body): {
+			for (stmt <- body)
+				m3 = fillContainment(m3, stmt, parent, currNs);
 		}
 	}
 	return m3;
