@@ -81,7 +81,7 @@ public test bool testContainment() {
 		if (f.extension == "containment") {
 			rel[loc from, loc to] expectedContainment = readTextValueFile(#rel[loc,loc], f);
 			loc phpFileName = testFolder+"<f.file[0..-12]>.php";
-			println("Running test: <f>");
+			//println("Running test: <f>");
 			if (m3s[phpFileName]@containment != expectedContainment) {
 				println("Test failed for file: `<phpFileName.file>`, `<f.file>` (test stopped)");
 				println("Not in expected/actual:");
@@ -89,7 +89,7 @@ public test bool testContainment() {
 				println(expectedContainment - m3s[phpFileName]@containment);
 				return false;
 			}
-			println("Test Success: <f>");
+			//println("Test Success: <f>");
 		}
 	}
 	return true;

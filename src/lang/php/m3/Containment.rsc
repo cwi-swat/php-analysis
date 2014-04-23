@@ -4,8 +4,6 @@ extend lang::php::m3::Core;
 
 @doc { recursively fill containment }
 public M3 fillContainment(M3 m3, Script script) {
-	println("---------------------------------------------------------");
-	println("visit script: <script>");
 	loc currNs = globalNamespace;
 	
 	for (stmt <- script.body)
@@ -15,7 +13,6 @@ public M3 fillContainment(M3 m3, Script script) {
 }
 
 public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
-	println("visit stmt: <statement>");
 	switch(statement) {
 		case ns:namespace(_,body): {
 			for (stmt <- body)
@@ -29,32 +26,27 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 	
 		// class/trait/interface/function set the parent node	
 		case classDef(c:class(_,_,_,_,body)): {
-			println("class: <currNs> \>\> <c@decl>");
 			m3@containment += { <currNs, c@decl> };
 			
 			for (stmt <- body)
 				m3 = fillContainment(m3, stmt, c, currNs);
 		}
 		case interfaceDef(i:interface(_,_,body)): {
-			println("interface: <currNs> \>\> <i@decl>");
 			m3@containment += { <currNs, i@decl> };
 			
 			for (stmt <- body)
 				m3 = fillContainment(m3, stmt, i, currNs);
 		}
 		case traitDef(t:trait(_,body)): {
-			println("trait: <currNs> \>\> <t@decl>");
 			m3@containment += { <currNs, t@decl> };
 			
 			for (stmt <- body)
 				m3 = fillContainment(m3, stmt, t, currNs);
 		}
 		case f:function(_,_,params,body): { 
-			println("function: <currNs> \>\> <f@decl>");
 			m3@containment += { <currNs, f@decl> };
 			
 			for (p <- params) {
-				println("function param: <f@decl> \>\> <p@decl>");
 				m3@containment += { <f@decl, p@decl> };
 			}
 				
@@ -168,7 +160,6 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 					m3@containment += { <currNs, var@decl> };
 				}	
 				m3 = fillContainment(m3, var.defaultValue, parent, currNs);
-				println("ssdf");
 			}
 		}
 				
@@ -215,7 +206,6 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent, loc currNs) {
 }
 
 public M3 fillContainment(M3 m3, OptionExpr optionExpr, node parent, loc currNs) {
-	println("visit optionExpr: <optionExpr>");
 	switch(optionExpr) {
 		case someExpr(expr): {
 			m3 = fillContainment(m3, expr, parent, currNs);
@@ -226,7 +216,6 @@ public M3 fillContainment(M3 m3, OptionExpr optionExpr, node parent, loc currNs)
 }
 
 public M3 fillContainment(M3 m3, OptionElse optionElse, node parent, loc currNs) {
-	println("visit optionElse: <optionElse>");
 	switch(optionElse) {
 		case someElse(\else(body)): {
 			for (stmt <- body) {
@@ -239,26 +228,21 @@ public M3 fillContainment(M3 m3, OptionElse optionElse, node parent, loc currNs)
 }
 
 public M3 fillContainment(M3 m3, ClassItem ci, node parent, loc currNs) {
-	println("visit classItem: <ci>");
 	top-down-break visit (ci) {
 		case property(_,ps): {
 			for (p <- ps) {	
-				println("class property: <parent@decl> \>\> <p@decl>");
 				m3@containment += { <parent@decl, p@decl> };
 			}
 		}
 		case constCI(cs): {
 			for (c <- cs) {
-				println("class constant: <parent@decl> \>\> <c@decl>");
 				m3@containment += { <parent@decl, c@decl> };
 			}
 		}
 		case m:method(_,_,_,params,body): {
-			println("class method: <parent@decl> \>\> <m@decl>");
 			m3@containment += { <parent@decl, m@decl> };
 			
 			for (p <- params) {
-				println("class method param: <m@decl> \>\> <p@decl>");
 				m3@containment += { <m@decl, p@decl> };
 			}
 				
@@ -271,15 +255,12 @@ public M3 fillContainment(M3 m3, ClassItem ci, node parent, loc currNs) {
 }
 
 public M3 fillContainment(M3 m3, Expr e, node parent, loc currNs) {
-	println("visit Expr: <e>");
 	top-down visit (e) {
 		case v:var(_): {
 			if ( (v@decl)? ) {
 				if ( (parent@decl)? ) {
-					println("variable, parent decl: <parent@decl> \>\> <v@decl>");
 					m3@containment += { <parent@decl, v@decl> };
 				} else {
-					println("variable, no parent decl: <currNs> \>\> <v@decl>");
 					m3@containment += { <currNs, v@decl> };
 				}
 			}
