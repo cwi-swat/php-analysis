@@ -66,10 +66,9 @@ public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemEx
 	return n[@definedConstants=justDefs][@definingExps=exprs][@setsIncludePath=setsip];	
 }
 
-public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(System sys, str p, str v, loc toResolve, loc baseLoc) {
+public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(System sys, str p, str v, loc toResolve, loc baseLoc, list[str] ipath=[]) {
 	lrel[str,datetime] timings = [ < "Starting includes resolution", now() > ];
 	clearLookupCache();
-	list[str] ipath = [ ];
 	
 	// First find all the includes in the script. If we don't have any, we are already done.
 	includeMap = ( i@at : i | /i:include(_,_) := sys[toResolve] );
@@ -223,6 +222,9 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// Find any unsolved edges, defined as edges that do not target a standard include graph node.
 	unsolvedEdges = { e | e <- igraph.edges, !(e.target is igNode) };
 	
+	// Build a model of the files in the site; we may want to cache this...
+	Branch site = buildSiteTree(baseLoc);
+	
 	// This is our loop flag: it will be true as long as there are unsolved edges AND we
 	// make progress on trying to solve them.
 	bool continueTrying = ( size(unsolvedEdges) > 0 );
@@ -242,7 +244,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 		for (e <- basicMatched) {
 			if (iexp:include(scalar(string(sp)),_) := e.includeExpr) {
 				try {
-					iloc = calculateLoc(sys<0>,toResolve,baseLoc,sp,pathMayBeChanged=size(reachable(igraph,baseLoc) & setsIncludePath) > 0,ipath=ipath);
+					iloc = calculateLoc(toResolve,baseLoc,sp,site,pathMayBeChanged=size(reachable(igraph,baseLoc) & setsIncludePath) > 0,ipath=ipath);
 					solvingEdges = solvingEdges + e[target=igraph.nodes[iloc]];
 				} catch UnavailableLoc(_) : {
 					solvingEdges = solvingEdges + e;
@@ -261,6 +263,6 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 		continueTrying = (unsolvedEdges != originalUnsolved);
 	}	
 	
-	finalResult = { < edge.source.fileLoc, et > | edge <- igraph.edges, et <- getEdgeTargets(igraph, edge) }; 
+	finalResult = { < edge.includeExpr@at, et > | edge <- igraph.edges, et <- getEdgeTargets(igraph, edge) }; 
 	return < finalResult, timings >;
 }
