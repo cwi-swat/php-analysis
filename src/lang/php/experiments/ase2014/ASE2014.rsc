@@ -112,11 +112,35 @@ public void doQuickResolve(Corpus corpus) {
 	}
 }
 
+@doc{Run the quick resolve over the entire provided corpus, saving reduced expressions}
+public void doQuickResolveExpr(Corpus corpus) {
+	for (p <- corpus, v := corpus[p]) {
+		pt = loadBinary(p,v);
+		IncludesInfo iinfo = loadIncludesInfo(p, v);
+		rel[loc,loc,Expr,loc] res = { };
+		println("Resolving <p> for <size(pt<0>)> files");
+		counter = 0;
+		for (l <- pt) {
+			qr = quickResolveExpr(pt, iinfo, l, getCorpusItem(p,v) libs = (p in usedLibs) ? usedLibs[p] : { });
+			res = res + { < l, ll, e, lr > | < ll, e, lr > <- qr };
+			counter += 1;
+			if (counter % 100 == 0) {
+				println("Resolved <counter> files");
+			}
+		}
+		writeBinaryValueFile(infoLoc + "<p>-<v>-qre.bin", res);
+	}
+}
+
 @doc{Reload the quick resolve info.}
 public rel[loc,loc,loc] loadQuickResolveInfo(str p, str v) {
 	return readBinaryValueFile(#rel[loc,loc,loc], infoLoc + "<p>-<v>-qr.bin");
 }
 
+@doc{Reload the quick resolve info with expressions.}
+public rel[loc,loc,Expr,loc] loadQuickResolveExprInfo(str p, str v) {
+	return readBinaryValueFile(#rel[loc,loc,Expr,loc], infoLoc + "<p>-<v>-qre.bin");
+}
 @doc{Compute basic distribution: how many possibilities for each include?}
 public map[int hits, int includes] computeQuickResolveCounts(str p, str v) {
 	map[int hits, int includes] res = ( );
@@ -222,9 +246,18 @@ public void buildResolveInfo(Corpus corpus, str p, set[loc] files) {
 	RInfoMap rmap = loadResolveInfoMap();
 	rootloc = getCorpusItem(p,corpus[p]);
 	pt = loadBinary(p, corpus[p]);
+	qrei = loadQuickResolveExprInfo(p,corpus[p]);
+	map[loc,rel[loc,Expr,loc]] qrmap = ( );
+	for (<lf,li,e,lr> <- qrei) {
+		if (lf in qrmap) {
+			qrmap[lf] = qrmap[lf] + < li, e, lr >;
+		} else {
+			qrmap[lf] = { < li, e, lr > };
+		}
+	}
 	for (f <- files) {
 		println("Resolving script <f>");
-		res = scriptResolve(pt, p, corpus[p], f, rootloc, ipath=getIncludePath(p));
+		res = scriptResolve(pt, p, corpus[p], f, rootloc, ipath=getIncludePath(p), quickResolveInfo=qrmap);
 		ResolveInfo ri = rinfo(p, corpus[p], f, res);
 		lipath = incLoc + "ri<rmap.nextidx>.bin";
 		writeBinaryValueFile(lipath, ri);
