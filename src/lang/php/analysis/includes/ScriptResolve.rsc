@@ -66,7 +66,7 @@ public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemEx
 	return n[@definedConstants=justDefs][@definingExps=exprs][@setsIncludePath=setsip];	
 }
 
-public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(System sys, str p, str v, loc toResolve, loc baseLoc, list[str] ipath=[]) {
+public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(System sys, str p, str v, loc toResolve, loc baseLoc, list[str] ipath=[], map[loc,rel[loc,Expr,loc]] quickResolveInfo = ( )) {
 	lrel[str,datetime] timings = [ < "Starting includes resolution", now() > ];
 	clearLookupCache();
 	
@@ -80,7 +80,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// and perform simplifications
 	IncludesInfo iinfo = loadIncludesInfo(p, v);
 	timings += < "Includes info loaded", now()>;
-	quickResolved = quickResolveExpr(sys, iinfo, toResolve, baseLoc);
+	quickResolved = (size(quickResolveInfo) > 0) ? ( (toResolve in quickResolveInfo) ? quickResolveInfo[toResolve] : { }) : quickResolveExpr(sys, iinfo, toResolve, baseLoc);
 	timings += < "Finished with initial quick resolve", now()>;
 	
 	// This gives us a base model of what can be immediately included
@@ -89,14 +89,15 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// try to narrow this down at this point, since it often depends
 	// on the reachability relation, which realistically we need to
 	// gradually narrow.
-	set[loc] worked = { toResolve };
-	set[loc] worklist = quickResolved<2> - worked;
+	set[loc] worked = { toResolve } + { qri | qri <- quickResolved<2>, qri.scheme == "php+lib" };
+	set[loc] worklist = { qri | qri <- quickResolved<2>, qri.scheme != "php+lib" } - worked;
 	while (! isEmpty(worklist) ) {
 		next = getOneFrom(worklist); worklist -= next; worked += next;
 		includeMap += ( i@at : i | /i:include(_,_) := sys[next] );
-		nextResolved = quickResolveExpr(sys, iinfo, next, baseLoc);
+		nextResolved = (size(quickResolveInfo) > 0) ? ( (next in quickResolveInfo) ? quickResolveInfo[next] : { } ) : quickResolveExpr(sys, iinfo, next, baseLoc);
 		quickResolved += nextResolved;
-		worklist += (nextResolved<2> - worked);
+		worklist += ({ qri | qri <- nextResolved<2>, qri.scheme != "php+lib" } - worked);
+		worked += { qri | qri <- nextResolved<2>, qri.scheme == "php+lib" };
 	} 
 	timings += < "Finished with initial reachability model", now()>;
 
@@ -111,7 +112,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// assuming we are examining the entire system that will be run.
 	timings += < "Building includes graph based on model", now()>;
 	int sizeToRemove = size(baseLoc.path);
-	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- worked );// + (|file:///synthesizedLoc/<lib.path>| : libNode(lib.name,lib.path) | lib <- libraries);	
+	map[loc,IncludeGraphNode] nodeMap = ( l:igNode((l.scheme != "php+lib") ? substring(l.path,sizeToRemove) : l.path,l) | l <- worked );// + (|file:///synthesizedLoc/<lib.path>| : libNode(lib.name,lib.path) | lib <- libraries);	
 	set[IncludeGraphEdge] edgeSet = { };
 	for (l <- includeMap) {
 		possibleTargets = quickResolved[l];
@@ -139,8 +140,8 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// could be a dynamic call to these functions, using variable functions or dynamic invocations, that is not detected here. This
 	// could happen, but seemingly would be done with the intent to obfuscate the changing of the path. TODO: it would be good to do
 	// a string analysis to rule this out, though, if possible.	
-	set[loc] setsIncludePath = { l | l <- worked, /call(name(name("set_include_path")),_) := sys[l] } + 
-							   { l | l <- worked, /call(name(name("ini_set")),[actualParameter(pe,_)]) := sys[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
+	set[loc] setsIncludePath = { l | l <- worked, l.scheme != "php+lib", /call(name(name("set_include_path")),_) := sys[l] } + 
+							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("ini_set")),[actualParameter(pe,_)]) := sys[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
 	timings += < "Found <size(setsIncludePath)> locations that set the include path", now() >;
 
 	// Decorate the nodes in the include graph with info on constants and behaviors.
