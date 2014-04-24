@@ -1,0 +1,33 @@
+{
+	<|php+namespace:///|,   |php+class:///X|>,
+
+	<|php+namespace:///|,   |php+function:///f|>,
+	<|php+namespace:///|,   |php+function:///g|>,
+	<|php+namespace:///|,   |php+function:///h|>,
+
+	<|php+namespace:///|,   |php+variable:///global|>,
+	<|php+namespace:///|,   |php+variable:///global2|>,
+	<|php+namespace:///|,   |php+variable:///global3|>,
+	<|php+namespace:///|,   |php+variable:///global4|>,
+	<|php+namespace:///|,   |php+variable:///global5|>,
+	<|php+namespace:///|,   |php+variable:///global6|>,
+	<|php+namespace:///|,   |php+variable:///global7|>,
+	<|php+namespace:///|,   |php+variable:///global8|>,
+	<|php+namespace:///|,   |php+variable:///global9|>,
+	<|php+namespace:///|,   |php+variable:///global10|>,
+	<|php+namespace:///|,   |php+variable:///global11|>,
+	<|php+namespace:///|,   |php+variable:///global12|>,
+	<|php+namespace:///|,   |php+variable:///global13|>,
+	<|php+namespace:///|,   |php+variable:///global14|>,
+	<|php+namespace:///|,   |php+variable:///global15|>,
+	<|php+namespace:///|,   |php+variable:///global16|>,
+
+	<|php+namespace:///|,   |php+variable:///var|>,
+
+	<|php+function:///f|,   |php+variable:///f/private|>,
+	<|php+function:///g|,   |php+variable:///g/private|>,
+	<|php+function:///h|,   |php+variable:///h/private|>,
+
+	<|php+class:///X|,      |php+method:///X/getX|>,
+	<|php+method:///X/getX|,|php+variable:///X/getX/private|>
+}

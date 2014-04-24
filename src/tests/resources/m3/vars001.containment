@@ -1,0 +1,4 @@
+{
+	<|php+namespace:///|,   |php+function:///f|>,
+	<|php+function:///f|,   |php+variable:///f/private|>
+}

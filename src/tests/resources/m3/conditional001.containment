@@ -1,0 +1,25 @@
+{
+    <|php+namespace:///|,   |php+function:///f|>,
+    <|php+function:///f|,   |php+variable:///f/a|>,
+    <|php+function:///f|,   |php+variable:///f/f|>,
+
+    <|php+function:///f|,   |php+variable:///f/b|>,
+    <|php+function:///f|,   |php+variable:///f/c|>,
+
+    <|php+namespace:///|,   |php+function:///g|>,
+    <|php+function:///g|,   |php+variable:///g/g|>,
+
+    <|php+namespace:///|,   |php+function:///h|>,
+    <|php+function:///h|,   |php+variable:///h/h|>,
+
+    <|php+namespace:///|,   |php+class:///C|>,
+    <|php+class:///C|,      |php+constant:///C/thisClassIsUsed|>,
+    <|php+class:///C|,      |php+constant:///C/constIsNeverUsed|>,
+
+    <|php+namespace:///|,   |php+class:///D|>,
+    <|php+class:///D|,      |php+constant:///D/thisClassIsUsed|>,
+    <|php+class:///D|,      |php+constant:///D/constIsNeverUsed|>,
+
+    <|php+namespace:///|,   |php+variable:///elseIf|>,
+    <|php+namespace:///|,   |php+variable:///else|>
+}

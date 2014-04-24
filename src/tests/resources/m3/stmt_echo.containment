@@ -1,0 +1,5 @@
+{
+    <|php+namespace:///|,|php+variable:///a|>,
+    <|php+namespace:///|,|php+variable:///b|>,
+    <|php+namespace:///|,|php+variable:///c|>
+}
