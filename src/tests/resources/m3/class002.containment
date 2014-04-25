@@ -1,9 +1,9 @@
 {
 	<|php+namespace:///A|,      |php+class:///A/X|>,
-	<|php+namespace:///A::B|,   |php+class:///A::B/Y|>,
+	<|php+namespace:///A/B|,   |php+class:///A/B/Y|>,
 	<|php+namespace:///B|,      |php+class:///B/Z|>,
 
 	<|php+class:///A/X|, 		|php+method:///A/X/getX|>,
-	<|php+class:///A::B/Y|, 	|php+method:///A::B/Y/getY|>,
+	<|php+class:///A/B/Y|, 	|php+method:///A/B/Y/getY|>,
 	<|php+class:///B/Z|, 		|php+method:///B/Z/getZ|>
 }

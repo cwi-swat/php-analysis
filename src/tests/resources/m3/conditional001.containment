@@ -1,25 +1,25 @@
 {
     <|php+namespace:///|,   |php+function:///f|>,
-    <|php+function:///f|,   |php+variable:///f/a|>,
-    <|php+function:///f|,   |php+variable:///f/f|>,
+    <|php+function:///f|,   |php+functionVar:///f/a|>,
+    <|php+function:///f|,   |php+functionVar:///f/f|>,
 
-    <|php+function:///f|,   |php+variable:///f/b|>,
-    <|php+function:///f|,   |php+variable:///f/c|>,
+    <|php+function:///f|,   |php+functionVar:///f/b|>,
+    <|php+function:///f|,   |php+functionVar:///f/c|>,
 
     <|php+namespace:///|,   |php+function:///g|>,
-    <|php+function:///g|,   |php+variable:///g/g|>,
+    <|php+function:///g|,   |php+functionVar:///g/g|>,
 
     <|php+namespace:///|,   |php+function:///h|>,
-    <|php+function:///h|,   |php+variable:///h/h|>,
+    <|php+function:///h|,   |php+functionVar:///h/h|>,
 
     <|php+namespace:///|,   |php+class:///C|>,
-    <|php+class:///C|,      |php+constant:///C/thisClassIsUsed|>,
-    <|php+class:///C|,      |php+constant:///C/constIsNeverUsed|>,
+    <|php+class:///C|,      |php+classConstant:///C/thisClassIsUsed|>,
+    <|php+class:///C|,      |php+classConstant:///C/constIsNeverUsed|>,
 
     <|php+namespace:///|,   |php+class:///D|>,
-    <|php+class:///D|,      |php+constant:///D/thisClassIsUsed|>,
-    <|php+class:///D|,      |php+constant:///D/constIsNeverUsed|>,
+    <|php+class:///D|,      |php+classConstant:///D/thisClassIsUsed|>,
+    <|php+class:///D|,      |php+classConstant:///D/constIsNeverUsed|>,
 
-    <|php+namespace:///|,   |php+variable:///elseIf|>,
-    <|php+namespace:///|,   |php+variable:///else|>
+    <|php+namespace:///|,   |php+globalVar:///elseIf|>,
+    <|php+namespace:///|,   |php+globalVar:///else|>
 }

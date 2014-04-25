@@ -207,7 +207,7 @@ public anno loc InterfaceDef@at;
 public anno loc StaticVar@at;
 public anno loc Script@at;
 
-@decl{Contains current Namespace/Class/Interace/Trait/Method/Function information.}
+public anno loc Script@decl;
 public anno loc ActualParameter@decl;
 public anno loc Const@decl;
 public anno loc ArrayElement@decl;

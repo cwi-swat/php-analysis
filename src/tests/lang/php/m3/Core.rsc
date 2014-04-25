@@ -1,7 +1,7 @@
 module tests::lang::php::m3::Core
 
 import analysis::m3::Core;
-import lang::php::m3::Core;
+//import lang::php::m3::Core;
 import lang::php::m3::Containment;
 import lang::php::util::Config;
 import lang::php::ast::AbstractSyntax;

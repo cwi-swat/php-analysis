@@ -2,7 +2,7 @@
 	<|php+namespace:///|,   |php+trait:///Hello|>,
 	<|php+namespace:///|,   |php+trait:///World|>,
 	<|php+namespace:///|,   |php+class:///MyHelloWorld|>,
-	<|php+namespace:///|,   |php+variable:///o|>,
+	<|php+namespace:///|,   |php+globalVar:///o|>,
 
 	<|php+trait:///Hello|,          |php+method:///Hello/sayHello|>,
 	<|php+trait:///World|,          |php+method:///World/sayWorld|>,

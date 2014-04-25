@@ -47,5 +47,5 @@ namespace {
     $c->f(1);
     //ff(1);
     \NS\FunctionInClass\ff(1);
-    g();
+    //g();
 }

@@ -3,6 +3,8 @@
 
 namespace Alpha;
 
+const x = 4;
+
 interface a
 {
     const b = 'Interface constant';
@@ -12,7 +14,7 @@ namespace Beta;
 use \Alpha\a;
 
 // Prints: Interface constant
-echo a::b;
+echo a/b;
 
 
 // This will however not work because it's not allowed to

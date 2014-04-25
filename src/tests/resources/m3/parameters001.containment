@@ -1,0 +1,10 @@
+{
+	<|php+namespace:///|,           |php+function:///a|>,
+	<|php+namespace:///|,           |php+class:///C|>,
+
+	<|php+function:///a|, 		    |php+functionParam:///a/b|>,
+	<|php+function:///a|, 		    |php+functionParam:///a/c|>,
+	<|php+class:///C|, 		        |php+method:///C/__construct|>,
+	<|php+method:///C/__construct|, |php+methodParam:///C/__construct/x|>,
+	<|php+method:///C/__construct|, |php+methodParam:///C/__construct/y|>
+}
