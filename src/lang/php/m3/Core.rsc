@@ -29,13 +29,12 @@ import Map;
 import Node;
 import List;
 
-import util::FileSystem;
-import demo::common::Crawl;
-
 alias M3Collection = map[loc fileloc, M3 model];
 
 anno rel[loc from, loc to] M3@extends;      // classes extending classes and interfaces extending interfaces
 anno rel[loc from, loc to] M3@implements;   // classes implementing interfaces
+anno rel[loc from, loc to] M3@usesTrait;    // classes using traits and traits using traits
+anno rel[loc from, loc to] M3@aliases;      // class name aliases (new name -> old name)
 anno rel[loc pos, str phpDoc] M3@phpDoc;    // Multiline php comments /** ... */
 
 public loc globalNamespace = |php+namespace:///|;
