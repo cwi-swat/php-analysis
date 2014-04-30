@@ -23,3 +23,11 @@ public bool useBinaries = false;
 public bool includePhpDocs = true;
 public bool includeLocationInfo = true;
 public bool resolveNamespaces = true;
+
+// debug options
+@logLevel {
+	Log level 0 => no logging;
+	Log level 1 => main logging;
+	Log level 2 => debug logging;
+}
+public int logLevel = 2;

@@ -24,7 +24,6 @@ import DateTime;
 import util::ShellExec;
 
 import lang::php::pp::PrettyPrinter;
-import lang::php::util::ValueUICustom;
 
 @doc{Parse an individual PHP statement using the external parser, returning the associated AST.}
 public Stmt parsePHPStatement(str s) {
@@ -338,13 +337,6 @@ public rel[str Product,str PlainText,str Description] loadProductInfoCSV() {
 public System discardErrorScripts(System s) {
 	return (l : s[l] | l <- s, script(_) := s[l]);
 }
-
-@logLevel {
-	Log level 0 => no logging;
-	Log level 1 => main logging;
-	Log level 2 => debug logging;
-}
-private int logLevel = 0;
 
 @doc { }
 public void logMessage(str message, int level) {
