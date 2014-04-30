@@ -111,7 +111,7 @@ public M3 fillContainment(M3 m3, Stmt statement, node parent) {
 		case foreach(expr, keyvar, _, asVar, body): {
 			m3 = fillContainment(m3, expr, parent);
 			m3 = fillContainment(m3, keyvar, parent);
-			m3 = fillContainment(m3, cond, parent);
+			m3 = fillContainment(m3, asVar, parent);
 			
 			for (stmt <- body)
 				m3 = fillContainment(m3, stmt, parent);
