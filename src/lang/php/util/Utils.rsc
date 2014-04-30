@@ -334,7 +334,10 @@ public rel[str Product,str PlainText,str Description] loadProductInfoCSV() {
 	return res;
 }
 
-// added functions by ruudvanderweijde
+@doc { filter a system to only contain script(_), and therefor discard errscript }
+public System discardErrorScripts(System s) {
+	return (l : s[l] | l <- s, script(_) := s[l]);
+}
 
 @logLevel {
 	Log level 0 => no logging;
