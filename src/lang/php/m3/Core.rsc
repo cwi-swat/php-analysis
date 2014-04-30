@@ -16,6 +16,7 @@ import analysis::m3::Registry;
 import lang::php::ast::AbstractSyntax;
 import lang::php::ast::NormalizeAST;
 import lang::php::m3::Containment;
+import lang::php::util::Config;
 import lang::php::util::Utils;
 import lang::php::util::System;
 
@@ -27,6 +28,8 @@ import String;
 import Map;
 import Node;
 import List;
+
+import ValueIO;
 
 alias M3Collection = map[loc fileloc, M3 model];
 
@@ -41,8 +44,8 @@ public loc globalNamespace = |php+namespace:///|;
 public M3 composePhpM3(loc id, set[M3] models) {
   m = composeM3(id, models);
   
-  m@extends 	= {*model@extends 		| model <- models};
-  m@implements 	= {*model@implements 	| model <- models};
+  m@extends 	= {*model@extends       | model <- models};
+  m@implements 	= {*model@implements    | model <- models};
   m@annotations = {*model@annotations 	| model <- models};
   m@phpDoc 		= {*model@phpDoc 		| model <- models};
   
@@ -52,14 +55,30 @@ public M3 composePhpM3(loc id, set[M3] models) {
 @doc{
 Synopsis: globs for jars, class files and java files in a directory and tries to compile all source files into an [$analysis/m3] model
 }
-public M3Collection createM3sFromDirectory(loc l) {
+public M3Collection createM3sFromDirectory(loc l) = createM3sFromDirectory(l, true);
+
+public M3Collection createM3sFromDirectory(loc l, bool useCache) {
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
 	if (l.scheme != "file") throw AssertionFailed("Location <l> must be an absolute path, use |file:///|");
-    
-    System system = loadPHPFiles(l);
+
+	System system = ();
+	if (useCache && cacheFileExists(l)) {
+		logMessage("Reading <l> from cache.", 2);
+		system = readSystemFromCache(l);
+	} else {	    
+    	system = loadPHPFiles(l);
+	   	writeSystemToCache(system, l); 
+	}
     system = normalizeSystem(system);
     return getM3CollectionForSystem(system);
 }
+
+// move to cache function file 
+public void writeSystemToCache(System s, loc l) = writeBinaryValueFile(getCacheFileName(l), s);
+public System readSystemFromCache(loc l) = readBinaryValueFile(#System, getCacheFileName(l));
+public loc getCacheFileName(loc l) = |tmp:///| + "pa" +replaceAll(l.path, "/", "_");
+public bool cacheFileExists(loc l) = isFile(getCacheFileName(l));
+// end of cache functions
 
 public System normalizeSystem(System s) {
 	s = discardErrorScripts(s);
@@ -155,33 +174,6 @@ public M3Collection getM3CollectionForSystem(System system) {
 		}
 	}
 
-	// fill uses, first for class instantiations
-	// also fill types relation
-	for (l <- system) {
-		visit (system[l]) {
-			/* new(NameOrExpr className, list[ActualParameter] parameters) */
-			case n:new(c:expr(className), params): {
-				println("Warning: dynamic class instantiation is not supported");
-				m3s[l]@uses += {<n@at, emptyId>};
-			}
-			case n:new(name(c:name(className)), params): {
-				set[loc] classDecls = findClassDeclaration(m3s[l], className);
-				m3s[l]@uses += {<c@at, decl> | decl <- classDecls};
-				// fill types
-			}
-		}
-	}
-
-	// fill uses, now for other elements	
-	for (l <- system) {
-		visit (system[l]) {
-			/* example: $target->name; || $target->$expr; */
-			case propertyFetch(target, property): {
-				m3s[l]@uses += {<property@at, decl> | decl <- {}};
-				//m3s[l]@uses += {<property@at, decl> | decl <- findClassPoperty(m3s[l], target, property)};
-			} 
-		}
-	}   	
 	return m3s;
 }
 
@@ -189,16 +181,6 @@ public M3 addUsageForNode(M3 m3, Expr elm) {
 	set decl = "";
 	m3@uses += {<elm@at, decl> | decl <- decls};
 
-}
-
-@doc {	search in declarations for classNames }
-public set[loc] findClassDeclaration(M3 m3, str className) {
-	// todo check name space
-	set[loc] decls = { decl | <name,decl> <- m3@names, name == className, isClass(decl)};
-	if (isEmpty(decls)) {
-		decls += |php+unresolvedClass:///-/| + className;
-	}
-	return decls;
 }
  
 public set[loc] getPossibleClassesInM3(M3 m3, str className) {
