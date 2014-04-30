@@ -6,19 +6,18 @@ Description:
 For a quick start, go find [createM3FromEclipseProject].
 }
 module lang::php::m3::Core
+extend analysis::m3::Core;
 
 import lang::php::m3::AST;
-
-extend analysis::m3::Core;
 
 import analysis::graphs::Graph;
 import analysis::m3::Registry;
 
 import lang::php::ast::AbstractSyntax;
+import lang::php::ast::NormalizeAST;
+import lang::php::m3::Containment;
 import lang::php::util::Utils;
 import lang::php::util::System;
-
-import lang::php::m3::Containment;
 
 import IO;
 import String;
@@ -50,20 +49,31 @@ public M3 composePhpM3(loc id, set[M3] models) {
   return m;
 }
 
-// hack to make decls work on (all) nodes; visit does not recognize the annotations on specific nodes when visiting `node`
-public anno loc node@at;
-public anno loc node@decl;
-public anno str node@phpdoc;
-public anno node node@scope;
-
 @doc{
 Synopsis: globs for jars, class files and java files in a directory and tries to compile all source files into an [$analysis/m3] model
 }
 public M3Collection createM3sFromDirectory(loc l) {
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
+	if (l.scheme != "file") throw AssertionFailed("Location <l> must be an absolute path, use |file:///|");
     
     System system = loadPHPFiles(l);
+    system = normalizeSystem(system);
     return getM3CollectionForSystem(system);
+}
+
+public System normalizeSystem(System s) {
+	s = discardErrorScripts(s);
+	
+	for (l <- s) {
+		s[l] = oldNamespaces(s[l]);
+		s[l] = normalizeIf(s[l]);
+		s[l] = flattenBlocks(s[l]);
+		s[l] = discardEmpties(s[l]);
+		s[l] = useBuiltins(s[l]);
+		s[l] = discardHTML(s[l]);
+	}
+	
+	return s;
 }
 
 public M3 createEmptyM3(loc file) {
@@ -190,12 +200,6 @@ public set[loc] findClassDeclaration(M3 m3, str className) {
 	}
 	return decls;
 }
-public loc findClassPoperty(M3 m3, target, property) {
-	// resolve the class type of target
-	// resolve the property declaration	
-	// todo: this is a simple implementation which only handles $var->prop;
-	
-}
  
 public set[loc] getPossibleClassesInM3(M3 m3, str className) {
 	set[loc] locs = {};
@@ -214,18 +218,6 @@ public set[loc] getPossibleInterfacesInM3(M3 m3, str className) {
 			locs += name.qualifiedName;
 				
 	return isEmpty(locs) ? {|php+unknownInterface:///| + className} : locs;
-}
-
-public set[loc] getPossibleClassesInSystem(M3Collection m3map, str className) {
-	set[loc] locs = {};
-	set[M3] m3s = {m3map[m3] | m3 <- m3map};
-	
-	for (l <- m3map) 
-		for (name <- m3map[l]@names) 
-			if (name.simpleName == className && isClass(name.qualifiedName))
-				locs += name.qualifiedName;
-				
-	return isEmpty(locs) ? {|php+unknownClass:///| + className} : locs;
 }
 
 public bool isNamespace(loc entity) = entity.scheme == "php+namespace";

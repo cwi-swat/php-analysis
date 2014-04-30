@@ -1,7 +1,14 @@
 module lang::php::m3::Containment
 
-extend lang::php::m3::Core;
+import analysis::m3::Core;
+import analysis::m3::Registry;
+import lang::php::m3::Core;
+import lang::php::m3::AST;
+import lang::php::ast::AbstractSyntax;
 
+import Node;
+import Relation;
+import Set;
 
 @doc { recursively fill containment }
 public M3 fillContainment(M3 m3, Script script) {

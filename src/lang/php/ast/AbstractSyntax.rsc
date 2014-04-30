@@ -321,3 +321,9 @@ public anno str Script@phpdoc;
 
 @doc{Used to associate the actual compile-time value with magic constants.}
 public anno str Scalar@actualValue;
+
+@doc{ hack to make decls work on (all) nodes; visit does not recognize the annotations on specific nodes when visiting `node` }
+public anno loc node@at;
+public anno loc node@decl;
+public anno str node@phpdoc;
+public anno node node@scope;
