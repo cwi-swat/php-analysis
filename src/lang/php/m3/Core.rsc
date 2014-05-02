@@ -25,8 +25,7 @@ alias M3Collection = map[loc fileloc, M3 model];
 
 anno rel[loc from, loc to] M3@extends;      // classes extending classes and interfaces extending interfaces
 anno rel[loc from, loc to] M3@implements;   // classes implementing interfaces
-// suggestion: rename to traitUses
-anno rel[loc from, loc to] M3@usesTrait;    // classes using traits and traits using traits
+anno rel[loc from, loc to] M3@traitUses;    // classes using traits and traits using traits
 anno rel[loc from, loc to] M3@aliases;      // class name aliases (new name -> old name)
 anno rel[loc pos, str phpDoc] M3@phpDoc;    // Multiline php comments /** ... */
 
@@ -37,9 +36,9 @@ public loc globalNamespace = |php+namespace:///|;
 public M3 composePhpM3(loc id, set[M3] models) {
   m = composeM3(id, models);
   
-  m@extends 	= {*model@extends       | model <- models};
-  m@implements 	= {*model@implements    | model <- models};
-  m@usesTrait 	= {*model@usesTrait 	| model <- models};
+  m@extends 	= {*model@extends 		| model <- models};
+  m@implements 	= {*model@implements 	| model <- models};
+  m@traitUses 	= {*model@traitUses 	| model <- models};
   m@aliases 	= {*model@aliases	 	| model <- models};
   m@phpDoc 		= {*model@phpDoc 		| model <- models};
   

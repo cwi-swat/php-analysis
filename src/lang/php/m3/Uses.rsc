@@ -6,8 +6,6 @@ import lang::php::\syntax::Names;
 
 import Prelude;
 
-// TODO the parser does not include leading \ of fully qualified names (when resolveNamespaces if false)
-
 
 public M3 calculateUsesFlowInsensitive(M3 m3, Script script)
 {
@@ -293,7 +291,7 @@ public M3 calculateAliasesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 			// TODO traits?
 			m3@aliases += { <nameToLoc(newName, \type), nameToLoc(oldName, \type)> |
 					\type <- ["class", "interface"] };
-		}	
+		}
 	}
 	
 	return m3;
