@@ -1,4 +1,4 @@
-module lang::php::syntax::PHP4 
+module lang::php::\syntax::PHP4 
 
 lexical HereDocLit
   = (![\n \r $ \\ {] | CurlyBracketLit | SlashCharLit | DollarCharLit | HereDocLineTerminator)+ 

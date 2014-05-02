@@ -17,8 +17,8 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::ast::NormalizeAST;
 import lang::php::m3::Containment;
 import lang::php::util::Config;
+import lang::php::ast::System;
 import lang::php::util::Utils;
-import lang::php::util::System;
 
 import IO;
 import String;
@@ -30,6 +30,7 @@ import Node;
 import List;
 
 import ValueIO;
+import Prelude;
 
 alias M3Collection = map[loc fileloc, M3 model];
 
@@ -39,6 +40,8 @@ anno rel[loc from, loc to] M3@usesTrait;    // classes using traits and traits u
 anno rel[loc from, loc to] M3@aliases;      // class name aliases (new name -> old name)
 anno rel[loc pos, str phpDoc] M3@phpDoc;    // Multiline php comments /** ... */
 
+alias M3Collection = map[loc fileloc, M3 model];
+
 public loc globalNamespace = |php+namespace:///|;
 
 public M3 composePhpM3(loc id, set[M3] models) {
@@ -47,6 +50,8 @@ public M3 composePhpM3(loc id, set[M3] models) {
   m@extends 	= {*model@extends       | model <- models};
   m@implements 	= {*model@implements    | model <- models};
   m@annotations = {*model@annotations 	| model <- models};
+  m@usesTrait 	= {*model@usesTrait 	| model <- models};
+  m@aliases 	= {*model@aliases	 	| model <- models};
   m@phpDoc 		= {*model@phpDoc 		| model <- models};
   
   return m;
@@ -230,3 +235,36 @@ public set[loc] elements(M3 m, loc parent) = { e | <parent, e> <- m@containment 
 
 @memo public set[loc] fields(M3 m, loc class) = { e | e <- elements(m, class), isField(e) };
 @memo public set[loc] methods(M3 m, loc class) = { e | e <- elements(m, class), isMethod(e) };
+
+
+public str normalizeName(str phpName, str \type)
+{
+	str name = replaceAll(phpName, "\\", "/");
+
+	if (\type in ["namespace", "class", "interface", "trait"])
+	{
+		name = toLowerCase(name);
+	}
+	
+	return name;
+}
+
+
+public loc nameToLoc(str phpName, str \type)
+{
+	str name = normalizeName(phpName, \type);
+
+	if (/^\/.*$/ !:= name)
+	{
+		name = "/" + name;
+	}
+	return |php+<\type>://<name>|;
+}
+
+
+public loc addNameToNamespace(str phpName, str \type, loc namespace)
+{
+	str name = normalizeName(phpName, \type);
+
+	return |php+<\type>://<namespace.path>/<name>|;
+}
