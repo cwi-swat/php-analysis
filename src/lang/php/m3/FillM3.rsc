@@ -25,24 +25,25 @@ public M3 createM3forScript(loc filename, Script script)
 	// fill uses (currently only for namespace/class/interface/trait names)
 	m3 = calculateUsesFlowInsensitive(m3, script);
 
-	// fill extends, implements and usesTrait, by trying to look up class names
+	// fill extends, implements and traitUse, by trying to look up class names
 	visit (script) {
-		case c:class(_,_,someName(name(name)),_,_): {
-			set[loc] possibleExtends = getPossibleClassesInM3(m3, name);
-			m3@extends += {<c@decl, ext> | ext <- possibleExtends};
-			fail; // continue this visit, a class can have extends and implements.
+		case c:class(_, _, extends:name(_), implements, body): {			
+			m3@extends += {<c@decl, ext> | ext <- m3@uses[extends@at]};
+			m3@implements += {<c@decl, impl> | name <- implements, impl <- m3@uses[name@at]};
+			
+			for (traitUse(names, _) <- body) {
+				m3@traitUse += {<c@decl, trait> | name <- names, trait <- m3@uses[name@at]};
+			}		
 		}
-		case c:class(_,_,_,list[Name] implements,_): {
-			for (name <- [n | name(n) <- implements]) {
-				set[loc] possibleImplements = getPossibleInterfacesInM3(m3, name);
-				m3@implements += {<c@decl, impl> | impl <- possibleImplements};
-			}
-		}	
-		case c:interface(_,list[Name] implements,_): {
-			for (name <- [n | name(n) <- implements]) {
-				set[loc] possibleImplements = getPossibleInterfacesInM3(m3, name);
-				m3@implements += {<c@decl, impl> | impl <- possibleImplements};
-			}
+		
+		case i:interface(_, extends, _): {
+			m3@extends += {<i@decl, ext> | name <- extends, ext <- m3@uses[name@at]};;
+		}
+		
+		case t:trait(_, body): { 
+			for (traitUse(names, _) <- body) {
+				m3@traitUse += {<c@decl, trait> | name <- names, trait <- m3@uses[name@at]};
+			}		
 		}
    	}	
    	
@@ -51,6 +52,8 @@ public M3 createM3forScript(loc filename, Script script)
 		case n:class(_,set[Modifier] mfs,_,_,_): 				m3@modifiers += {<n@decl, mf> | mf <- mfs};
 		case n:property(set[Modifier] mfs,list[Property] ps): 	m3@modifiers += {<p@decl, mf> | mf <- mfs, p <- ps };	
 		case n:method(_,set[Modifier] mfs,_,_,_):				m3@modifiers += {<n@decl, mf> | mf <- mfs};
+		
+		//traitAlias isn't done here
 	}
    	 
  	// fill documentation, defined as @phpdoc
