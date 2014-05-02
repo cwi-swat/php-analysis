@@ -15,21 +15,10 @@ import analysis::m3::Registry;
 
 import lang::php::ast::AbstractSyntax;
 import lang::php::ast::NormalizeAST;
-import lang::php::m3::Containment;
-import lang::php::util::Config;
 import lang::php::ast::System;
+import lang::php::util::Config;
 import lang::php::util::Utils;
 
-import IO;
-import String;
-import Relation;
-import Set;
-import String;
-import Map;
-import Node;
-import List;
-
-import ValueIO;
 import Prelude;
 
 alias M3Collection = map[loc fileloc, M3 model];
@@ -57,157 +46,7 @@ public M3 composePhpM3(loc id, set[M3] models) {
   return m;
 }
 
-@doc{
-Synopsis: globs for jars, class files and java files in a directory and tries to compile all source files into an [$analysis/m3] model
-}
-public M3Collection createM3sFromDirectory(loc l) = createM3sFromDirectory(l, true);
-
-public M3Collection createM3sFromDirectory(loc l, bool useCache) {
-	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
-	if (l.scheme != "file") throw AssertionFailed("Location <l> must be an absolute path, use |file:///|");
-
-	System system = ();
-	if (useCache && cacheFileExists(l)) {
-		logMessage("Reading <l> from cache.", 2);
-		system = readSystemFromCache(l);
-	} else {	    
-    	system = loadPHPFiles(l);
-		logMessage("Writing <l> to cache.", 2);
-	   	writeSystemToCache(system, l); 
-		logMessage("Writing <l> done.", 2);
-	}
-    system = normalizeSystem(system);
-    return getM3CollectionForSystem(system);
-}
-
-// move to cache function file 
-public void writeSystemToCache(System s, loc l) = writeBinaryValueFile(getCacheFileName(l), s);
-public System readSystemFromCache(loc l) = readBinaryValueFile(#System, getCacheFileName(l));
-public loc getCacheFileName(loc l) = |tmp:///| + "pa" +replaceAll(l.path, "/", "_");
-public bool cacheFileExists(loc l) = isFile(getCacheFileName(l));
-// end of cache functions
-
-public System normalizeSystem(System s) {
-	s = discardErrorScripts(s);
-	
-	for (l <- s) {
-		s[l] = oldNamespaces(s[l]);
-		s[l] = normalizeIf(s[l]);
-		s[l] = flattenBlocks(s[l]);
-		s[l] = discardEmpties(s[l]);
-		s[l] = useBuiltins(s[l]);
-		s[l] = discardHTML(s[l]);
-	}
-	
-	return s;
-}
-
-public M3 createEmptyM3(loc file) {
-	M3 m3 = composePhpM3(file, {});
-	return m3;
-}
-
-public M3Collection getM3CollectionForSystem(System system) {
-    M3Collection m3s = (l:createEmptyM3(l) | l <- system); // for each file, create an empty m3
-	
-	// fill declarations
-	for (l <- system) {
-		visit (system[l]) {
-			case node n: {
-				if ( (n@at)? && (n@decl)? ) {
-					m3s[l]@declarations += {<n@decl, n@at>};
-					m3s[l]@names += {<n@decl.file, n@decl>};
-				}
-			}
-	   	}
-	   	// if there are no namespaces, or no declarations at all, add global namespace
-	   	if (!(m3s[l]@declarations)? || isEmpty({ ns | <ns,_> <- m3s[l]@declarations, isNamespace(ns) })) {
-			m3s[l]@declarations += {<globalNamespace, l>};
-	   	}
-	}	
-	
-	// fill containtment with declarations
-	for (l <- system) {
-		m3s[l] = fillContainment(m3s[l], system[l]);
-	}	
-	
-	
-	// fill extends and implements, by trying to look up class names
-	for (l <- system) {
-		visit (system[l]) {
-			case c:class(_,_,someName(name(name)),_,_): {
-				set[loc] possibleExtends = getPossibleClassesInM3(m3s[l], name);
-				m3s[l]@extends += {<c@decl, ext> | ext <- possibleExtends};
-				fail; // continue this visit, a class can have extends and implements.
-			}
-			case c:class(_,_,_,list[Name] implements,_): {
-				for (name <- [n | name(n) <- implements]) {
-					set[loc] possibleImplements = getPossibleInterfacesInM3(m3s[l], name);
-					m3s[l]@implements += {<c@decl, impl> | impl <- possibleImplements};
-				}
-			}	
-			case c:interface(_,list[Name] implements,_): {
-				for (name <- [n | name(n) <- implements]) {
-					set[loc] possibleImplements = getPossibleInterfacesInM3(m3s[l], name);
-					m3s[l]@implements += {<c@decl, impl> | impl <- possibleImplements};
-				}
-			}
-	   	}
-	}	
-	
-   	
-   	// fill modifiers for classes, class fields and class methods
-	for (l <- system) {
-	   	visit (system[l]) {
-   			case n:class(_,set[Modifier] mfs,_,_,_): 				m3s[l]@modifiers += {<n@decl, mf> | mf <- mfs};
-			case n:property(set[Modifier] mfs,list[Property] ps): 	m3s[l]@modifiers += {<p@decl, mf> | mf <- mfs, p <- ps };	
-			case n:method(_,set[Modifier] mfs,_,_,_):				m3s[l]@modifiers += {<n@decl, mf> | mf <- mfs};
-   		}
-   	}
-   	 
- 	// fill documentation, defined as @phpdoc
-	for (l <- system) {
-	  visit (system[l]) {
-			case node n:
-				if ( (n@decl)? && (n@phpdoc)? ) 
-					m3s[l]@phpDoc += {<n@decl, n@phpdoc>};
-		}	
-	}
-
-	// fill containment, for now only for compilationMethod, Class/Interface/Trait, Method, field
-	for (l <- system) {
-		visit (system[l]) {
-			case _: ;
-		}
-	}
-
-	return m3s;
-}
-
-public M3 addUsageForNode(M3 m3, Expr elm) {
-	set decl = "";
-	m3@uses += {<elm@at, decl> | decl <- decls};
-
-}
- 
-public set[loc] getPossibleClassesInM3(M3 m3, str className) {
-	set[loc] locs = {};
-	
-	for (name <- m3@names) 
-		if (name.simpleName == className && isClass(name.qualifiedName))
-			locs += name.qualifiedName;
-				
-	return isEmpty(locs) ? {|php+unknownClass:///| + className} : locs;
-}
-public set[loc] getPossibleInterfacesInM3(M3 m3, str className) {
-	set[loc] locs = {};
-	
-	for (name <- m3@names) 
-		if (name.simpleName == className && isInterface(name.qualifiedName))
-			locs += name.qualifiedName;
-				
-	return isEmpty(locs) ? {|php+unknownInterface:///| + className} : locs;
-}
+public M3 createEmptyM3(loc file) = composePhpM3(file, {});
 
 public bool isNamespace(loc entity) = entity.scheme == "php+namespace";
 public bool isClass(loc entity) = entity.scheme == "php+class";

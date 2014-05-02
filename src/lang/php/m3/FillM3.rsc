@@ -73,18 +73,32 @@ public M3Collection getM3CollectionForSystem(System system) {
     return (filename:createM3forScript(filename, system[filename]) | filename <- system);
 }
 
-
 @doc{
 Synopsis: globs for jars, class files and java files in a directory and tries to compile all source files into an [$analysis/m3] model
 }
-public M3Collection createM3sFromDirectory(loc l) {
+public M3Collection createM3sFromDirectory(loc l) = createM3sFromDirectory(l, true);
+
+public M3Collection createM3sFromDirectory(loc l, bool useCache) {
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
 	if (l.scheme != "file") throw AssertionFailed("Location <l> must be an absolute path, use |file:///|");
-    
-    System system = loadPHPFiles(l);
+
+	System system = ();
+	if (useCache && cacheFileExists(l)) {
+		logMessage("Reading <l> from cache.", 2);
+		system = readSystemFromCache(l);
+	} else {	    
+    	system = loadPHPFiles(l);
+		logMessage("Writing <l> to cache.", 2);
+	   	writeSystemToCache(system, l); 
+		logMessage("Writing <l> done.", 2);
+	}
     system = normalizeSystem(system);
     return getM3CollectionForSystem(system);
 }
 
-
-
+// move to cache function file 
+public void writeSystemToCache(System s, loc l) = writeBinaryValueFile(getCacheFileName(l), s);
+public System readSystemFromCache(loc l) = readBinaryValueFile(#System, getCacheFileName(l));
+public loc getCacheFileName(loc l) = |tmp:///| + "pa" +replaceAll(l.path, "/", "_");
+public bool cacheFileExists(loc l) = isFile(getCacheFileName(l));
+// end of cache functions
