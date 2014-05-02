@@ -9,7 +9,6 @@
 module lang::php::util::Utils
 
 import lang::php::util::Corpus;
-import lang::php::util::System;
 import lang::php::ast::System;
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Config;
@@ -332,11 +331,6 @@ public map[tuple[str product, str version], map[loc l, Script scr]] getLatestTre
 public rel[str Product,str PlainText,str Description] loadProductInfoCSV() {
 	rel[str Product,str PlainText,str Description] res = readCSV(#rel[str Product,str PlainText,str Description],|rascal://src/lang/php/extract/csvs/ProductInfo.csv|);
 	return res;
-}
-
-@doc { filter a system to only contain script(_), and therefor discard errscript }
-public System discardErrorScripts(System s) {
-	return (l : s[l] | l <- s, script(_) := s[l]);
 }
 
 @doc { }

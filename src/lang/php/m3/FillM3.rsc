@@ -19,11 +19,6 @@ public M3 createM3forScript(loc filename, Script script)
 		}
    	}
    	
-   	// if there are no namespaces, or no declarations at all, add global namespace
-   	if (!(m3@declarations)? || isEmpty({ ns | <ns,_> <- m3@declarations, isNamespace(ns) })) {
-		m3@declarations += {<globalNamespace, l>};
-   	}
-	  	
 	// fill containment with declarations
 	m3 = fillContainment(m3, script);
 
@@ -76,13 +71,20 @@ public M3Collection getM3CollectionForSystem(System system) {
 @doc{
 Synopsis: globs for jars, class files and java files in a directory and tries to compile all source files into an [$analysis/m3] model
 }
-public M3Collection createM3sFromDirectory(loc l) = createM3sFromDirectory(l, true);
+public M3Collection createM3sFromDirectory(loc l) = createM3sFromDirectory(l, false);
 
 public M3Collection createM3sFromDirectory(loc l, bool useCache) {
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
 	if (l.scheme != "file") throw AssertionFailed("Location <l> must be an absolute path, use |file:///|");
 
+	System system = getSystem(l, useCache);
+    system = normalizeSystem(system);
+    return getM3CollectionForSystem(system);
+}
+
+public System getSystem(loc l, bool useCache) {
 	System system = ();
+	
 	if (useCache && cacheFileExists(l)) {
 		logMessage("Reading <l> from cache.", 2);
 		system = readSystemFromCache(l);
@@ -92,8 +94,8 @@ public M3Collection createM3sFromDirectory(loc l, bool useCache) {
 	   	writeSystemToCache(system, l); 
 		logMessage("Writing <l> done.", 2);
 	}
-    system = normalizeSystem(system);
-    return getM3CollectionForSystem(system);
+	
+	return system;
 }
 
 // move to cache function file 
