@@ -14,7 +14,6 @@ import analysis::graphs::Graph;
 import analysis::m3::Registry;
 
 import lang::php::ast::AbstractSyntax;
-import lang::php::ast::NormalizeAST;
 import lang::php::ast::System;
 import lang::php::util::Config;
 import lang::php::util::Utils;
