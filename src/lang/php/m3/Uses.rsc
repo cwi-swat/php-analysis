@@ -58,7 +58,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 		
 		case interface(_, extends, members):
 		{
-			for (interfaceName <- names)
+			for (interfaceName <- extends)
 			{
 				m3 = addUse(m3, interfaceName, "interface", currentNamespace);
 			}		

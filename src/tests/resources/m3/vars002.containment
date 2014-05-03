@@ -1,5 +1,5 @@
 {
-	<|php+namespace:///|,   |php+class:///X|>,
+	<|php+namespace:///|,   |php+class:///x|>,
 
 	<|php+namespace:///|,   |php+function:///f|>,
 	<|php+namespace:///|,   |php+function:///g|>,
@@ -28,6 +28,6 @@
 	<|php+function:///g|,   |php+functionVar:///g/private|>,
 	<|php+function:///h|,   |php+functionVar:///h/private|>,
 
-	<|php+class:///X|,      |php+method:///X/getX|>,
-	<|php+method:///X/getX|,|php+methodVar:///X/getX/private|>
+	<|php+class:///x|,      |php+method:///x/getx|>,
+	<|php+method:///x/getx|,|php+methodvar:///x/getx/private|>
 }

@@ -12,13 +12,13 @@
     <|php+namespace:///|,   |php+function:///h|>,
     <|php+function:///h|,   |php+functionVar:///h/h|>,
 
-    <|php+namespace:///|,   |php+class:///C|>,
-    <|php+class:///C|,      |php+classConstant:///C/thisClassIsUsed|>,
-    <|php+class:///C|,      |php+classConstant:///C/constIsNeverUsed|>,
+    <|php+namespace:///|,   |php+class:///c|>,
+    <|php+class:///c|,      |php+classConstant:///c/thisClassIsUsed|>,
+    <|php+class:///c|,      |php+classConstant:///c/constIsNeverUsed|>,
 
-    <|php+namespace:///|,   |php+class:///D|>,
-    <|php+class:///D|,      |php+classConstant:///D/thisClassIsUsed|>,
-    <|php+class:///D|,      |php+classConstant:///D/constIsNeverUsed|>,
+    <|php+namespace:///|,   |php+class:///d|>,
+    <|php+class:///d|,      |php+classConstant:///d/thisClassIsUsed|>,
+    <|php+class:///d|,      |php+classConstant:///d/constIsNeverUsed|>,
 
     <|php+namespace:///|,   |php+globalVar:///elseIf|>,
     <|php+namespace:///|,   |php+globalVar:///else|>

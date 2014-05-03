@@ -1,8 +1,9 @@
 module tests::lang::php::m3::Core
 
-import analysis::m3::Core;
-//import lang::php::m3::Core;
+import lang::php::m3::Core;
+import lang::php::m3::FillM3;
 import lang::php::m3::Containment;
+import lang::php::m3::Uses;
 import lang::php::util::Config;
 import lang::php::ast::AbstractSyntax;
 
@@ -20,9 +21,9 @@ public test bool testIsNamespace() = isNamespace(|php+namespace:///|);
 public test bool testIsClass()     = isClass(|php+class:///|);
 public test bool testIsMethod()    = isMethod(|php+method:///|);
 public test bool testIsTrait()     = isTrait(|php+trait:///|);
-public test bool testIsParameter() = isParameter(|php+parameter:///|);
+public test bool testIsParameter() = isParameter(|php+functionParam:///|) && isParameter(|php+methodParam:///|);
 public test bool testIsFunction()  = isFunction(|php+function:///|);
-public test bool testIsVariable()  = isVariable(|php+variable:///|);
+public test bool testIsVariable()  = isVariable(|php+globalVar:///|) && isVariable(|php+functionVar:///|) && isVariable(|php+methodVar:///|);
 public test bool testIsField()     = isField(|php+field:///|);
 public test bool testIsInterface() = isInterface(|php+interface:///|);
 
@@ -34,12 +35,6 @@ public M3Collection getM3s() {
 	m3@names = { <"Class_1",|php+class:///Class_1|>, <"Class_2",|php+class:///Class_2|> };
 	return (emptyId:m3);
 }
-// test getPossibleClassesInSystem 
-public test bool findClass_1() = {|php+class:///Class_1|} == getPossibleClassesInSystem(getM3s(), "Class_1");
-public test bool findClass_2() = {|php+class:///Class_2|} == getPossibleClassesInSystem(getM3s(), "Class_2");
-public test bool findClass_3() = {|php+unknownClass:///Class_3|} == getPossibleClassesInSystem(getM3s(), "Class_3");
-public test bool findUnknown() = {|php+unknownClass:///Unknown|} == getPossibleClassesInSystem(getM3s(), "Unknown");
-
 
 // helpers 
 public loc classTestFolder = analysisLoc + "src/tests/resources/class/";
@@ -55,32 +50,31 @@ public test bool testModifierInModel1() = isEmpty(classM3s[classTestFolder+"Clas
 public test bool testModifierInModel2() = {abstract()}== range(classM3s[classTestFolder+"ClassAbstract.php"]@modifiers);
 public test bool testModifierInModel3() = {final()} == range(classM3s[classTestFolder+"ClassFinal.php"]@modifiers);
 
-public test bool testExtends() 	  = 1 == size(classM3s[classTestFolder+"ClassAExtendsB.php"]@extends);
-public test bool testImplements() = 2 == size(classM3s[classTestFolder+"ClassAImplementsCD.php"]@implements);
-
 public rel[str,Modifier] actualClassModifiers = (classM3s[classTestFolder+"ClassPopulated.php"]@names o classM3s[classTestFolder+"ClassPopulated.php"]@modifiers);
 public rel[str,Modifier] expectedClassModifiers = { 
-	<"publicFieldB", \public()>, 
-	<"publicFieldC", \public()>, 
+    <"publicFieldC", \public()>,
+    <"publicFieldB", \public()>,
 	<"protectedField", protected()>, 
 	<"privateField", \private()>, 
-	<"publicFunction", \public()>, 
-	<"publicStaticFunction", \public()>, 
-	<"publicStaticFunction", static()>, 
-	<"publicFinalFunction", \public()>, 
-	<"publicFinalFunction", final()>, 
-	<"protectedFunction", protected()>,
-	<"privateFunction", \private()>};
+	<"publicfunction", \public()>, 
+	<"publicstaticfunction", \public()>, 
+	<"publicstaticfunction", static()>, 
+	<"publicfinalfunction", \public()>, 
+	<"publicfinalfunction", final()>, 
+	<"protectedfunction", protected()>,
+	<"privatefunction", \private()>
+	};
 	
 public test bool testClassModifiers() =  actualClassModifiers == expectedClassModifiers;
 
+public loc testFolder = analysisLoc + "src/tests/resources/m3";
+
 public test bool testContainment() {
-	loc testFolder = analysisLoc + "src/tests/resources/m3";
 	M3Collection m3s = createM3sFromDirectory(testFolder);
 	for (f <- testFolder.ls) {
 		if (f.extension == "containment") {
 			rel[loc from, loc to] expectedContainment = readTextValueFile(#rel[loc,loc], f);
-			loc phpFileName = testFolder+"<f.file[0..-12]>.php";
+			loc phpFileName = getPhpFileNameFromContainmentFile(f);
 			//println("Running test: <f>");
 			if (m3s[phpFileName]@containment != expectedContainment) {
 				println("Test failed for file: `<phpFileName.file>`, `<f.file>` (test stopped)");
@@ -94,3 +88,5 @@ public test bool testContainment() {
 	}
 	return true;
 }
+
+private loc getPhpFileNameFromContainmentFile(loc f) = testFolder+"<f.file[0..-12]>.php";

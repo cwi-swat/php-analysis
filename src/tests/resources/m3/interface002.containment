@@ -1,7 +1,7 @@
 {
-	<|php+namespace:///Alpha|,  |php+interface:///Alpha/a|>,
-	<|php+namespace:///Beta|,   |php+class:///Beta/b|>,
+	<|php+namespace:///alpha|,  |php+interface:///alpha/a|>,
+	<|php+namespace:///beta|,   |php+class:///beta/b|>,
 
-	<|php+interface:///Alpha/a|, |php+classConstant:///Alpha/a/b|>,
-	<|php+namespace:///Alpha|, |php+constant:///Alpha/x|>
+	<|php+interface:///alpha/a|, |php+classconstant:///alpha/a/b|>,
+	<|php+namespace:///alpha|, |php+constant:///alpha/x|>
 }

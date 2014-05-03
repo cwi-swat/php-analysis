@@ -1,10 +1,10 @@
 {
-	<|php+namespace:///|,   |php+trait:///Hello|>,
-	<|php+namespace:///|,   |php+trait:///World|>,
-	<|php+namespace:///|,   |php+class:///MyHelloWorld|>,
-	<|php+namespace:///|,   |php+globalVar:///o|>,
+	<|php+namespace:///|,   |php+trait:///hello|>,
+	<|php+namespace:///|,   |php+trait:///world|>,
+	<|php+namespace:///|,   |php+class:///myhelloworld|>,
+	<|php+namespace:///|,   |php+globalvar:///o|>,
 
-	<|php+trait:///Hello|,          |php+method:///Hello/sayHello|>,
-	<|php+trait:///World|,          |php+method:///World/sayWorld|>,
-	<|php+class:///MyHelloWorld|,   |php+method:///MyHelloWorld/sayExclamationMark|>,
+	<|php+trait:///hello|,          |php+method:///hello/sayhello|>,
+	<|php+trait:///world|,          |php+method:///world/sayworld|>,
+	<|php+class:///myhelloworld|,   |php+method:///myhelloworld/sayexclamationmark|>,
 }
