@@ -73,20 +73,31 @@ public test bool testContainment() {
 	M3Collection m3s = createM3sFromDirectory(testFolder);
 	for (f <- testFolder.ls) {
 		if (f.extension == "containment") {
-			rel[loc from, loc to] expectedContainment = readTextValueFile(#rel[loc,loc], f);
-			loc phpFileName = getPhpFileNameFromContainmentFile(f);
-			//println("Running test: <f>");
-			if (m3s[phpFileName]@containment != expectedContainment) {
-				println("Test failed for file: `<phpFileName.file>`, `<f.file>` (test stopped)");
-				println("Not in expected/actual:");
-				println(m3s[phpFileName]@containment - expectedContainment);
-				println(expectedContainment - m3s[phpFileName]@containment);
+			rel[loc from, loc to] expected = readTextValueFile(#rel[loc,loc], f);
+			loc phpFile = getPhpFileNameFromContainmentFile(f);
+			if (m3s[phpFile]@containment != expected) {
+				printFailedTest(phpFile, f, expected, m3s[phpFile]@containment);
 				return false;
 			}
-			//println("Test Success: <f>");
+		}
+		if (f.extension == "uses") {
+			rel[loc from, loc to] expected = readTextValueFile(#rel[loc,loc], f);
+			loc phpFile = getPhpFileNameFromUsesFile(f);
+			if (m3s[phpFile]@uses != expected) {
+				printFailedTest(phpFile, f, expected, m3s[phpFile]@uses);
+				return false;
+			}
 		}
 	}
 	return true;
 }
 
 private loc getPhpFileNameFromContainmentFile(loc f) = testFolder+"<f.file[0..-12]>.php";
+private loc getPhpFileNameFromUsesFile(loc f) = testFolder+"<f.file[0..-5]>.php";
+
+private void printFailedTest(loc phpFile, loc testFile, rel[loc,loc] expected, rel[loc,loc] actual) {
+    println("Test failed for file: `<phpFile.file>`, `<testFile.file>` (test stopped)");
+    println("Not in expected/actual:");
+    println(actual - expected);
+    println(expected - actual);
+}
