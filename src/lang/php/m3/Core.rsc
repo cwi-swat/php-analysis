@@ -18,6 +18,8 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::util::Utils;
 import lang::php::util::System;
 
+import lang::php::m3::Containment;
+
 import IO;
 import String;
 import Relation;
@@ -36,13 +38,15 @@ anno rel[loc from, loc to] M3@extends;      // classes extending classes and int
 anno rel[loc from, loc to] M3@implements;   // classes implementing interfaces
 anno rel[loc pos, str phpDoc] M3@phpDoc;    // Multiline php comments /** ... */
 
+public loc globalNamespace = |php+namespace:///|;
+
 public M3 composePhpM3(loc id, set[M3] models) {
   m = composeM3(id, models);
   
-  m@extends = {*model@extends | model <- models};
-  m@implements = {*model@implements | model <- models};
-  m@annotations = {*model@annotations | model <- models};
-  m@phpDoc = {*model@phpDoc | model <- models};
+  m@extends 	= {*model@extends 		| model <- models};
+  m@implements 	= {*model@implements 	| model <- models};
+  m@annotations = {*model@annotations 	| model <- models};
+  m@phpDoc 		= {*model@phpDoc 		| model <- models};
   
   return m;
 }
@@ -56,12 +60,10 @@ public anno node node@scope;
 @doc{
 Synopsis: globs for jars, class files and java files in a directory and tries to compile all source files into an [$analysis/m3] model
 }
-public M3Collection createM3sFromDirectory(loc project) {
-    if (!(isDirectory(project)))
-      throw "<project> is not a valid directory";
+public M3Collection createM3sFromDirectory(loc l) {
+	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
     
-    System system = loadPHPFiles(project);
-    
+    System system = loadPHPFiles(l);
     return getM3CollectionForSystem(system);
 }
 
@@ -71,30 +73,45 @@ public M3Collection getM3CollectionForSystem(System system) {
 	// fill declarations
 	for (l <- system) {
 		visit (system[l]) {
-			case node n:
+			case node n: {
 				if ( (n@at)? && (n@decl)? ) {
 					m3s[l]@declarations += {<n@decl, n@at>};
 					m3s[l]@names += {<n@decl.file, n@decl>};
 				}
+			}
+	   	}
+	   	// if there are no namespaces, or no declarations at all, add global namespace
+	   	if (!(m3s[l]@declarations)? || isEmpty({ ns | <ns,_> <- m3s[l]@declarations, isNamespace(ns) })) {
+			m3s[l]@declarations += {<globalNamespace, l>};
 	   	}
 	}	
+	
+	// fill containtment with declarations
+	for (l <- system) {
+		m3s[l] = fillContainment(m3s[l], system[l]);
+	}	
+	
 	
 	// fill extends and implements, by trying to look up class names
 	for (l <- system) {
 		visit (system[l]) {
-			case c:class(_,_,someName(name(name)),_,_): 
-			{
+			case c:class(_,_,someName(name(name)),_,_): {
 				set[loc] possibleExtends = getPossibleClassesInM3(m3s[l], name);
 				m3s[l]@extends += {<c@decl, ext> | ext <- possibleExtends};
 				fail; // continue this visit, a class can have extends and implements.
 			}
-			case c:class(_,_,_,list[Name] implements,_):
-			{
+			case c:class(_,_,_,list[Name] implements,_): {
 				for (name <- [n | name(n) <- implements]) {
-					set[loc] possibleImplements = getPossibleClassesInM3(m3s[l], name);
+					set[loc] possibleImplements = getPossibleInterfacesInM3(m3s[l], name);
 					m3s[l]@implements += {<c@decl, impl> | impl <- possibleImplements};
 				}
 			}	
+			case c:interface(_,list[Name] implements,_): {
+				for (name <- [n | name(n) <- implements]) {
+					set[loc] possibleImplements = getPossibleInterfacesInM3(m3s[l], name);
+					m3s[l]@implements += {<c@decl, impl> | impl <- possibleImplements};
+				}
+			}
 	   	}
 	}	
 	
@@ -117,13 +134,63 @@ public M3Collection getM3CollectionForSystem(System system) {
 		}	
 	}
 
-	// fill usage
+	// fill containment, for now only for compilationMethod, Class/Interface/Trait, Method, field
 	for (l <- system) {
 		visit (system[l]) {
-			case elm:var(name(name(name))): m3s[l]@uses += {<elm@at, decl> | decl <- findVarInM3UsingScopeInfo(m3s[l], name, elm)};
+			case _: ;
+		}
+	}
+
+	// fill uses, first for class instantiations
+	// also fill types relation
+	for (l <- system) {
+		visit (system[l]) {
+			/* new(NameOrExpr className, list[ActualParameter] parameters) */
+			case n:new(c:expr(className), params): {
+				println("Warning: dynamic class instantiation is not supported");
+				m3s[l]@uses += {<n@at, emptyId>};
+			}
+			case n:new(name(c:name(className)), params): {
+				set[loc] classDecls = findClassDeclaration(m3s[l], className);
+				m3s[l]@uses += {<c@at, decl> | decl <- classDecls};
+				// fill types
+			}
+		}
+	}
+
+	// fill uses, now for other elements	
+	for (l <- system) {
+		visit (system[l]) {
+			/* example: $target->name; || $target->$expr; */
+			case propertyFetch(target, property): {
+				m3s[l]@uses += {<property@at, decl> | decl <- {}};
+				//m3s[l]@uses += {<property@at, decl> | decl <- findClassPoperty(m3s[l], target, property)};
+			} 
 		}
 	}   	
 	return m3s;
+}
+
+public M3 addUsageForNode(M3 m3, Expr elm) {
+	set decl = "";
+	m3@uses += {<elm@at, decl> | decl <- decls};
+
+}
+
+@doc {	search in declarations for classNames }
+public set[loc] findClassDeclaration(M3 m3, str className) {
+	// todo check name space
+	set[loc] decls = { decl | <name,decl> <- m3@names, name == className, isClass(decl)};
+	if (isEmpty(decls)) {
+		decls += |php+unresolvedClass:///-/| + className;
+	}
+	return decls;
+}
+public loc findClassPoperty(M3 m3, target, property) {
+	// resolve the class type of target
+	// resolve the property declaration	
+	// todo: this is a simple implementation which only handles $var->prop;
+	
 }
 
 public set[loc] findVarInM3UsingScopeInfo(M3 m3, str name, Expr elm) {
@@ -146,6 +213,15 @@ public set[loc] getPossibleClassesInM3(M3 m3, str className) {
 			locs += name.qualifiedName;
 				
 	return isEmpty(locs) ? {|php+unknownClass:///| + className} : locs;
+}
+public set[loc] getPossibleInterfacesInM3(M3 m3, str className) {
+	set[loc] locs = {};
+	
+	for (name <- m3@names) 
+		if (name.simpleName == className && isInterface(name.qualifiedName))
+			locs += name.qualifiedName;
+				
+	return isEmpty(locs) ? {|php+unknownInterface:///| + className} : locs;
 }
 
 public set[loc] getPossibleClassesInSystem(M3Collection m3map, str className) {

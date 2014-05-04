@@ -2,14 +2,18 @@ module tests::lang::php::m3::Core
 
 import analysis::m3::Core;
 import lang::php::m3::Core;
+import lang::php::m3::Containment;
 import lang::php::util::Config;
 import lang::php::ast::AbstractSyntax;
 
+import IO;
 import List;
 import Map;
 import Node;
 import Relation;
 import Set;
+
+import ValueIO;
 
 // test PHP Schemes
 public test bool testIsNamespace() = isNamespace(|php+namespace:///|);
@@ -69,3 +73,24 @@ public rel[str,Modifier] expectedClassModifiers = {
 	<"privateFunction", \private()>};
 	
 public test bool testClassModifiers() =  actualClassModifiers == expectedClassModifiers;
+
+public test bool testContainment() {
+	loc testFolder = analysisLoc + "src/tests/resources/m3";
+	M3Collection m3s = createM3sFromDirectory(testFolder);
+	for (f <- testFolder.ls) {
+		if (f.extension == "containment") {
+			rel[loc from, loc to] expectedContainment = readTextValueFile(#rel[loc,loc], f);
+			loc phpFileName = testFolder+"<f.file[0..-12]>.php";
+			//println("Running test: <f>");
+			if (m3s[phpFileName]@containment != expectedContainment) {
+				println("Test failed for file: `<phpFileName.file>`, `<f.file>` (test stopped)");
+				println("Not in expected/actual:");
+				println(m3s[phpFileName]@containment - expectedContainment);
+				println(expectedContainment - m3s[phpFileName]@containment);
+				return false;
+			}
+			//println("Test Success: <f>");
+		}
+	}
+	return true;
+}
