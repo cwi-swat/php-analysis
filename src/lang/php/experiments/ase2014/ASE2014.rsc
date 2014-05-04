@@ -98,17 +98,22 @@ public void doQuickResolve(Corpus corpus) {
 		pt = loadBinary(p,v);
 		IncludesInfo iinfo = loadIncludesInfo(p, v);
 		rel[loc,loc,loc] res = { };
+		map[loc,Duration] timings = ( );
 		println("Resolving for <size(pt<0>)> files");
 		counter = 0;
 		for (l <- pt) {
+			dt1 = now();
 			qr = quickResolve(pt, iinfo, l, getCorpusItem(p,v) libs = (p in usedLibs) ? usedLibs[p] : { });
+			dt2 = now();
 			res = res + { < l, ll, lr > | < ll, lr > <- qr };
 			counter += 1;
 			if (counter % 100 == 0) {
 				println("Resolved <counter> files");
 			}
+			timings[l] = (dt2 - dt1);
 		}
 		writeBinaryValueFile(infoLoc + "<p>-<v>-qr.bin", res);
+		writeBinaryValueFile(infoLoc + "<p>-<v>-qrtime.bin", timings);
 	}
 }
 
@@ -137,10 +142,43 @@ public rel[loc,loc,loc] loadQuickResolveInfo(str p, str v) {
 	return readBinaryValueFile(#rel[loc,loc,loc], infoLoc + "<p>-<v>-qr.bin");
 }
 
+public map[loc,Duration] loadQuickResolveTimings(str p, str v) {
+	return readBinaryValueFile(#map[loc,Duration], infoLoc + "<p>-<v>-qrtime.bin");
+}
+
+public map[loc,Duration] loadAllQuickResolveTimings(Corpus corpus) {
+	map[loc,Duration] res = ( );
+	for (p <- corpus, v := corpus[p], exists(infoLoc + "<p>-<v>-qrtime.bin")) {
+		res = res + readBinaryValueFile(#map[loc,Duration], infoLoc + "<p>-<v>-qrtime.bin");
+	}
+	return res;
+}
+
+public list[int] allTimingsInMillis(map[loc,Duration] timings) {
+	list[int] res = [ ];
+	for (l <- timings, d := timings[l]) {
+		res = res + (d.milliseconds + (d.seconds * 1000) + (d.minutes * 60 * 1000) + (d.hours * 60 * 60 * 1000));
+	}
+	return res;
+}
+
 @doc{Reload the quick resolve info with expressions.}
 public rel[loc,loc,Expr,loc] loadQuickResolveExprInfo(str p, str v) {
 	return readBinaryValueFile(#rel[loc,loc,Expr,loc], infoLoc + "<p>-<v>-qre.bin");
 }
+
+public set[loc] getAnyIncludes(System sys, rel[loc,loc,loc] qrinfo) {
+	cutoff = size(sys<0>) * .9;
+	nofile = qrinfo<1,2>;
+	return {l | l <- nofile<0>, size(nofile[l]) > cutoff };
+}
+
+public set[loc] getOtherIncludes(System sys, rel[loc,loc,loc] qrinfo) {
+	cutoff = size(sys<0>) * .9;
+	nofile = qrinfo<1,2>;
+	return {l | l <- nofile<0>, fls := nofile[l], !(size(fls) < 2 || size(nofile[l]) > cutoff) };
+}
+
 @doc{Compute basic distribution: how many possibilities for each include?}
 public map[int hits, int includes] computeQuickResolveCounts(str p, str v) {
 	map[int hits, int includes] res = ( );
@@ -193,7 +231,7 @@ public str createQuickResolveCountsTable() {
 		files = size(pt<0>);
 		threshold = floor(files * 0.9);
 		anyinc = ( 0 | it + m[h] | h <- m<0>, h >= threshold );
-		other = total - unique - anyinc;
+		other = total - unique - anyinc - missing;
 		denom = ( 0 | it + m[h] | h <- m<0>, h > 1, h < threshold );
 		avg = (denom == 0) ? 0 : ( ( 0 | it + (m[h] * h) | h <- m<0>, h > 1, h < threshold ) * 1.000 / denom);
 							
@@ -265,4 +303,92 @@ public void buildResolveInfo(Corpus corpus, str p, set[loc] files) {
 		rmap.nextidx = rmap.nextidx + 1;
 	}
 	saveResolveInfoMap(rmap);
+}
+
+public set[loc] getPrograms(str p) {
+	base = getCorpusItem(p,getBaseCorpus()[p]);
+	if (p == "osCommerce") {
+		return { l | l <- (base+"catalog").ls, l.extension == "php"} + { l | l <- (base+"catalog/admin").ls, l.extension == "php"};
+	} else if (p == "WordPress") {
+		return { l | l <- base.ls, l.extension == "php", /config/ !:= l.path } + { l | l <- (base+"wp-admin").ls, l.extension == "php", /config/ !:= l.path };
+	} else if (p == "phpMyAdmin") {
+		return { l | l <- base.ls, l.extension == "php" };
+	} else if (p == "MediaWiki") {
+		return { l | l <- (base+"maintenance").ls, l.extension == "php" }; 
+	} else if (p == "CakePHP") {
+		return { |home:///PHPAnalysis/systems/CakePHP/cakephp-2.4.4/app/webroot/test.php|, |home:///PHPAnalysis/systems/CakePHP/cakephp-2.4.4/app/webroot/index.php| };
+	}
+}
+
+
+public ResolveInfo loadResolveInfo(int id) {
+	lipath = incLoc + "ri<id>.bin";
+	return readBinaryValueFile(#ResolveInfo, lipath);
+}
+
+public map[loc l,tuple[set[loc] fr,set[loc] pr] res] beforeAndAfter(ResolveInfo ri, rel[loc,loc] qrinfo) {
+	progResolved = ri.res.resolved;
+	map[loc,tuple[set[loc],set[loc]]] res = ( );
+	for (l <- (progResolved<0> + ({l.top|l<-qrinfo<0>})))	{
+		res[l] = < qrinfo[l], progResolved[l] >;
+	}
+	return res;
+}
+
+public map[int n, tuple[int before, int after] counts] computeImpact(map[loc l,tuple[set[loc] fr,set[loc] pr] res] res) {
+	map[int,int] before = ( );
+	map[int,int] after = ( );
+	for (l <- res) {
+		bsize = size(res[l].fr);
+		asize = size(res[l].pr);
+		
+		if (bsize in before) {
+			before[bsize] = before[bsize] + 1;
+		} else {
+			before[bsize] = 1;
+		}
+		
+		if (asize in after) {
+			after[asize] = after[asize] + 1;
+		} else {
+			after[asize] = 1;
+		}
+	}
+	return ( i : < (i in before) ? before[i] : 0, (i in after) ? after[i] : 0 > | i <- (before<0> + after<0>) );
+}
+
+public map[int n, tuple[int before, int after] counts] computeSystemImpact(str p, str v) {
+	sys = loadBinary(p,v);
+	rm = loadResolveInfoMap();
+	qrinfo = loadQuickResolveInfo(p,v);
+	
+	map[int n, tuple[int before, int after] counts] res = ( );
+	
+	for (l <- sys, l in rm.rmap) {
+		rinf = loadResolveInfo(rm.rmap[l]);
+		ba = beforeAndAfter(rinf, qrinfo<1,2>);
+		lcounts = computeImpact(ba);
+		for (i <- lcounts) {
+			if (i in res) {
+				res[i] = < res[i].before + lcounts[i].before, res[i].after + lcounts[i].after >;
+			} else {
+				res[i] = lcounts[i];
+			}
+		}
+	}
+	
+	return res;
+}
+
+public list[int] getResolveInfoTimes() {
+	rim = loadResolveInfoMap();
+	list[int] res = [ ];
+	for (l <- rim.rmap) {
+		ri = loadResolveInfo(rim.rmap[l]);
+		dt1 = ri.res.timings[0][1];
+		dt2 = ri.res.timings[-1][1];
+		d = dt2 - dt1;
+		res = res + (d.milliseconds + (d.seconds * 1000) + (d.minutes * 60 * 1000) + (d.hours * 60 * 60 * 1000));		
+	}
+	return res;
 }
