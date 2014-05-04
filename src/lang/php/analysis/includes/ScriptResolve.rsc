@@ -70,7 +70,7 @@ public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemEx
 	}
 }
 
-public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(System sys, str p, str v, loc toResolve, loc baseLoc, list[str] ipath=[], map[loc,rel[loc,Expr,loc]] quickResolveInfo = ( )) {
+public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(System sys, str p, str v, loc toResolve, loc baseLoc, set[loc] libs = { }, list[str] ipath=[], map[loc,rel[loc,Expr,loc]] quickResolveInfo = ( )) {
 	lrel[str,datetime] timings = [ < "Starting includes resolution", now() > ];
 	clearLookupCache();
 	
@@ -84,7 +84,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// and perform simplifications
 	IncludesInfo iinfo = loadIncludesInfo(p, v);
 	timings += < "Includes info loaded", now()>;
-	quickResolved = (size(quickResolveInfo) > 0) ? ( (toResolve in quickResolveInfo) ? quickResolveInfo[toResolve] : { }) : quickResolveExpr(sys, iinfo, toResolve, baseLoc);
+	quickResolved = (size(quickResolveInfo) > 0) ? ( (toResolve in quickResolveInfo) ? quickResolveInfo[toResolve] : { }) : quickResolveExpr(sys, iinfo, toResolve, baseLoc, libs=libs);
 	timings += < "Finished with initial quick resolve", now()>;
 	
 	// This gives us a base model of what can be immediately included
@@ -98,7 +98,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	while (! isEmpty(worklist) ) {
 		next = getOneFrom(worklist); worklist -= next; worked += next;
 		includeMap += ( i@at : i | /i:include(_,_) := sys[next] );
-		nextResolved = (size(quickResolveInfo) > 0) ? ( (next in quickResolveInfo) ? quickResolveInfo[next] : { } ) : quickResolveExpr(sys, iinfo, next, baseLoc);
+		nextResolved = (size(quickResolveInfo) > 0) ? ( (next in quickResolveInfo) ? quickResolveInfo[next] : { } ) : quickResolveExpr(sys, iinfo, next, baseLoc, libs=libs);
 		quickResolved += nextResolved;
 		worklist += ({ qri | qri <- nextResolved<2>, qri.scheme != "php+lib" } - worked);
 		worked += { qri | qri <- nextResolved<2>, qri.scheme == "php+lib" };

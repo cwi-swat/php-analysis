@@ -103,7 +103,7 @@ public void doQuickResolve(Corpus corpus) {
 		counter = 0;
 		for (l <- pt) {
 			dt1 = now();
-			qr = quickResolve(pt, iinfo, l, getCorpusItem(p,v) libs = (p in usedLibs) ? usedLibs[p] : { });
+			qr = quickResolve(pt, iinfo, l, getCorpusItem(p,v), libs = (p in usedLibs) ? usedLibs[p] : { });
 			dt2 = now();
 			res = res + { < l, ll, lr > | < ll, lr > <- qr };
 			counter += 1;
@@ -126,7 +126,7 @@ public void doQuickResolveExpr(Corpus corpus) {
 		println("Resolving <p> for <size(pt<0>)> files");
 		counter = 0;
 		for (l <- pt) {
-			qr = quickResolveExpr(pt, iinfo, l, getCorpusItem(p,v) libs = (p in usedLibs) ? usedLibs[p] : { });
+			qr = quickResolveExpr(pt, iinfo, l, getCorpusItem(p,v), libs = (p in usedLibs) ? usedLibs[p] : { });
 			res = res + { < l, ll, e, lr > | < ll, e, lr > <- qr };
 			counter += 1;
 			if (counter % 100 == 0) {
@@ -295,7 +295,7 @@ public void buildResolveInfo(Corpus corpus, str p, set[loc] files) {
 	}
 	for (f <- files) {
 		println("Resolving script <f>");
-		res = scriptResolve(pt, p, corpus[p], f, rootloc, ipath=getIncludePath(p), quickResolveInfo=qrmap);
+		res = scriptResolve(pt, p, corpus[p], f, rootloc, libs = (p in usedLibs) ? usedLibs[p] : { }, ipath=getIncludePath(p), quickResolveInfo=qrmap);
 		ResolveInfo ri = rinfo(p, corpus[p], f, res);
 		lipath = incLoc + "ri<rmap.nextidx>.bin";
 		writeBinaryValueFile(lipath, ri);
