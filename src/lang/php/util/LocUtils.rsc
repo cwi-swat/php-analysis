@@ -93,7 +93,7 @@ public loc walkBranches(Branch br, list[Branch] parents, str pathexp) {
 }
 
 @doc{Calculate the actual location of a path given as a string.}
-public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str path, bool pathMayBeChanged = true, list[str] ipath = []) {
+public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str path, bool pathMayBeChanged = true, list[str] ipath = [], bool checkFS = false) {
 	qualifiedPath = false;
 	set[str] paths = { };
 	set[loc] matchedLocs = { };
@@ -137,7 +137,11 @@ public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str pat
 		// Create the new loc and look it up, if we find it as a file we know exists
 		// return it		
 		newLoc = (newPath[0] == "/") ? |home://<newPath>| : |home:///<newPath>|;
-		if (newLoc in possibleLocs) matchedLocs += newLoc;
+		if (newLoc in possibleLocs) { 
+			matchedLocs += newLoc;
+		} else if (checkFS && exists(newLoc)) {
+			matchedLocs += newLoc;
+		}
 	}
 	
 	if (size(matchedLocs) == 1) return getOneFrom(matchedLocs);
