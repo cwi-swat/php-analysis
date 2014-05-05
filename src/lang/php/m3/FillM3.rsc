@@ -2,6 +2,7 @@ module lang::php::m3::FillM3
 extend lang::php::m3::Core;
 
 import lang::php::m3::Containment;
+import lang::php::m3::Aliases;
 import lang::php::m3::Uses;
 
 @doc { extract M3 relations from a single PHP script }
@@ -21,6 +22,9 @@ public M3 createM3forScript(loc filename, Script script)
    	
 	// fill containment with declarations
 	m3 = fillContainment(m3, script);
+
+	// fill aliases (currently only for namespace/class/interface/trait names)
+	m3 = calculateAliasesFlowInsensitive(m3, script);
 
 	// fill uses (currently only for namespace/class/interface/trait names)
 	m3 = calculateUsesFlowInsensitive(m3, script);

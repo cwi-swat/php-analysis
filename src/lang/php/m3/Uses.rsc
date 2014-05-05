@@ -9,13 +9,8 @@ import Prelude;
 
 public M3 calculateUsesFlowInsensitive(M3 m3, Script script)
 {
-	m3 = calculateAliasesFlowInsensitive(m3, script);
-
-	m3 = calculateUsesFlowInsensitive(m3, script, globalNamespace);
-	
-	return m3;
+	return calculateUsesFlowInsensitive(m3, script, globalNamespace);
 }
-
 
 public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 {
@@ -37,6 +32,8 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 			
 			m3 = calculateUsesFlowInsensitive(m3, script(body), currentNamespace); // hack, wrap body in a node
 		}			
+
+		// classes, interfaces and traits use
 
 		case class(_, _, extends, implements, members):
 		{
@@ -81,6 +78,8 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 		{
 			m3 = addUse(m3, nameNode, "class", currentNamespace);
 		}
+
+		// parameter type hints
 		
 		case param(_, _, someName(nameNode), _):
 		{
@@ -92,6 +91,8 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 				}
 			}
 		}
+
+		// static references
 		
 		case fetchClassConst(name(nameNode), _):
 		{
@@ -107,6 +108,8 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 		{
 			m3 = addUseStaticRef(m3, nameNode, currentNamespace);
 		}
+		
+		// type operators
 		
 		case instanceOf(_, n:name(name(phpName))):
 		{
@@ -134,6 +137,42 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 				m3 = addUseFullyQualified(m3, s@at, typeName, \type, currentNamespace);
 			}
 		}
+		
+		// method or property access
+		
+		case methodCall(_, n:name(name(methodName)), _):
+		{
+			m3@uses += {<n@at, |php+unresolved+method:///<methodName>|>};
+		}
+		
+		case propertyFetch(_, n:name(name(propertyName))):
+		{
+			m3@uses += {<n@at, |php+unresolved+field:///<propertyName>|>};
+		}
+		
+		// function call and variable / const access
+		
+		case call(name(nameNode), _):
+		{
+			m3 = addUse(m3, nameNode, "function", currentNamespace);
+		}
+		
+		/*case var(name(nameNode)):
+		{
+			// TODO can be global or local var, i.e. we need current function/method
+			m3 = addUse(m3, nameNode, "globalVar", currentNamespace);
+			
+			
+			// TODO globalVar, functionVar or methodVar
+		}
+		*/
+		
+		case fetchConst(nameNode): // always global constant
+		{
+			m3 = addUse(m3, nameNode, "constant", currentNamespace);
+		}
+		
+		// $GLOBALS
 	}
 
 	return m3;
@@ -222,120 +261,16 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc currentNamespace)
 		{
 			fullyQualifiedName = addNameToNamespace(name, \type, currentNamespace);
 			
-			// TODO check if name is reference to internal PHP class or function
+			// name could also be reference to internal PHP class or function
+			// TODO test if name is an internal name
+			/*if (\type in ["class", "function"])
+			{				
+				m3@uses += {<at, nameToLoc(name, \type)>}; // name in global namespace			
+			}*/			
 		}
 	}
 	
-	return addUseSubstituteAliases(m3, at, fullyQualifiedName);
-}
-
-public M3 addUseSubstituteAliases(M3 m3, loc at, loc name)
-{	
-	set[loc] names;
-
-	if (name in domain(m3@aliases))
-	{
-		// follow aliases to reach final type names
-		// don't store intermediate names b/c they can't be aliases AND real type names at the same time
-		names = (m3@aliases+)[name] & (range(m3@aliases) - domain(m3@aliases));
-	}
-	else
-	{
-		names = {name};
-	}
-
-	m3@uses += {<at, n> | n <-names };
+	m3@uses += {<at, fullyQualifiedName> };
 
 	return m3;
 }
-
-
-public M3 calculateAliasesFlowInsensitive(M3 m3, Script script)
-{
-	return calculateAliasesFlowInsensitive(m3, script, globalNamespace);
-}
-
-
-public M3 calculateAliasesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
-{
-	top-down-break visit (ast)
-	{
-		case ns:namespace(name, body):
-		{
-			if (someName(name(phpName)) := name)
-			{
-				currentNamespace = ns@decl;
-			}
-			else
-			{
-				currentNamespace = globalNamespace;
-			}
-			
-			m3 = calculateAliasesFlowInsensitive(m3, script(body), currentNamespace); // hack, wrap body in a node
-		}			
-		
-		case use(uses):
-		{
-			for (u <- uses)
-			{
-				m3 = addImportToAliases(m3, u, currentNamespace);
-			}
-		}	
-		
-		case call(name(name("class_alias")),
-			[actualParameter(scalar(string(oldName)), _), actualParameter(scalar(string(newName)), _), _*]):
-		{
-			// both names are interpreted as fully qualified
-			
-			// also works for interfaces
-			// TODO traits?
-			m3@aliases += { <nameToLoc(newName, \type), nameToLoc(oldName, \type)> |
-					\type <- ["class", "interface"] };
-		}
-	}
-	
-	return m3;
-}
-
-
-public M3 addImportToAliases(M3 m3, Use u, loc currentNamespace)
-{
-	str importedName, asName;
-	
-	if (use(name(n1), someName(name(n2))) := u)
-	{
-		importedName = n1;
-		asName = n2;
-	}
-	else if (use(name(importedName), noName()) := u)
-	{
-		importedName = n1;
-		asName = getLastNamePart(importedName);
-	}
-	else
-	{
-		throw "unknown use: <u>";
-	}
-	
-	/* PHP namespaces support three kinds of aliasing or importing:
-		- aliasing a class name,
-		- aliasing an interface name,
-		- and aliasing a namespace name
-	*/
-		
-	// assume asName is a simple name
-	// TODO: can asName be (fully) qualified?	
-	m3@aliases += { <addNameToNamespace(asName, \type, currentNamespace), nameToLoc(importedName, \type)> |
-					\type <- ["class", "interface", "namespace"] };
-	return m3;
-}
-
-
-public M3 addUseAndAlias(M3 m3, loc oldName, loc oldNameLoc, loc newName)
-{
-	m3 = addUseSubstituteAliases(m3, oldNameLoc, oldName);
-
-	m3@aliases += {newName, oldName};
-	
-	return m3;
-} 
