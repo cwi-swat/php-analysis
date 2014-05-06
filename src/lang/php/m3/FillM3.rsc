@@ -5,6 +5,8 @@ import lang::php::m3::Containment;
 import lang::php::m3::Aliases;
 import lang::php::m3::Uses;
 
+import lang::php::ast::Scopes;
+
 @doc { extract M3 relations from a single PHP script }
 public M3 createM3forScript(loc filename, Script script)
 {
@@ -19,6 +21,11 @@ public M3 createM3forScript(loc filename, Script script)
 			}
 		}
    	}
+   	
+   	// propagate @decl to @scope
+	script = annotateWithDeclScopes(script, globalNamespace);   	
+   	
+   	iprintln(script);
    	
 	// fill containment with declarations
 	m3 = fillContainment(m3, script);

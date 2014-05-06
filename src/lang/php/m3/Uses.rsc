@@ -7,36 +7,16 @@ import lang::php::\syntax::Names;
 import Prelude;
 
 
-public M3 calculateUsesFlowInsensitive(M3 m3, Script script)
+public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 {
-	return calculateUsesFlowInsensitive(m3, script, globalNamespace);
-}
-
-public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
-{
-	// for now, no methods/functions/variable names etc...
-
-	top-down-break visit (ast)
+	visit (ast)
 	{
-		case ns:namespace(name, body):
-		{
-			// TODO the same case statement appears in calculateAliases...., factor out into a visit with a parametric function?
-			if (someName(name(phpName)) := name)
-			{
-				currentNamespace = ns@decl;
-			}
-			else
-			{
-				currentNamespace = globalNamespace;
-			}
-			
-			m3 = calculateUsesFlowInsensitive(m3, script(body), currentNamespace); // hack, wrap body in a node
-		}			
-
 		// classes, interfaces and traits use
 
-		case class(_, _, extends, implements, members):
+		case c:class(_, _, extends, implements, _):
 		{
+			currentNamespace = getNamespace(c@scope);
+		
 			if (someName(className) := extends)
 			{
 				m3 = addUse(m3, className, "class", currentNamespace);
@@ -45,38 +25,28 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 			for (interfaceName <- implements)
 			{
 				m3 = addUse(m3, interfaceName, "interface", currentNamespace);
-			}		
-		
-			for (member <- members)
-			{
-				m3 = calculateUsesFlowInsensitive(m3, member, currentNamespace);
-			}
+			}				
 		}
 		
-		case interface(_, extends, members):
+		case i:interface(_, extends, _):
 		{
 			for (interfaceName <- extends)
 			{
-				m3 = addUse(m3, interfaceName, "interface", currentNamespace);
+				m3 = addUse(m3, interfaceName, "interface", getNamespace(i@scope));
 			}		
-		
-			for (member <- members)
-			{
-				m3 = calculateUsesFlowInsensitive(m3, member, currentNamespace);
-			}
 		}
 		
-		case traitUse(names, _):
+		case t:traitUse(names, _):
 		{
 			for (name <- names)
 			{
-				m3 = addUse(m3, name, "trait", currentNamespace);
+				m3 = addUse(m3, name, "trait", getNamespace(t@scope));
 			}
 		}
 		
 		case new(name(nameNode), _):
 		{
-			m3 = addUse(m3, nameNode, "class", currentNamespace);
+			m3 = addUse(m3, nameNode, "class", getNamespace(nameNode@scope));			
 		}
 
 		// parameter type hints
@@ -87,7 +57,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 			{
 				for (\type <- ["class", "interface"])
 				{
-					m3 = addUse(m3, nameNode, \type, currentNamespace);
+					m3 = addUse(m3, nameNode, \type, getNamespace(nameNode@scope));
 				}
 			}
 		}
@@ -96,51 +66,51 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 		
 		case fetchClassConst(name(nameNode), _):
 		{
-			m3 = addUseStaticRef(m3, nameNode, currentNamespace);
+			m3 = addUseStaticRef(m3, nameNode, getNamespace(nameNode@scope));
 		}
 		
 		case staticCall(name(nameNode), _, _):
 		{
-			m3 = addUseStaticRef(m3, nameNode, currentNamespace);
+			m3 = addUseStaticRef(m3, nameNode, getNamespace(nameNode@scope));			
 		}
 		
 		case staticPropertyFetch(name(nameNode), _):
 		{
-			m3 = addUseStaticRef(m3, nameNode, currentNamespace);
+			m3 = addUseStaticRef(m3, nameNode, getNamespace(nameNode@scope));
 		}
 		
 		// type operators
 		
-		case instanceOf(_, n:name(name(phpName))):
+		case i:instanceOf(_, n:name(name(phpName))):
 		{
 			// name is interpreted as fully qualified
 			for (\type <- ["class", "interface"])
 			{
-				m3 = addUseFullyQualified(m3, n@at, phpName, \type, currentNamespace);
+				m3 = addUseFullyQualified(m3, n@at, phpName, \type, getNamespace(i@scope));
 			}
 		}
 		
-		case call(name(name("is_a")), [_, actualParameter(s:scalar(string(typeName)), _), _*]):
+		case c:call(name(name("is_a")), [_, actualParameter(s:scalar(string(typeName)), _), _*]):
 		{
 			// name is interpreted as fully qualified
 			for (\type <- ["class", "interface"])
 			{
-				m3 = addUseFullyQualified(m3, s@at, typeName, \type, currentNamespace);
+				m3 = addUseFullyQualified(m3, s@at, typeName, \type, getNamespace(c@scope));
 			}
 		}
 		
-		case call(name(name("is_subclass_of")), [_, actualParameter(s:scalar(string(typeName)), _), _*]):
+		case c:call(name(name("is_subclass_of")), [_, actualParameter(s:scalar(string(typeName)), _), _*]):
 		{
 			// name is interpreted as fully qualified
 			for (\type <- ["class", "interface"])
 			{
-				m3 = addUseFullyQualified(m3, s@at, typeName, \type, currentNamespace);
+				m3 = addUseFullyQualified(m3, s@at, typeName, \type, getNamespace(c@scope));
 			}
 		}
 		
 		// method or property access
 		
-		case methodCall(_, n:name(name(methodName)), _):
+		case methodCall(_, n:name(name(methodName)), parameters):
 		{
 			m3@uses += {<n@at, |php+unresolved+method:///<methodName>|>};
 		}
@@ -152,27 +122,46 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast, loc currentNamespace)
 		
 		// function call and variable / const access
 		
-		case call(name(nameNode), _):
+		case c:call(name(nameNode), _):
 		{
-			m3 = addUse(m3, nameNode, "function", currentNamespace);
+			m3 = addUse(m3, nameNode, "function", getNamespace(c@scope));
 		}
 		
-		/*case var(name(nameNode)):
+		case v:var(name(name(phpName))):
 		{
-			// TODO can be global or local var, i.e. we need current function/method
-			m3 = addUse(m3, nameNode, "globalVar", currentNamespace);
+			loc scope = v@scope;
+			list[str] types;
 			
+			if (isNamespace(scope))
+			{
+				types = ["globalVar"];
+				scope = globalNamespace;
+			}
+			else if (isFunction(scope))
+			{
+				types = ["functionVar", "functionParam"];
+			}
+			elseif (isMethod(scope))
+			{
+				types = ["methodVar", "methodParam"]; 
+			}
+			else
+			{
+				throw "Unknown variable scope type: <scope>";
+			}
 			
-			// TODO globalVar, functionVar or methodVar
+			m3@uses += {<v@at, |php+<\type>://<scope.path>/<phpName>|> | \type <- types};
 		}
-		*/
 		
 		case fetchConst(nameNode): // always global constant
 		{
-			m3 = addUse(m3, nameNode, "constant", currentNamespace);
+			m3 = addUse(m3, nameNode, "constant", getNamespace(nameNode@scope));
 		}
 		
-		// $GLOBALS
+		case f:fetchArrayDim(var(name(name("GLOBALS"))), someExpr(scalar(string(str name)))):
+		{
+			m3@uses += {<f@at, nameToLoc(name, "globalVar")>};
+		}
 	}
 
 	return m3;
@@ -255,11 +244,11 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc currentNamespace)
 		}
 		case qualified():
 		{
-			fullyQualifiedName = addNameToNamespace(name, \type, currentNamespace);
+			fullyQualifiedName = appendName(name, \type, currentNamespace);
 		}
 		case unqualified():
 		{
-			fullyQualifiedName = addNameToNamespace(name, \type, currentNamespace);
+			fullyQualifiedName = appendName(name, \type, currentNamespace);
 			
 			// name could also be reference to internal PHP class or function
 			// TODO test if name is an internal name

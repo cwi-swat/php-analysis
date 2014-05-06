@@ -52,8 +52,13 @@ public bool isInterface(loc entity) = entity.scheme == "php+interface";
 public bool isTrait(loc entity) = entity.scheme == "php+trait";
 public bool isMethod(loc entity) = entity.scheme == "php+method";
 public bool isFunction(loc entity) = entity.scheme == "php+function";
-public bool isParameter(loc entity) = entity.scheme == "php+functionParam" || entity.scheme == "php+methodParam";
-public bool isVariable(loc entity) = entity.scheme == "php+globalVar" || entity.scheme == "php+functionVar" || entity.scheme == "php+methodVar";
+public bool isFunctionParam(loc entity) = entity.scheme == "php+functionParam";
+public bool isMethodParam(loc entity) = entity.scheme == "php+methodParam"; 
+public bool isParameter(loc entity) = isFunctionParam(entity) || isMethodParam(entity);
+public bool isGlobalVar(loc entity) = entity.scheme == "php+globalVar";
+public bool isFunctionVar(loc entity) = entity.scheme == "php+functionVar";
+public bool isMethodVar(loc entity) = entity.scheme == "php+methodVar";
+public bool isVariable(loc entity) = isGlobalVar(entity) || isFunctionVar(entity) || isMethodVar(entity);
 public bool isField(loc entity) = entity.scheme == "php+field";
 public bool isConstant(loc entity) = entity.scheme == "php+constant";
 public bool isClassConstant(loc entity) = entity.scheme == "php+classConstant";
@@ -101,9 +106,38 @@ public loc nameToLoc(str phpName, str \type)
 }
 
 
-public loc addNameToNamespace(str phpName, str \type, loc namespace)
+public loc appendName(str phpName, str \type, loc prefix)
 {
 	str name = normalizeName(phpName, \type);
 
-	return |php+<\type>://<namespace.path>/<name>|;
+	return |php+<\type>://<prefix.path>/<name>|;
+}
+
+
+public loc getNamespace(loc name)
+{
+	if (isNamespace(name)) return name;
+	
+	int partsToDiscard;
+	
+	if (isClass(name) || isInterface(name) || isTrait(name) || isFunction(name) || isConstant(name) || isGlobalVar(name))
+	{
+		partsToDiscard = 1; 
+	}
+	else if (isMethod(name) || isField(name) || isClassConstant(name) || isFunctionParam(name) || isFunctionVar(name))
+	{
+		partsToDiscard = 2;
+	}
+	else if (isMethodParam(name) || isMethodVar(name))
+	{
+		partsToDiscard = 3;
+	}
+	else
+	{
+		throw "Unknown name type: <name>";
+	}
+	
+	namespacePath = intercalate("/", split("/", name.path)[..-partsToDiscard]);
+	
+	return |php+namespace:///<namespacePath>|;
 }
