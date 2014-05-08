@@ -23,7 +23,8 @@ public M3 createM3forScript(loc filename, Script script)
    	}
    	
    	// propagate @decl to @scope
-	script = annotateWithDeclScopes(script, globalNamespace);   	
+   	set[str] scopingTypes = {"namespace", "class", "interface", "trait", "function", "method"};
+	script = annotateWithDeclScopes(script, globalNamespace, scopingTypes);   	
    	
    	iprintln(script);
    	
@@ -110,6 +111,15 @@ public System getSystem(loc l, bool useCache) {
 	}
 	
 	return system;
+}
+
+public M3 getM3ForSystem(System system, loc l)
+{
+	M3Collection m3s = getM3CollectionForSystem(system);
+	
+	M3 m3 = composePhpM3(l, range(m3s));
+	
+	return m3;
 }
 
 // move to cache function file 

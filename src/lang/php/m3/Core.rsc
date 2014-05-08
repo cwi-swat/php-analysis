@@ -31,6 +31,7 @@ anno rel[loc pos, str phpDoc] M3@phpDoc;    // Multiline php comments /** ... */
 alias M3Collection = map[loc fileloc, M3 model];
 
 public loc globalNamespace = |php+namespace:///|;
+public loc unknownLocation = |php+unknown:///|;
 
 public M3 composePhpM3(loc id, set[M3] models) {
   m = composeM3(id, models);

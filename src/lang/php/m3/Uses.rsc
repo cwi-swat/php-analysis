@@ -36,11 +36,11 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			}		
 		}
 		
-		case t:traitUse(names, _):
+		case traitUse(names, _):
 		{
 			for (name <- names)
 			{
-				m3 = addUse(m3, name, "trait", getNamespace(t@scope));
+				m3 = addUse(m3, name, "trait", getNamespace(name@scope));
 			}
 		}
 		
@@ -127,30 +127,12 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			m3 = addUse(m3, nameNode, "function", getNamespace(c@scope));
 		}
 		
-		case v:var(name(name(phpName))):
+		case v:var(name(nameNode)):
 		{
-			loc scope = v@scope;
-			list[str] types;
-			
-			if (isNamespace(scope))
+			if (!v@decl?) // don't add uses on declarations
 			{
-				types = ["globalVar"];
-				scope = globalNamespace;
+				m3 = addVarUse(m3, nameNode, v@at, nameNode@scope);
 			}
-			else if (isFunction(scope))
-			{
-				types = ["functionVar", "functionParam"];
-			}
-			elseif (isMethod(scope))
-			{
-				types = ["methodVar", "methodParam"]; 
-			}
-			else
-			{
-				throw "Unknown variable scope type: <scope>";
-			}
-			
-			m3@uses += {<v@at, |php+<\type>://<scope.path>/<phpName>|> | \type <- types};
 		}
 		
 		case fetchConst(nameNode): // always global constant
@@ -161,6 +143,16 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		case f:fetchArrayDim(var(name(name("GLOBALS"))), someExpr(scalar(string(str name)))):
 		{
 			m3@uses += {<f@at, nameToLoc(name, "globalVar")>};
+		}
+		
+		// closure captures
+		
+		case c:closure(_, _, closureUses, _, _):
+		{
+			for (closureUse(nameNode, _) <- closureUses)
+			{
+				m3 = addVarUse(m3, nameNode, closureUse@at, c@scope);
+			}
 		}
 	}
 
@@ -232,6 +224,7 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc currentNamespace)
 	static method foo()
 	7) qualified class names are interpreted as class from corresponding
 	namespace. So "new A\B\C()" refers to class C from namespace A\B.
+	
 	*/
 	
 	loc fullyQualifiedName;
@@ -250,16 +243,77 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc currentNamespace)
 		{
 			fullyQualifiedName = appendName(name, \type, currentNamespace);
 			
-			// name could also be reference to internal PHP class or function
-			// TODO test if name is an internal name
-			/*if (\type in ["class", "function"])
+			// name could also be reference to internal PHP class or function.
+			
+			/*if (\type in ["class", "interface"]) // TODO and name is an internal name
 			{				
 				m3@uses += {<at, nameToLoc(name, \type)>}; // name in global namespace			
-			}*/			
+			}
+			else */ if (\type in ["function"])
+			{
+				// Contrary to what it says at point 4, function name resolution falls back
+				// to the global namespace, not only to internal function names. 
+				m3@uses += {<at, nameToLoc(name, \type)>}; // name in global namespace
+			}			
 		}
 	}
 	
 	m3@uses += {<at, fullyQualifiedName> };
 
 	return m3;
+}
+
+
+M3 addVarUse(M3 m3, Name name, loc pos, loc scope)
+{
+	list[str] types;
+	
+	if (isNamespace(scope))
+	{
+		types = ["globalVar"];
+		scope = globalNamespace;
+	}
+	else if (isFunction(scope))
+	{
+		types = ["functionVar", "functionParam"];
+	}
+	elseif (isMethod(scope))
+	{
+		types = ["methodVar", "methodParam"]; 
+	}
+	else
+	{
+		throw "Unknown variable scope type: <scope>";
+	}
+	
+	m3@uses += {<pos, |php+<\type>://<scope.path>/<name.name>|> | \type <- types};
+	
+	return m3;
+}
+
+
+@doc{
+	Extend uses relation by following alias links.
+}
+M3 propagateAliasesInUses(M3 m3)
+{
+	m3@uses += m3@uses o (m3@aliases)+;
+	return m3;
+}
+
+
+@doc{
+	Resolve names in uses range to source code locations of potentially matching declarations.
+	Result: <position, position> relation, relating use sites to declaration sites.
+}
+rel[loc, loc] resolveUsesToPossibleDeclarations(M3 m3)
+{
+	set[loc] allUseSites = domain(m3@uses);
+
+	rel[loc, loc] result = m3@uses o m3@declarations;
+	
+	// add tuples for unresolved uses
+	result += (allUseSites - domain(result)) * {unknownLocation};
+	
+	return result;
 }
