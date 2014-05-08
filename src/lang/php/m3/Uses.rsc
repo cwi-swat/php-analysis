@@ -57,7 +57,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			{
 				for (\type <- ["class", "interface"])
 				{
-					m3 = addUse(m3, nameNode, \type, getNamespace(nameNode@scope));
+					;// TODO m3 = addUse(m3, nameNode, \type, getNamespace(nameNode@scope));
 				}
 			}
 		}
@@ -86,7 +86,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			// name is interpreted as fully qualified
 			for (\type <- ["class", "interface"])
 			{
-				m3 = addUseFullyQualified(m3, n@at, phpName, \type, getNamespace(i@scope));
+				;// TODO m3 = addUseFullyQualified(m3, n@at, phpName, \type, getNamespace(i@scope));
 			}
 		}
 		
@@ -117,7 +117,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		
 		case propertyFetch(_, n:name(name(propertyName))):
 		{
-			m3@uses += {<n@at, |php+unresolved+field:///<propertyName>|>};
+			;// TODO m3@uses += {<n@at, |php+unresolved+field:///<propertyName>|>};
 		}
 		
 		// function call and variable / const access
@@ -154,6 +154,16 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 				m3 = addVarUse(m3, nameNode, closureUse@at, c@scope);
 			}
 		}
+		
+		// exception names in catch
+		
+		case \catch(nameNode, _, _):
+		{
+			for (\type <- ["class", "interface"])
+			{
+				m3 = addUse(m3, nameNode, \type, getNamespace(nameNode@scope));
+			}
+		}		
 	}
 
 	return m3;
