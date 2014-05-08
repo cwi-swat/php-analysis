@@ -26,8 +26,6 @@ public M3 createM3forScript(loc filename, Script script)
    	set[str] scopingTypes = {"namespace", "class", "interface", "trait", "function", "method"};
 	script = annotateWithDeclScopes(script, globalNamespace, scopingTypes);   	
    	
-   	iprintln(script);
-   	
 	// fill containment with declarations
 	m3 = fillContainment(m3, script);
 
@@ -105,9 +103,12 @@ public System getSystem(loc l, bool useCache) {
 		system = readSystemFromCache(l);
 	} else {	    
     	system = loadPHPFiles(l);
-		logMessage("Writing <l> to cache.", 2);
-	   	writeSystemToCache(system, l); 
-		logMessage("Writing <l> done.", 2);
+    	if (useCache)
+    	{
+			logMessage("Writing <l> to cache.", 2);
+		   	writeSystemToCache(system, l); 
+			logMessage("Writing <l> done.", 2);
+		}
 	}
 	
 	return system;
