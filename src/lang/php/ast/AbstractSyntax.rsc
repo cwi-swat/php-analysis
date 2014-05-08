@@ -27,7 +27,7 @@ public data NameOrExpr = name(Name name) | expr(Expr expr);
 
 public data CastType = \int() | \bool() | float() | string() | array() | object() | unset();
 	
-public data ClosureUse = closureUse(str name, bool byRef);
+public data ClosureUse = closureUse(Expr varName, bool byRef); 
 
 public data IncludeType = include() | includeOnce() | require() | requireOnce();
 
@@ -38,7 +38,7 @@ public data IncludeType = include() | includeOnce() | require() | requireOnce();
 public data Expr 
 	= array(list[ArrayElement] items)
 	| fetchArrayDim(Expr var, OptionExpr dim)
-	| fetchClassConst(NameOrExpr className, str constName)
+	| fetchClassConst(NameOrExpr className, Name constantName)
 	| assign(Expr assignTo, Expr assignExpr)
 	| assignWOp(Expr assignTo, Expr assignExpr, Op operation)
 	| listAssign(list[OptionExpr] assignsTo, Expr assignExpr)
@@ -70,6 +70,7 @@ public data Expr
 	| yield(OptionExpr keyExpr, OptionExpr valueExpr)
 	| listExpr(list[OptionExpr] listExprs)
 	;
+	
 
 public data Op = bitwiseAnd() | bitwiseOr() | bitwiseXor() | concat() | div() 
 			   | minus() | \mod() | mul() | plus() | rightShift() | leftShift()
@@ -112,7 +113,7 @@ public data Stmt
 	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
 	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
 	| global(list[Expr] exprs)
-	| goto(str label)
+	| goto(Name gotoName)
 	| haltCompiler(str remainingText)
 	| \if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, OptionElse elseClause)
 	| inlineHTML(str htmlText)
@@ -137,7 +138,7 @@ public data Stmt
 
 public data Declaration = declaration(str key, Expr val);
 
-public data Catch = \catch(Name xtype, str xname, list[Stmt] body);
+public data Catch = \catch(Name xtype, Expr varName, list[Stmt] body);
 	
 public data Case = \case(OptionExpr cond, list[Stmt] body);
 
@@ -155,8 +156,8 @@ public data ClassItem
 	;
 
 public data Adaptation
-	= traitAlias(OptionName traitName, str methodName, set[Modifier] newModifiers, OptionName newName)
-	| traitPrecedence(OptionName traitName, str methodName, set[Name] insteadOf)
+	= traitAlias(OptionName traitName, Name methName, set[Modifier] newModifiers, OptionName newName)
+	| traitPrecedence(OptionName traitName, Name methName, set[Name] insteadOf)
 	;
 	
 public data Property = property(str propertyName, OptionExpr defaultValue);
@@ -327,3 +328,12 @@ public anno loc node@at;
 public anno loc node@decl;
 public anno str node@phpdoc;
 public anno loc node@scope;
+
+// deprecated nodes	
+//public data ClosureUse = closureUse(str name, bool byRef);
+//public data Expr = fetchClassConst(NameOrExpr className, str constName);
+//public data Catch = \catch(Name xtype, str xname, list[Stmt] body);
+//public data Adaptation = traitAlias(OptionName traitName, str methodName, set[Modifier] newModifiers, OptionName newName);
+//public data Adaptation = traitPrecedence(OptionName traitName, str methodName, set[Name] insteadOf);
+//public data Stmt = goto(str label); 
+// end
