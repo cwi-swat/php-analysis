@@ -64,7 +64,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 
 		// static references
 		
-		case fetchClassConst(name(str nameNode), _):
+		case fetchClassConst(name(nameNode), _):
 		{
 			m3 = addUseStaticRef(m3, nameNode, getNamespace(nameNode@scope));
 		}
