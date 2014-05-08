@@ -11,7 +11,7 @@ module lang::php::analysis::includes::ScriptResolve
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Utils;
 import lang::php::util::LocUtils;
-import lang::php::util::System;
+import lang::php::ast::System;
 import lang::php::analysis::includes::IncludesInfo;
 import lang::php::analysis::includes::MatchIncludes;
 import lang::php::analysis::includes::QuickResolve;

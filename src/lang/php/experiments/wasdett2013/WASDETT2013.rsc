@@ -3,7 +3,7 @@ module lang::php::experiments::wasdett2013::WASDETT2013
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Utils;
 import lang::php::util::Corpus;
-import lang::php::util::System;
+import lang::php::ast::System;
 import lang::php::stats::Stats;
 import lang::php::analysis::includes::ResolveIncludes;
 
