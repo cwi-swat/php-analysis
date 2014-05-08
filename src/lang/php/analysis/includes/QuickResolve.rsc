@@ -16,7 +16,7 @@ private Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 		case fc:fetchConst(name(cn)) => (iinfo.constMap[cn])[@at=fc@at]
 			when cn in iinfo.constMap
 			
-		case fcc:fetchClassConst(name(name(cln)),cn) => (iinfo.classConstMap[cln][cn])[@at=fcc@at]
+		case fcc:fetchClassConst(name(name(cln)),name(cn)) => (iinfo.classConstMap[cln][cn])[@at=fcc@at]
 			when cln in iinfo.classConstMap && cn in iinfo.classConstMap[cln]
 	}
 }

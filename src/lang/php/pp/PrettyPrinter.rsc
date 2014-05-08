@@ -55,9 +55,9 @@ public str pp(CastType::array()) = "array";
 public str pp(object()) = "object";
 public str pp(CastType::unset()) = "unset";
 
-//public data ClosureUse = closureUse(str name, bool byRef);
-public str pp(closureUse(str name, true)) = "&$<name>";
-public str pp(closureUse(str name, false)) = "$<name>";
+//public data ClosureUse = closureUse(Name name, bool byRef);
+public str pp(closureUse(Name name, true)) = "&$<pp(name)>";
+public str pp(closureUse(Name name, false)) = "$<pp(name)>";
 
 //public data IncludeType = include() | includeOnce() | require() | requireOnce();
 public str pp(IncludeType::include()) = "include";
@@ -73,9 +73,9 @@ public str pp(Expr::array(list[ArrayElement] items)) = "array(<intercalate(",",[
 public str pp(fetchArrayDim(Expr var, someExpr(Expr dim))) = "<pp(var)>[<pp(dim)>]";
 public str pp(fetchArrayDim(Expr var, noExpr())) = "<pp(var)>[]";
 
-//	| fetchClassConst(NameOrExpr className, str constName)
-public str pp(fetchClassConst(name(Name className), str constName)) = "<pp(className)>::<constName>";
-public str pp(fetchClassConst(expr(Expr className), str constName)) = "$<pp(className)>::<constName>";
+//	| fetchClassConst(NameOrExpr className, Name constName)
+public str pp(fetchClassConst(name(Name className), Name constName)) = "<pp(className)>::<pp(constName)>";
+public str pp(fetchClassConst(expr(Expr className), Name constName)) = "$<pp(className)>::<pp(constName)>";
 
 //	| assign(Expr assignTo, Expr assignExpr)
 public str pp(assign(Expr assignTo, Expr assignExpr)) = "<pp(assignTo@phpdoc)><pp(assignTo)> = <pp(assignExpr)>";
@@ -379,8 +379,8 @@ public str pp(function(str name, false, list[Param] params, list[Stmt] body)) =
 //	| global(list[Expr] exprs)
 public str pp(global(list[Expr] exprs)) = "global <intercalate(",",[pp(e)|e<-exprs])>";
 
-//	| goto(str label)
-public str pp(goto(str label)) = "goto <label>;";
+//	| goto(Name label)
+public str pp(goto(Name label)) = "goto <pp(label)>;";
 
 //	| haltCompiler(str remainingText)
 public str pp(haltCompiler(str remainingText)) = "__halt_compiler()";
@@ -479,9 +479,9 @@ public str pp(block(list[Stmt] body)) =
 //public data Declaration = declaration(str key, Expr val);
 public str pp(declaration(str key, Expr val)) = "key=<pp(val)>";
 
-//public data Catch = \catch(Name xtype, str xname, list[Stmt] body);
-public str pp(\catch(Name xt, str xn, list[Stmt] body)) =
-	"catch (<pp(xt)> <xn>) {
+//public data Catch = \catch(Name xtype, Expr xname, list[Stmt] body);
+public str pp(\catch(Name xt, Expr xn, list[Stmt] body)) =
+	"catch (<pp(xt)> <pp(xn)>) {
 	'	<for (b <- body) {><pp(b)><}> }";
 	
 //public data Case = \case(OptionExpr cond, list[Stmt] body);
@@ -558,8 +558,8 @@ public str pp(method(str name, set[Modifier] modifiers, false, list[Param] param
 
 // TODO: Add pretty-printing code for trait adaptations
 //public data Adaptation
-//	= traitAlias(OptionName traitName, str methodName, set[Modifier] newModifiers, OptionName newName)
-//	| traitPrecedence(OptionName traitName, str methodName, set[Name] insteadOf)
+//	= traitAlias(OptionName traitName, Name methName, set[Modifier] newModifiers, OptionName newName)
+//	| traitPrecedence(OptionName traitName, Name methName, set[Name] insteadOf)
 //	;
 
 //public data Property = property(str propertyName, OptionExpr defaultValue);

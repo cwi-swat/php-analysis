@@ -328,12 +328,3 @@ public anno loc node@at;
 public anno loc node@decl;
 public anno str node@phpdoc;
 public anno loc node@scope;
-
-// deprecated nodes	
-//public data ClosureUse = closureUse(str name, bool byRef);
-//public data Expr = fetchClassConst(NameOrExpr className, str constName);
-//public data Catch = \catch(Name xtype, str xname, list[Stmt] body);
-//public data Adaptation = traitAlias(OptionName traitName, str methodName, set[Modifier] newModifiers, OptionName newName);
-//public data Adaptation = traitPrecedence(OptionName traitName, str methodName, set[Name] insteadOf);
-//public data Stmt = goto(str label); 
-// end

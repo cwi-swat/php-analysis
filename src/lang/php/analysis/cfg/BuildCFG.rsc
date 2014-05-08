@@ -487,8 +487,8 @@ public Lab init(Expr e) {
 		
 		case fetchArrayDim(Expr var, OptionExpr dim) : return init(var);
 		
-		case fetchClassConst(name(Name className), str constName) : return e@lab;
-		case fetchClassConst(expr(Expr className), str constName) : return init(className);
+		case fetchClassConst(name(Name className), name(str constName)) : return e@lab;
+		case fetchClassConst(expr(Expr className), name(str constName)) : return init(className);
 		
 		case assign(Expr assignTo, Expr assignExpr) : return init(assignExpr);
 		
@@ -1150,7 +1150,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			< edges, lstate > = addExpSeqEdges(edges, lstate, exprs);
 		}
 
-		case goto(str gotoLabel) : {
+		case goto(name(str gotoLabel)) : {
 			if (gotoLabel in lstate.gotoNodes)
 				edges += { jumpEdge(fl, lstate.gotoNodes[gotoLabel]) | fl <- finalLabels };
 			else
@@ -1548,7 +1548,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges += makeEdges(final(var, lstate), finalLabels);
 		}
 		
-		case fetchClassConst(expr(Expr className), str constName) : {
+		case fetchClassConst(expr(Expr className), name(str constName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
 			edges += makeEdges(final(className, lstate), finalLabels);
 		}

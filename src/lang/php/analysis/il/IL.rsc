@@ -18,7 +18,7 @@ data Var
 	
 	//= array(list[ArrayElement] items)
 	//| fetchArrayDim(Expr var, OptionExpr dim)
-	//| fetchClassConst(NameOrExpr className, str constName)
+	//| fetchClassConst(NameOrExpr className, Name constName)
 	//| assign(Expr assignTo, Expr assignExpr)
 	//| assignWOp(Expr assignTo, Expr assignExpr, Op operation)
 	//| listAssign(list[OptionExpr] assignsTo, Expr assignExpr)

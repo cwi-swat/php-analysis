@@ -170,7 +170,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 			Expr resolveConstExpr(Expr resolveExpr, loc constLoc) {
 				// Get the constants used inside resolveExpr
 				usedConstants = { normalConst(cn) | /fetchConst(name(cn)) := resolveExpr } +
-								{ classConst(cln,cn) | /fetchClassConst(name(name(cln)),cn) := resolveExpr };
+								{ classConst(cln,cn) | /fetchClassConst(name(name(cln)),name(cn)) := resolveExpr };
 
 				map[ConstItem,Expr] solvedConstants = ( );
 				for (ci:normalConst(cn) <- usedConstants, cn in constMap)
@@ -192,7 +192,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 				resolvedExpr = bottom-up visit(resolveExpr) {
 					case fetchConst(name(cn)) => solvedConstants[normalConst(cn)] when normalConst(cn) in solvedConstants
 					
-					case fetchClassConst(name(name(cln)),cn) => solvedConstants[classConst(cln,cn)] when classConst(cln,cn) in solvedConstants
+					case fetchClassConst(name(name(cln)),name(cn)) => solvedConstants[classConst(cln,cn)] when classConst(cln,cn) in solvedConstants
 				}
 				resolvedExpr = normalizeConstCase(algebraicSimplification(simulateCalls(resolvedExpr)));
 				return resolvedExpr;
