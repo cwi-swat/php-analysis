@@ -23,9 +23,8 @@ public M3 createM3forScript(loc filename, Script script)
    	}
    	
    	// propagate @decl to @scope
-	script = annotateWithDeclScopes(script, globalNamespace);   	
-   	
-   	iprintln(script);
+   	set[str] scopingTypes = {"namespace", "class", "interface", "trait", "function", "method"};
+	script = annotateWithDeclScopes(script, globalNamespace, scopingTypes);   	
    	
 	// fill containment with declarations
 	m3 = fillContainment(m3, script);
@@ -104,12 +103,24 @@ public System getSystem(loc l, bool useCache) {
 		system = readSystemFromCache(l);
 	} else {	    
     	system = loadPHPFiles(l);
-		logMessage("Writing <l> to cache.", 2);
-	   	writeSystemToCache(system, l); 
-		logMessage("Writing <l> done.", 2);
+    	if (useCache)
+    	{
+			logMessage("Writing <l> to cache.", 2);
+		   	writeSystemToCache(system, l); 
+			logMessage("Writing <l> done.", 2);
+		}
 	}
 	
 	return system;
+}
+
+public M3 getM3ForSystem(System system, loc l)
+{
+	M3Collection m3s = getM3CollectionForSystem(system);
+	
+	M3 m3 = composePhpM3(l, range(m3s));
+	
+	return m3;
 }
 
 // move to cache function file 

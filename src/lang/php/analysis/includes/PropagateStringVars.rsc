@@ -14,7 +14,7 @@ import lang::php::analysis::NamePaths;
 import lang::php::analysis::cfg::Label;
 import lang::php::analysis::cfg::FlowEdge;
 import lang::php::analysis::cfg::BuildCFG;
-import lang::php::util::System;
+import lang::php::ast::System;
 import lang::php::analysis::includes::IncludeGraph;
 
 import Set;

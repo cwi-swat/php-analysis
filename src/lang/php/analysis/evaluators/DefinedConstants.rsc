@@ -11,7 +11,7 @@ module lang::php::analysis::evaluators::DefinedConstants
 import lang::php::ast::AbstractSyntax;
 import lang::php::analysis::signatures::Signatures;
 import lang::php::analysis::includes::IncludeGraph;
-import lang::php::util::System;
+import lang::php::ast::System;
 
 import Set;
 import List;

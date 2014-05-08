@@ -16,7 +16,7 @@ module lang::php::analysis::evaluators::MagicConstants
 // TODO: Add support for __TRAIT__. We aren't encountering this yet in code.
 
 import lang::php::ast::AbstractSyntax;
-import lang::php::util::System;
+import lang::php::ast::System;
 import Set;
 import List;
 import String;
