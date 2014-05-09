@@ -53,11 +53,11 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		
 		case param(_, _, someName(nameNode), _):
 		{
-			if (nameNode notin ["array", "callable"])
+			if (nameNode.name notin ["array", "callable"])
 			{
 				for (\type <- ["class", "interface"])
 				{
-					;// TODO m3 = addUse(m3, nameNode, \type, getNamespace(nameNode@scope));
+					m3 = addUse(m3, nameNode, \type, getNamespace(nameNode@scope));
 				}
 			}
 		}
@@ -81,12 +81,12 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		
 		// type operators
 		
-		case i:instanceOf(_, n:name(name(phpName))):
+		case i:instanceOf(_, name(n:name(phpName))):
 		{
 			// name is interpreted as fully qualified
 			for (\type <- ["class", "interface"])
 			{
-				;// TODO m3 = addUseFullyQualified(m3, n@at, phpName, \type, getNamespace(i@scope));
+				m3 = addUseFullyQualified(m3, n@at, phpName, \type, getNamespace(i@scope));
 			}
 		}
 		
@@ -110,14 +110,14 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		
 		// method or property access
 		
-		case methodCall(_, n:name(name(methodName)), parameters):
+		case methodCall(_, name(n:name(methodName)), parameters):
 		{
 			m3@uses += {<n@at, |php+unresolved+method:///<methodName>|>};
 		}
 		
-		case propertyFetch(_, n:name(name(propertyName))):
+		case propertyFetch(_, name(n:name(propertyName))):
 		{
-			;// TODO m3@uses += {<n@at, |php+unresolved+field:///<propertyName>|>};
+			m3@uses += {<n@at, |php+unresolved+field:///<propertyName>|>};
 		}
 		
 		// function call and variable / const access
