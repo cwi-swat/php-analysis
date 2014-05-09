@@ -115,7 +115,11 @@ private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) lo
 	list[loc] phpEntries = [ e | e <- entries, e.extension in extensions];
 
 	System phpNodes = ( );
-	logMessage("Parsing directory: <l>.", 2);
+	
+	increaseFolderCounter();
+	if (folderTotal == 0) setFolderTotal(l);
+		
+	logMessage("[<folderCounter>/<folderTotal>] Parsing directory: <l>.", 2);
 	for (e <- phpEntries) {
 		try {
 			Script scr = loader(e, addLocationAnnotations, addUniqueIds);
@@ -128,7 +132,8 @@ private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) lo
 	}
 	
 	for (d <- dirEntries) phpNodes = phpNodes + loadPHPFiles(d, extensions, loader, addLocationAnnotations, addUniqueIds);
-	
+	resetCounters();
+		
 	return phpNodes;
 }
 
@@ -332,6 +337,23 @@ public rel[str Product,str PlainText,str Description] loadProductInfoCSV() {
 	rel[str Product,str PlainText,str Description] res = readCSV(#rel[str Product,str PlainText,str Description],|rascal://src/lang/php/extract/csvs/ProductInfo.csv|);
 	return res;
 }
+
+@doc{ counter helper methods }
+public int folderCounter = 0;
+public int folderTotal = 0;
+public void increaseFolderCounter() {
+	folderCounter = folderCounter + 1;
+}
+public void resetCounters() {
+	if (folderCounter == folderTotal) { 
+		folderTotal = 0;
+		folderCounter = 0;
+	}
+}
+public void setFolderTotal(loc baseDir) {
+	folderTotal = countFolders(baseDir);
+}
+public int countFolders(loc d) = (1 | it + countFolders(d+f) | str f <- listEntries(d), isDirectory(d+f));
 
 @doc { }
 public void logMessage(str message, int level) {
