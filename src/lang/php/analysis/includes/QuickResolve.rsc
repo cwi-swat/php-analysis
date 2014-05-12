@@ -21,12 +21,12 @@ private Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 	}
 }
 
-public rel[loc,loc] quickResolve(System sys, str p, str v, loc toResolve, loc baseLoc, set[loc] libs = { }) {
+public rel[loc,loc] quickResolve(System sys, str p, str v, loc toResolve, loc baseLoc, set[loc] libs = { }, bool checkFS=false) {
 	IncludesInfo iinfo = loadIncludesInfo(p, v);
-	return quickResolve(sys, iinfo, toResolve, baseLoc, libs=libs);
+	return quickResolve(sys, iinfo, toResolve, baseLoc, libs=libs, checkFS=checkFS);
 }
 
-public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc toResolve, loc baseLoc, set[loc] libs = { }) {
+public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc toResolve, loc baseLoc, set[loc] libs = { }, bool checkFS=false) {
 	rel[loc,Expr,loc] resolved = { };
 
 	Script scr = sys[toResolve];
@@ -45,7 +45,7 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	unresolved = includes;
 	for (iitem:< _, i > <- includes, scalar(string(s)) := i.expr, size(s) > 0, s[0] in { "\\", "/"}) {
 		try {
-			iloc = calculateLoc(sys<0>,toResolve,baseLoc,s);
+			iloc = calculateLoc(sys<0>,toResolve,baseLoc,s,checkFS=checkFS);
 			resolved = resolved + <i@at, i, iloc >;
 			unresolved = domainX(unresolved, {i@at});  
 		} catch UnavailableLoc(_) : {
@@ -65,6 +65,6 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	return resolved;
 }
 
-public rel[loc,loc] quickResolve(System sys, IncludesInfo iinfo, loc toResolve, loc baseLoc, set[loc] libs = { }) {
-	return (quickResolveExpr(sys, iinfo, toResolve, baseLoc, libs=libs))<0,2>;
+public rel[loc,loc] quickResolve(System sys, IncludesInfo iinfo, loc toResolve, loc baseLoc, set[loc] libs = { }, bool checkFS=false) {
+	return (quickResolveExpr(sys, iinfo, toResolve, baseLoc, libs=libs, checkFS=checkFS))<0,2>;
 }

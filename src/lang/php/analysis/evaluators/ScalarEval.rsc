@@ -22,7 +22,7 @@ import Exception;
 import IO;
 
 @doc{Perform all defined scalar evaluations.}
-public map[loc fileloc, Script scr] evalAllScalars(map[loc fileloc, Script scr] scripts) {
+public System evalAllScalars(System scripts) {
 	solve(scripts) {
 		println("APPLYING SIMPLIFICATIONS");
 		scripts = ( l : algebraicSimplification(simulateCalls(scripts[l])) | l <- scripts );
@@ -33,7 +33,7 @@ public map[loc fileloc, Script scr] evalAllScalars(map[loc fileloc, Script scr] 
 }
 
 @doc{Perform all defined scalar evaluations and inline constants.}
-public map[loc fileloc, Script scr] evalAllScalarsAndInline(map[loc fileloc, Script scr] scripts, loc baseLoc) {
+public System evalAllScalarsAndInline(System scripts, loc baseLoc) {
 	solve(scripts) {
 		println("APPLYING SIMPLIFICATIONS");
 		scripts = ( l : algebraicSimplification(simulateCalls(scripts[l])) | l <- scripts );
@@ -70,7 +70,7 @@ public map[loc fileloc, Script scr] evalAllScalarsAndInline(map[loc fileloc, Scr
 }
 
 @doc{Perform all defined scalar evaluations and inline constants.}
-public map[loc fileloc, Script scr] evalAllScalarsAndInlineUniques(map[loc fileloc, Script scr] scripts, loc baseLoc) {
+public System evalAllScalarsAndInlineUniques(System scripts, loc baseLoc) {
 	solve(scripts) {
 		println("APPLYING SIMPLIFICATIONS");
 		scripts = ( l : algebraicSimplification(simulateCalls(scripts[l])) | l <- scripts );

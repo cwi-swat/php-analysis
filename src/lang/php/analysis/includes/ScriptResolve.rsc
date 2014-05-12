@@ -60,13 +60,17 @@ anno map[ConstItem,Expr] IncludeGraphNode@definingExps;
 anno bool IncludeGraphNode@setsIncludePath;
 
 public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemExp]] loc2consts, bool setsip) {
-	constDefs = loc2consts[n.fileLoc];
-	justDefs = { normalConst(cn) | normalConst(cn,_) <- constDefs } + { classConst(cln,cn) | classConst(cln,cn,_) <- constDefs };
-	exprs = ( normalConst(cn) : cne | normalConst(cn,cne) <- constDefs ) + ( classConst(cln,cn) : cne | classConst(cln,cn,cne) <- constDefs );
-	return n[@definedConstants=justDefs][@definingExps=exprs][@setsIncludePath=setsip];	
+	if (n.fileLoc notin loc2consts) {
+		return n[@definedConstants={}][@definingExps=()][@setsIncludePath=false];
+	} else {
+		constDefs = loc2consts[n.fileLoc];
+		justDefs = { normalConst(cn) | normalConst(cn,_) <- constDefs } + { classConst(cln,cn) | classConst(cln,cn,_) <- constDefs };
+		exprs = ( normalConst(cn) : cne | normalConst(cn,cne) <- constDefs ) + ( classConst(cln,cn) : cne | classConst(cln,cn,cne) <- constDefs );
+		return n[@definedConstants=justDefs][@definingExps=exprs][@setsIncludePath=setsip];	
+	}
 }
 
-public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(System sys, str p, str v, loc toResolve, loc baseLoc, list[str] ipath=[], map[loc,rel[loc,Expr,loc]] quickResolveInfo = ( )) {
+public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(System sys, str p, str v, loc toResolve, loc baseLoc, set[loc] libs = { }, list[str] ipath=[], map[loc,rel[loc,Expr,loc]] quickResolveInfo = ( )) {
 	lrel[str,datetime] timings = [ < "Starting includes resolution", now() > ];
 	clearLookupCache();
 	
@@ -80,7 +84,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// and perform simplifications
 	IncludesInfo iinfo = loadIncludesInfo(p, v);
 	timings += < "Includes info loaded", now()>;
-	quickResolved = (size(quickResolveInfo) > 0) ? ( (toResolve in quickResolveInfo) ? quickResolveInfo[toResolve] : { }) : quickResolveExpr(sys, iinfo, toResolve, baseLoc);
+	quickResolved = (size(quickResolveInfo) > 0) ? ( (toResolve in quickResolveInfo) ? quickResolveInfo[toResolve] : { }) : quickResolveExpr(sys, iinfo, toResolve, baseLoc, libs=libs);
 	timings += < "Finished with initial quick resolve", now()>;
 	
 	// This gives us a base model of what can be immediately included
@@ -94,7 +98,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	while (! isEmpty(worklist) ) {
 		next = getOneFrom(worklist); worklist -= next; worked += next;
 		includeMap += ( i@at : i | /i:include(_,_) := sys[next] );
-		nextResolved = (size(quickResolveInfo) > 0) ? ( (next in quickResolveInfo) ? quickResolveInfo[next] : { } ) : quickResolveExpr(sys, iinfo, next, baseLoc);
+		nextResolved = (size(quickResolveInfo) > 0) ? ( (next in quickResolveInfo) ? quickResolveInfo[next] : { } ) : quickResolveExpr(sys, iinfo, next, baseLoc, libs=libs);
 		quickResolved += nextResolved;
 		worklist += ({ qri | qri <- nextResolved<2>, qri.scheme != "php+lib" } - worked);
 		worked += { qri | qri <- nextResolved<2>, qri.scheme == "php+lib" };
@@ -115,7 +119,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	map[loc,IncludeGraphNode] nodeMap = ( l:igNode((l.scheme != "php+lib") ? substring(l.path,sizeToRemove) : l.path,l) | l <- worked );// + (|file:///synthesizedLoc/<lib.path>| : libNode(lib.name,lib.path) | lib <- libraries);	
 	set[IncludeGraphEdge] edgeSet = { };
 	for (l <- includeMap) {
-		possibleTargets = quickResolved[l];
+		possibleTargets = (l in quickResolved) ? quickResolved[l] : { };
 		if (size(possibleTargets) == 0) {
 			// This means that no possible files could be included.
 			edgeSet += igEdge(nodeMap[l.top], unknownNode(), includeMap[l]); // TODO: Should use resolved version, just for completeness	
@@ -140,7 +144,8 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// could be a dynamic call to these functions, using variable functions or dynamic invocations, that is not detected here. This
 	// could happen, but seemingly would be done with the intent to obfuscate the changing of the path. TODO: it would be good to do
 	// a string analysis to rule this out, though, if possible.	
-	set[loc] setsIncludePath = { l | l <- worked, l.scheme != "php+lib", /call(name(name("set_include_path")),_) := sys[l] } + 
+	set[loc] setsIncludePath = { l | l <- worked, l.scheme != "php+lib", /call(name(name("set_include_path")),_) := sys[l] } +
+							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("chdir")),_) := sys[l] } + 
 							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("ini_set")),[actualParameter(pe,_)]) := sys[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
 	timings += < "Found <size(setsIncludePath)> locations that set the include path", now() >;
 
@@ -203,7 +208,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 		
 		// Finally, perform our standard simplifications on the expression, performing
 		// concatenations, etc.
-		resolvedExpr = normalizeExpr(resolvedExpr, toResolve);
+		resolvedExpr = normalizeExpr(resolvedExpr, baseLoc);
 		return resolvedExpr;
 	}						 			
 	

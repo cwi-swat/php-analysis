@@ -5,6 +5,7 @@ import List;
 import String;
 import lang::php::util::Utils;
 import lang::php::util::Corpus;
+import lang::php::stats::Stats;
 
 public str generateFullCorpusInfoTable() {
 	pInfo = loadProductInfoCSV();
