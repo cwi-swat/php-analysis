@@ -64,6 +64,11 @@ data IncludesInfo
 				   map[str, Expr] constMap,
 				   map[str, map[str, Expr]] classConstMap);
 				   
+
+public bool includesInfoExists(str p, str v) {
+	return exists(infoLoc + "<p>-<v>-l2c.bin") && exists(infoLoc + "<p>-<v>-crel.bin") && exists(infoLoc + "<p>-<v>-cmap.bin") && exists(infoLoc + "<p>-<v>-ccmap.bin");
+}
+				  
 public IncludesInfo loadIncludesInfo(str p, str v) {
 	map[loc,set[ConstItemExp]] loc2consts = readBinaryValueFile(#map[loc,set[ConstItemExp]], infoLoc + "<p>-<v>-l2c.bin");
 	rel[ConstItem,loc,Expr] constRel = readBinaryValueFile(#rel[ConstItem,loc,Expr], infoLoc + "<p>-<v>-crel.bin");
