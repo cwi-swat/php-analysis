@@ -96,6 +96,7 @@ public void doQuickResolve() {
 public void doQuickResolve(Corpus corpus) {
 	for (p <- corpus, v := corpus[p]) {
 		pt = loadBinary(p,v);
+		if (!includesInfoExists(p,v)) buildIncludesInfo(p,v,getCorpusItem(p,v));
 		IncludesInfo iinfo = loadIncludesInfo(p, v);
 		rel[loc,loc,loc] res = { };
 		map[loc,Duration] timings = ( );
@@ -218,7 +219,10 @@ public str createQuickResolveCountsTable() {
 	corpus = getBaseCorpus();
 	
 	str headerLine() {
-		return "System & Includes & Dynamic & Unique & Missing & Any & Other & Average \\\\ \\midrule";
+		res = "System & \\multicolumn{3}{c}{Includes} & \\phantom{abc} & \\multicolumn{5}{c}{Results} \\\\
+			  '\\cmidrule{2-4} \\cmidrule{6-10}
+			  ' & Total & Static & Dynamic & & Unique & Missing & Any & Other & Average \\\\ \\midrule";
+		return res;
 	}
 	
 	str productLine(str p, str v) {
@@ -226,6 +230,7 @@ public str createQuickResolveCountsTable() {
 		total = ( 0 | it + m[h] | h <- m<0> );
 		pt = loadBinary(p,v);
 		dyn = total - size([ i | /i:include(ip,_) := pt, scalar(sv) := ip, encapsed(_) !:= sv ]);
+		st = total - dyn;
 		unique = (1 in m) ? m[1] : 0;
 		missing = (0 in m) ? m[0] : 0;
 		files = size(pt<0>);
@@ -235,23 +240,21 @@ public str createQuickResolveCountsTable() {
 		denom = ( 0 | it + m[h] | h <- m<0>, h > 1, h < threshold );
 		avg = (denom == 0) ? 0 : ( ( 0 | it + (m[h] * h) | h <- m<0>, h > 1, h < threshold ) * 1.000 / denom);
 							
-		return "<p> & \\numprint{<total>} & \\numprint{<dyn>} & \\numprint{<unique>} & \\numprint{<missing>} & \\numprint{<anyinc>} & \\numprint{<other>} & \\nprounddigits{2} \\numprint{<avg>} \\npnoround \\\\";
+		return "<p> & \\numprint{<total>} & \\numprint{<st>} & \\numprint{<dyn>} & & \\numprint{<unique>} & \\numprint{<missing>} & \\numprint{<anyinc>} & \\numprint{<other>} & \\nprounddigits{2} \\numprint{<avg>} \\npnoround \\\\";
 	}
 
 	res = "\\npaddmissingzero
 		  '\\npfourdigitsep
-		  '\\begin{table}
+		  '\\begin{table*}
 		  '\\centering
-		  '\\ra{1.0}
-		  '\\resizebox{\\columnwidth}{!}{%
-		  '\\begin{tabular}{@{}lrrrrrrr@{}} \\toprule 
+		  '\\ra{1.2}
+		  '\\begin{tabular}{@{}lrrrcrrrrr@{}} \\toprule 
 		  '<headerLine()> <for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '  <productLine(p,corpus[p])> <}>
 		  '\\bottomrule
 		  '\\end{tabular}
-		  '}
-		  '\\caption{File-Level Resolution.\\label{table-quick}}
-		  '\\end{table}
+		  '\\caption{Results of running {\\sf FLRES} on the corpus.\\label{table-quick}}
+		  '\\end{table*}
 		  '";
 	return res;
 }
