@@ -70,7 +70,7 @@ public M3 addUseToAliases(M3 m3, Use u, loc currentNamespace)
 		importedName = n1;
 		asName = n2;
 	}
-	else if (use(name(importedName), noName()) := u)
+	else if (use(name(n1), noName()) := u)
 	{
 		importedName = n1;
 		asName = getLastNamePart(importedName);
