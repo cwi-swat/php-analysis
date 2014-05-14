@@ -5,6 +5,7 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::\syntax::Names;
 
 import Prelude;
+import Traversal;
 
 
 public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
@@ -126,13 +127,20 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		{
 			m3 = addUse(m3, nameNode, "function", getNamespace(c@scope));
 		}
-		
+		 	
 		case v:var(name(nameNode)):
 		{
-			if (!v@decl?) // don't add uses on declarations
-			{
+			if (v@decl?) // Special case for assign with Operation. They can be both declarations AND uses
+			{	
+				parentNode = getTraversalContextNodes()[1];
+				/* if parent is $i++; or $i += 1; */
+				if (unaryOperation(_,_) := parentNode || assignWOp(_,_,_) := parentNode) {
+					m3 = addVarUse(m3, nameNode, v@at, nameNode@scope);
+				}
+			} else { // add all vars uses that have no declarations
 				m3 = addVarUse(m3, nameNode, v@at, nameNode@scope);
 			}
+			
 		}
 		
 		case fetchConst(nameNode): // always global constant
@@ -149,9 +157,9 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		
 		case c:closure(_, _, closureUses, _, _):
 		{
-			for (closureUse(nameNode, _) <- closureUses)
+			for (cu:closureUse(var(name(nameNode)), _) <- closureUses)
 			{
-				m3 = addVarUse(m3, nameNode, closureUse@at, c@scope);
+				m3 = addVarUse(m3, nameNode, cu@at, c@scope);
 			}
 		}
 		
