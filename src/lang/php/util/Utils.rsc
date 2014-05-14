@@ -71,10 +71,10 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	if (addUniqueIds) opts += "-i";
 	if (l.scheme == "home") opts += "-r";
 	if (includePhpDocs) opts += "--phpdocs";
-	if (resolveNamespaces) opts += "--resolveNames";
 	
 	PID pid = createProcess(phploc.path, ["-d memory_limit="+parserMemLimit, rgenLoc.path, "-f<l.path>"] + opts, rgenCwd);
 	str phcOutput = readEntireStream(pid);
+	println(phcOutput);
 	str phcErr = readEntireErrStream(pid);
 	Script res = errscript("Could not parse file <l.path>: <phcErr>");
 	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {

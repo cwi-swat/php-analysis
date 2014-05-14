@@ -22,7 +22,6 @@ public bool useBinaries = false;
 // parse options
 public bool includePhpDocs = false;
 public bool includeLocationInfo = false;
-public bool resolveNamespaces = false;
 
 // debug options
 @logLevel {
