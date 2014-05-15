@@ -13,27 +13,24 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 	visit (ast)
 	{
 		// classes, interfaces and traits use
-
-		case c:class(_, _, extends, implements, _):
+		case class(_, _, extends, implements, _):
 		{
-			currentNamespace = getNamespace(c@scope);
-		
 			if (someName(className) := extends)
 			{
-				m3 = addUse(m3, className, "class", currentNamespace);
+				m3 = addUse(m3, className, "class");
 			}
 		
 			for (interfaceName <- implements)
 			{
-				m3 = addUse(m3, interfaceName, "interface", currentNamespace);
+				m3 = addUse(m3, interfaceName, "interface");
 			}				
 		}
 		
-		case i:interface(_, extends, _):
+		case interface(_, extends, _):
 		{
 			for (interfaceName <- extends)
 			{
-				m3 = addUse(m3, interfaceName, "interface", getNamespace(i@scope));
+				m3 = addUse(m3, interfaceName, "interface");
 			}		
 		}
 		
@@ -41,13 +38,13 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		{
 			for (name <- names)
 			{
-				m3 = addUse(m3, name, "trait", getNamespace(name@scope));
+				m3 = addUse(m3, name, "trait");
 			}
 		}
 		
 		case new(name(nameNode), _):
 		{
-			m3 = addUse(m3, nameNode, "class", getNamespace(nameNode@scope));			
+			m3 = addUse(m3, nameNode, "class");			
 		}
 
 		// parameter type hints
@@ -58,7 +55,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			{
 				for (\type <- ["class", "interface"])
 				{
-					m3 = addUse(m3, nameNode, \type, getNamespace(nameNode@scope));
+					m3 = addUse(m3, nameNode, \type);
 				}
 			}
 		}
@@ -67,27 +64,27 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		
 		case fetchClassConst(name(nameNode), _):
 		{
-			m3 = addUseStaticRef(m3, nameNode, getNamespace(nameNode@scope));
+			m3 = addUseStaticRef(m3, nameNode);
 		}
 		
 		case staticCall(name(nameNode), _, _):
 		{
-			m3 = addUseStaticRef(m3, nameNode, getNamespace(nameNode@scope));			
+			m3 = addUseStaticRef(m3, nameNode);			
 		}
 		
 		case staticPropertyFetch(name(nameNode), _):
 		{
-			m3 = addUseStaticRef(m3, nameNode, getNamespace(nameNode@scope));
+			m3 = addUseStaticRef(m3, nameNode);
 		}
 		
 		// type operators
 		
-		case i:instanceOf(_, name(n:name(phpName))):
+		case instanceOf(_, name(n:name(phpName))):
 		{
 			// name is interpreted as fully qualified
 			for (\type <- ["class", "interface"])
 			{
-				m3 = addUseFullyQualified(m3, n@at, phpName, \type, getNamespace(i@scope));
+				m3 = addUseFullyQualified(m3, n@at, phpName, \type, n@scope);
 			}
 		}
 		
@@ -96,7 +93,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			// name is interpreted as fully qualified
 			for (\type <- ["class", "interface"])
 			{
-				m3 = addUseFullyQualified(m3, s@at, typeName, \type, getNamespace(c@scope));
+				m3 = addUseFullyQualified(m3, s@at, typeName, \type, c@scope);
 			}
 		}
 		
@@ -105,9 +102,11 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			// name is interpreted as fully qualified
 			for (\type <- ["class", "interface"])
 			{
-				m3 = addUseFullyQualified(m3, s@at, typeName, \type, getNamespace(c@scope));
+				m3 = addUseFullyQualified(m3, s@at, typeName, \type, c@scope);
 			}
 		}
+
+		// TODO class_exists() ?
 		
 		// method or property access
 		
@@ -123,9 +122,9 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		
 		// function call and variable / const access
 		
-		case c:call(name(nameNode), _):
+		case call(name(nameNode), _):
 		{
-			m3 = addUse(m3, nameNode, "function", getNamespace(c@scope));
+			m3 = addUse(m3, nameNode, "function");
 		}
 		 	
 		case v:var(name(nameNode)):
@@ -145,7 +144,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		
 		case fetchConst(nameNode): // always global constant
 		{
-			m3 = addUse(m3, nameNode, "constant", getNamespace(nameNode@scope));
+			m3 = addUse(m3, nameNode, "constant");
 		}
 		
 		case f:fetchArrayDim(var(name(name("GLOBALS"))), someExpr(scalar(string(str name)))):
@@ -169,7 +168,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		{
 			for (\type <- ["class", "interface"])
 			{
-				m3 = addUse(m3, nameNode, \type, getNamespace(nameNode@scope));
+				m3 = addUse(m3, nameNode, \type);
 			}
 		}		
 	}
@@ -178,38 +177,40 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 }
 
 
-public M3 addUse(M3 m3, Name name, str \type, loc currentNamespace)
+public M3 addUse(M3 m3, Name name, str \type)
 {
-	return addUse(m3, name@at, name.name, \type, currentNamespace);
+	return addUse(m3, name@at, name.name, \type, name@scope); 
+}
+
+public M3 addUse(M3 m3, Name name, str \type, loc scope)
+{
+	return addUse(m3, name@at, name.name, \type, scope);
 }
 
 
-public M3 addUseFullyQualified(M3 m3, loc at, str name, str \type, loc currentNamespace)
+public M3 addUseFullyQualified(M3 m3, loc at, str name, str \type, loc scope)
 {
 	if (fullyQualified() !:= getNameQualification(name))
 	{
 		name = "/" + name;
 	}
 	
-	return addUse(m3, at, name, \type, currentNamespace);
+	return addUse(m3, at, name, \type, scope);
 }
 
 
-public M3 addUseStaticRef(M3 m3, Name name, loc currentNamespace)
+public M3 addUseStaticRef(M3 m3, Name name)
 {
-	if (name.name notin ["static", "self", "parent"])
+	for (\type <- ["class", "interface"])
 	{
-		for (\type <- ["class", "interface"])
-		{
-			m3 = addUse(m3, name@at, name.name, \type, currentNamespace);
-		}
+		m3 = addUse(m3, name, \type);
 	}
 
 	return m3;
 }
 
 
-public M3 addUse(M3 m3, loc at, str name, str \type, loc currentNamespace)
+public M3 addUse(M3 m3, loc at, str name, str \type, loc scope)
 {
 	/* from https://github.com/php/php-src/blob/master/README.namespaces#L83-111 :
 	
@@ -246,6 +247,12 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc currentNamespace)
 	*/
 	
 	loc fullyQualifiedName;
+
+	if (name in ["static", "self", "parent"])
+	{
+		// don't resolve these for now
+		return m3;
+	}
 	
 	switch(getNameQualification(name))
 	{
@@ -255,11 +262,11 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc currentNamespace)
 		}
 		case qualified():
 		{
-			fullyQualifiedName = appendName(name, \type, currentNamespace);
+			fullyQualifiedName = appendName(name, \type, getNamespace(scope));
 		}
 		case unqualified():
 		{
-			fullyQualifiedName = appendName(name, \type, currentNamespace);
+			fullyQualifiedName = appendName(name, \type, getNamespace(scope));
 			
 			// name could also be reference to internal PHP class or function.
 			
@@ -334,4 +341,50 @@ rel[loc, loc] resolveUsesToPossibleDeclarations(M3 m3)
 	result += (allUseSites - domain(result)) * {unknownLocation};
 	
 	return result;
+}
+
+@doc{
+	Return a histogram stating the number of times a use is matched with a number of declarations.
+}
+public map[int, int] calculateResolutionHistogram(rel[loc, loc] useDecl)
+{
+	map[int, int] counts = ();
+	map[loc, int] countPerLoc = countNumPossibleDeclarations(useDecl);
+
+	// calculation written for efficiency
+	for (i <- [0..20])
+	{
+		int c = 0;
+		for (loc l <- countPerLoc)
+		{
+			if (countPerLoc[l] == i)
+			{
+				c += 1;
+			}
+		}
+
+		counts[i] = c;
+	}
+
+	return counts;
+}
+
+@doc{
+	Count the number of declarations that are matched to each use.
+}
+public map[loc, int] countNumPossibleDeclarations(rel[loc, loc] useDecl)
+{
+	// calculation written for efficiency
+	set[loc] uses = domain(useDecl);
+	map[loc, int] countPerLoc = toMapUnique(uses * {0});
+
+	for (<u,d> <- useDecl)
+	{
+		if (d != unknownLocation)
+		{
+			countPerLoc[u] ? 0 += 1;
+		}
+	}
+
+	return countPerLoc;
 }
