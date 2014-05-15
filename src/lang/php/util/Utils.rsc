@@ -74,7 +74,6 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	
 	PID pid = createProcess(phploc.path, ["-d memory_limit="+parserMemLimit, rgenLoc.path, "-f<l.path>"] + opts, rgenCwd);
 	str phcOutput = readEntireStream(pid);
-	println(phcOutput);
 	str phcErr = readEntireErrStream(pid);
 	Script res = errscript("Could not parse file <l.path>: <phcErr>");
 	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
