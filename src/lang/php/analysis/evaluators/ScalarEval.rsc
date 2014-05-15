@@ -9,6 +9,7 @@
 module lang::php::analysis::evaluators::ScalarEval
 
 import lang::php::ast::AbstractSyntax;
+import lang::php::ast::System;
 import lang::php::analysis::evaluators::MagicConstants;
 import lang::php::analysis::evaluators::AlgebraicSimplification;
 import lang::php::analysis::evaluators::SimulateCalls;
