@@ -217,7 +217,7 @@ public Script switchNamespaceSeparators(Script s) {
 public Script setDefaultUseAlias(Script s) {
 	solve(s) {
 		s = visit(s) {
-			case use(name(str un), noName()) => use(name(un),someName(name(last(split("::",un)))))
+			case use(name(str un), noName()) => use(name(un),someName(name(last(split("/",un)))))
 		}
 	}
 	return s;
