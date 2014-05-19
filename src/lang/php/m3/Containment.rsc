@@ -266,10 +266,20 @@ public M3 addVarDecl(M3 m3, node n, node parent) {
 	return m3;
 }
 
-public loc getNamespace(rel[loc from, loc to] containment, loc decl) {
+@memo public loc getNamespace(rel[loc from, loc to] containment, loc decl) {
 	containment = invert(containment);
 	solve(decl) {
 		if (!isNamespace(decl)) {
+			decl = getOneFrom(containment[decl]);	
+		}
+	}
+	return decl;
+}
+
+@memo public loc getClass(rel[loc from, loc to] containment, loc decl) {
+	containment = invert(containment);
+	solve(decl) {
+		if (!isClass(decl)) {
 			decl = getOneFrom(containment[decl]);	
 		}
 	}
