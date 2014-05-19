@@ -242,3 +242,18 @@ public Script discardModifiers(Script s) {
 	}
 	return s;
 }
+
+public Script setEmptyModifiersToPublic(Script s) {
+	set[Modifier] publicModifier = { \public() };
+	
+	solve(s) {
+		s = visit(s) {
+			case property({}, prop) => 
+				property(publicModifier, prop)
+				
+			case method(name, {}, byRef, params, body) =>
+				method(name, publicModifier, byRef, params, body)
+		}
+	}
+	return s;
+}
