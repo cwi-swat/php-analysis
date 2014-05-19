@@ -2,6 +2,7 @@ module lang::php::m3::Uses
 
 import lang::php::m3::Core;
 import lang::php::ast::AbstractSyntax;
+import lang::php::pp::PrettyPrinter;
 import lang::php::\syntax::Names;
 
 import Prelude;
@@ -42,9 +43,9 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			}
 		}
 		
-		case new(name(nameNode), _):
+		case new(nameOrExprNode, _):
 		{
-			m3 = addUse(m3, nameNode, "class");			
+			m3 = addUse(m3, nameOrExprNode, "class");			
 		}
 
 		// parameter type hints
@@ -62,17 +63,17 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 
 		// static references
 		
-		case fetchClassConst(name(nameNode), _):
+		case fetchClassConst(nameNode, _):
 		{
 			m3 = addUseStaticRef(m3, nameNode);
 		}
 		
-		case staticCall(name(nameNode), _, _):
+		case staticCall(nameNode, _, _):
 		{
 			m3 = addUseStaticRef(m3, nameNode);			
 		}
 		
-		case staticPropertyFetch(name(nameNode), _):
+		case staticPropertyFetch(nameNode, _):
 		{
 			m3 = addUseStaticRef(m3, nameNode);
 		}
@@ -110,14 +111,15 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		
 		// method or property access
 		
-		case methodCall(_, name(n:name(methodName)), parameters):
+		case methodCall(_, methodName, _): // todo, actually resolve this.
 		{
-			m3@uses += {<n@at, |php+unresolved+method:///<methodName>|>};
+			// todo, arrays fail in pretty print
+			m3@uses += {<methodName@at, |php+unresolved+method:///<ppVar(methodName)>|>};
 		}
 		
-		case propertyFetch(_, name(n:name(propertyName))):
+		case p:propertyFetch(_, propertyName): // todo, actually resolve this.
 		{
-			m3@uses += {<n@at, |php+unresolved+field:///<propertyName>|>};
+			m3@uses += {<propertyName@at, |php+unresolved+field:///<ppVar(propertyName)>|>};
 		}
 		
 		// function call and variable / const access
@@ -127,17 +129,17 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			m3 = addUse(m3, nameNode, "function");
 		}
 		 	
-		case v:var(name(nameNode)):
+		case v:var(varNode):
 		{
 			if (v@decl?) // Special case for assign with Operation. They can be both declarations AND uses
 			{	
 				parentNode = getTraversalContextNodes()[1];
 				/* if parent is $i++; or $i += 1; */
 				if (unaryOperation(_,_) := parentNode || assignWOp(_,_,_) := parentNode) {
-					m3 = addVarUse(m3, nameNode, v@at, nameNode@scope);
+					m3 = addVarUse(m3, varNode, v@at, varNode@scope);
 				}
 			} else { // add all vars uses that have no declarations
-				m3 = addVarUse(m3, nameNode, v@at, nameNode@scope);
+				m3 = addVarUse(m3, varNode, v@at, varNode@scope);
 			}
 			
 		}
@@ -147,18 +149,22 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			m3 = addUse(m3, nameNode, "constant");
 		}
 		
-		case f:fetchArrayDim(var(name(name("GLOBALS"))), someExpr(scalar(string(str name)))):
+		//case f:fetchArrayDim(var(name(name("GLOBALS"))), someExpr(scalar(string(str name)))):
+		//{
+		//	m3@uses += {<f@at, nameToLoc(name, "globalVar")>};
+		//}
+		case f:fetchArrayDim(otherVars:var(varNode), _): // other than global
 		{
-			m3@uses += {<f@at, nameToLoc(name, "globalVar")>};
+			m3 = addVarUse(m3, ppVar(varNode), otherVars@at, varNode@scope);
 		}
 		
 		// closure captures
 		
 		case c:closure(_, _, closureUses, _, _):
 		{
-			for (cu:closureUse(var(name(nameNode)), _) <- closureUses)
+			for (cu:closureUse(var(varNode), _) <- closureUses)
 			{
-				m3 = addVarUse(m3, nameNode, cu@at, c@scope);
+				m3 = addVarUse(m3, ppVar(varNode), cu@at, c@scope);
 			}
 		}
 		
@@ -176,6 +182,15 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 	return m3;
 }
 
+
+public M3 addUse(M3 m3, NameOrExpr nameOrExpr, str \type)
+{
+	if (name(name) := nameOrExpr) {
+		return addUse(m3, name, \type, name@scope);
+	} else {
+		return addUse(m3, nameOrExpr@at, ppVar(nameOrExpr), "unresolved+"+\type, nameOrExpr@scope);
+	}
+}
 
 public M3 addUse(M3 m3, Name name, str \type)
 {
@@ -199,6 +214,16 @@ public M3 addUseFullyQualified(M3 m3, loc at, str name, str \type, loc scope)
 }
 
 
+public M3 addUseStaticRef(M3 m3, NameOrExpr nameOrExpr) {
+	if (name(name) := nameOrExpr) {
+		return addUseStaticRef(m3, name);
+	} else {
+		// todo, check what values come in here
+		return m3; // check is this needs some work
+		//return addVarUse(m3, ppVar(nameOrExpr), pos, scope);
+	}
+}
+
 public M3 addUseStaticRef(M3 m3, Name name)
 {
 	for (\type <- ["class", "interface"])
@@ -208,6 +233,29 @@ public M3 addUseStaticRef(M3 m3, Name name)
 
 	return m3;
 }
+
+//public M3 addUseStaticRef(M3 m3, NameOrExpr nameOrExpr, loc currentNamespace)
+//{
+//	if (name(name) := nameOrExpr) {
+//		m3 = addUse(m3, nameOrExpr, name.name, currentNamespace);
+//	} else {
+//		m3 = addUse(m3, nameOrExpr, ppVar(nameOrExpr), currentNamespace);
+//	}
+//	return m3;
+//}
+//
+//public M3 addUseStaticRef(M3 m3, loc at, str name, loc currentNamespace)
+//{
+//	if (name notin ["static", "self", "parent"])
+//	{
+//		for (\type <- ["class", "interface"])
+//		{
+//			m3 = addUse(m3, at, name, \type, currentNamespace);
+//		}
+//	}
+//
+//	return m3;
+//}
 
 
 public M3 addUse(M3 m3, loc at, str name, str \type, loc scope)
@@ -289,7 +337,16 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc scope)
 }
 
 
-M3 addVarUse(M3 m3, Name name, loc pos, loc scope)
+M3 addVarUse(M3 m3, NameOrExpr nameOrExpr, loc pos, loc scope) {
+
+	if (name(name) := nameOrExpr) {
+		return addVarUse(m3, name.name, pos, scope);
+	} else {
+		return addVarUse(m3, ppVar(nameOrExpr), pos, scope);
+	}
+}
+	
+M3 addVarUse(M3 m3, str name, loc pos, loc scope)
 {
 	list[str] types;
 	
@@ -311,7 +368,7 @@ M3 addVarUse(M3 m3, Name name, loc pos, loc scope)
 		throw "Unknown variable scope type: <scope>";
 	}
 	
-	m3@uses += {<pos, |php+<\type>://<scope.path>/<name.name>|> | \type <- types};
+	m3@uses += {<pos, |php+<\type>://<scope.path>/<name>|> | \type <- types};
 	
 	return m3;
 }
@@ -387,4 +444,14 @@ public map[loc, int] countNumPossibleDeclarations(rel[loc, loc] useDecl)
 	}
 
 	return countPerLoc;
+}
+
+private str ppVar(node ast) {
+	//println("ast: <ast>");
+	str pretty = "";
+	visit (ast) {
+		case name(str name): pretty = name;
+	}
+	//println(pretty);
+	return pretty;
 }
