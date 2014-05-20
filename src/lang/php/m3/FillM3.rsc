@@ -29,7 +29,7 @@ public M3 createM3forScript(loc filename, Script script)
 
 private bool useCacheDefault = true;
 // get a system for a specific location
-public System getSystem(loc l) = getSystem(l, useCacheDefault);
+public System getSystem(loc l) = discardErrorScripts(getSystem(l, useCacheDefault));
 public System getSystem(loc l, bool useCache) = loadFromCache(l, useCache) ? readSystemFromCache(l) : loadSystem(l, useCache);
 
 public M3 getM3ForDirectory(loc l) = getM3ForSystem(getSystem(l), l);
@@ -40,10 +40,15 @@ public M3Collection getM3CollectionForSystem(System system) = (filename:createM3
 
 // getSystem helper methods
 private bool loadFromCache(loc l, bool useCache) = useCache && cacheFileExists(l);
-private System loadSystem(l, true) = loadPHPFiles(l);
+private System loadSystem(l, true) {
+	logMessage("loading system from cache");
+	return loadPHPFiles(l);
+}
 private System loadSystem(l, false) { 
 	System system = loadPHPFiles(l); 
+	logMessage("Writing system to cache");
 	writeSystemToCache(system, l); 
+	logMessage("Writing done.");
 	return system;
 }
 // end of getSystem helper methods
