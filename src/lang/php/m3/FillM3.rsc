@@ -27,10 +27,10 @@ public M3 createM3forScript(loc filename, Script script)
 }
 
 
-private bool useCacheDefault = true;
+private bool useCacheDefault = false;
 // get a system for a specific location
-public System getSystem(loc l) = discardErrorScripts(getSystem(l, useCacheDefault));
-public System getSystem(loc l, bool useCache) = loadFromCache(l, useCache) ? readSystemFromCache(l) : loadSystem(l, useCache);
+public System getSystem(loc l) = getSystem(l, useCacheDefault);
+public System getSystem(loc l, bool useCache) = isCacheUsed(l, useCache) ? readSystemFromCache(l) : loadSystem(l, useCache);
 
 public M3 getM3ForDirectory(loc l) = getM3ForSystem(getSystem(l), l);
 public M3 getM3ForSystem(System system, loc l) = M3CollectionToM3(getM3CollectionForSystem(system), l);
@@ -39,25 +39,22 @@ public M3 M3CollectionToM3 (M3Collection m3s, loc l) = composePhpM3(l, range(m3s
 public M3Collection getM3CollectionForSystem(System system) = (filename:createM3forScript(filename, system[filename]) | filename <- system);
 
 // getSystem helper methods
-private bool loadFromCache(loc l, bool useCache) = useCache && cacheFileExists(l);
-private System loadSystem(l, true) {
-	logMessage("loading system from cache");
-	return loadPHPFiles(l);
-}
-private System loadSystem(l, false) { 
+private bool isCacheUsed(loc l, bool useCache) = useCache && cacheFileExists(l);
+private System loadSystem(l, false) = loadPHPFiles(l); 
+private System loadSystem(l, true) { 
 	System system = loadPHPFiles(l); 
-	logMessage("Writing system to cache");
+	logMessage("Writing system to cache...", 2);
 	writeSystemToCache(system, l); 
-	logMessage("Writing done.");
+	logMessage("Writing done.", 2);
 	return system;
 }
 // end of getSystem helper methods
 
-// move to cache function file 
-public void writeSystemToCache(System s, loc l) = writeBinaryValueFile(getCacheFileName(l), s);
-public System readSystemFromCache(loc l) = readBinaryValueFile(#System, getCacheFileName(l));
-public loc getCacheFileName(loc l) = |tmp:///| + "pa" +replaceAll(l.path, "/", "_");
-public bool cacheFileExists(loc l) = isFile(getCacheFileName(l));
+// to cache function file 
+private void writeSystemToCache(System s, loc l) = writeBinaryValueFile(getCacheFileName(l), s);
+private System readSystemFromCache(loc l) = readBinaryValueFile(#System, getCacheFileName(l));
+private bool cacheFileExists(loc l) = isFile(getCacheFileName(l));
+private loc getCacheFileName(loc l) = |tmp:///| + "pa" +replaceAll(l.path, "/", "_");
 // end of cache functions
 
 @doc {
