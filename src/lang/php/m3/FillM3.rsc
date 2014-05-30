@@ -4,6 +4,7 @@ extend lang::php::m3::Core;
 import lang::php::m3::Containment;
 import lang::php::m3::Aliases;
 import lang::php::m3::Uses;
+import lang::php::m3::Types;
 
 import lang::php::ast::NormalizeAST;
 import lang::php::ast::Scopes;
@@ -19,6 +20,8 @@ public M3 createM3forScript(loc filename, Script script)
 	m3 = fillContainment(m3, script); // fill containment with declarations 
 	m3 = calculateAliasesFlowInsensitive(m3, script); // fill aliases (currently only for namespace/class/interface/trait names) 
 	m3 = calculateUsesFlowInsensitive(m3, script); // fill uses (currently only for namespace/class/interface/trait names) 
+	m3 = calculateTypesFlowInsensitive(m3, script); // fill uses (currently only for namespace/class/interface/trait names) 
+	m3 = calculateUsesAfterTypes(m3, script); // fill uses (currently only for namespace/class/interface/trait names) 
 	m3 = fillExtendsAndImplements(m3, script); // fill extends, implements and traitUse, by trying to look up class names 
 	m3 = fillModifiers(m3, script); // fill modifiers for classes, class fields and class methods 
 	m3 = fillPhpDocAnnotations(m3, script); // fill documentation, defined as @phpdoc
@@ -52,7 +55,12 @@ private System loadSystem(l, true) {
 
 // to cache function file 
 private void writeSystemToCache(System s, loc l) = writeBinaryValueFile(getCacheFileName(l), s);
-private System readSystemFromCache(loc l) = readBinaryValueFile(#System, getCacheFileName(l));
+private System readSystemFromCache(loc l) {
+	logMessage("Reading system from cache...", 2);
+	System system = readBinaryValueFile(#System, getCacheFileName(l));
+	logMessage("Reading done.", 2);
+	return system;
+}
 private bool cacheFileExists(loc l) = isFile(getCacheFileName(l));
 private loc getCacheFileName(loc l) = |tmp:///| + "pa" +replaceAll(l.path, "/", "_");
 // end of cache functions
@@ -87,7 +95,7 @@ private M3 fillDeclarations(M3 m3, Script script) {
 
 private M3 fillExtendsAndImplements(M3 m3, Script script) {
 	visit (script) {
-		case c:class(_, _, extends:name(_), implements, body): {			
+		case c:class(_, _, someName(extends), implements, body): {
 			m3@extends += {<c@decl, ext> | ext <- m3@uses[extends@at]};
 			m3@implements += {<c@decl, impl> | name <- implements, impl <- m3@uses[name@at]};
 			
