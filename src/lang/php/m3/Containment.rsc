@@ -276,10 +276,10 @@ public M3 addVarDecl(M3 m3, node n, node parent) {
 	return decl;
 }
 
-@memo public loc getClass(rel[loc from, loc to] containment, loc decl) {
+@memo public loc getClassOrInterface(rel[loc from, loc to] containment, loc decl) {
 	containment = invert(containment);
 	solve(decl) {
-		if (!isClass(decl)) {
+		if (!isClass(decl) && !isInterface(decl)) {
 			decl = getOneFrom(containment[decl]);	
 		}
 	}
