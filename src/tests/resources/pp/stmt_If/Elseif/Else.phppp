@@ -1,0 +1,23 @@
+<?php
+if ($a) {
+} elseif ($b) {
+
+} elseif ($c) {
+
+} else {
+
+}
+
+if ($a) {
+}
+if ($a) {
+} elseif ($b) {
+
+} elseif ($c) {
+
+} else {
+
+}
+
+if ($a) {
+}

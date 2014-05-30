@@ -1,0 +1,20 @@
+<?php
+try {
+    doTry();
+} catch (A $b) {
+    doCatchA();
+} catch (B $c) {
+    doCatchB();
+} finally {
+    doFinally();
+}
+try {
+
+} catch (A $b) {
+}
+
+try {
+
+} finally {
+
+}

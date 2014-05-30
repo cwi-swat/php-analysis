@@ -1,0 +1,11 @@
+<?php
+use A as B;
+use A;
+use A\B;
+use C\D as E;
+use F\G as H;
+use foo\BAR as BAZ;
+use foo\BAR;
+use foo\bar as baz;
+use foo\bar;
+use J;

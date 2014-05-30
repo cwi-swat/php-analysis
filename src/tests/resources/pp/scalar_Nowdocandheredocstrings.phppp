@@ -1,0 +1,8 @@
+<?php
+'';
+'';
+'Test '" $a \n';
+'Test '" $a 
+';
+'Test '.$a;
+'Test '.$a.' and '.$b->c.' test';
