@@ -43,14 +43,14 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			}
 		}
 		
-		case new(nameOrExprNode, _):
+		case new(name(nameNode), _): // only handle Names
 		{
-			m3 = addUse(m3, nameOrExprNode, "class");			
+			m3 = addUse(m3, nameNode, "class");
 		}
 
 		// parameter type hints
 		
-		case param(_, _, someName(nameNode), _):
+		case p:param(_, _, someName(nameNode), _):
 		{
 			if (nameNode.name notin ["array", "callable"])
 			{
@@ -63,24 +63,28 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 
 		// static references
 		
-		case fetchClassConst(nameNode, _):
+		case fetchClassConst(name(className), constName): // only handle literal class names
 		{
-			m3 = addUseStaticRef(m3, nameNode);
+			// create a NameOrExpr node, with a copy of the annotations
+			annotations = getAnnotations(constName);
+			constNameOrExpr = setAnnotations(name(constName), annotations);
+			
+			m3 = addUseStaticRefItem(m3, className, constNameOrExpr, "constant");
+		}
+	
+		case staticCall(name(className), methodName, _): // only handle literal class names
+		{
+			m3 = addUseStaticRefItem(m3, className, methodName, "method");
 		}
 		
-		case staticCall(nameNode, _, _):
+		case staticPropertyFetch(name(className), propertyName): // only handle literal class names
 		{
-			m3 = addUseStaticRef(m3, nameNode);			
-		}
-		
-		case staticPropertyFetch(nameNode, _):
-		{
-			m3 = addUseStaticRef(m3, nameNode);
+			m3 = addUseStaticRefItem(m3, className, propertyName, "field");
 		}
 		
 		// type operators
 		
-		case instanceOf(_, name(n:name(phpName))):
+		case x:instanceOf(_, name(n:name(phpName))):
 		{
 			// name is interpreted as fully qualified
 			for (\type <- ["class", "interface"])
@@ -113,13 +117,15 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 		
 		case methodCall(_, methodName, _): // todo, actually resolve this.
 		{
-			// todo, arrays fail in pretty print
-			m3@uses += {<methodName@at, |php+unresolved+method:///<ppVar(methodName)>|>};
+			// class name is missing
+			m3@uses += {<methodName@at, |php+method:///<ppVar(methodName)>|>};
 		}
 		
 		case p:propertyFetch(_, propertyName): // todo, actually resolve this.
 		{
-			m3@uses += {<propertyName@at, |php+unresolved+field:///<ppVar(propertyName)>|>};
+			// class name is missing
+			println(ast);
+			m3@uses += {<propertyName@at, |php+field:///<ppVar(propertyName)>|>};
 		}
 		
 		// function call and variable / const access
@@ -149,14 +155,15 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			m3 = addUse(m3, nameNode, "constant");
 		}
 		
-		//case f:fetchArrayDim(var(name(name("GLOBALS"))), someExpr(scalar(string(str name)))):
-		//{
-		//	m3@uses += {<f@at, nameToLoc(name, "globalVar")>};
-		//}
-		case f:fetchArrayDim(otherVars:var(varNode), _): // other than global
+		case f:fetchArrayDim(var(name(name("GLOBALS"))), someExpr(scalar(string(str name)))):
 		{
-			m3 = addVarUse(m3, ppVar(varNode), otherVars@at, varNode@scope);
+			m3@uses += {<f@at, nameToLoc(name, "globalVar")>};
 		}
+		
+		//case f:fetchArrayDim(otherVars:var(varNode), _): // other than global
+		//{
+		//	m3 = addVarUse(m3, ppVar(varNode), otherVars@at, varNode@scope);
+		//}
 		
 		// closure captures
 		
@@ -176,20 +183,60 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
 			{
 				m3 = addUse(m3, nameNode, \type);
 			}
-		}		
+		}
+
+		// ignore these		
+		case Stmt: ;
+		case str _: ;
+		case n:_: println("Ignored: <n>");		
 	}
 
 	return m3;
 }
 
+public M3 calculateUsesAfterTypes(M3 m3, Script script)
+{
+	visit (script)
+	{	
+		// add use for this variable class instantation: e.g. new $model;
+		case x:new(expr(exprNode), _):
+		{
+			println("todo: calculateUsesAfterTypes: handle class instantiation of: `<pp(x)>` :: <exprNode@at>");
+			//m3 = addUse(m3, exprNode, "class");
+		}
+		
+		// class name is an expression
+		case x:fetchClassConst(expr(className), constName): // only handle class names which are expressions
+		{
+			// create a NameOrExpr node, with a copy of the annotations
+			annotations = getAnnotations(constName);
+			constNameOrExpr = setAnnotations(name(constName), annotations);
+			
+			m3 = addUseStaticRefItem(m3, className, constNameOrExpr, "constant");
+		}
+	
+		case x:staticCall(expr(className), methodName, _): // only handle class names which are expressions
+		{
+			m3 = addUseStaticRefItem(m3, className, methodName, "method");
+		}
+		
+		case x:staticPropertyFetch(expr(className), propertyName): // only handle class names which are expressions
+		{
+			m3 = addUseStaticRefItem(m3, className, propertyName, "field");
+		}
+		
+		//case x:instanceOf(_, expr(e)): // $var instanceOf $className
+		//{
+		//	println("todo: calculateUsesAfterTypes: instanceOf: <pp(x)> :: <e@at>");
+		//}
+	}
+	
+	return m3;
+}
 
 public M3 addUse(M3 m3, NameOrExpr nameOrExpr, str \type)
 {
-	if (name(name) := nameOrExpr) {
-		return addUse(m3, name, \type, name@scope);
-	} else {
-		return addUse(m3, nameOrExpr@at, ppVar(nameOrExpr), "unresolved+"+\type, nameOrExpr@scope);
-	}
+	return addUse(m3, nameOrExpr@at, toString(nameOrExpr), \type, nameOrExpr@scope);
 }
 
 public M3 addUse(M3 m3, Name name, str \type)
@@ -213,15 +260,24 @@ public M3 addUseFullyQualified(M3 m3, loc at, str name, str \type, loc scope)
 	return addUse(m3, at, name, \type, scope);
 }
 
+public M3 addUseStaticRefItem(M3 m3, Name className, NameOrExpr itemName, str \type) 
+{
+	m3 = addUseStaticRef(m3, className); // for class or interface
+	m3 = addUseClassItem(m3, itemName, className, \type); 
+	
+	return m3;
+}
 
-public M3 addUseStaticRef(M3 m3, NameOrExpr nameOrExpr) {
-	if (name(name) := nameOrExpr) {
-		return addUseStaticRef(m3, name);
-	} else {
-		// todo, check what values come in here
-		return m3; // check is this needs some work
-		//return addVarUse(m3, ppVar(nameOrExpr), pos, scope);
-	}
+public M3 addUseStaticRefItem(M3 m3, Expr className, NameOrExpr itemName, str \type) 
+{
+	
+	// resolve the type (e.g. class) of the expression used. For now, resolve everything.
+	// for example: $car = new Car();
+	//              $car->start();
+	println("todo: resolve class name `<pp(className)>::<pp(itemName)>` from the expression (<\type>)");	
+	// for now resolve to everything!
+		
+	return m3;
 }
 
 public M3 addUseStaticRef(M3 m3, Name name)
@@ -233,30 +289,6 @@ public M3 addUseStaticRef(M3 m3, Name name)
 
 	return m3;
 }
-
-//public M3 addUseStaticRef(M3 m3, NameOrExpr nameOrExpr, loc currentNamespace)
-//{
-//	if (name(name) := nameOrExpr) {
-//		m3 = addUse(m3, nameOrExpr, name.name, currentNamespace);
-//	} else {
-//		m3 = addUse(m3, nameOrExpr, ppVar(nameOrExpr), currentNamespace);
-//	}
-//	return m3;
-//}
-//
-//public M3 addUseStaticRef(M3 m3, loc at, str name, loc currentNamespace)
-//{
-//	if (name notin ["static", "self", "parent"])
-//	{
-//		for (\type <- ["class", "interface"])
-//		{
-//			m3 = addUse(m3, at, name, \type, currentNamespace);
-//		}
-//	}
-//
-//	return m3;
-//}
-
 
 public M3 addUse(M3 m3, loc at, str name, str \type, loc scope)
 {
@@ -311,10 +343,31 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc scope)
 		case qualified():
 		{
 			fullyQualifiedName = appendName(name, \type, getNamespace(scope));
+			// qualified name can be an alias
+			if (\type in ["class", "interface", "trait"]) {
+				tuple[str firstPart, list[str] rest] nameParts = pop(split("/", name));
+				set[loc] aliases = { to | <from, to> <- m3@aliases, from.scheme == "php+<\type>" && from.file == toLowerCase(nameParts.firstPart) };
+				if (size(aliases) == 1) {
+					str postFix = isEmpty(nameParts.rest) ? "" : "/" + intercalate("/", nameParts.rest);
+					fullyQualifiedName = getOneFrom(aliases) + toLowerCase(postFix);
+				} else if (size(aliases) > 1) {
+					throw ("more than one alias found");
+				}
+			}
 		}
 		case unqualified():
 		{
 			fullyQualifiedName = appendName(name, \type, getNamespace(scope));
+			
+			if (\type in ["class", "interface", "trait"]) {
+				// qualified name can be an alias
+				set[loc] aliases = { to | <from, to> <- m3@aliases, from.scheme == "php+<\type>" && from.file == toLowerCase(name) };
+				if (size(aliases) == 1) {
+					fullyQualifiedName = getOneFrom(aliases);
+				} else if (size(aliases) > 1) {
+					throw ("more than one alias found");
+				}
+			}
 			
 			// name could also be reference to internal PHP class or function.
 			
@@ -322,7 +375,8 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc scope)
 			{				
 				m3@uses += {<at, nameToLoc(name, \type)>}; // name in global namespace			
 			}
-			else */ if (\type in ["function"])
+			else */ 
+			if (\type in ["function"])
 			{
 				// Contrary to what it says at point 4, function name resolution falls back
 				// to the global namespace, not only to internal function names. 
@@ -330,7 +384,6 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc scope)
 			}			
 		}
 	}
-	
 	m3@uses += {<at, fullyQualifiedName> };
 
 	return m3;
@@ -339,7 +392,7 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc scope)
 
 M3 addVarUse(M3 m3, NameOrExpr nameOrExpr, loc pos, loc scope) {
 
-	if (name(name) := nameOrExpr) {
+	if (name(Name name) := nameOrExpr) {
 		return addVarUse(m3, name.name, pos, scope);
 	} else {
 		return addVarUse(m3, ppVar(nameOrExpr), pos, scope);
@@ -373,6 +426,16 @@ M3 addVarUse(M3 m3, str name, loc pos, loc scope)
 	return m3;
 }
 
+M3 addUseClassItem(m3, node classItem, node classNode, str \type)
+{
+	//println(classItem);
+	loc pos = classItem@at;
+	str name = toString(classItem);
+	for (classUse <- m3@uses[classNode@at]) {
+		m3@uses += <pos, |php+<\type>://<classUse.path>/<name>|>;
+	}
+	return m3;
+}
 
 @doc{
 	Extend uses relation by following alias links.
@@ -446,12 +509,19 @@ public map[loc, int] countNumPossibleDeclarations(rel[loc, loc] useDecl)
 	return countPerLoc;
 }
 
+public str toString(Name name) = name.name;
+public str toString(NameOrExpr nameOrExpr) = ppVar(nameOrExpr);
+
 private str ppVar(node ast) {
-	//println("ast: <ast>");
 	str pretty = "";
-	visit (ast) {
-		case name(str name): pretty = name;
+	top-down-break visit (ast) {
+		case n:_: pretty = pp(n);
 	}
-	//println(pretty);
+	pretty = replaceAll(pretty, "[", "(");
+	pretty = replaceAll(pretty, "]", ")");
 	return pretty;
+}
+
+private set[loc] getUse(m3, loc l) {
+	return m3@uses[l];	
 }
