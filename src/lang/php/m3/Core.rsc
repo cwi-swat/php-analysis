@@ -15,6 +15,7 @@ import analysis::m3::Registry;
 
 import lang::php::ast::AbstractSyntax;
 import lang::php::ast::System;
+import lang::php::\syntax::Names;
 import lang::php::util::Config;
 import lang::php::util::Utils;
 
@@ -27,8 +28,6 @@ anno rel[loc from, loc to] M3@implements;   // classes implementing interfaces
 anno rel[loc from, loc to] M3@traitUses;    // classes using traits and traits using traits
 anno rel[loc from, loc to] M3@aliases;      // class name aliases (new name -> old name)
 anno rel[loc pos, str phpDoc] M3@phpDoc;    // Multiline php comments /** ... */
-
-alias M3Collection = map[loc fileloc, M3 model];
 
 public loc globalNamespace = |php+namespace:///|;
 public loc unknownLocation = |php+unknown:///|;
@@ -94,6 +93,19 @@ public str normalizeName(str phpName, str \type)
 	return name;
 }
 
+public loc nameToLoc(Name nameNode, str \type)
+{
+	str phpName = "";
+	
+    switch(getNameQualification(nameNode.name))
+    {
+        case fullyQualified():	phpName = nameNode.name;
+        case qualified(): 		phpName = "<getNamespace(nameNode@scope).path>/<nameNode.name>";
+        case unqualified(): 	phpName = "<getNamespace(nameNode@scope).path>/<nameNode.name>";
+    }
+
+	return nameToLoc(phpName, \type);
+}
 
 public loc nameToLoc(str phpName, str \type)
 {
@@ -103,6 +115,7 @@ public loc nameToLoc(str phpName, str \type)
 	{
 		name = "/" + name;
 	}
+
 	return |php+<\type>://<name>|;
 }
 
