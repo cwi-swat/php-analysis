@@ -109,7 +109,7 @@ private bool useCacheDefault = false;
 public System getSystem(loc l) = getSystem(l, useCacheDefault);
 public System getSystem(loc l, bool useCache) = isCacheUsed(l, useCache) ? readSystemFromCache(l) : loadSystem(l, useCache);
 
-public M3 M3CollectionToM3 (M3Collection m3s, loc l) = composePhpM3(l, range(m3s));
+public M3 M3CollectionToM3 (M3Collection m3s, loc l) = composeM3(l, range(m3s));
 
 public M3Collection getM3CollectionForSystem(System system, loc l) = (filename:createM3forScript(filename, system[filename]) | filename <- system);
 
