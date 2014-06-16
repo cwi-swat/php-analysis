@@ -3,7 +3,6 @@ Synopsis: extends the M3 [$analysis/m3/Core] with Php specific concepts
 
 Description: 
 
-For a quick start, go find [createM3FromEclipseProject].
 }
 module lang::php::m3::Core
 extend analysis::m3::Core;
@@ -32,19 +31,18 @@ anno rel[loc pos, str phpDoc] M3@phpDoc;    // Multiline php comments /** ... */
 public loc globalNamespace = |php+namespace:///|;
 public loc unknownLocation = |php+unknown:///|;
 
-public M3 composePhpM3(loc id, set[M3] models) {
-  m = composeM3(id, models);
-  
-  m@extends 	= {*model@extends 		| model <- models};
-  m@implements 	= {*model@implements 	| model <- models};
-  m@traitUses 	= {*model@traitUses 	| model <- models};
-  m@aliases 	= {*model@aliases	 	| model <- models};
-  m@phpDoc 		= {*model@phpDoc 		| model <- models};
-  
-  return m;
-}
+public M3 createEmptyM3(loc file)
+{
+	m = emptyM3(file);
+	
+	m@extends = {};
+	m@implements = {};
+	m@traitUses = {};
+	m@aliases = {};
+	m@phpDoc = {};
 
-public M3 createEmptyM3(loc file) = composePhpM3(file, {});
+	return m;
+}
 
 public bool isNamespace(loc entity) = entity.scheme == "php+namespace";
 public bool isClass(loc entity) = entity.scheme == "php+class";
@@ -62,6 +60,8 @@ public bool isVariable(loc entity) = isGlobalVar(entity) || isFunctionVar(entity
 public bool isField(loc entity) = entity.scheme == "php+field";
 public bool isConstant(loc entity) = entity.scheme == "php+constant";
 public bool isClassConstant(loc entity) = entity.scheme == "php+classConstant";
+
+public bool isUnresolved(loc entity) = "unresolved" in entity.scheme;
 
 @memo public set[loc] namespaces(M3 m) = {e | e <- m@declarations<name>, isNamespace(e)};
 @memo public set[loc] classes(M3 m) =  {e | e <- m@declarations<name>, isClass(e)};
