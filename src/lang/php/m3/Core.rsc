@@ -31,6 +31,9 @@ anno rel[loc pos, str phpDoc] M3@phpDoc;    // Multiline php comments /** ... */
 public loc globalNamespace = |php+namespace:///|;
 public loc unknownLocation = |php+unknown:///|;
 
+public data Language(str version="")
+	= php();
+
 public M3 createEmptyM3(loc file)
 {
 	m = emptyM3(file);
