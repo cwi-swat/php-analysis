@@ -1,9 +1,0 @@
-{
-	<|php+namespace:///a|,      |php+class:///a/x|>,
-	<|php+namespace:///a/b|,   |php+class:///a/b/y|>,
-	<|php+namespace:///b|,      |php+class:///b/z|>,
-
-	<|php+class:///a/x|, 		|php+method:///a/x/getx|>,
-	<|php+class:///a/b/y|, 	|php+method:///a/b/y/gety|>,
-	<|php+class:///b/z|, 		|php+method:///b/z/getz|>
-}
