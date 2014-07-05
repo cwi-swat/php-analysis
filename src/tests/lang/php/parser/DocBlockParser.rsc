@@ -38,41 +38,48 @@ public bool testParser(type[&T<:Tree] t, lrel[str input, node expectedResult] in
     return true;
 }
 
+// helper methods to create nodes
+private node expectedTypeNode(str nodeName) 
+    = makeNode("types", [ [ makeNode(nodeName) ] ]);	
+    
+private node expectedArrayTypeNode(str nodeName) 
+    = makeNode("types", [ [ makeNode("arrayOf", makeNode(nodeName)) ] ]);
+
 public test bool testPhpTypes() 
 {
     lrel[str input, node expectedResult] inputs
-        = [ <"array",     makeNode("types", [[makeNode("array")]])> ] 
-        + [ <"array()", makeNode("types", [[makeNode("array")]])> ]
+        = [ <"array",   expectedTypeNode("array")> ] 
+        + [ <"array()", expectedTypeNode("array")> ] 
     	
-        + [ <"mixed",     makeNode("types", [[makeNode("mixed")]])> ]
-        + [ <"mixed()", makeNode("types", [[makeNode("mixed")]])> ]
+        + [ <"mixed",   expectedTypeNode("mixed")> ] 
+        + [ <"mixed()", expectedTypeNode("mixed")> ] 
     	
-        + [ <"bool",     makeNode("types", [[makeNode("bool")]])> ]
-        + [ <"bool()",     makeNode("types", [[makeNode("bool")]])> ]
-        + [ <"bool[]",     makeNode("types", [[makeNode("arrayOf", makeNode("bool"))]])> ]
-        + [ <"boolean",     makeNode("types", [[makeNode("bool")]])> ]
-        + [ <"boolean()",     makeNode("types", [[makeNode("bool")]])> ]
-        + [ <"boolean[]",     makeNode("types", [[makeNode("arrayOf", makeNode("bool"))]])> ]
+        + [ <"bool",   expectedTypeNode("bool")> ] 
+        + [ <"bool()", expectedTypeNode("bool")> ] 
+        + [ <"bool[]", expectedArrayTypeNode("bool")> ] 
+        + [ <"boolean",   expectedTypeNode("bool")> ] 
+        + [ <"boolean()", expectedTypeNode("bool")> ] 
+        + [ <"boolean[]", expectedArrayTypeNode("bool")> ] 
     	
-        + [ <"int",     makeNode("types", [[makeNode("int")]])> ]
-        + [ <"int()",     makeNode("types", [[makeNode("int")]])> ]
-        + [ <"int[]",     makeNode("types", [[makeNode("arrayOf", makeNode("int"))]])> ]
-    	
-        + [ <"float",     makeNode("types", [[makeNode("float")]])> ]
-        + [ <"float()",     makeNode("types", [[makeNode("float")]])> ]
-        + [ <"float[]",     makeNode("types", [[makeNode("arrayOf", makeNode("float"))]])> ]
-    	
-        + [ <"string",         makeNode("types", [[makeNode("string")]])> ]
-        + [ <"string()",     makeNode("types", [[makeNode("string")]])> ]
-        + [ <"string[]",     makeNode("types", [[makeNode("arrayOf", makeNode("string"))]])> ]
-    	
-        + [ <"resource",     makeNode("types", [[makeNode("resource")]])> ]
-        + [ <"resource()",     makeNode("types", [[makeNode("resource")]])> ]
-        + [ <"resource[]",     makeNode("types", [[makeNode("arrayOf", makeNode("resource"))]])> ]
-    	
-        + [ <"unset",         makeNode("types", [[makeNode("unset")]])> ]
-        + [ <"unset()",     makeNode("types", [[makeNode("unset")]])> ]
-        + [ <"unset[]",     makeNode("types", [[makeNode("arrayOf", makeNode("unset"))]])> ]
+        + [ <"int",   expectedTypeNode("int")> ] 
+        + [ <"int()", expectedTypeNode("int")> ] 
+        + [ <"int[]", expectedArrayTypeNode("int")> ] 
+        
+        + [ <"float",   expectedTypeNode("float")> ] 
+        + [ <"float()", expectedTypeNode("float")> ] 
+        + [ <"float[]", expectedArrayTypeNode("float")> ] 
+        
+        + [ <"string",   expectedTypeNode("string")> ] 
+        + [ <"string()", expectedTypeNode("string")> ] 
+        + [ <"string[]", expectedArrayTypeNode("string")> ] 
+        
+        + [ <"resource",   expectedTypeNode("resource")> ] 
+        + [ <"resource()", expectedTypeNode("resource")> ] 
+        + [ <"resource[]", expectedArrayTypeNode("resource")> ] 
+        
+        + [ <"unset",   expectedTypeNode("unset")> ] 
+        + [ <"unset()", expectedTypeNode("unset")> ] 
+        + [ <"unset[]", expectedArrayTypeNode("unset")> ] 
         ;
 
     return testParser(#Types, inputs);	
