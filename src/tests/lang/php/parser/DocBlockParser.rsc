@@ -121,139 +121,27 @@ public test bool testDescriptions()
     return testParser(#Description, inputs);	
 }
 
-// this method contains 3 private methods, not the most pretty thing
+@doc { Test multiple types, devided by |; example: int|mixed }
+
 public test bool testMultipleTypes(int numberOfTests)
 {
-//    // used these three `magic` methods to generate tests.
-//    // magic to get some random collection
-//    private str listToString(list[str] keywords)
-//        = intercalate(getOneFrom(["|", " |", "| ", " | "]), keywords);
-//
-//    // list to expected output
-//    private node listToExpectedOutput(list[str] keywords)
-//        = makeNode("types", [[ makeNode(k) | k <- keywords ]]);
-//    	
-//    private list[str] getMixedKeywordsList(list[str] keywords) 
-//        = getOneFrom(toList(permutations(slice(keywords, getOneFrom([0..(size(keywords)-4)]), getOneFrom([1..5])))));
-//    
-//    // list of php types
-//    list[str] keywords = [ "array", "bool", "float", "int", "mixed", "resource", "null", "string", "unset" ];
-//    // list of mixed types (from the array above)
-//    list[list[str]] lists = [ getMixedKeywordsList(keywords) | n <- [0 .. numberOfTests] ];	
-//    
-//    // create x random inputs	
-//    lrel[str input, node expectedResult] inputs = [ <listToString(l), listToExpectedOutput(l)> | l <- lists ];
-//
-//    iprintln(inputs);
-//    exit;
-
-    lrel[str input, node expectedResult] inputs = [
-  <"float","types"(["float"()])>,
-  <"float|bool|array","types"([ "float"(), "bool"(), "array"() ])>,
-  <"float | bool | array","types"([ "float"(), "bool"(), "array"() ])>,
-  <"int |float","types"([ "int"(), "float"() ])>,
-  <"bool| float| int| array","types"([ "bool"(), "float"(), "int"(), "array"() ])>,
-  <"mixed |resource","types"([ "mixed"(), "resource"() ])>,
-  <"bool","types"(["bool"()])>,
-  <"int|mixed|float","types"([ "int"(), "mixed"(), "float"() ])>,
-  <"bool |float |int |mixed","types"([ "bool"(), "float"(), "int"(), "mixed"() ])>,
-  <"float|bool","types"([ "float"(), "bool"() ])>,
-  <"mixed| resource","types"([ "mixed"(), "resource"() ])>,
-  <"mixed|int","types"([ "mixed"(), "int"() ])>,
-  <"mixed| resource","types"([ "mixed"(), "resource"() ])>,
-  <"mixed| null| resource","types"([ "mixed"(), "null"(), "resource"() ])>,
-  <"mixed| string| resource| null","types"([ "mixed"(), "string"(), "resource"(), "null"() ])>,
-  <"bool|mixed|int|float","types"([ "bool"(), "mixed"(), "int"(), "float"() ])>,
-  <"bool|array","types"([ "bool"(), "array"() ])>,
-  <"float| mixed| int| resource","types"([ "float"(), "mixed"(), "int"(), "resource"() ])>,
-  <"int | mixed | float | resource","types"([ "int"(), "mixed"(), "float"(), "resource"() ])>,
-  <"int| resource| mixed","types"([ "int"(), "resource"(), "mixed"() ])>,
-  <"float |int |mixed","types"([ "float"(), "int"(), "mixed"() ])>,
-  <"float | int | mixed | bool","types"([ "float"(), "int"(), "mixed"(), "bool"() ])>,
-  <"float|int|bool|array","types"([ "float"(), "int"(), "bool"(), "array"() ])>,
-  <"float| array| int| bool","types"([ "float"(), "array"(), "int"(), "bool"() ])>,
-  <"mixed","types"(["mixed"()])>,
-  <"mixed|int","types"([ "mixed"(), "int"() ])>,
-  <"bool","types"(["bool"()])>,
-  <"mixed| resource","types"([ "mixed"(), "resource"() ])>,
-  <"float | int | bool","types"([ "float"(), "int"(), "bool"() ])>,
-  <"array | bool","types"([ "array"(), "bool"() ])>,
-  <"bool | float | int","types"([ "bool"(), "float"(), "int"() ])>,
-  <"bool|float|array","types"([ "bool"(), "float"(), "array"() ])>,
-  <"mixed| resource| int","types"([ "mixed"(), "resource"(), "int"() ])>,
-  <"mixed","types"(["mixed"()])>,
-  <"array","types"(["array"()])>,
-  <"int | mixed","types"([ "int"(), "mixed"() ])>,
-  <"string| resource| null| mixed","types"([ "string"(), "resource"(), "null"(), "mixed"() ])>,
-  <"float |int","types"([ "float"(), "int"() ])>,
-  <"string| mixed| resource| null","types"([ "string"(), "mixed"(), "resource"(), "null"() ])>,
-  <"int | float | bool","types"([ "int"(), "float"(), "bool"() ])>,
-  <"float |int |resource |mixed","types"([ "float"(), "int"(), "resource"(), "mixed"() ])>,
-  <"resource|int|mixed","types"([ "resource"(), "int"(), "mixed"() ])>,
-  <"int","types"(["int"()])>,
-  <"bool","types"(["bool"()])>,
-  <"mixed","types"(["mixed"()])>,
-  <"mixed| int| resource| null","types"([ "mixed"(), "int"(), "resource"(), "null"() ])>,
-  <"int |bool |array |float","types"([ "int"(), "bool"(), "array"(), "float"() ])>,
-  <"array","types"(["array"()])>,
-  <"float","types"(["float"()])>,
-  <"float |int","types"([ "float"(), "int"() ])>,
-  <"mixed | float | resource | int","types"([ "mixed"(), "float"(), "resource"(), "int"() ])>,
-  <"mixed | int | float","types"([ "mixed"(), "int"(), "float"() ])>,
-  <"mixed|bool|int|float","types"([ "mixed"(), "bool"(), "int"(), "float"() ])>,
-  <"mixed| null| resource| string","types"([ "mixed"(), "null"(), "resource"(), "string"() ])>,
-  <"mixed","types"(["mixed"()])>,
-  <"array","types"(["array"()])>,
-  <"float| resource| int| mixed","types"([ "float"(), "resource"(), "int"(), "mixed"() ])>,
-  <"int","types"(["int"()])>,
-  <"resource | int | mixed | float","types"([ "resource"(), "int"(), "mixed"(), "float"() ])>,
-  <"int | float","types"([ "int"(), "float"() ])>,
-  <"bool| float","types"([ "bool"(), "float"() ])>,
-  <"bool|array","types"([ "bool"(), "array"() ])>,
-  <"bool","types"(["bool"()])>,
-  <"bool |float |int |mixed","types"([ "bool"(), "float"(), "int"(), "mixed"() ])>,
-  <"int | mixed","types"([ "int"(), "mixed"() ])>,
-  <"bool|array","types"([ "bool"(), "array"() ])>,
-  <"null|mixed|string|resource","types"([ "null"(), "mixed"(), "string"(), "resource"() ])>,
-  <"mixed | int","types"([ "mixed"(), "int"() ])>,
-  <"mixed| int| float| bool","types"([ "mixed"(), "int"(), "float"(), "bool"() ])>,
-  <"resource |mixed","types"([ "resource"(), "mixed"() ])>,
-  <"bool| float| int| mixed","types"([ "bool"(), "float"(), "int"(), "mixed"() ])>,
-  <"resource|null|mixed|string","types"([ "resource"(), "null"(), "mixed"(), "string"() ])>,
-  <"float","types"(["float"()])>,
-  <"bool |array |float","types"([ "bool"(), "array"(), "float"() ])>,
-  <"mixed |resource |null","types"([ "mixed"(), "resource"(), "null"() ])>,
-  <"mixed |resource","types"([ "mixed"(), "resource"() ])>,
-  <"array","types"(["array"()])>,
-  <"array | float | bool","types"([ "array"(), "float"(), "bool"() ])>,
-  <"mixed | resource","types"([ "mixed"(), "resource"() ])>,
-  <"resource| null| string| mixed","types"([ "resource"(), "null"(), "string"(), "mixed"() ])>,
-  <"int| mixed| float| resource","types"([ "int"(), "mixed"(), "float"(), "resource"() ])>,
-  <"float| bool| array| int","types"([ "float"(), "bool"(), "array"(), "int"() ])>,
-  <"int| bool| mixed| float","types"([ "int"(), "bool"(), "mixed"(), "float"() ])>,
-  <"int","types"(["int"()])>,
-  <"array","types"(["array"()])>,
-  <"float","types"(["float"()])>,
-  <"float | array | bool | int","types"([ "float"(), "array"(), "bool"(), "int"() ])>,
-  <"int","types"(["int"()])>,
-  <"int| mixed| bool| float","types"([ "int"(), "mixed"(), "bool"(), "float"() ])>,
-  <"float| bool| mixed| int","types"([ "float"(), "bool"(), "mixed"(), "int"() ])>,
-  <"array | bool","types"([ "array"(), "bool"() ])>,
-  <"float","types"(["float"()])>,
-  <"int|mixed|resource","types"([ "int"(), "mixed"(), "resource"() ])>,
-  <"bool|float|int","types"([ "bool"(), "float"(), "int"() ])>,
-  <"int |resource |float |mixed","types"([ "int"(), "resource"(), "float"(), "mixed"() ])>,
-  <"float| bool| int","types"([ "float"(), "bool"(), "int"() ])>,
-  <"int","types"(["int"()])>,
-  <"float","types"(["float"()])>,
-  <"resource| mixed| null","types"([ "resource"(), "mixed"(), "null"() ])>,
-  <"array","types"(["array"()])>
-];
+    // list of php types
+    list[str] keywords = [ "array", "bool", "float", "int", "mixed", "resource", "null", "string", "unset" ];
+        
+    // list of mixed types (from the array above)
+    list[list[str]] lists = [ dup(getMixedKeywordsList(keywords)) | n <- [0 .. numberOfTests] ];	
     
-    	
-    	
+    // create x random inputs	
+    lrel[str input, node expectedResult] inputs = [ <listToString(l), listToExpectedOutput(l)> | l <- lists ];
+    inputs += [ <"ClassName|null", makeNode("types", [[ makeNode("class", "ClassName"), makeNode("null") ]])> ];
+
     return testParser(#Types, inputs);
 }
+
+// Helper methods for testMultipleTypes
+private str listToString(list[str] keywords) = intercalate(getOneFrom(["|", "|", "|", "|", "|", "|", " |", "| ", " | "]), keywords);
+private node listToExpectedOutput(list[str] keywords) = makeNode("types", [[ makeNode(k) | k <- keywords ]]);
+private list[str] getMixedKeywordsList(list[str] keywords) { return for (i <- [0..getOneFrom([2..5])]) append getOneFrom(keywords); }
 
 public test bool testAnnotations() 
 {
