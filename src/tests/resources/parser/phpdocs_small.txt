@@ -1,42 +1,33 @@
-
   ["/**
      * @param User $usr
      * @param Document $doc
-     */"]
-
-+ ["/**
+     */",
+"/**
      * @return User
-     */"]
-
-+ ["/**
+     */",
+"/**
      * @return Document
-     */"]
-
-+ ["/**
+     */",
+"/**
  * Class Loan
  * @package eLib
- */"]
-
-+ ["/**
+ */",
+"/**
      * @param string $string
-     */"]
-
-+ ["/**
+     */",
+"/**
  * Class Document
  * @package eLib
- */"]
-
-+ ["/**
+ */",
+"/**
      * @param string $string
      * @param string $string2
      * @param string $string3
-     */"]
-
-+ ["/**
+     */",
+"/**
  * Class User
  * @package eLib
- */"]
-
-+ ["/**
+ */",
+"/**
  * Class Main
  */"]

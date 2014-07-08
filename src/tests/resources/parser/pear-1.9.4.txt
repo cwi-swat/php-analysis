@@ -1,0 +1,5852 @@
+ ["/**
+ * Parser for channel.xml
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * Unindent given string
+     *
+     * @param string $str The string that has to be unindented.
+     * @return string
+     * @access private
+     */",
+ "/**
+     * post-process data
+     *
+     * @param string $data
+     * @param string $element element name
+     */",
+ "/**
+     * @param string
+     * @param string file name of the package.xml
+     * @param string|false name of the archive this package.xml came from, if any
+     * @param string class name to instantiate and return.  This must be PEAR_PackageFile_v2 or
+     *               a subclass
+     * @return PEAR_PackageFile_v2
+     */",
+ "/**
+ * Parser for package.xml version 2.0
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: @PEAR-VER@
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * Mirror types allowed.  Currently only internet servers are recognized.
+ */",
+ "/**
+     * @return array
+     * @access protected
+     */",
+ "/**
+     * @param string contents of package.xml file
+     * @return bool success of parsing
+     */",
+ "/**
+     * @return array
+     */",
+ "/**
+     * @param array
+     * @static
+     * @return PEAR_ChannelFile|false false if invalid
+     */",
+ "/**
+     * Unlike {@link fromArray()} this does not do any validation
+     * @param array
+     * @static
+     * @return PEAR_ChannelFile
+     */",
+ "/**
+     * @param array
+     * @access private
+     */",
+ "/**
+     * Wrapper to {@link PEAR_ErrorStack::getErrors()}
+     * @param boolean determines whether to purge the error stack after retrieving
+     * @return array
+     */",
+ "/**
+     * Unindent given string (?)
+     *
+     * @param string $str The string that has to be unindented.
+     * @return string
+     * @access private
+     */",
+ "/**
+     * Parse a channel.xml file.  Expects the name of
+     * a channel xml file as input.
+     *
+     * @param string  $descfile  name of channel xml file
+     * @return bool success of parsing
+     */",
+ "/**
+     * Parse channel information from different sources
+     *
+     * This method is able to extract information about a channel
+     * from an .xml file or a string
+     *
+     * @access public
+     * @param  string Filename of the source or the source itself
+     * @return bool
+     */",
+ "/**
+     * Return an XML document based on previous parsing and modifications
+     *
+     * @return string XML data
+     *
+     * @access public
+     */",
+ "/**
+     * Generate the <rest> tag
+     * @access private
+     */",
+ "/**
+     * Generate the <mirrors> tag
+     * @access private
+     */",
+ "/**
+     * Generate the <functions> tag
+     * @access private
+     */",
+ "/**
+     * Validation error.  Also marks the object contents as invalid
+     * @param error code
+     * @param array error information
+     * @access private
+     */",
+ "/**
+     * Validation warning.  Does not mark the object contents invalid.
+     * @param error code
+     * @param array error information
+     * @access private
+     */",
+ "/**
+     * Validate parsed file.
+     *
+     * @access public
+     * @return boolean
+     */",
+ "/**
+     * @param string  rest - protocol name this function applies to
+     * @param array the functions
+     * @param string the name of the parent element (mirror name, for instance)
+     */",
+ "/**
+     * Test whether a string contains a valid channel server.
+     * @param string $ver the package version to test
+     * @return bool
+     */",
+ "/**
+     * @return string|false
+     */",
+ "/**
+     * @return string|false
+     */",
+ "/**
+     * @return int|80 port number to connect to
+     */",
+ "/**
+     * @return bool Determines whether secure sockets layer (SSL) is used to connect to this channel
+     */",
+ "/**
+     * @return string|false
+     */",
+ "/**
+     * @param string protocol type
+     * @param string Mirror name
+     * @return array|false
+     */",
+ "/**
+     * @param string Protocol type
+     * @param string Function name (null to return the
+     *               first protocol of the type requested)
+     * @param string Mirror name, if any
+     * @return array
+     */",
+ "/**
+     * @param string protocol type
+     * @param string protocol name
+     * @param string version
+     * @param string mirror name
+     * @return boolean
+     */",
+ "/**
+     * Determines whether a channel supports Representational State Transfer (REST) protocols
+     * for retrieving channel information
+     * @param string
+     * @return bool
+     */",
+ "/**
+     * Get the URL to access a base resource.
+     *
+     * Hyperlinks in the returned xml will be used to retrieve the proper information
+     * needed.  This allows extreme extensibility and flexibility in implementation
+     * @param string Resource Type to retrieve
+     */",
+ "/**
+     * Since REST does not implement RPC, provide this as a logical wrapper around
+     * resetFunctions for REST
+     * @param string|false mirror name, if any
+     */",
+ "/**
+     * Empty all protocol definitions
+     * @param string protocol type
+     * @param string|false mirror name, if any
+     */",
+ "/**
+     * Set a channel\'s protocols to the protocols supported by pearweb
+     */",
+ "/**
+     * @return array
+     */",
+ "/**
+     * Get the unserialized XML representing a mirror
+     * @return array|false
+     */",
+ "/**
+     * @param string
+     * @return string|false
+     * @error PEAR_CHANNELFILE_ERROR_NO_NAME
+     * @error PEAR_CHANNELFILE_ERROR_INVALID_NAME
+     */",
+ "/**
+     * Set the socket number (port) that is used to connect to this channel
+     * @param integer
+     * @param string|false name of the mirror server, or false for the primary
+     */",
+ "/**
+     * Set the socket number (port) that is used to connect to this channel
+     * @param bool Determines whether to turn on SSL support or turn it off
+     * @param string|false name of the mirror server, or false for the primary
+     */",
+ "/**
+     * @param string
+     * @return string|false
+     * @error PEAR_CHANNELFILE_ERROR_NO_SERVER
+     * @error PEAR_CHANNELFILE_ERROR_INVALID_SERVER
+     */",
+ "/**
+     * @param string
+     * @return boolean success
+     * @error PEAR_CHANNELFILE_ERROR_NO_SUMMARY
+     * @warning PEAR_CHANNELFILE_ERROR_MULTILINE_SUMMARY
+     */",
+ "/**
+     * @param string
+     * @param boolean determines whether the alias is in channel.xml or local
+     * @return boolean success
+     */",
+ "/**
+     * @return string
+     */",
+ "/**
+     * Set the package validation object if it differs from PEAR\'s default
+     * The class must be includeable via changing _ in the classname to path separator,
+     * but no checking of this is made.
+     * @param string|false pass in false to reset to the default packagename regex
+     * @return boolean success
+     */",
+ "/**
+     * Add a protocol to the provides section
+     * @param string protocol type
+     * @param string protocol version
+     * @param string protocol name, if any
+     * @param string mirror name, if this is a mirror\'s protocol
+     * @return bool
+     */",
+ "/**
+     * Add a protocol to a mirror\'s provides section
+     * @param string mirror name (server)
+     * @param string protocol type
+     * @param string protocol version
+     * @param string protocol name, if any
+     */",
+ "/**
+     * @param string Resource Type this url links to
+     * @param string URL
+     * @param string|false mirror name, if this is not a primary server REST base URL
+     */",
+ "/**
+     * @param string mirror server
+     * @param int mirror http port
+     * @return boolean
+     */",
+ "/**
+     * Retrieve the name of the validation package for this channel
+     * @return string|false
+     */",
+ "/**
+     * Retrieve the object that can be used for custom validation
+     * @param string|false the name of the package to validate.  If the package is
+     *                     the channel validation package, PEAR_Validate is returned
+     * @return PEAR_Validate|false false is returned if the validation package
+     *         cannot be located
+     */",
+ "/**
+     * This function is used by the channel updater and retrieves a value set by
+     * the registry, or the current time if it has not been set
+     * @return string
+     */",
+ "/**
+ * The Channel handling class
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * Administration class used to make a PEAR release tarball.
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+     * @param PEAR_PackageFile_v2
+     * @param int
+     */",
+ "/**
+     * This is here to allow role extension through plugins
+     * @param string
+     */",
+ "/**
+     * Analyze the source code of the given PHP file
+     *
+     * @param  string Filename of the PHP file
+     * @param  boolean whether to analyze $file as the file contents
+     * @return mixed
+     */",
+ "/**
+     * Build a \"provides\" array from data returned by
+     * analyzeSourceCode().  The format of the built array is like
+     * this:
+     *
+     *  array(
+     *    \'class;MyClass\' => \'array(\'type\' => \'class\', \'name\' => \'MyClass\'),
+     *    ...
+     *  )
+     *
+     *
+     * @param array $srcinfo array with information about a source file
+     * as returned by the analyzeSourceCode() method.
+     *
+     * @return void
+     *
+     * @access private
+     *
+     */",
+ "/**
+ * Private validation class used by PEAR_PackageFile_v2 - do not use directly, its
+ * sole purpose is to split up the PEAR/PackageFile/v2.php file to make it smaller
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a8
+ * @access private
+ */",
+ "/**
+     * BC hack to allow PEAR_Common::infoFromString() to sort of
+     * work with the version 2.0 format - there\'s no filelist though
+     * @param PEAR_PackageFile_v2
+     */",
+ "/**
+     * @param string contents of package.xml file, version 1.0
+     * @return bool success of parsing
+     */",
+ "/**
+     * Unindent given string
+     *
+     * @param string $str The string that has to be unindented.
+     * @return string
+     * @access private
+     */",
+ "/**
+     * XML parser callback for ending elements.  Used for version 1.0
+     * packages.
+     *
+     * @param resource  $xp    XML parser resource
+     * @param string    $name  name of ending element
+     *
+     * @return void
+     *
+     * @access private
+     */",
+ "/**
+     * XML parser callback for ending elements.  Used for version 1.0
+     * packages.
+     *
+     * @param resource  $xp    XML parser resource
+     * @param string    $name  name of ending element
+     *
+     * @return void
+     *
+     * @access private
+     */",
+ "/**
+     * XML parser callback for character data.  Used for version 1.0
+     * packages.
+     *
+     * @param resource  $xp    XML parser resource
+     * @param string    $name  character data
+     *
+     * @return void
+     *
+     * @access private
+     */",
+ "/**
+ * Parser for package.xml version 1.0
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: @PEAR-VER@
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * PEAR_Command_Remote constructor.
+     *
+     * @access public
+     */",
+ "/**
+ * PEAR commands for remote server querying
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+     * PEAR_Builder constructor.
+     *
+     * @param object $ui user interface object (instance of PEAR_Frontend_*)
+     *
+     * @access public
+     */",
+ "/**
+     * Build an extension from source on windows.
+     * requires msdev
+     */",
+ "/**
+     * @param string
+     * @param string
+     * @param array
+     * @access private
+     */",
+ "/**
+     * Build an extension from source.  Runs \"phpize\" in the source
+     * directory, but compiles in a temporary directory
+     * (TMPDIR/pear-build-USER/PACKAGE-VERSION).
+     *
+     * @param string|PEAR_PackageFile_v* $descfile path to XML package description file, or
+     *               a PEAR_PackageFile object
+     *
+     * @param mixed $callback callback function used to report output,
+     * see PEAR_Builder::_runCommand for details
+     *
+     * @return array an array of associative arrays with built files,
+     * format:
+     * array( array( \'file\' => \'/path/to/ext.so\',
+     *               \'php_api\' => YYYYMMDD,
+     *               \'zend_mod_api\' => YYYYMMDD,
+     *               \'zend_ext_api\' => YYYYMMDD ),
+     *        ... )
+     *
+     * @access public
+     *
+     * @see PEAR_Builder::_runCommand
+     */",
+ "/**
+     * Message callback function used when running the \"phpize\"
+     * program.  Extracts the API numbers used.  Ignores other message
+     * types than \"cmdoutput\".
+     *
+     * @param string $what the type of message
+     * @param mixed $data the message
+     *
+     * @return void
+     *
+     * @access public
+     */",
+ "/**
+     * Run an external command, using a message callback to report
+     * output.  The command will be run through popen and output is
+     * reported for every line with a \"cmdoutput\" message with the
+     * line string, including newlines, as payload.
+     *
+     * @param string $command the command to run
+     *
+     * @param mixed $callback (optional) function to use as message
+     * callback
+     *
+     * @return bool whether the command was successful (exit code 0
+     * means success, any other means failure)
+     *
+     * @access private
+     */",
+ "/**
+ * Class to handle building (compiling) extensions.
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since PHP 4.0.2
+ * @see        http://pear.php.net/manual/en/core.ppm.pear-builder.php
+ */",
+ "/**
+     * PEAR_Command_Config constructor.
+     *
+     * @access public
+     */",
+ "/**
+     * Checks if a layer is defined or not
+     *
+     * @param string $layer The layer to search for
+     * @return mixed False on no error or the error message
+     */",
+ "/**
+ * PEAR commands for managing configuration data.
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+     * Enter description here...
+     *
+     * @param PEAR_PackageFile_v2_rw $pkg
+     * @param PEAR_Config $config
+     * @param PEAR_Frontend $logger
+     * @param array $fileXml
+     * @return PEAR_Task_Postinstallscript_rw
+     */",
+ "/**
+     * add a simple <paramgroup> to the post-install script
+     *
+     * Order is significant, so call this method in the same
+     * sequence the users should see the paramgroups.  The $params
+     * parameter should either be the result of a call to {@link getParam()}
+     * or an array of calls to getParam().
+     *
+     * Use {@link addConditionTypeGroup()} to add a <paramgroup> containing
+     * a <conditiontype> tag
+     * @param string $id <paramgroup> id as seen by the script
+     * @param array|false $params array of getParam() calls, or false for no params
+     * @param string|false $instructions
+     */",
+ "/**
+     * add a complex <paramgroup> to the post-install script with conditions
+     *
+     * This inserts a <paramgroup> with
+     *
+     * Order is significant, so call this method in the same
+     * sequence the users should see the paramgroups.  The $params
+     * parameter should either be the result of a call to {@link getParam()}
+     * or an array of calls to getParam().
+     *
+     * Use {@link addParamGroup()} to add a simple <paramgroup>
+     *
+     * @param string $id <paramgroup> id as seen by the script
+     * @param string $oldgroup <paramgroup> id of the section referenced by
+     *                         <conditiontype>
+     * @param string $param name of the <param> from the older section referenced
+     *                      by <contitiontype>
+     * @param string $value value to match of the parameter
+     * @param string $conditiontype one of \'=\', \'!=\', \'preg_match\'
+     * @param array|false $params array of getParam() calls, or false for no params
+     * @param string|false $instructions
+     */",
+ "/**
+     * Use to set up a param tag for use in creating a paramgroup
+     * @static
+     */",
+ "/**
+ * Abstracts the postinstallscript file task xml.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a10
+ */",
+ "/**
+     * returns the commandline arguments of a function
+     *
+     * @param    string  $argv           the commandline
+     * @param    string  $short_options  the allowed option short-tags
+     * @param    string  $long_options   the allowed option long-tags
+     * @return   array   the given options and there values
+     * @static
+     * @access private
+     */",
+ "/**
+     * Output errors with PHP trigger_error(). You can silence the errors
+     * with prefixing a \"@\" sign to the function call: @System::mkdir(..);
+     *
+     * @param mixed $error a PEAR error or a string with the error message
+     * @return bool false
+     * @static
+     * @access private
+     */",
+ "/**
+     * Creates a nested array representing the structure of a directory
+     *
+     * System::_dirToStruct(\'dir1\', 0) =>
+     *   Array
+     *    (
+     *    [dirs] => Array
+     *        (
+     *            [0] => dir1
+     *        )
+     *
+     *    [files] => Array
+     *        (
+     *            [0] => dir1/file2
+     *            [1] => dir1/file3
+     *        )
+     *    )
+     * @param    string  $sPath      Name of the directory
+     * @param    integer $maxinst    max. deep of the lookup
+     * @param    integer $aktinst    starting deep of the lookup
+     * @param    bool    $silent     if true, do not emit errors.
+     * @return   array   the structure of the dir
+     * @static
+     * @access   private
+     */",
+ "/**
+     * Creates a nested array representing the structure of a directory and files
+     *
+     * @param    array $files Array listing files and dirs
+     * @return   array
+     * @static
+     * @see System::_dirToStruct()
+     */",
+ "/**
+     * The rm command for removing files.
+     * Supports multiple files and dirs and also recursive deletes
+     *
+     * @param    string  $args   the arguments for rm
+     * @return   mixed   PEAR_Error or true for success
+     * @static
+     * @access   public
+     */",
+ "/**
+     * Make directories.
+     *
+     * The -p option will create parent directories
+     * @param    string  $args    the name of the director(y|ies) to create
+     * @return   bool    True for success
+     * @static
+     * @access   public
+     */",
+ "/**
+     * Concatenate files
+     *
+     * Usage:
+     * 1) $var = System::cat(\'sample.txt test.txt\');
+     * 2) System::cat(\'sample.txt test.txt > final.txt\');
+     * 3) System::cat(\'sample.txt test.txt >> final.txt\');
+     *
+     * Note: as the class use fopen, urls should work also (test that)
+     *
+     * @param    string  $args   the arguments
+     * @return   boolean true on success
+     * @static
+     * @access   public
+     */",
+ "/**
+     * Creates temporary files or directories. This function will remove
+     * the created files when the scripts finish its execution.
+     *
+     * Usage:
+     *   1) $tempfile = System::mktemp(\"prefix\");
+     *   2) $tempdir  = System::mktemp(\"-d prefix\");
+     *   3) $tempfile = System::mktemp();
+     *   4) $tempfile = System::mktemp(\"-t /var/tmp prefix\");
+     *
+     * prefix -> The string that will be prepended to the temp name
+     *           (defaults to \"tmp\").
+     * -d     -> A temporary dir will be created instead of a file.
+     * -t     -> The target dir where the temporary (file|dir) will be created. If
+     *           this param is missing by default the env vars TMP on Windows or
+     *           TMPDIR in Unix will be used. If these vars are also missing
+     *           c:\windows\temp or /tmp will be used.
+     *
+     * @param   string  $args  The arguments
+     * @return  mixed   the full path of the created (file|dir) or false
+     * @see System::tmpdir()
+     * @static
+     * @access  public
+     */",
+ "/**
+     * Remove temporary files created my mkTemp. This function is executed
+     * at script shutdown time
+     *
+     * @static
+     * @access private
+     */",
+ "/**
+     * Get the path of the temporal directory set in the system
+     * by looking in its environments variables.
+     * Note: php.ini-recommended removes the \"E\" from the variables_order setting,
+     * making unavaible the $_ENV array, that s why we do tests with _ENV
+     *
+     * @static
+     * @return string The temporary directory on the system
+     */",
+ "/**
+     * The \"which\" command (show the full path of a command)
+     *
+     * @param string $program The command to search for
+     * @param mixed  $fallback Value to return if $program is not found
+     *
+     * @return mixed A string with the full path or false if not found
+     * @static
+     * @author Stig Bakken <ssb@php.net>
+     */",
+ "/**
+     * The \"find\" command
+     *
+     * Usage:
+     *
+     * System::find($dir);
+     * System::find(\"$dir -type d\");
+     * System::find(\"$dir -type f\");
+     * System::find(\"$dir -name *.php\");
+     * System::find(\"$dir -name *.php -name *.htm*\");
+     * System::find(\"$dir -maxdepth 1\");
+     *
+     * Params implmented:
+     * $dir            -> Start the search at this directory
+     * -type d         -> return only directories
+     * -type f         -> return only files
+     * -maxdepth <n>   -> max depth of recursion
+     * -name <pattern> -> search pattern (bash style). Multiple -name param allowed
+     *
+     * @param  mixed Either array or string with the command line
+     * @return array Array of found files
+     * @static
+     *
+     */",
+ "/**
+* System offers cross plattform compatible system functions
+*
+* Static functions for different operations. Should work under
+* Unix and Windows. The names and usage has been taken from its respectively
+* GNU commands. The functions will return (bool) false on error and will
+* trigger the error with the PHP trigger_error() function (you can silence
+* the error by prefixing a \'@\' sign after the function call, but this
+* is not recommended practice.  Instead use an error handler with
+* {@link set_error_handler()}).
+*
+* Documentation on this class you can find in:
+* http://pear.php.net/manual/
+*
+* Example usage:
+* if (!@System::rm(\'-r file1 dir1\')) {
+*    print \"could not delete file1 or dir1\";
+* }
+*
+* In case you need to to pass file names with spaces,
+* pass the params as an array:
+*
+* System::rm(array(\'-r\', $file1, $dir1));
+*
+* @category   pear
+* @package    System
+* @author     Tomas V.V. Cox <cox@idecnet.com>
+* @copyright  1997-2006 The PHP Group
+* @license    http://opensource.org/licenses/bsd-license.php New BSD License
+* @version    Release: 1.9.4
+* @link       http://pear.php.net/package/PEAR
+* @since      Class available since Release 0.1
+* @static
+*/",
+ "/**
+    * If you have a class that\'s mostly/entirely static, and you need static
+    * properties, you can use this method to simulate them. Eg. in your method(s)
+    * do this: $myVar = &PEAR5::getStaticProperty(\'myclass\', \'myVar\');
+    * You MUST use a reference, or they will not persist!
+    *
+    * @access public
+    * @param  string $class  The calling classname, to prevent clashes
+    * @param  string $var    The variable to retrieve.
+    * @return mixed   A reference to the variable. If not set it will be
+    *                 auto initialised to NULL.
+    */",
+ "/**
+ * This is only meant for PHP 5 to get rid of certain strict warning
+ * that doesn\'t get hidden since it\'s in the shutdown function
+ */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2007-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.7.0
+ */",
+ "/**
+     * @param PEAR_PackageFile_v2
+     */",
+ "/**
+     * @return string
+     */",
+ "/**
+     * @param PEAR_Packager
+     * @param bool generate a .tgz or a .tar
+     * @param string|null temporary directory to package in
+     */",
+ "/**
+     * Package up both a package.xml and package2.xml for the same release
+     * @param PEAR_Packager
+     * @param PEAR_PackageFile_v1
+     * @param bool generate a .tgz or a .tar
+     * @param string|null temporary directory to package in
+     */",
+ "/**
+     * Return an XML document based on the package info (as returned
+     * by the PEAR_Common::infoFrom* methods).
+     *
+     * @return string XML data
+     */",
+ "/**
+    * reset all options to default options
+    *
+    * @access   public
+    * @see      setOption(), XML_Unserializer()
+    */",
+ "/**
+    * set an option
+    *
+    * You can use this method if you do not want to set all options in the constructor
+    *
+    * @access   public
+    * @see      resetOption(), XML_Serializer()
+    */",
+ "/**
+    * sets several options at once
+    *
+    * You can use this method if you do not want to set all options in the constructor
+    *
+    * @access   public
+    * @see      resetOption(), XML_Unserializer(), setOption()
+    */",
+ "/**
+    * serialize data
+    *
+    * @access   public
+    * @param    mixed    $data data to serialize
+    * @return   boolean  true on success, pear error on failure
+    */",
+ "/**
+    * get the result of the serialization
+    *
+    * @access public
+    * @return string serialized XML
+    */",
+ "/**
+    * serialize any value
+    *
+    * This method checks for the type of the value and calls the appropriate method
+    *
+    * @access private
+    * @param  mixed     $value
+    * @param  string    $tagName
+    * @param  array     $attributes
+    * @return string
+    */",
+ "/**
+    * serialize an array
+    *
+    * @access   private
+    * @param    array   $array       array to serialize
+    * @param    string  $tagName     name of the root tag
+    * @param    array   $attributes  attributes for the root tag
+    * @return   string  $string      serialized data
+    * @uses     XML_Util::isValidName() to check, whether key has to be substituted
+    */",
+ "/**
+    * create a tag from an array
+    * this method awaits an array in the following format
+    * array(
+    *       \'qname\'        => $tagName,
+    *       \'attributes\'   => array(),
+    *       \'content\'      => $content,      // optional
+    *       \'namespace\'    => $namespace     // optional
+    *       \'namespaceUri\' => $namespaceUri  // optional
+    *   )
+    *
+    * @access   private
+    * @param    array   $tag tag definition
+    * @param    boolean $replaceEntities whether to replace XML entities in content or not
+    * @return   string  $string XML tag
+    */",
+ "/**
+ * This class converts a PEAR_PackageFile_v2 object into any output format.
+ *
+ * Supported output formats include array, XML string (using S. Schmidt\'s
+ * XML_Serializer, slightly customized)
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @author     Stephan Schmidt (original XML_Serializer code)
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * @param PEAR_Packager
+     * @param bool if true, a .tgz is written, otherwise a .tar is written
+     * @param string|null directory in which to save the .tgz
+     * @return string|PEAR_Error location of package or error object
+     */",
+ "/**
+     * @param string|null directory to place the package.xml in, or null for a temporary dir
+     * @param int one of the PEAR_VALIDATE_* constants
+     * @param string name of the generated file
+     * @param bool if true, then no analysis will be performed on role=\"php\" files
+     * @return string|PEAR_Error path to the created file on success
+     */",
+ "/**
+     * fix both XML encoding to be UTF8, and replace standard XML entities < > \" & \'
+     *
+     * @param string $string
+     * @return string
+     * @access private
+     */",
+ "/**
+     * Return an XML document based on the package info (as returned
+     * by the PEAR_Common::infoFrom* methods).
+     *
+     * @return string XML data
+     */",
+ "/**
+     * Generate part of an XML description with release information.
+     *
+     * @param array  $pkginfo    array with release information
+     * @param bool   $changelog  whether the result will be in a changelog element
+     *
+     * @return string XML data
+     *
+     * @access private
+     */",
+ "/**
+     * @param array
+     * @access protected
+     */",
+ "/**
+     * @param array
+     * @param array
+     * @param string|null
+     * @param array|null
+     * @access private
+     */",
+ "/**
+     * @param array
+     * @param string
+     * @param string
+     * @access private
+     */",
+ "/**
+     * @param string
+     * @param array
+     * @param string
+     * @access private
+     */",
+ "/**
+     * Unindent given string (?)
+     *
+     * @param string $str The string that has to be unindented.
+     * @return string
+     * @access private
+     */",
+ "/**
+     * @return array
+     */",
+ "/**
+     * Convert a package.xml version 1.0 into version 2.0
+     *
+     * Note that this does a basic conversion, to allow more advanced
+     * features like bundles and multiple releases
+     * @param string the classname to instantiate and return.  This must be
+     *               PEAR_PackageFile_v2 or a descendant
+     * @param boolean if true, only valid, deterministic package.xml 1.0 as defined by the
+     *                strictest parameters will be converted
+     * @return PEAR_PackageFile_v2|PEAR_Error
+     */",
+ "/**
+     * @param array
+     * @param bool
+     * @access private
+     */",
+ "/**
+     * @param array
+     * @access private
+     */",
+ "/**
+     * Post-process special files with install-as/platform attributes and
+     * make the release tag.
+     *
+     * This complex method follows this work-flow to create the release tags:
+     *
+     * <pre>
+     * - if any install-as/platform exist, create a generic release and fill it with
+     *   o <install as=..> tags for <file name=... install-as=...>
+     *   o <install as=..> tags for <file name=... platform=!... install-as=..>
+     *   o <ignore> tags for <file name=... platform=...>
+     *   o <ignore> tags for <file name=... platform=... install-as=..>
+     * - create a release for each platform encountered and fill with
+     *   o <install as..> tags for <file name=... install-as=...>
+     *   o <install as..> tags for <file name=... platform=this platform install-as=..>
+     *   o <install as..> tags for <file name=... platform=!other platform install-as=..>
+     *   o <ignore> tags for <file name=... platform=!this platform>
+     *   o <ignore> tags for <file name=... platform=other platform>
+     *   o <ignore> tags for <file name=... platform=other platform install-as=..>
+     *   o <ignore> tags for <file name=... platform=!this platform install-as=..>
+     * </pre>
+     *
+     * It does this by accessing the $package parameter, which contains an array with
+     * indices:
+     *
+     *  - platform: mapping of file => OS the file should be installed on
+     *  - install-as: mapping of file => installed name
+     *  - osmap: mapping of OS => list of files that should be installed
+     *    on that OS
+     *  - notosmap: mapping of OS => list of files that should not be
+     *    installed on that OS
+     *
+     * @param array
+     * @param array
+     * @access private
+     */",
+ "/**
+     * @param array
+     * @return array
+     * @access private
+     */",
+ "/**
+     * @param array
+     * @return array
+     */",
+ "/**
+     * process multiple dependencies that have a name, like package deps
+     * @param array
+     * @return array
+     * @access private
+     */",
+ "/**
+ * This class converts a PEAR_PackageFile_v1 object into any output format.
+ *
+ * Supported output formats include array, XML string, and a PEAR_PackageFile_v2
+ * object, for converting package.xml 1.0 into package.xml 2.0 with no sweat.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * PEAR_Command_Mirror constructor.
+     *
+     * @access public
+     * @param object PEAR_Frontend a reference to an frontend
+     * @param object PEAR_Config a reference to the configuration data
+     */",
+ "/**
+     * For unit-testing
+     */",
+ "/**
+    * retrieves a list of avaible Packages from master server
+    * and downloads them
+    *
+    * @access public
+    * @param string $command the command
+    * @param array $options the command options before the command
+    * @param array $params the stuff after the command name
+    * @return bool true if succesful
+    * @throw PEAR_Error
+    */",
+ "/**
+ * PEAR commands for providing file mirrors
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Alexander Merz <alexmerz@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.2.0
+ */",
+ "/**
+ * Retrieves information about the current operating system
+ *
+ * This class uses php_uname() to grok information about the current OS
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+     * Supported signatures:
+     *  - PEAR_Exception(string $message);
+     *  - PEAR_Exception(string $message, int $code);
+     *  - PEAR_Exception(string $message, Exception $cause);
+     *  - PEAR_Exception(string $message, Exception $cause, int $code);
+     *  - PEAR_Exception(string $message, PEAR_Error $cause);
+     *  - PEAR_Exception(string $message, PEAR_Error $cause, int $code);
+     *  - PEAR_Exception(string $message, array $causes);
+     *  - PEAR_Exception(string $message, array $causes, int $code);
+     * @param string exception message
+     * @param int|Exception|PEAR_Error|array|null exception cause
+     * @param int|null exception code or null
+     */",
+ "/**
+     * @param mixed $callback  - A valid php callback, see php func is_callable()
+     *                         - A PEAR_Exception::OBSERVER_* constant
+     *                         - An array(const PEAR_Exception::OBSERVER_*,
+     *                           mixed $options)
+     * @param string $label    The name of the observer. Use this if you want
+     *                         to remove it later with removeObserver()
+     */",
+ "/**
+     * @return int unique identifier for an observer
+     */",
+ "/**
+     * Return specific error information that can be used for more detailed
+     * error messages or translation.
+     *
+     * This method may be overridden in child exception classes in order
+     * to add functionality not present in PEAR_Exception and is a placeholder
+     * to define API
+     *
+     * The returned array must be an associative array of parameter => value like so:
+     * <pre>
+     * array(\'name\' => $name, \'context\' => array(...))
+     * </pre>
+     * @return array
+     */",
+ "/**
+     * Returns the exception that caused this exception to be thrown
+     * @access public
+     * @return Exception|array The context of the exception
+     */",
+ "/**
+     * Function must be public to call on caused exceptions
+     * @param array
+     */",
+ "/**
+ * Base PEAR_Exception Class
+ *
+ * 1) Features:
+ *
+ * - Nestable exceptions (throw new PEAR_Exception($msg, $prev_exception))
+ * - Definable triggers, shot when exceptions occur
+ * - Pretty and informative error messages
+ * - Added more context info available (like class, method or cause)
+ * - cause can be a PEAR_Exception or an array of mixed
+ *   PEAR_Exceptions/PEAR_ErrorStack warnings
+ * - callbacks for specific exception classes and their children
+ *
+ * 2) Ideas:
+ *
+ * - Maybe a way to define a \'template\' for the output
+ *
+ * 3) Inherited properties from PHP Exception Class:
+ *
+ * protected $message
+ * protected $code
+ * protected $line
+ * protected $file
+ * private   $trace
+ *
+ * 4) Inherited methods from PHP Exception Class:
+ *
+ * __clone
+ * __construct
+ * getMessage
+ * getCode
+ * getFile
+ * getLine
+ * getTraceSafe
+ * getTraceSafeAsString
+ * __toString
+ *
+ * 5) Usage example
+ *
+ * <code>
+ *  require_once \'PEAR/Exception.php\';
+ *
+ *  class Test {
+ *     function foo() {
+ *         throw new PEAR_Exception(\'Error Message\', ERROR_CODE);
+ *     }
+ *  }
+ *
+ *  function myLogger($pear_exception) {
+ *     echo $pear_exception->getMessage();
+ *  }
+ *  // each time a exception is thrown the \'myLogger\' will be called
+ *  // (its use is completely optional)
+ *  PEAR_Exception::addObserver(\'myLogger\');
+ *  $test = new Test;
+ *  try {
+ *     $test->foo();
+ *  } catch (PEAR_Exception $e) {
+ *     print $e;
+ *  }
+ * </code>
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Tomas V.V.Cox <cox@idecnet.com>
+ * @author     Hans Lellelid <hans@velum.net>
+ * @author     Bertrand Mansion <bmansion@mamasam.com>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.3.3
+ *
+ */",
+ "/**
+     * @param string Extension name
+     * @return bool success of operation
+     */",
+ "/**
+     * set this as a package.xml version 2.1
+     * @access private
+     */",
+ "/**
+     * Adds a new maintainer - no checking of duplicates is performed, use
+     * updatemaintainer for that purpose.
+     */",
+ "/**
+     * snapshot|devel|alpha|beta|stable
+     */",
+ "/**
+     * @param devel|alpha|beta|stable
+     */",
+ "/**
+     * This is only used at install-time, after all serialization
+     * is over.
+     * @param string file name
+     * @param string installed path
+     */",
+ "/**
+     * This is only used at install-time, after all serialization
+     * is over.
+     */",
+ "/**
+     * Reset the listing of package contents
+     * @param string base installation dir for the whole package, if any
+     */",
+ "/**
+     * @param string relative path of the bundled package.
+     */",
+ "/**
+     * @param string file name
+     * @param PEAR_Task_Common a read/write task
+     */",
+ "/**
+     * @param string path to the file
+     * @param string filename
+     * @param array extra attributes
+     */",
+ "/**
+     * @param string Dependent package name
+     * @param string Dependent package\'s channel name
+     * @param string minimum version of specified package that this release is guaranteed to be
+     *               compatible with
+     * @param string maximum version of specified package that this release is guaranteed to be
+     *               compatible with
+     * @param string versions of specified package that this release is not compatible with
+     */",
+ "/**
+     * Removes the <usesrole> tag entirely
+     */",
+ "/**
+     * @param string
+     * @param string package name or uri
+     * @param string channel name if non-uri
+     */",
+ "/**
+     * Removes the <usestask> tag entirely
+     */",
+ "/**
+     * @param string
+     * @param string package name or uri
+     * @param string channel name if non-uri
+     */",
+ "/**
+     * Remove all compatible tags
+     */",
+ "/**
+     * Reset dependencies prior to adding new ones
+     */",
+ "/**
+     * @param string minimum PHP version allowed
+     * @param string maximum PHP version allowed
+     * @param array $exclude incompatible PHP versions
+     */",
+ "/**
+     * @param string minimum allowed PEAR installer version
+     * @param string maximum allowed PEAR installer version
+     * @param string recommended PEAR installer version
+     * @param array incompatible version of the PEAR installer
+     */",
+ "/**
+     * Mark a package as conflicting with this package
+     * @param string package name
+     * @param string package channel
+     * @param string extension this package provides, if any
+     * @param string|false minimum version required
+     * @param string|false maximum version allowed
+     * @param array|false versions to exclude from installation
+     */",
+ "/**
+     * Mark a package as conflicting with this package
+     * @param string package name
+     * @param string package channel
+     * @param string extension this package provides, if any
+     */",
+ "/**
+     * @param string package name
+     * @param string|false channel name, false if this is a uri
+     * @param string|false uri name, false if this is a channel
+     * @param string|false minimum version required
+     * @param string|false maximum version allowed
+     * @param string|false recommended installation version
+     * @param array|false versions to exclude from installation
+     * @param string extension this package provides, if any
+     * @param bool if true, tells the installer to ignore the default optional dependency group
+     *             when installing this package
+     * @param bool if true, tells the installer to negate this dependency (conflicts)
+     * @return array
+     * @access private
+     */",
+ "/**
+     * @param package|subpackage
+     * @param string group name
+     * @param string package name
+     * @param string package channel
+     * @param string minimum version
+     * @param string maximum version
+     * @param string recommended version
+     * @param array|false optional excluded versions
+     * @param string extension this package provides, if any
+     * @param bool if true, tells the installer to ignore the default optional dependency group
+     *             when installing this package
+     * @return bool false if the dependency group has not been initialized with
+     *              {@link addDependencyGroup()}, or a subpackage is added with
+     *              a providesextension
+     */",
+ "/**
+     * @param package|subpackage
+     * @param string group name
+     * @param string package name
+     * @param string package uri
+     * @param string extension this package provides, if any
+     * @param bool if true, tells the installer to ignore the default optional dependency group
+     *             when installing this package
+     * @return bool false if the dependency group has not been initialized with
+     *              {@link addDependencyGroup()}
+     */",
+ "/**
+     * @param string group name (must be pre-existing)
+     * @param string extension name
+     * @param string minimum version allowed
+     * @param string maximum version allowed
+     * @param string recommended version
+     * @param array incompatible versions
+     */",
+ "/**
+     * @param package|subpackage|extension
+     * @param array dependency contents
+     * @param string name of the dependency group to add this to
+     * @return boolean
+     * @access private
+     */",
+ "/**
+     * @param optional|required
+     * @param string package name
+     * @param string package channel
+     * @param string minimum version
+     * @param string maximum version
+     * @param string recommended version
+     * @param string extension this package provides, if any
+     * @param bool if true, tells the installer to ignore the default optional dependency group
+     *             when installing this package
+     * @param array|false optional excluded versions
+     */",
+ "/**
+     * @param optional|required
+     * @param string name of the package
+     * @param string uri of the package
+     * @param string extension this package provides, if any
+     * @param bool if true, tells the installer to ignore the default optional dependency group
+     *             when installing this package
+     */",
+ "/**
+     * @param optional|required optional, required
+     * @param string package name
+     * @param string package channel
+     * @param string minimum version
+     * @param string maximum version
+     * @param string recommended version
+     * @param array incompatible versions
+     * @param bool if true, tells the installer to ignore the default optional dependency group
+     *             when installing this package
+     */",
+ "/**
+     * @param optional|required optional, required
+     * @param string package name
+     * @param string package uri for download
+     * @param bool if true, tells the installer to ignore the default optional dependency group
+     *             when installing this package
+     */",
+ "/**
+     * @param optional|required optional, required
+     * @param string extension name
+     * @param string minimum version
+     * @param string maximum version
+     * @param string recommended version
+     * @param array incompatible versions
+     */",
+ "/**
+     * @param string Operating system name
+     * @param boolean true if this package cannot be installed on this OS
+     */",
+ "/**
+     * @param string Architecture matching pattern
+     * @param boolean true if this package cannot be installed on this architecture
+     */",
+ "/**
+     * Set the kind of package, and erase all release tags
+     *
+     * - a php package is a PEAR-style package
+     * - an extbin package is a PECL-style extension binary
+     * - an extsrc package is a PECL-style source for a binary
+     * - an zendextbin package is a PECL-style zend extension binary
+     * - an zendextsrc package is a PECL-style source for a zend extension binary
+     * - a bundle package is a collection of other pre-packaged packages
+     * @param php|extbin|extsrc|zendextsrc|zendextbin|bundle
+     * @return bool success
+     */",
+ "/**
+     * @return bool true if package type is set up
+     */",
+ "/**
+     * Get the current release tag in order to add to it
+     * @param bool returns only releases that have installcondition if true
+     * @return array|null
+     */",
+ "/**
+     * Add a file to the current release that should be installed under a different name
+     * @param string <contents> path to file
+     * @param string name the file should be installed as
+     */",
+ "/**
+     * Add a file to the current release that should be ignored
+     * @param string <contents> path to file
+     * @return bool success of operation
+     */",
+ "/**
+     * Add an extension binary package for this extension source code release
+     *
+     * Note that the package must be from the same channel as the extension source package
+     * @param string
+     */",
+ "/**
+     * Add a configureoption to an extension source package
+     * @param string
+     * @param string
+     * @param string
+     */",
+ "/**
+     * Set an installation condition based on php version for the current release set
+     * @param string minimum version
+     * @param string maximum version
+     * @param false|array incompatible versions of PHP
+     */",
+ "/**
+     * @param optional|required optional, required
+     * @param string extension name
+     * @param string minimum version
+     * @param string maximum version
+     * @param string recommended version
+     * @param array incompatible versions
+     */",
+ "/**
+     * Set an installation condition based on operating system for the current release set
+     * @param string OS name
+     * @param bool whether this OS is incompatible with the current release
+     */",
+ "/**
+     * Set an installation condition based on architecture for the current release set
+     * @param string architecture pattern
+     * @param bool whether this arch is incompatible with the current release
+     */",
+ "/**
+     * For extension binary releases, this is used to specify either the
+     * static URI to a source package, or the package name and channel of the extsrc/zendextsrc
+     * package it is based on.
+     * @param string Package name, or full URI to source package (extsrc/zendextsrc type)
+     */",
+ "/**
+     * Generate a valid change log entry from the current package.xml
+     * @param string|false
+     */",
+ "/**
+     * @param string release version to set change log notes for
+     * @param array output of {@link generateChangeLogEntry()}
+     */",
+ "/**
+     * Remove the changelog entirely
+     */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a8
+ */",
+ "/**
+     * Validate the raw xml at parsing-time.
+     * @param PEAR_PackageFile_v2
+     * @param array raw, parsed xml
+     * @param PEAR_Config
+     * @static
+     */",
+ "/**
+     * Initialize a task instance with the parameters
+     * @param array raw, parsed xml
+     * @param unused
+     */",
+ "/**
+     * Replace all line endings with windows line endings
+     *
+     * See validateXml() source for the complete list of allowed fields
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @param string file contents
+     * @param string the eventual final file location (informational only)
+     * @return string|false|PEAR_Error false to skip this file, PEAR_Error to fail
+     *         (use $this->throwError), otherwise return the new contents
+     */",
+ "/**
+ * Implements the windows line endsings file task.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * Validate the raw xml at parsing-time.
+     * @param PEAR_PackageFile_v2
+     * @param array raw, parsed xml
+     * @param PEAR_Config
+     * @static
+     */",
+ "/**
+     * Initialize a task instance with the parameters
+     * @param array raw, parsed xml
+     * @param unused
+     */",
+ "/**
+     * Replace all line endings with line endings customized for the current OS
+     *
+     * See validateXml() source for the complete list of allowed fields
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @param string file contents
+     * @param string the eventual final file location (informational only)
+     * @return string|false|PEAR_Error false to skip this file, PEAR_Error to fail
+     *         (use $this->throwError), otherwise return the new contents
+     */",
+ "/**
+ * Implements the unix line endings file task.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * Abstracts the windowseol task xml.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a10
+ */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * Add one or more autoload entries.
+     *
+     * @param string $method     which method to autoload
+     *
+     * @param string $classname  (optional) which class to find the method in.
+     *                           If the $method parameter is an array, this
+     *                           parameter may be omitted (and will be ignored
+     *                           if not), and the $method parameter will be
+     *                           treated as an associative array with method
+     *                           names as keys and class names as values.
+     *
+     * @return void
+     *
+     * @access public
+     */",
+ "/**
+     * Remove an autoload entry.
+     *
+     * @param string $method  which method to remove the autoload entry for
+     *
+     * @return bool TRUE if an entry was removed, FALSE if not
+     *
+     * @access public
+     */",
+ "/**
+     * Add an aggregate object to this object.  If the specified class
+     * is not defined, loading it will be attempted following PEAR\'s
+     * file naming scheme.  All the methods in the class will be
+     * aggregated, except private ones (name starting with an
+     * underscore) and constructors.
+     *
+     * @param string $classname  what class to instantiate for the object.
+     *
+     * @return void
+     *
+     * @access public
+     */",
+ "/**
+     * Remove an aggregate object.
+     *
+     * @param string $classname  the class of the object to remove
+     *
+     * @return bool  TRUE if an object was removed, FALSE if not
+     *
+     * @access public
+     */",
+ "/**
+     * Overloaded object call handler, called each time an
+     * undefined/aggregated method is invoked.  This method repeats
+     * the call in the right aggregate object and passes on the return
+     * value.
+     *
+     * @param string $method  which method that was called
+     *
+     * @param string $args    An array of the parameters passed in the
+     *                        original call
+     *
+     * @return mixed  The return value from the aggregated method, or a PEAR
+     *                error if the called method was unknown.
+     */",
+ "/**
+ * This class is for objects where you want to separate the code for
+ * some methods into separate classes.  This is useful if you have a
+ * class with not-frequently-used methods that contain lots of code
+ * that you would like to avoid always parsing.
+ *
+ * The PEAR_Autoloader class provides autoloading and aggregation.
+ * The autoloading lets you set up in which classes the separated
+ * methods are found.  Aggregation is the technique used to import new
+ * methods, an instance of each class providing separated methods is
+ * stored and called every time the aggregated method is called.
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author Stig Bakken <ssb@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/manual/en/core.ppm.php#core.ppm.pear-autoloader
+ * @since      File available since Release 0.1
+ * @deprecated File deprecated in Release 1.4.0a1
+ */",
+ "/**
+     * PEAR_Registry constructor.
+     *
+     * @param string (optional) PEAR install directory (for .php files)
+     * @param PEAR_ChannelFile PEAR_ChannelFile object representing the PEAR channel, if
+     *        default values are not desired.  Only used the very first time a PEAR
+     *        repository is initialized
+     * @param PEAR_ChannelFile PEAR_ChannelFile object representing the PECL channel, if
+     *        default values are not desired.  Only used the very first time a PEAR
+     *        repository is initialized
+     *
+     * @access public
+     */",
+ "/**
+     * PEAR_Registry destructor.  Makes sure no locks are forgotten.
+     *
+     * @access private
+     */",
+ "/**
+     * Make sure the directory where we keep registry files exists.
+     *
+     * @return bool TRUE if directory exists, FALSE if it could not be
+     * created
+     *
+     * @access private
+     */",
+ "/**
+     * Make sure the directory where we keep registry files exists for a non-standard channel.
+     *
+     * @param string channel name
+     * @return bool TRUE if directory exists, FALSE if it could not be
+     * created
+     *
+     * @access private
+     */",
+ "/**
+     * Make sure the directory where we keep registry files for channels exists
+     *
+     * @return bool TRUE if directory exists, FALSE if it could not be
+     * created
+     *
+     * @access private
+     */",
+ "/**
+     * Get the name of the file where data for a given package is stored.
+     *
+     * @param string channel name, or false if this is a PEAR package
+     * @param string package name
+     *
+     * @return string registry file name
+     *
+     * @access public
+     */",
+ "/**
+     * Get the name of the file where data for a given channel is stored.
+     * @param string channel name
+     * @return string registry file name
+     */",
+ "/**
+     * @param string
+     * @return string
+     */",
+ "/**
+     * Get the name of a channel from its alias
+     */",
+ "/**
+     * Get the alias of a channel from its alias or its name
+     */",
+ "/**
+     * Get the name of the file where data for a given package is stored.
+     *
+     * @param string channel name, or false if this is a PEAR package
+     * @param string package name
+     *
+     * @return string registry file name
+     *
+     * @access public
+     */",
+ "/**
+     * Lock the registry.
+     *
+     * @param integer lock mode, one of LOCK_EX, LOCK_SH or LOCK_UN.
+     *                See flock manual for more information.
+     *
+     * @return bool TRUE on success, FALSE if locking failed, or a
+     *              PEAR error if some other error occurs (such as the
+     *              lock file not being writable).
+     *
+     * @access private
+     */",
+ "/**
+     * Determine whether a channel exists in the registry
+     *
+     * @param string Channel name
+     * @param bool if true, then aliases will be ignored
+     * @return boolean
+     */",
+ "/**
+     * Determine whether a mirror exists within the deafult channel in the registry
+     *
+     * @param string Channel name
+     * @param string Mirror name
+     *
+     * @return boolean
+     */",
+ "/**
+     * @param PEAR_ChannelFile Channel object
+     * @param donotuse
+     * @param string Last-Modified HTTP tag from remote request
+     * @return boolean|PEAR_Error True on creation, false if it already exists
+     */",
+ "/**
+     * Deletion fails if there are any packages installed from the channel
+     * @param string|PEAR_ChannelFile channel name
+     * @return boolean|PEAR_Error True on deletion, false if it doesn\'t exist
+     */",
+ "/**
+     * Determine whether a channel exists in the registry
+     * @param string Channel Alias
+     * @return boolean
+     */",
+ "/**
+     * @param string|null
+     * @param string|null
+     * @param string|null
+     * @return array|null
+     * @access private
+     */",
+ "/**
+     * @param string Channel name
+     * @param bool whether to strictly retrieve info of channels, not just aliases
+     * @return array|null
+     */",
+ "/**
+     * Add an installed package to the registry
+     * @param string package name
+     * @param array package info (parsed by PEAR_Common::infoFrom*() methods)
+     * @return bool success of saving
+     * @access private
+     */",
+ "/**
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @return bool
+     * @access private
+     */",
+ "/**
+     * @param string Package name
+     * @param array parsed package.xml 1.0
+     * @param bool this parameter is only here for BC.  Don\'t use it.
+     * @access private
+     */",
+ "/**
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @return bool
+     * @access private
+     */",
+ "/**
+     * @param string Package name
+     * @param string Channel name
+     * @return PEAR_PackageFile_v1|PEAR_PackageFile_v2|null
+     * @access private
+     */",
+ "/**
+     * @param string channel name
+     * @param bool whether to strictly retrieve channel names
+     * @return PEAR_ChannelFile|PEAR_Error
+     * @access private
+     */",
+ "/**
+     * @param string Package name
+     * @param string Channel name
+     * @return bool
+     */",
+ "/**
+     * @param string channel name
+     * @param bool if true, then aliases will be ignored
+     * @return bool
+     */",
+ "/**
+     * @param string channel name mirror is in
+     * @param string mirror name
+     *
+     * @return bool
+     */",
+ "/**
+     * Determines whether the parameter is an alias of a channel
+     * @param string
+     * @return bool
+     */",
+ "/**
+     * @param string|null
+     * @param string|null
+     * @param string
+     * @return array|null
+     */",
+ "/**
+     * Retrieve a raw array of channel data.
+     *
+     * Do not use this, instead use {@link getChannel()} for normal
+     * operations.  Array structure is undefined in this method
+     * @param string channel name
+     * @param bool whether to strictly retrieve information only on non-aliases
+     * @return array|null|PEAR_Error
+     */",
+ "/**
+     * @param string
+     */",
+ "/**
+     * @param string
+     */",
+ "/**
+     * Add an installed package to the registry
+     * @param string|PEAR_PackageFile_v1|PEAR_PackageFile_v2 package name or object
+     *               that will be passed to {@link addPackage2()}
+     * @param array package info (parsed by PEAR_Common::infoFrom*() methods)
+     * @return bool success of saving
+     */",
+ "/**
+     * For future expandibility purposes, separate this
+     * @param PEAR_ChannelFile
+     */",
+ "/**
+     * Deletion fails if there are any packages installed from the channel
+     * @param string|PEAR_ChannelFile channel name
+     * @return boolean|PEAR_Error True on deletion, false if it doesn\'t exist
+     */",
+ "/**
+     * @param PEAR_ChannelFile Channel object
+     * @param string Last-Modified header from HTTP for caching
+     * @return boolean|PEAR_Error True on creation, false if it already exists
+     */",
+ "/**
+     * @param string channel name
+     * @param bool whether to strictly return raw channels (no aliases)
+     * @return PEAR_ChannelFile|PEAR_Error
+     */",
+ "/**
+     * @param string package name
+     * @param string channel name
+     * @return PEAR_PackageFile_v1|PEAR_PackageFile_v2|null
+     */",
+ "/**
+     * Get PEAR_PackageFile_v[1/2] objects representing the contents of
+     * a dependency group that are installed.
+     *
+     * This is used at uninstall-time
+     * @param array
+     * @return array|false
+     */",
+ "/**
+     * @param string channel name
+     * @return PEAR_Validate|false
+     */",
+ "/**
+     * @param string channel name
+     * @return array an array of PEAR_ChannelFile objects representing every installed channel
+     */",
+ "/**
+     * Test whether a file or set of files belongs to a package.
+     *
+     * If an array is passed in
+     * @param string|array file path, absolute or relative to the pear
+     *                     install dir
+     * @param string|array name of PEAR package or array(\'package\' => name, \'channel\' =>
+     *                     channel) of a package that will be ignored
+     * @param string API version - 1.1 will exclude any files belonging to a package
+     * @param array private recursion variable
+     * @return array|false which package and channel the file belongs to, or an empty
+     *                     string if the file does not belong to an installed package,
+     *                     or belongs to the second parameter\'s package
+     */",
+ "/**
+     * Force a reload of the filemap
+     * @since 1.5.0RC3
+     */",
+ "/**
+     * Get the expected API version.  Channels API is version 1.1, as it is backwards
+     * compatible with 1.0
+     * @return string
+     */",
+ "/**
+     * Parse a package name, or validate a parsed package name array
+     * @param string|array pass in an array of format
+     *                     array(
+     *                      \'package\' => \'pname\',
+     *                     [\'channel\' => \'channame\',]
+     *                     [\'version\' => \'version\',]
+     *                     [\'state\' => \'state\',]
+     *                     [\'group\' => \'groupname\'])
+     *                     or a string of format
+     *                     [channel://][channame/]pname[-version|-state][/group=groupname]
+     * @return array|PEAR_Error
+     */",
+ "/**
+     * @param array
+     * @return string
+     */",
+ "/**
+ * Administration class used to maintain the installed package database.
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Tomas V. V. Cox <cox@idecnet.com>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * Abstracts the replace task xml.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a10
+ */",
+ "/**
+     * Retrieve REST data, but always retrieve the local cache if it is available.
+     *
+     * This is useful for elements that should never change, such as information on a particular
+     * release
+     * @param string full URL to this resource
+     * @param array|false contents of the accept-encoding header
+     * @param boolean     if true, xml will be returned as a string, otherwise, xml will be
+     *                    parsed using PEAR_XMLParser
+     * @return string|array
+     */",
+ "/**
+     * Retrieve a remote REST resource
+     * @param string full URL to this resource
+     * @param array|false contents of the accept-encoding header
+     * @param boolean     if true, xml will be returned as a string, otherwise, xml will be
+     *                    parsed using PEAR_XMLParser
+     * @return string|array
+     */",
+ "/**
+     * @param string full URL to REST resource
+     * @param string original contents of the REST resource
+     * @param array  HTTP Last-Modified and ETag headers
+     * @param bool   if true, then the cache id file should be regenerated to
+     *               trigger a new time-to-live value
+     */",
+ "/**
+     * Efficiently Download a file through HTTP.  Returns downloaded file as a string in-memory
+     * This is best used for small files
+     *
+     * If an HTTP proxy has been configured (http_proxy PEAR_Config
+     * setting), the proxy will be used.
+     *
+     * @param string  $url       the URL to download
+     * @param string  $save_dir  directory to save file in
+     * @param false|string|array $lastmodified header values to check against for caching
+     *                           use false to return the header values from this download
+     * @param false|array $accept Accept headers to send
+     * @return string|array  Returns the contents of the downloaded file or a PEAR
+     *                       error on failure.  If the error is caused by
+     *                       socket-related errors, the error object will
+     *                       have the fsockopen error code available through
+     *                       getCode().  If caching is requested, then return the header
+     *                       values.
+     *
+     * @access public
+     */",
+ "/**
+ * Intelligently retrieve data, following hyperlinks if necessary, and re-directing
+ * as well
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * PEAR_Command_Registry constructor.
+     *
+     * @access public
+     */",
+ "/**
+     * The channel-discover command
+     *
+     * @param string $command command name
+     * @param array  $options option_name => value
+     * @param array  $params  list of additional parameters.
+     *               $params[0] should contain a string with either:
+     *               - <channel name> or
+     *               - <username>:<password>@<channel name>
+     * @return null|PEAR_Error
+     */",
+ "/**
+     * Execute the \'login\' command.
+     *
+     * @param string $command command name
+     * @param array $options option_name => value
+     * @param array $params list of additional parameters
+     *
+     * @return bool TRUE on success or
+     * a PEAR error on failure
+     *
+     * @access public
+     */",
+ "/**
+     * Execute the \'logout\' command.
+     *
+     * @param string $command command name
+     * @param array $options option_name => value
+     * @param array $params list of additional parameters
+     *
+     * @return bool TRUE on success or
+     * a PEAR error on failure
+     *
+     * @access public
+     */",
+ "/**
+ * PEAR commands for managing channels.
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * Do any unusual setup here
+     * @param PEAR_Installer
+     * @param PEAR_PackageFile_v2
+     * @param array file attributes
+     * @param string file name
+     */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2007-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.7.0
+ */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * Abstracts the unixeol task xml.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a10
+ */",
+ "/**
+     *
+     * @param   PEAR_Config $config
+     * @param   ?   $debug
+     * @param   string @tmpdir Optional temporary directory for uncompressing
+     *          files
+     */",
+ "/**
+     * Turn off validation - return a parsed package.xml without checking it
+     *
+     * This is used by the package-validate command
+     */",
+ "/**
+     * Create a PEAR_PackageFile_Parser_v* of a given version.
+     * @param   int $version
+     * @return  PEAR_PackageFile_Parser_v1|PEAR_PackageFile_Parser_v1
+     */",
+ "/**
+     * For simpler unit-testing
+     * @return string
+     */",
+ "/**
+     * Create a PEAR_PackageFile_v* of a given version.
+     * @param   int $version
+     * @return  PEAR_PackageFile_v1|PEAR_PackageFile_v1
+     */",
+ "/**
+     * Create a PEAR_PackageFile_v* from its toArray() method
+     *
+     * WARNING: no validation is performed, the array is assumed to be valid,
+     * always parse from xml if you want validation.
+     * @param   array $arr
+     * @return PEAR_PackageFileManager_v1|PEAR_PackageFileManager_v2
+     * @uses    factory() to construct the returned object.
+     */",
+ "/**
+     * Create a PEAR_PackageFile_v* from an XML string.
+     * @access  public
+     * @param   string $data contents of package.xml file
+     * @param   int $state package state (one of PEAR_VALIDATE_* constants)
+     * @param   string $file full path to the package.xml file (and the files
+     *          it references)
+     * @param   string $archive optional name of the archive that the XML was
+     *          extracted from, if any
+     * @return  PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @uses    parserFactory() to construct a parser to load the package.
+     */",
+ "/**
+     * Register a temporary file or directory.  When the destructor is
+     * executed, all registered temporary files and directories are
+     * removed.
+     *
+     * @param string  $file  name of file or directory
+     * @return  void
+     */",
+ "/**
+     * Create a PEAR_PackageFile_v* from a compresed Tar or Tgz file.
+     * @access  public
+     * @param string contents of package.xml file
+     * @param int package state (one of PEAR_VALIDATE_* constants)
+     * @return  PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @using   Archive_Tar to extract the files
+     * @using   fromPackageFile() to load the package after the package.xml
+     *          file is extracted.
+     */",
+ "/**
+     * helper callback for extracting Archive_Tar errors
+     *
+     * @param PEAR_Error|null $err
+     * @return array
+     * @access private
+     */",
+ "/**
+     * Create a PEAR_PackageFile_v* from a package.xml file.
+     *
+     * @access public
+     * @param   string  $descfile  name of package xml file
+     * @param   int     $state package state (one of PEAR_VALIDATE_* constants)
+     * @param   string|false $archive name of the archive this package.xml came
+     *          from, if any
+     * @return  PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @uses    PEAR_PackageFile::fromXmlString to create the oject after the
+     *          XML is loaded from the package.xml file.
+     */",
+ "/**
+     * Create a PEAR_PackageFile_v* from a .tgz archive or package.xml file.
+     *
+     * This method is able to extract information about a package from a .tgz
+     * archive or from a XML package definition file.
+     *
+     * @access public
+     * @param   string  $info file name
+     * @param   int     $state package state (one of PEAR_VALIDATE_* constants)
+     * @return  PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @uses    fromPackageFile() if the file appears to be XML
+     * @uses    fromTgzFile() to load all non-XML files
+     */",
+ "/**
+ * Abstraction for the package.xml package description file
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * PEAR_Command_Package constructor.
+     *
+     * @access public
+     */",
+ "/**
+     * For unit testing purposes
+     */",
+ "/**
+     * For unit testing purposes
+     */",
+ "/**
+ * PEAR commands for login/logout
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Martin Jansen <mj@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: @package_version@
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+ * List of temporary files and directories registered by
+ * PEAR_Common::addTempFile().
+ * @var array
+ */",
+ "/**
+ * Valid maintainer roles
+ * @var array
+ */",
+ "/**
+ * Valid release states
+ * @var array
+ */",
+ "/**
+ * Valid dependency types
+ * @var array
+ */",
+ "/**
+ * Valid dependency relations
+ * @var array
+ */",
+ "/**
+ * Valid file roles
+ * @var array
+ */",
+ "/**
+ * Valid replacement types
+ * @var array
+ */",
+ "/**
+ * Valid \"provide\" types
+ * @var array
+ */",
+ "/**
+ * Valid \"provide\" types
+ * @var array
+ */",
+ "/**
+     * PEAR_Common constructor
+     *
+     * @access public
+     */",
+ "/**
+     * PEAR_Common destructor
+     *
+     * @access private
+     */",
+ "/**
+     * Register a temporary file or directory.  When the destructor is
+     * executed, all registered temporary files and directories are
+     * removed.
+     *
+     * @param string  $file  name of file or directory
+     *
+     * @return void
+     *
+     * @access public
+     */",
+ "/**
+     * Wrapper to System::mkDir(), creates a directory as well as
+     * any necessary parent directories.
+     *
+     * @param string  $dir  directory name
+     *
+     * @return bool TRUE on success, or a PEAR error
+     *
+     * @access public
+     */",
+ "/**
+     * Logging method.
+     *
+     * @param int    $level  log level (0 is quiet, higher is noisier)
+     * @param string $msg    message to write to the log
+     *
+     * @return void
+     *
+     * @access public
+     * @static
+     */",
+ "/**
+     * Create and register a temporary directory.
+     *
+     * @param string $tmpdir (optional) Directory to use as tmpdir.
+     *                       Will use system defaults (for example
+     *                       /tmp or c:\windows\temp) if not specified
+     *
+     * @return string name of created directory
+     *
+     * @access public
+     */",
+ "/**
+     * Set object that represents the frontend to be used.
+     *
+     * @param  object Reference of the frontend object
+     * @return void
+     * @access public
+     */",
+ "/**
+     * Return an array containing all of the states that are more stable than
+     * or equal to the passed in state
+     *
+     * @param string Release state
+     * @param boolean Determines whether to include $state in the list
+     * @return false|array False if $state is not a valid release state
+     */",
+ "/**
+     * Get the valid roles for a PEAR package maintainer
+     *
+     * @return array
+     * @static
+     */",
+ "/**
+     * Get the valid package release states of packages
+     *
+     * @return array
+     * @static
+     */",
+ "/**
+     * Get the implemented dependency types (php, ext, pkg etc.)
+     *
+     * @return array
+     * @static
+     */",
+ "/**
+     * Get the implemented dependency relations (has, lt, ge etc.)
+     *
+     * @return array
+     * @static
+     */",
+ "/**
+     * Get the implemented file roles
+     *
+     * @return array
+     * @static
+     */",
+ "/**
+     * Get the implemented file replacement types in
+     *
+     * @return array
+     * @static
+     */",
+ "/**
+     * Get the implemented file replacement types in
+     *
+     * @return array
+     * @static
+     */",
+ "/**
+     * Get the implemented file replacement types in
+     *
+     * @return array
+     * @static
+     */",
+ "/**
+     * Test whether a string contains a valid package name.
+     *
+     * @param string $name the package name to test
+     *
+     * @return bool
+     *
+     * @access public
+     */",
+ "/**
+     * Test whether a string contains a valid package version.
+     *
+     * @param string $ver the package version to test
+     *
+     * @return bool
+     *
+     * @access public
+     */",
+ "/**
+     * @param string $path relative or absolute include path
+     * @return boolean
+     * @static
+     */",
+ "/**
+     * Returns information about a package file.  Expects the name of
+     * a gzipped tar file as input.
+     *
+     * @param string  $file  name of .tgz file
+     *
+     * @return array  array with package information
+     *
+     * @access public
+     * @deprecated use PEAR_PackageFile->fromTgzFile() instead
+     *
+     */",
+ "/**
+     * Returns information about a package file.  Expects the name of
+     * a package xml file as input.
+     *
+     * @param string  $descfile  name of package xml file
+     *
+     * @return array  array with package information
+     *
+     * @access public
+     * @deprecated use PEAR_PackageFile->fromPackageFile() instead
+     *
+     */",
+ "/**
+     * Returns information about a package file.  Expects the contents
+     * of a package xml file as input.
+     *
+     * @param string  $data  contents of package.xml file
+     *
+     * @return array   array with package information
+     *
+     * @access public
+     * @deprecated use PEAR_PackageFile->fromXmlstring() instead
+     *
+     */",
+ "/**
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @return array
+     */",
+ "/**
+     * Returns package information from different sources
+     *
+     * This method is able to extract information about a package
+     * from a .tgz archive or from a XML package definition file.
+     *
+     * @access public
+     * @param  string Filename of the source (\'package.xml\', \'<package>.tgz\')
+     * @return string
+     * @deprecated use PEAR_PackageFile->fromAnyFile() instead
+     */",
+ "/**
+     * Return an XML document based on the package info (as returned
+     * by the PEAR_Common::infoFrom* methods).
+     *
+     * @param array  $pkginfo  package info
+     *
+     * @return string XML data
+     *
+     * @access public
+     * @deprecated use a PEAR_PackageFile_v* object\'s generator instead
+     */",
+ "/**
+     * Validate XML package definition file.
+     *
+     * @param  string $info Filename of the package archive or of the
+     *                package definition file
+     * @param  array $errors Array that will contain the errors
+     * @param  array $warnings Array that will contain the warnings
+     * @param  string $dir_prefix (optional) directory where source files
+     *                may be found, or empty if they are not available
+     * @access public
+     * @return boolean
+     * @deprecated use the validation of PEAR_PackageFile objects
+     */",
+ "/**
+     * Build a \"provides\" array from data returned by
+     * analyzeSourceCode().  The format of the built array is like
+     * this:
+     *
+     *  array(
+     *    \'class;MyClass\' => \'array(\'type\' => \'class\', \'name\' => \'MyClass\'),
+     *    ...
+     *  )
+     *
+     *
+     * @param array $srcinfo array with information about a source file
+     * as returned by the analyzeSourceCode() method.
+     *
+     * @return void
+     *
+     * @access public
+     *
+     */",
+ "/**
+     * Analyze the source code of the given PHP file
+     *
+     * @param  string Filename of the PHP file
+     * @return mixed
+     * @access public
+     */",
+ "/**
+     * Download a file through HTTP.  Considers suggested file name in
+     * Content-disposition: header and can run a callback function for
+     * different events.  The callback will be called with two
+     * parameters: the callback type, and parameters.  The implemented
+     * callback types are:
+     *
+     *  \'setup\'       called at the very beginning, parameter is a UI object
+     *                that should be used for all output
+     *  \'message\'     the parameter is a string with an informational message
+     *  \'saveas\'      may be used to save with a different file name, the
+     *                parameter is the filename that is about to be used.
+     *                If a \'saveas\' callback returns a non-empty string,
+     *                that file name will be used as the filename instead.
+     *                Note that $save_dir will not be affected by this, only
+     *                the basename of the file.
+     *  \'start\'       download is starting, parameter is number of bytes
+     *                that are expected, or -1 if unknown
+     *  \'bytesread\'   parameter is the number of bytes read so far
+     *  \'done\'        download is complete, parameter is the total number
+     *                of bytes read
+     *  \'connfailed\'  if the TCP connection fails, this callback is called
+     *                with array(host,port,errno,errmsg)
+     *  \'writefailed\' if writing to disk fails, this callback is called
+     *                with array(destfile,errmsg)
+     *
+     * If an HTTP proxy has been configured (http_proxy PEAR_Config
+     * setting), the proxy will be used.
+     *
+     * @param string  $url       the URL to download
+     * @param object  $ui        PEAR_Frontend_* instance
+     * @param object  $config    PEAR_Config instance
+     * @param string  $save_dir  (optional) directory to save file in
+     * @param mixed   $callback  (optional) function/method to call for status
+     *                           updates
+     *
+     * @return string  Returns the full path of the downloaded file or a PEAR
+     *                 error on failure.  If the error is caused by
+     *                 socket-related errors, the error object will
+     *                 have the fsockopen error code available through
+     *                 getCode().
+     *
+     * @access public
+     * @deprecated in favor of PEAR_Downloader::downloadHttp()
+     */",
+ "/**
+ * Class providing common functionality for PEAR administration classes.
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Tomas V. V. Cox <cox@idecnet.com>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ * @deprecated This class will disappear, and its components will be spread
+ *             into smaller classes, like the AT&T breakup, as of Release 1.4.0a1
+ */",
+ "/**
+     * @param PEAR_Config
+     */",
+ "/**
+     * Retrieve configuration information about a file role from its XML info
+     *
+     * @param string $role Role Classname, as in \"PEAR_Installer_Role_Data\"
+     * @return array
+     */",
+ "/**
+     * This is called for each file to set up the directories and files
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @param array attributes from the <file> tag
+     * @param string file name
+     * @return array an array consisting of:
+     *
+     *    1 the original, pre-baseinstalldir installation directory
+     *    2 the final installation directory
+     *    3 the full path to the final location of the file
+     *    4 the location of the pre-installation file
+     */",
+ "/**
+     * Get the name of the configuration variable that specifies the location of this file
+     * @return string|false
+     */",
+ "/**
+     * Do any unusual setup here
+     * @param PEAR_Installer
+     * @param PEAR_PackageFile_v2
+     * @param array file attributes
+     * @param string file name
+     */",
+ "/**
+ * Base class for all installation roles.
+ *
+ * This class allows extensibility of file roles.  Packages with complex
+ * customization can now provide custom file roles along with the possibility of
+ * adding configuration values to match.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2006 The PHP Group
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * Retrieve information about a remote package to be downloaded from a REST server
+     *
+     * This is smart enough to resolve the minimum PHP version dependency prior to download
+     * @param string $base The uri to prepend to all REST calls
+     * @param array $packageinfo an array of format:
+     * <pre>
+     *  array(
+     *   \'package\' => \'packagename\',
+     *   \'channel\' => \'channelname\',
+     *  [\'state\' => \'alpha\' (or valid state),]
+     *  -or-
+     *  [\'version\' => \'1.whatever\']
+     * </pre>
+     * @param string $prefstate Current preferred_state config variable value
+     * @param bool $installed the installed version of this package to compare against
+     * @return array|false|PEAR_Error see {@link _returnDownloadURL()}
+     */",
+ "/**
+ * Implement REST 1.3
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a12
+ */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * List all categories of a REST server
+     *
+     * @param string $base base URL of the server
+     * @return array of categorynames
+     */",
+ "/**
+     * List packages in a category of a REST server
+     *
+     * @param string $base base URL of the server
+     * @param string $category name of the category
+     * @param boolean $info also download full package info
+     * @return array of packagenames
+     */",
+ "/**
+     * Return an array containing all of the states that are more stable than
+     * or equal to the passed in state
+     *
+     * @param string Release state
+     * @param boolean Determines whether to include $state in the list
+     * @return false|array False if $state is not a valid release state
+     */",
+ "/**
+ * Implement REST 1.1
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.3
+ */",
+ "/**
+     * Retrieve information about a remote package to be downloaded from a REST server
+     *
+     * @param string $base The uri to prepend to all REST calls
+     * @param array $packageinfo an array of format:
+     * <pre>
+     *  array(
+     *   \'package\' => \'packagename\',
+     *   \'channel\' => \'channelname\',
+     *  [\'state\' => \'alpha\' (or valid state),]
+     *  -or-
+     *  [\'version\' => \'1.whatever\']
+     * </pre>
+     * @param string $prefstate Current preferred_state config variable value
+     * @param bool $installed the installed version of this package to compare against
+     * @return array|false|PEAR_Error see {@link _returnDownloadURL()}
+     */",
+ "/**
+     * Take raw data and return the array needed for processing a download URL
+     *
+     * @param string $base REST base uri
+     * @param string $package Package name
+     * @param array $release an array of format array(\'v\' => version, \'s\' => state)
+     *                       describing the release to download
+     * @param array $info list of all releases as defined by allreleases.xml
+     * @param bool|null $found determines whether the release was found or this is the next
+     *                    best alternative.  If null, then versions were skipped because
+     *                    of PHP dependency
+     * @return array|PEAR_Error
+     * @access private
+     */",
+ "/**
+     * List all categories of a REST server
+     *
+     * @param string $base base URL of the server
+     * @return array of categorynames
+     */",
+ "/**
+     * List a category of a REST server
+     *
+     * @param string $base base URL of the server
+     * @param string $category name of the category
+     * @param boolean $info also download full package info
+     * @return array of packagenames
+     */",
+ "/**
+     * Return an array containing all of the states that are more stable than
+     * or equal to the passed in state
+     *
+     * @param string Release state
+     * @param boolean Determines whether to include $state in the list
+     * @return false|array False if $state is not a valid release state
+     */",
+ "/**
+     * Sort releases by version number
+     *
+     * @access private
+     */",
+ "/**
+ * Implement REST 1.0
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a12
+ */",
+ "/**
+     * @return array
+     */",
+ "/**
+     * @param string xml content
+     * @return true|PEAR_Error
+     */",
+ "/**
+     * Start element handler for XML parser
+     *
+     * @access private
+     * @param  object $parser  XML parser object
+     * @param  string $element XML element
+     * @param  array  $attribs attributes of XML tag
+     * @return void
+     */",
+ "/**
+     * post-process data
+     *
+     * @param string $data
+     * @param string $element element name
+     */",
+ "/**
+     * End element handler for XML parser
+     *
+     * @access private
+     * @param  object XML parser object
+     * @param  string
+     * @return void
+     */",
+ "/**
+     * Handler for character data
+     *
+     * @access private
+     * @param  object XML parser object
+     * @param  string CDATA
+     * @return void
+     */",
+ "/**
+ * Parser for any xml file
+ * @category  pear
+ * @package   PEAR
+ * @author    Greg Beaver <cellog@php.net>
+ * @author    Stephan Schmidt (original XML_Unserializer code)
+ * @copyright 1997-2009 The Authors
+ * @license   http://opensource.org/licenses/bsd-license New BSD License
+ * @version   Release: 1.9.4
+ * @link      http://pear.php.net/package/PEAR
+ * @since     Class available since Release 1.4.0a1
+ */",
+ "/**
+     * @param PEAR_Config
+     * @param PEAR_Common
+     */",
+ "/**
+     * Validate the basic contents of a task tag.
+     * @param PEAR_PackageFile_v2
+     * @param array
+     * @param PEAR_Config
+     * @param array the entire parsed <file> tag
+     * @return true|array On error, return an array in format:
+     *    array(PEAR_TASK_ERROR_???[, param1][, param2][, ...])
+     *
+     *    For PEAR_TASK_ERROR_MISSING_ATTRIB, pass the attribute name in
+     *    For PEAR_TASK_ERROR_WRONG_ATTRIB_VALUE, pass the attribute name and an array
+     *    of legal values in
+     * @static
+     * @abstract
+     */",
+ "/**
+     * Initialize a task instance with the parameters
+     * @param array raw, parsed xml
+     * @param array attributes from the <file> tag containing this task
+     * @param string|null last installed version of this package
+     * @abstract
+     */",
+ "/**
+     * Begin a task processing session.  All multiple tasks will be processed after each file
+     * has been successfully installed, all simple tasks should perform their task here and
+     * return any errors using the custom throwError() method to allow forward compatibility
+     *
+     * This method MUST NOT write out any changes to disk
+     * @param PEAR_PackageFile_v2
+     * @param string file contents
+     * @param string the eventual final file location (informational only)
+     * @return string|false|PEAR_Error false to skip this file, PEAR_Error to fail
+     *         (use $this->throwError), otherwise return the new contents
+     * @abstract
+     */",
+ "/**
+     * This method is used to process each of the tasks for a particular multiple class
+     * type.  Simple tasks need not implement this method.
+     * @param array an array of tasks
+     * @access protected
+     * @static
+     * @abstract
+     */",
+ "/**
+     * @static
+     * @final
+     */",
+ "/**
+     * @static
+     * @final
+     */",
+ "/**
+     * Determines whether a role is a script
+     * @return bool
+     */",
+ "/**
+ * A task is an operation that manipulates the contents of a file.
+ *
+ * Simple tasks operate on 1 file.  Multiple tasks are executed after all files have been
+ * processed and installed, and are designed to operate on all files containing the task.
+ * The Post-install script task simply takes advantage of the fact that it will be run
+ * after installation, replace is a simple task.
+ *
+ * Combining tasks is possible, but ordering is significant.
+ *
+ * <file name=\"test.php\" role=\"php\">
+ *  <tasks:replace from=\"@data-dir@\" to=\"data_dir\" type=\"pear-config\"/>
+ *  <tasks:postinstallscript/>
+ * </file>
+ *
+ * This will first replace any instance of @data-dir@ in the test.php file
+ * with the path to the current data directory.  Then, it will include the
+ * test.php file and run the script it contains to configure the package post-installation.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ * @abstract
+ */",
+ "/**
+     * PEAR_Command_Registry constructor.
+     *
+     * @access public
+     */",
+ "/**
+     * @access private
+     */",
+ "/**
+ * PEAR commands for registry manipulation
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+ * Singleton storage
+ * 
+ * Format:
+ * <pre>
+ * array(
+ *  \'package1\' => PEAR_ErrorStack object,
+ *  \'package2\' => PEAR_ErrorStack object,
+ *  ...
+ * )
+ * </pre>
+ * @access private
+ * @global array $GLOBALS[\'_PEAR_ERRORSTACK_SINGLETON\']
+ */",
+ "/**
+ * Global error callback (default)
+ * 
+ * This is only used if set to non-false.  * is the default callback for
+ * all packages, whereas specific packages may set a default callback
+ * for all instances, regardless of whether they are a singleton or not.
+ *
+ * To exclude non-singletons, only set the local callback for the singleton
+ * @see PEAR_ErrorStack::setDefaultCallback()
+ * @access private
+ * @global array $GLOBALS[\'_PEAR_ERRORSTACK_DEFAULT_CALLBACK\']
+ */",
+ "/**
+ * Global Log object (default)
+ * 
+ * This is only used if set to non-false.  Use to set a default log object for
+ * all stacks, regardless of instantiation order or location
+ * @see PEAR_ErrorStack::setDefaultLogger()
+ * @access private
+ * @global array $GLOBALS[\'_PEAR_ERRORSTACK_DEFAULT_LOGGER\']
+ */",
+ "/**
+ * Global Overriding Callback
+ * 
+ * This callback will override any error callbacks that specific loggers have set.
+ * Use with EXTREME caution
+ * @see PEAR_ErrorStack::staticPushCallback()
+ * @access private
+ * @global array $GLOBALS[\'_PEAR_ERRORSTACK_DEFAULT_LOGGER\']
+ */",
+ "/**
+     * Set up a new error stack
+     * 
+     * @param string   $package name of the package this error stack represents
+     * @param callback $msgCallback callback used for error message generation
+     * @param callback $contextCallback callback used for context generation,
+     *                 defaults to {@link getFileLine()}
+     * @param boolean  $throwPEAR_Error
+     */",
+ "/**
+     * Return a single error stack for this package.
+     * 
+     * Note that all parameters are ignored if the stack for package $package
+     * has already been instantiated
+     * @param string   $package name of the package this error stack represents
+     * @param callback $msgCallback callback used for error message generation
+     * @param callback $contextCallback callback used for context generation,
+     *                 defaults to {@link getFileLine()}
+     * @param boolean  $throwPEAR_Error
+     * @param string   $stackClass class to instantiate
+     * @static
+     * @return PEAR_ErrorStack
+     */",
+ "/**
+     * Internal error handler for PEAR_ErrorStack class
+     * 
+     * Dies if the error is an exception (and would have died anyway)
+     * @access private
+     */",
+ "/**
+     * Set up a PEAR::Log object for all error stacks that don\'t have one
+     * @param Log $log 
+     * @static
+     */",
+ "/**
+     * Set up a PEAR::Log object for this error stack
+     * @param Log $log 
+     */",
+ "/**
+     * Set an error code => error message mapping callback
+     * 
+     * This method sets the callback that can be used to generate error
+     * messages for any instance
+     * @param array|string Callback function/method
+     */",
+ "/**
+     * Get an error code => error message mapping callback
+     * 
+     * This method returns the current callback that can be used to generate error
+     * messages
+     * @return array|string|false Callback function/method or false if none
+     */",
+ "/**
+     * Sets a default callback to be used by all error stacks
+     * 
+     * This method sets the callback that can be used to generate error
+     * messages for a singleton
+     * @param array|string Callback function/method
+     * @param string Package name, or false for all packages
+     * @static
+     */",
+ "/**
+     * Set a callback that generates context information (location of error) for an error stack
+     * 
+     * This method sets the callback that can be used to generate context
+     * information for an error.  Passing in NULL will disable context generation
+     * and remove the expensive call to debug_backtrace()
+     * @param array|string|null Callback function/method
+     */",
+ "/**
+     * Set an error Callback
+     * If set to a valid callback, this will be called every time an error
+     * is pushed onto the stack.  The return value will be used to determine
+     * whether to allow an error to be pushed or logged.
+     * 
+     * The return value must be one of the ERRORSTACK_* constants.
+     * 
+     * This functionality can be used to emulate PEAR\'s pushErrorHandling, and
+     * the PEAR_ERROR_CALLBACK mode, without affecting the integrity of
+     * the error stack or logging
+     * @see PEAR_ERRORSTACK_PUSHANDLOG, PEAR_ERRORSTACK_PUSH, PEAR_ERRORSTACK_LOG
+     * @see popCallback()
+     * @param string|array $cb
+     */",
+ "/**
+     * Remove a callback from the error callback stack
+     * @see pushCallback()
+     * @return array|string|false
+     */",
+ "/**
+     * Set a temporary overriding error callback for every package error stack
+     *
+     * Use this to temporarily disable all existing callbacks (can be used
+     * to emulate the @ operator, for instance)
+     * @see PEAR_ERRORSTACK_PUSHANDLOG, PEAR_ERRORSTACK_PUSH, PEAR_ERRORSTACK_LOG
+     * @see staticPopCallback(), pushCallback()
+     * @param string|array $cb
+     * @static
+     */",
+ "/**
+     * Remove a temporary overriding error callback
+     * @see staticPushCallback()
+     * @return array|string|false
+     * @static
+     */",
+ "/**
+     * Add an error to the stack
+     * 
+     * If the message generator exists, it is called with 2 parameters.
+     *  - the current Error Stack object
+     *  - an array that is in the same format as an error.  Available indices
+     *    are \'code\', \'package\', \'time\', \'params\', \'level\', and \'context\'
+     * 
+     * Next, if the error should contain context information, this is
+     * handled by the context grabbing method.
+     * Finally, the error is pushed onto the proper error stack
+     * @param int    $code      Package-specific error code
+     * @param string $level     Error level.  This is NOT spell-checked
+     * @param array  $params    associative array of error parameters
+     * @param string $msg       Error message, or a portion of it if the message
+     *                          is to be generated
+     * @param array  $repackage If this error re-packages an error pushed by
+     *                          another package, place the array returned from
+     *                          {@link pop()} in this parameter
+     * @param array  $backtrace Protected parameter: use this to pass in the
+     *                          {@link debug_backtrace()} that should be used
+     *                          to find error context
+     * @return PEAR_Error|array if compatibility mode is on, a PEAR_Error is also
+     * thrown.  If a PEAR_Error is returned, the userinfo
+     * property is set to the following array:
+     * 
+     * <code>
+     * array(
+     *    \'code\' => $code,
+     *    \'params\' => $params,
+     *    \'package\' => $this->_package,
+     *    \'level\' => $level,
+     *    \'time\' => time(),
+     *    \'context\' => $context,
+     *    \'message\' => $msg,
+     * //[\'repackage\' => $err] repackaged error array/Exception class
+     * );
+     * </code>
+     * 
+     * Normally, the previous array is returned.
+     */",
+ "/**
+     * Static version of {@link push()}
+     * 
+     * @param string $package   Package name this error belongs to
+     * @param int    $code      Package-specific error code
+     * @param string $level     Error level.  This is NOT spell-checked
+     * @param array  $params    associative array of error parameters
+     * @param string $msg       Error message, or a portion of it if the message
+     *                          is to be generated
+     * @param array  $repackage If this error re-packages an error pushed by
+     *                          another package, place the array returned from
+     *                          {@link pop()} in this parameter
+     * @param array  $backtrace Protected parameter: use this to pass in the
+     *                          {@link debug_backtrace()} that should be used
+     *                          to find error context
+     * @return PEAR_Error|array if compatibility mode is on, a PEAR_Error is also
+     *                          thrown.  see docs for {@link push()}
+     * @static
+     */",
+ "/**
+     * Log an error using PEAR::Log
+     * @param array $err Error array
+     * @param array $levels Error level => Log constant map
+     * @access protected
+     */",
+ "/**
+     * Pop an error off of the error stack
+     * 
+     * @return false|array
+     * @since 0.4alpha it is no longer possible to specify a specific error
+     * level to return - the last error pushed will be returned, instead
+     */",
+ "/**
+     * Pop an error off of the error stack, static method
+     *
+     * @param string package name
+     * @return boolean
+     * @since PEAR1.5.0a1
+     */",
+ "/**
+     * Determine whether there are any errors on the stack
+     * @param string|array Level name.  Use to determine if any errors
+     * of level (string), or levels (array) have been pushed
+     * @return boolean
+     */",
+ "/**
+     * Retrieve all errors since last purge
+     * 
+     * @param boolean set in order to empty the error stack
+     * @param string level name, to return only errors of a particular severity
+     * @return array
+     */",
+ "/**
+     * Determine whether there are any errors on a single error stack, or on any error stack
+     *
+     * The optional parameter can be used to test the existence of any errors without the need of
+     * singleton instantiation
+     * @param string|false Package name to check for errors
+     * @param string Level name to check for a particular severity
+     * @return boolean
+     * @static
+     */",
+ "/**
+     * Get a list of all errors since last purge, organized by package
+     * @since PEAR 1.4.0dev BC break! $level is now in the place $merge used to be
+     * @param boolean $purge Set to purge the error stack of existing errors
+     * @param string  $level Set to a level name in order to retrieve only errors of a particular level
+     * @param boolean $merge Set to return a flat array, not organized by package
+     * @param array   $sortfunc Function used to sort a merged array - default
+     *        sorts by time, and should be good for most cases
+     * @static
+     * @return array 
+     */",
+ "/**
+     * Error sorting function, sorts by time
+     * @access private
+     */",
+ "/**
+     * Standard file/line number/function/class context callback
+     *
+     * This function uses a backtrace generated from {@link debug_backtrace()}
+     * and so will not work at all in PHP < 4.3.0.  The frame should
+     * reference the frame that contains the source of the error.
+     * @return array|false either array(\'file\' => file, \'line\' => line,
+     *         \'function\' => function name, \'class\' => class name) or
+     *         if this doesn\'t work, then false
+     * @param unused
+     * @param integer backtrace frame.
+     * @param array Results of debug_backtrace()
+     * @static
+     */",
+ "/**
+     * Standard error message generation callback
+     * 
+     * This method may also be called by a custom error message generator
+     * to fill in template values from the params array, simply
+     * set the third parameter to the error message template string to use
+     * 
+     * The special variable %__msg% is reserved: use it only to specify
+     * where a message passed in by the user should be placed in the template,
+     * like so:
+     * 
+     * Error message: %msg% - internal error
+     * 
+     * If the message passed like so:
+     * 
+     * <code>
+     * $stack->push(ERROR_CODE, \'error\', array(), \'server error 500\');
+     * </code>
+     * 
+     * The returned error message will be \"Error message: server error 500 -
+     * internal error\"
+     * @param PEAR_ErrorStack
+     * @param array
+     * @param string|false Pre-generated error message template
+     * @static
+     * @return string
+     */",
+ "/**
+     * Standard Error Message Template generator from code
+     * @return string
+     */",
+ "/**
+     * Set the Error Message Template array
+     * 
+     * The array format must be:
+     * <pre>
+     * array(error code => \'message template\',...)
+     * </pre>
+     * 
+     * Error message parameters passed into {@link push()} will be used as input
+     * for the error message.  If the template is \'message %foo% was %bar%\', and the
+     * parameters are array(\'foo\' => \'one\', \'bar\' => \'six\'), the error message returned will
+     * be \'message one was six\'
+     * @return string
+     */",
+ "/**
+     * emulate PEAR::raiseError()
+     * 
+     * @return PEAR_Error
+     */",
+ "/**
+ * Error Stack Implementation
+ *
+ * Usage:
+ * <code>
+ * // global error stack
+ * $global_stack = &PEAR_ErrorStack::singleton(\'MyPackage\');
+ * // local error stack
+ * $local_stack = new PEAR_ErrorStack(\'MyPackage\');
+ * </code>
+ * @author     Greg Beaver <cellog@php.net>
+ * @version    1.9.4
+ * @package    PEAR_ErrorStack
+ * @category   Debugging
+ * @copyright  2004-2008 Greg Beaver
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    CVS: $Id: ErrorStack.php 313023 2011-07-06 19:17:11Z dufuz $
+ * @link       http://pear.php.net/package/PEAR_ErrorStack
+ */",
+ "/**
+     * Validate the raw xml at parsing-time.
+     *
+     * This also attempts to validate the script to make sure it meets the criteria
+     * for a post-install script
+     * @param PEAR_PackageFile_v2
+     * @param array The XML contents of the <postinstallscript> tag
+     * @param PEAR_Config
+     * @param array the entire parsed <file> tag
+     * @static
+     */",
+ "/**
+     * Initialize a task instance with the parameters
+     * @param array raw, parsed xml
+     * @param array attributes from the <file> tag containing this task
+     * @param string|null last installed version of this package, if any (useful for upgrades)
+     */",
+ "/**
+     * Strip the tasks: namespace from internal params
+     *
+     * @access private
+     */",
+ "/**
+     * Unlike other tasks, the installed file name is passed in instead of the file contents,
+     * because this task is handled post-installation
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @param string file name
+     * @return bool|PEAR_Error false to skip this file, PEAR_Error to fail
+     *         (use $this->throwError)
+     */",
+ "/**
+     * No longer used
+     * @see PEAR_PackageFile_v2::runPostinstallScripts()
+     * @param array an array of tasks
+     * @param string install or upgrade
+     * @access protected
+     * @static
+     */",
+ "/**
+ * Implements the postinstallscript file task.
+ *
+ * Note that post-install scripts are handled separately from installation, by the
+ * \"pear run-scripts\" command
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * List of commands and what classes they are implemented in.
+ * @var array command => implementing class
+ */",
+ "/**
+ * List of commands and their descriptions
+ * @var array command => description
+ */",
+ "/**
+ * List of shortcuts to common commands.
+ * @var array shortcut => command
+ */",
+ "/**
+ * Array of command objects
+ * @var array class => object
+ */",
+ "/**
+     * Get the right object for executing a command.
+     *
+     * @param string $command The name of the command
+     * @param object $config  Instance of PEAR_Config object
+     *
+     * @return object the command object or a PEAR error
+     *
+     * @access public
+     * @static
+     */",
+ "/**
+     * Get instance of frontend object.
+     *
+     * @return object|PEAR_Error
+     * @static
+     */",
+ "/**
+     * Load current frontend class.
+     *
+     * @param string $uiclass Name of class implementing the frontend
+     *
+     * @return object the frontend object, or a PEAR error
+     * @static
+     */",
+ "/**
+     * Set current frontend.
+     *
+     * @param string $uitype Name of the frontend type (for example \"CLI\")
+     *
+     * @return object the frontend object, or a PEAR error
+     * @static
+     */",
+ "/**
+     * Scan through the Command directory looking for classes
+     * and see what commands they implement.
+     *
+     * @param bool   (optional) if FALSE (default), the new list of
+     *               commands should replace the current one.  If TRUE,
+     *               new entries will be merged with old.
+     *
+     * @param string (optional) where (what directory) to look for
+     *               classes, defaults to the Command subdirectory of
+     *               the directory from where this file (__FILE__) is
+     *               included.
+     *
+     * @return bool TRUE on success, a PEAR error on failure
+     *
+     * @access public
+     * @static
+     */",
+ "/**
+     * Get the list of currently supported commands, and what
+     * classes implement them.
+     *
+     * @return array command => implementing class
+     *
+     * @access public
+     * @static
+     */",
+ "/**
+     * Get the list of command shortcuts.
+     *
+     * @return array shortcut => command
+     *
+     * @access public
+     * @static
+     */",
+ "/**
+     * Compiles arguments for getopt.
+     *
+     * @param string $command     command to get optstring for
+     * @param string $short_args  (reference) short getopt format
+     * @param array  $long_args   (reference) long getopt format
+     *
+     * @return void
+     *
+     * @access public
+     * @static
+     */",
+ "/**
+     * Get description for a command.
+     *
+     * @param  string $command Name of the command
+     *
+     * @return string command description
+     *
+     * @access public
+     * @static
+     */",
+ "/**
+     * Get help for command.
+     *
+     * @param string $command Name of the command to return help for
+     *
+     * @access public
+     * @static
+     */",
+ "/**
+ * PEAR command class, a simple factory class for administrative
+ * commands.
+ *
+ * How to implement command classes:
+ *
+ * - The class must be called PEAR_Command_Nnn, installed in the
+ *   \"PEAR/Common\" subdir, with a method called getCommands() that
+ *   returns an array of the commands implemented by the class (see
+ *   PEAR/Command/Install.php for an example).
+ *
+ * - The class must implement a run() function that is called with three
+ *   params:
+ *
+ *    (string) command name
+ *    (array)  assoc array with options, freely defined by each
+ *             command, for example:
+ *             array(\'force\' => true)
+ *    (array)  list of the other parameters
+ *
+ *   The run() function returns a PEAR_CommandResponse object.  Use
+ *   these methods to get information:
+ *
+ *    int getStatus()   Returns PEAR_COMMAND_(SUCCESS|FAILURE|PARTIAL)
+ *                      *_PARTIAL means that you need to issue at least
+ *                      one more command to complete the operation
+ *                      (used for example for validation steps).
+ *
+ *    string getMessage()  Returns a message for the user.  Remember,
+ *                         no HTML or other interface-specific markup.
+ *
+ *   If something unexpected happens, run() returns a PEAR error.
+ *
+ * - DON\'T OUTPUT ANYTHING! Return text for output instead.
+ *
+ * - DON\'T USE HTML! The text you return will be used from both Gtk,
+ *   web and command-line interfaces, so for now, keep everything to
+ *   plain text.
+ *
+ * - DON\'T USE EXIT OR DIE! Always use pear errors.  From static
+ *   classes do PEAR::raiseError(), from other classes do
+ *   $this->raiseError().
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+     * PEAR_Command_Build constructor.
+     *
+     * @access public
+     */",
+ "/**
+ * PEAR commands for building extensions.
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Tomas V.V.Cox <cox@idecnet.com>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+     * PEAR_Installer constructor.
+     *
+     * @param object $ui user interface object (instance of PEAR_Frontend_*)
+     *
+     * @access public
+     */",
+ "/**
+     * Delete a package\'s installed files, does not remove empty directories.
+     *
+     * @param string package name
+     * @param string channel name
+     * @param bool if true, then files are backed up first
+     * @return bool TRUE on success, or a PEAR error on failure
+     * @access protected
+     */",
+ "/**
+*@paramstringfilename
+*@paramarrayattributesfrom<file>taginpackage.xml
+*@paramstringpathtoinstallthefilein
+*@paramarrayoptionsfromcommand-line
+*@accessprivate
+*/",
+ "/**
+*@paramPEAR_PackageFile_v1|PEAR_PackageFile_v2
+*@paramstringfilename
+*@paramarrayattributesfrom<file>taginpackage.xml
+*@paramstringpathtoinstallthefilein
+*@paramarrayoptionsfromcommand-line
+*@accessprivate
+*/",
+ "/**
+*Addafileoperationtothecurrentfiletransaction.
+*
+*@seestartFileTransaction()
+*@paramstring$typeThiscanbeoneof:
+*-rename:renameafile($datahas3values)
+*-backup:backupanexistingfile($datahas1value)
+*-removebackup:cleanupbackupscreatedduringinstall($datahas1value)
+*-chmod:changepermissionsonafile($datahas2values)
+*-delete:deleteafile($datahas1value)
+*-rmdir:deleteadirectoryifempty($datahas1value)
+*-installed_as:markafileasinstalled($datahas4values).
+*@paramarray$dataForallfileoperations,thisarraymustcontainthe
+*fullpathtothefileordirectorythatisbeingoperatedon.For
+*therenamecommand,thefirstparametermustbethefiletorename,
+*theseconditsnewname,thethirdwhetherthisisaPHPextension.
+*
+*Theinstalled_asoperationcontains4elementsinthisorder:
+*1.Filenameaslistedinthefilelistelementfrompackage.xml
+*2.Fullpathtotheinstalledfile
+*3.Fullpathfromthephp_dirconfigurationvariableusedinthis
+*installation
+*4.Relativepathfromthephp_dirthatthisfileisinstalledin
+*/",
+ "/**
+*Downloadanyfilesandtheirdependencies,ifnecessary
+*
+*@paramarrayamixedlistofpackagenames,localfiles,orpackage.xml
+*@paramPEAR_Config
+*@paramarrayoptionsfromthecommandline
+*@paramarraythisisthearraythatwillbepopulatedwithpackagesto
+*install.Formatofeachentry:
+*
+*<code>
+*array(\'pkg\'=>\'package_name\',\'file\'=>\'/path/to/local/file\',
+*\'info\'=>array()//parsedpackage.xml
+*);
+*</code>
+*@paramarraythiswillbepopulatedwithanyerrormessages
+*@paramfalseprivaterecursionvariable
+*@paramfalseprivaterecursionvariable
+*@paramfalseprivaterecursionvariable
+*@deprecatedinfavorofPEAR_Downloader
+*/",
+ "/**
+*SetthelistofPEAR_Downloader_Packageobjectstoallowmoresane
+*dependencyvalidation
+*@paramarray
+*/",
+ "/**
+*SetthelistofPEAR_Downloader_Packageobjectstoallowmoresane
+*dependencyvalidation
+*@paramarray
+*/",
+ "/**
+     * Installs the files within the package file specified.
+     *
+     * @param string|PEAR_Downloader_Package $pkgfile path to the package file,
+     *        or a pre-initialized packagefile object
+     * @param array $options
+     * recognized options:
+     * - installroot   : optional prefix directory for installation
+     * - force         : force installation
+     * - register-only : update registry but don\'t install files
+     * - upgrade       : upgrade existing install
+     * - soft          : fail silently
+     * - nodeps        : ignore dependency conflicts/missing dependencies
+     * - alldeps       : install all dependencies
+     * - onlyreqdeps   : install only required dependencies
+     *
+     * @return array|PEAR_Error package info if successful
+     */",
+ "/**
+     * @param string
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     */",
+ "/**
+     * Uninstall a package
+     *
+     * This method removes all files installed by the application, and then
+     * removes any empty directories.
+     * @param string package name
+     * @param array Command-line options.  Possibilities include:
+     *
+     *              - installroot: base installation dir, if not the default
+     *              - register-only : update registry but don\'t remove files
+     *              - nodeps: do not process dependencies of other packages to ensure
+     *                        uninstallation does not break things
+     */",
+ "/**
+     * Sort a list of arrays of array(downloaded packagefilename) by dependency.
+     *
+     * It also removes duplicate dependencies
+     * @param array an array of PEAR_PackageFile_v[1/2] objects
+     * @return array|PEAR_Error array of array(packagefilename, package.xml contents)
+     */",
+ "/**
+ * Administration class used to install PEAR packages and maintain the
+ * installed package database.
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Tomas V.V. Cox <cox@idecnet.com>
+ * @author     Martin Jansen <mj@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+     * Override this method to handle validation of normal package names
+     * @param string
+     * @return bool
+     * @access protected
+     */",
+ "/**
+     * @param string package name to validate
+     * @param string name of channel-specific validation package
+     * @final
+     */",
+ "/**
+     * This validates a bundle name, and bundle names must conform
+     * to the PEAR naming convention, so the method is final and static.
+     * @param string
+     * @final
+     * @static
+     */",
+ "/**
+     * Determine whether $state represents a valid stability level
+     * @param string
+     * @return bool
+     * @static
+     * @final
+     */",
+ "/**
+     * Get a list of valid stability levels
+     * @return array
+     * @static
+     * @final
+     */",
+ "/**
+     * Determine whether a version is a properly formatted version number that can be used
+     * by version_compare
+     * @param string
+     * @return bool
+     * @static
+     * @final
+     */",
+ "/**
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     */",
+ "/**
+     * @access private
+     */",
+ "/**
+     * @access private
+     */",
+ "/**
+     * @param int one of the PEAR_VALIDATE_* constants
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * for package.xml 2.0 only - channels can\'t use package.xml 1.0
+     * @access protected
+     */",
+ "/**
+     * for package.xml 1.0 only
+     * @access private
+     */",
+ "/**
+     * for package.xml 2.0 only
+     * @access protected
+     */",
+ "/**
+     * for package.xml 2.0 only
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+     * @access protected
+     */",
+ "/**
+ * Validation class for package.xml - channel-level advanced validation
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * @param PEAR_Config
+     * @param array installation options
+     * @param array format of PEAR_Registry::parsedPackageName()
+     * @param int installation state (one of PEAR_VALIDATE_*)
+     */",
+ "/**
+     * This makes unit-testing a heck of a lot easier
+     */",
+ "/**
+     * This makes unit-testing a heck of a lot easier
+     */",
+ "/**
+     * Specify a dependency on an OS.  Use arch for detailed os/processor information
+     *
+     * There are two generic OS dependencies that will be the most common, unix and windows.
+     * Other options are linux, freebsd, darwin (OS X), sunos, irix, hpux, aix
+     */",
+ "/**
+     * This makes unit-testing a heck of a lot easier
+     */",
+ "/**
+     * Specify a complex dependency on an OS/processor/kernel version,
+     * Use OS for simple operating system dependency.
+     *
+     * This is the only dependency that accepts an eregable pattern.  The pattern
+     * will be matched against the php_uname() output parsed by OS_Guess
+     */",
+ "/**
+     * This makes unit-testing a heck of a lot easier
+     */",
+ "/**
+     * This makes unit-testing a heck of a lot easier
+     */",
+ "/**
+     * This makes unit-testing a heck of a lot easier
+     */",
+ "/**
+     * @param array dependency information (2.0 format)
+     * @param boolean whether this is a required dependency
+     * @param array a list of downloaded packages to be installed, if any
+     * @param boolean if true, then deps on pear.php.net that fail will also check
+     *                against pecl.php.net packages to accomodate extensions that have
+     *                moved to pecl.php.net from pear.php.net
+     */",
+ "/**
+     * Verify that uninstalling packages passed in to command line is OK.
+     *
+     * @param PEAR_Installer $dl
+     * @return PEAR_Error|true
+     */",
+ "/**
+     * validate a downloaded package against installed packages
+     *
+     * As of PEAR 1.4.3, this will only validate
+     *
+     * @param array|PEAR_Downloader_Package|PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     *              $pkg package identifier (either
+     *                   array(\'package\' => blah, \'channel\' => blah) or an array with
+     *                   index \'info\' referencing an object)
+     * @param PEAR_Downloader $dl
+     * @param array $params full list of packages to install
+     * @return true|PEAR_Error
+     */",
+ "/**
+     * validate a package.xml 1.0 dependency
+     */",
+ "/**
+     * Convert a 1.0 dep into a 2.0 dep
+     */",
+ "/**
+     * Converts text comparing operators to them sign equivalents
+     *
+     * Example: \'ge\' to \'>=\'
+     *
+     * @access public
+     * @param  string Operator
+     * @return string Sign equivalent
+     */",
+ "/**
+ * Dependency check for PEAR packages
+ *
+ * This class handles both version 1.0 and 2.0 dependencies
+ * WARNING: *any* changes to this class must be duplicated in the
+ * test_PEAR_Dependency2 class found in tests/PEAR_Dependency2/setup.php.inc,
+ * or unit tests will not actually validate the changes
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * Which user interface class is being used.
+ * @var string class name
+ */",
+ "/**
+ * Instance of $_PEAR_Command_uiclass.
+ * @var object
+ */",
+ "/**
+     * Retrieve the frontend object
+     * @return PEAR_Frontend_CLI|PEAR_Frontend_Web|PEAR_Frontend_Gtk
+     * @static
+     */",
+ "/**
+     * Set the frontend class that will be used by calls to {@link singleton()}
+     *
+     * Frontends are expected to conform to the PEAR naming standard of
+     * _ => DIRECTORY_SEPARATOR (PEAR_Frontend_CLI is in PEAR/Frontend/CLI.php)
+     * @param string $uiclass full class name
+     * @return PEAR_Frontend
+     * @static
+     */",
+ "/**
+     * Set the frontend class that will be used by calls to {@link singleton()}
+     *
+     * Frontends are expected to be a descendant of PEAR_Frontend
+     * @param PEAR_Frontend
+     * @return PEAR_Frontend
+     * @static
+     */",
+ "/**
+     * @param string $path relative or absolute include path
+     * @return boolean
+     * @static
+     */",
+ "/**
+     * @param PEAR_Config
+     */",
+ "/**
+     * This can be overridden to allow session-based temporary file management
+     *
+     * By default, all files are deleted at the end of a session.  The web installer
+     * needs to be able to sustain a list over many sessions in order to support
+     * user interaction with install scripts
+     */",
+ "/**
+     * Log an action
+     *
+     * @param string $msg the message to log
+     * @param boolean $append_crlf
+     * @return boolean true
+     * @abstract
+     */",
+ "/**
+     * Run a post-installation script
+     *
+     * @param array $scripts array of post-install scripts
+     * @abstract
+     */",
+ "/**
+     * Display human-friendly output formatted depending on the
+     * $command parameter.
+     *
+     * This should be able to handle basic output data with no command
+     * @param mixed  $data    data structure containing the information to display
+     * @param string $command command from which this method was called
+     * @abstract
+     */",
+ "/**
+     * Display a modal form dialog and return the given input
+     *
+     * A frontend that requires multiple requests to retrieve and process
+     * data must take these needs into account, and implement the request
+     * handling code.
+     * @param string $command  command from which this method was called
+     * @param array  $prompts  associative array. keys are the input field names
+     *                         and values are the description
+     * @param array  $types    array of input field types (text, password,
+     *                         etc.) keys have to be the same like in $prompts
+     * @param array  $defaults array of default values. again keys have
+     *                         to be the same like in $prompts.  Do not depend
+     *                         on a default value being set.
+     * @return array input sent by the user
+     * @abstract
+     */",
+ "/**
+ * Singleton-based frontend for PEAR user input/output
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * PEAR_Command_Common constructor.
+     *
+     * @access public
+     */",
+ "/**
+     * Return a list of all the commands defined by this class.
+     * @return array list of commands
+     * @access public
+     */",
+ "/**
+     * Return a list of all the command shortcuts defined by this class.
+     * @return array shortcut => command
+     * @access public
+     */",
+ "/**
+    * Returns the help message for the given command
+    *
+    * @param string $command The command
+    * @return mixed A fail string if the command does not have help or
+    *               a two elements array containing [0]=>help string,
+    *               [1]=> help string for the accepted cmd args
+    */",
+ "/**
+     * Returns the help for the accepted arguments of a command
+     *
+     * @param  string $command
+     * @return string The help string
+     */",
+ "/**
+ * PEAR commands base class
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+     * PEAR_Command_Auth constructor.
+     *
+     * @access public
+     */",
+ "/**
+ * PEAR commands for login/logout
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ * @deprecated since 1.8.0alpha1
+ */",
+ "/**
+     * @param PEAR_Downloader
+     */",
+ "/**
+     * Parse the input and determine whether this is a local file, a remote uri, or an
+     * abstract package name.
+     *
+     * This is the heart of the PEAR_Downloader_Package(), and is used in
+     * {@link PEAR_Downloader::download()}
+     * @param string
+     * @return bool|PEAR_Error
+     */",
+ "/**
+     * Retrieve any non-local packages
+     * @return PEAR_PackageFile_v1|PEAR_PackageFile_v2|PEAR_Error
+     */",
+ "/**
+     * Like {@link initialize()}, but operates on a dependency
+     */",
+ "/**
+     * Remove packages to be downloaded that are already installed
+     * @param array of PEAR_Downloader_Package objects
+     * @static
+     */",
+ "/**
+     * Set the package.xml object for this downloaded package
+     *
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2 $pkg
+     */",
+ "/**
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     */",
+ "/**
+     * @param array Parsed array from {@link PEAR_Registry::parsePackageName()} or a dependency
+     *                     returned from getDepDownloadURL()
+     */",
+ "/**
+     * Detect duplicate package names with differing versions
+     *
+     * If a user requests to install Date 1.4.6 and Date 1.4.7,
+     * for instance, this is a logic error.  This method
+     * detects this situation.
+     *
+     * @param array $params array of PEAR_Downloader_Package objects
+     * @param array $errorparams empty array
+     * @return array array of stupid duplicated packages in PEAR_Downloader_Package obejcts
+     */",
+ "/**
+     * @param array
+     * @param bool ignore install groups - for final removal of dupe packages
+     * @static
+     */",
+ "/**
+     * @static
+     */",
+ "/**
+     * @static
+     */",
+ "/**
+     * For simpler unit-testing
+     * @param PEAR_Config
+     * @param int
+     * @param string
+     */",
+ "/**
+     * This will retrieve from a local file if possible, and parse out
+     * a group name as well.  The original parameter will be modified to reflect this.
+     * @param string|array can be a parsed package name as well
+     * @access private
+     */",
+ "/**
+     *
+     * @param string|array pass in an array of format
+     *                     array(
+     *                      \'package\' => \'pname\',
+     *                     [\'channel\' => \'channame\',]
+     *                     [\'version\' => \'version\',]
+     *                     [\'state\' => \'state\',])
+     *                     or a string of format [channame/]pname[-version|-state]
+     */",
+ "/**
+     * @param array output of package.getDownloadURL
+     * @param string|array|object information for detecting packages to be downloaded, and
+     *                            for errors
+     * @param array name information of the package
+     * @param array|null packages to be downloaded
+     * @param bool is this an optional dependency?
+     * @param bool is this any kind of dependency?
+     * @access private
+     */",
+ "/**
+ * Coordinates download parameters and manages their dependencies
+ * prior to downloading them.
+ *
+ * Input can come from three sources:
+ *
+ * - local files (archives or package.xml)
+ * - remote files (downloadable urls)
+ * - abstract package names
+ *
+ * The first two elements are handled cleanly by PEAR_PackageFile, but the third requires
+ * accessing pearweb\'s xml-rpc interface to determine necessary dependencies, and the
+ * format returned of dependencies is slightly different from that used in package.xml.
+ *
+ * This class hides the differences between these elements, and makes automatic
+ * dependency resolution a piece of cake.  It also manages conflicts when
+ * two classes depend on incompatible dependencies, or differing versions of the same
+ * package dependency.  In addition, download will not be attempted if the php version is
+ * not supported, PEAR installer version is not supported, or non-PECL extensions are not
+ * installed.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * An object that supports the PEAR_Common->log() signature, or null
+     * @param PEAR_Common|null
+     */",
+ "/**
+     * Taken from php-src/run-tests.php
+     *
+     * @param string $commandline command name
+     * @param array $env
+     * @param string $stdin standard input to pass to the command
+     * @return unknown
+     */",
+ "/**
+     * Turns a PHP INI string into an array
+     *
+     * Turns -d \"include_path=/foo/bar\" into this:
+     * array(
+     *   \'include_path\' => array(
+     *          \'operator\' => \'-d\',
+     *          \'value\'    => \'/foo/bar\',
+     *   )
+     * )
+     * Works both with quotes and without
+     *
+     * @param string an PHP INI string, -d \"include_path=/foo/bar\"
+     * @return array
+     */",
+ "/**
+     * Runs an individual test case.
+     *
+     * @param string       The filename of the test
+     * @param array|string INI settings to be applied to the test run
+     * @param integer      Number what the current running test is of the
+     *                     whole test suite being runned.
+     *
+     * @return string|object Returns PASSED, WARNED, FAILED depending on how the
+     *                       test came out.
+     *                       PEAR Error when the tester it self fails
+     */",
+ "/**
+     * Return an array that can be used with array_diff() to compare headers
+     *
+     * @param string $text
+     */",
+ "/**
+ * Simplified version of PHP\'s test suite
+ *
+ * Try it with:
+ *
+ * $ php -r \'include \"../PEAR/RunTest.php\"; $t=new PEAR_RunTest; $o=$t->run(\"./pear_system.phpt\");print_r($o);\'
+ *
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Tomas V.V.Cox <cox@idecnet.com>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.3.3
+ */",
+ "/**
+     * Validate the raw xml at parsing-time.
+     * @param PEAR_PackageFile_v2
+     * @param array raw, parsed xml
+     * @param PEAR_Config
+     * @static
+     */",
+ "/**
+     * Initialize a task instance with the parameters
+     * @param array raw, parsed xml
+     * @param unused
+     */",
+ "/**
+     * Do a package.xml 1.0 replacement, with additional package-info fields available
+     *
+     * See validateXml() source for the complete list of allowed fields
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @param string file contents
+     * @param string the eventual final file location (informational only)
+     * @return string|false|PEAR_Error false to skip this file, PEAR_Error to fail
+     *         (use $this->throwError), otherwise return the new contents
+     */",
+ "/**
+ * Implements the replace file task.
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * Get a raw dependency database.  Calls setConfig() and assertDepsDB()
+     * @param PEAR_Config
+     * @param string|false full path to the dependency database, or false to use default
+     * @return PEAR_DependencyDB|PEAR_Error
+     * @static
+     */",
+ "/**
+     * Set up the registry/location of dependency DB
+     * @param PEAR_Config|false
+     * @param string|false full path to the dependency database, or false to use default
+     */",
+ "/**
+     * Create the dependency database, if it doesn\'t exist.  Error if the database is
+     * newer than the code reading it.
+     * @return void|PEAR_Error
+     */",
+ "/**
+     * Get a list of installed packages that depend on this package
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2|array
+     * @return array|false
+     */",
+ "/**
+     * Get a list of the actual dependencies of installed packages that depend on
+     * a package.
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2|array
+     * @return array|false
+     */",
+ "/**
+     * Get a list of dependencies of this installed package
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2|array
+     * @return array|false
+     */",
+ "/**
+     * Determine whether $parent depends on $child, near or deep
+     * @param array|PEAR_PackageFile_v2|PEAR_PackageFile_v2
+     * @param array|PEAR_PackageFile_v2|PEAR_PackageFile_v2
+     */",
+ "/**
+     * Register dependencies of a package that is being installed or upgraded
+     * @param PEAR_PackageFile_v2|PEAR_PackageFile_v2
+     */",
+ "/**
+     * Remove dependencies of a package that is being uninstalled, or upgraded.
+     *
+     * Upgraded packages first uninstall, then install
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2|array If an array, then it must have
+     *        indices \'channel\' and \'package\'
+     */",
+ "/**
+     * Rebuild the dependency DB by reading registry entries.
+     * @return true|PEAR_Error
+     */",
+ "/**
+     * Register usage of the dependency DB to prevent race conditions
+     * @param int one of the LOCK_* constants
+     * @return true|PEAR_Error
+     * @access private
+     */",
+ "/**
+     * Release usage of dependency DB
+     * @return true|PEAR_Error
+     * @access private
+     */",
+ "/**
+     * Load the dependency database from disk, or return the cache
+     * @return array|PEAR_Error
+     */",
+ "/**
+     * Write out the dependency database to disk
+     * @param array the database
+     * @return true|PEAR_Error
+     * @access private
+     */",
+ "/**
+     * Register all dependencies from a package in the dependencies database, in essence
+     * \"installing\" the package\'s dependency information
+     * @param array the database
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @access private
+     */",
+ "/**
+     * @param array the database
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @param array the specific dependency
+     * @param required|optional whether this is a required or an optional dep
+     * @param string|false dependency group this dependency is from, or false for ordinary dep
+     */",
+ "/**
+ * Track dependency relationships between installed packages
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @author     Tomas V.V.Cox <cox@idec.net.com>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * The constructor merely sets up the private error stack
+     */",
+ "/**
+     * To make unit-testing easier
+     * @param PEAR_Frontend_*
+     * @param array options
+     * @param PEAR_Config
+     * @return PEAR_Downloader
+     * @access protected
+     */",
+ "/**
+     * To make unit-testing easier
+     * @param PEAR_Config
+     * @param array options
+     * @param array package name as returned from {@link PEAR_Registry::parsePackageName()}
+     * @param int PEAR_VALIDATE_* constant
+     * @return PEAR_Dependency2
+     * @access protected
+     */",
+ "/**
+     * Installation of source package has failed, attempt to download and install the
+     * binary version of this package.
+     * @param PEAR_Installer
+     * @return array|false
+     */",
+ "/**
+     * @return string|false Extension name
+     */",
+ "/**
+     * @param string Extension name
+     * @return bool
+     */",
+ "/**
+     * Tests whether every part of the package.xml 1.0 is represented in
+     * this package.xml 2.0
+     * @param PEAR_PackageFile_v1
+     * @return bool
+     */",
+ "/**
+     * WARNING - do not use this function unless you know what you\'re doing
+     */",
+ "/**
+     * WARNING - do not use this function unless you know what you\'re doing
+     */",
+ "/**
+     * WARNING - do not use this function unless you know what you\'re doing
+     */",
+ "/**
+     * WARNING - do not use this function unless you know what you\'re doing
+     */",
+ "/**
+     * For saving in the registry.
+     *
+     * Set the last version that was installed
+     * @param string
+     */",
+ "/**
+     * @return string|false
+     */",
+ "/**
+     * Determines whether this package.xml has post-install scripts or not
+     * @return array|false
+     */",
+ "/**
+     * Initialize post-install scripts for running
+     *
+     * This method can be used to detect post-install scripts, as the return value
+     * indicates whether any exist
+     * @return bool
+     */",
+ "/**
+     * Convert a recursive set of <dir> and <file> tags into a single <dir> tag with
+     * <file> tags.
+     */",
+ "/**
+     * @param array the final flattened file list
+     * @param array the current directory being processed
+     * @param string|false any recursively inherited baeinstalldir attribute
+     * @param string private recursion variable
+     * @return array
+     * @access protected
+     */",
+ "/**
+     * WARNING - do not use this function directly unless you know what you\'re doing
+     */",
+ "/**
+     * WARNING - do not use this function directly unless you know what you\'re doing
+     */",
+ "/**
+     * Wrapper to {@link PEAR_ErrorStack::getErrors()}
+     * @param boolean determines whether to purge the error stack after retrieving
+     * @return array
+     */",
+ "/**
+     * Directly set the array that defines this packagefile
+     *
+     * WARNING: no validation.  This should only be performed by internal methods
+     * inside PEAR or by inputting an array saved from an existing PEAR_PackageFile_v2
+     * @param array
+     */",
+ "/**
+     * @return array
+     */",
+ "/**
+     * @param package|api version category to return
+     */",
+ "/**
+     * Return the <usesrole> tag contents, if any
+     * @return array|false
+     */",
+ "/**
+     * Return the <usestask> tag contents, if any
+     * @return array|false
+     */",
+ "/**
+     * This should only be used to retrieve filenames and install attributes
+     */",
+ "/**
+     * Return configure options array, if any
+     *
+     * @return array|false
+     */",
+ "/**
+     * This is only used at install-time, after all serialization
+     * is over.
+     */",
+ "/**
+     * Retrieve a list of files that should be installed on this computer
+     * @return array
+     */",
+ "/**
+     * This is only used at install-time, after all serialization
+     * is over.
+     * @param string file name
+     * @param string installed path
+     */",
+ "/**
+     * This is only used at install-time, after all serialization
+     * is over.
+     */",
+ "/**
+     * Retrieve the contents tag
+     */",
+ "/**
+     * @param string full path to file
+     * @param string attribute name
+     * @param string attribute value
+     * @param int risky but fast - use this to choose a file based on its position in the list
+     *            of files.  Index is zero-based like PHP arrays.
+     * @return bool success of operation
+     */",
+ "/**
+     * Determines whether this package claims it is compatible with the version of
+     * the package that has a recommended version dependency
+     * @param PEAR_PackageFile_v2|PEAR_PackageFile_v1|PEAR_Downloader_Package
+     * @return boolean
+     */",
+ "/**
+     * @return array|false
+     */",
+ "/**
+     * Determines whether the passed in package is a subpackage of this package.
+     *
+     * No version checking is done, only name verification.
+     * @param PEAR_PackageFile_v1|PEAR_PackageFile_v2
+     * @return bool
+     */",
+ "/**
+     * Get the contents of a dependency group
+     * @param string
+     * @return array|false
+     */",
+ "/**
+     * Retrieve a partial package.xml 1.0 representation of dependencies
+     *
+     * a very limited representation of dependencies is returned by this method.
+     * The <exclude> tag for excluding certain versions of a dependency is
+     * completely ignored.  In addition, dependency groups are ignored, with the
+     * assumption that all dependencies in dependency groups are also listed in
+     * the optional group that work with all dependency groups
+     * @param boolean return package.xml 2.0 <dependencies> tag
+     * @return array|false
+     */",
+ "/**
+     * @return php|extsrc|extbin|zendextsrc|zendextbin|bundle|false
+     */",
+ "/**
+     * @return array|false
+     */",
+ "/**
+     * @return array
+     */",
+ "/**
+     * @return array|false
+     */",
+ "/**
+*Getthecontentsofafilelistedwithinthepackage.xml
+*@paramstring
+*@returnstring
+*/",
+ "/**
+*Determinewhetheratasknameisavalidtask.Customtasksmaybedefined
+*usingsubdirectoriesbyputtinga\"-\" in the name, as in <tasks:mycustom-task>
+     *
+     * Note that this method will auto-load the task class file and test for the existence
+     * of the name with \"-\" replaced by \"_\" as in PEAR/Task/mycustom/task.php makes class
+     * PEAR_Task_mycustom_task
+     * @param string
+     * @return boolean
+     */",
+ "/**
+     * Key-friendly array_splice
+     * @param tagname to splice a value in before
+     * @param mixed the value to splice in
+     * @param string the new tag name
+     */",
+ "/**
+     * @param array a list of possible keys, in the order they may occur
+     * @param mixed contents of the new package.xml tag
+     * @param string tag name
+     * @access private
+     */",
+ "/**
+     * @param subsection of {@link $_packageInfo}
+     * @param array|string tag contents
+     * @param array format:
+     * <pre>
+     * array(
+     *   tagname => array(list of tag names that follow this one),
+     *   childtagname => array(list of child tag names that follow this one),
+     * )
+     * </pre>
+     *
+     * This allows construction of nested tags
+     * @access private
+     */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * @param bool determines whether to return a PEAR_Error object, or use the PEAR_ErrorStack
+     * @param string Name of Error Stack class to use.
+     */",
+ "/**
+     * For saving in the registry.
+     *
+     * Set the last version that was installed
+     * @param string
+     */",
+ "/**
+     * @return string|false
+     */",
+ "/**
+     * @return array
+     */",
+ "/**
+     * WARNING - don\'t use this unless you know what you are doing
+     */",
+ "/**
+     * Adds a new maintainer - no checking of duplicates is performed, use
+     * updatemaintainer for that purpose.
+     */",
+ "/**
+     * Reset dependencies prior to adding new ones
+     */",
+ "/**
+     * WARNING - do not use this function directly unless you know what you\'re doing
+     */",
+ "/**
+     * Wrapper to {@link PEAR_ErrorStack::getErrors()}
+     * @param boolean determines whether to purge the error stack after retrieving
+     * @return array
+     */",
+ "/**
+     * Validation error.  Also marks the object contents as invalid
+     * @param error code
+     * @param array error information
+     * @access private
+     */",
+ "/**
+     * Validation warning.  Does not mark the object contents invalid.
+     * @param error code
+     * @param array error information
+     * @access private
+     */",
+ "/**
+     * @param integer error code
+     * @access protected
+     */",
+ "/**
+*ValidateXMLpackagedefinitionfile.
+*
+*@accesspublic
+*@returnboolean
+*/",
+ "/**
+*Getthedefaultxmlgeneratorobject
+*
+*@returnPEAR_PackageFile_Generator_v1
+*/",
+ "/**
+*Getthecontentsofafilelistedwithinthepackage.xml
+*@paramstring
+*@returnstring
+*/",
+ "/**
+     * Analyze the source code of the given PHP file
+     *
+     * @param  string Filename of the PHP file
+     * @return mixed
+     * @access private
+     */",
+ "/**
+     * Build a \"provides\" array from data returned by
+     * analyzeSourceCode().  The format of the built array is like
+     * this:
+     *
+     *  array(
+     *    \'class;MyClass\' => \'array(\'type\' => \'class\', \'name\' => \'MyClass\'),
+     *    ...
+     *  )
+     *
+     *
+     * @param array $srcinfo array with information about a source file
+     * as returned by the analyzeSourceCode() method.
+     *
+     * @return void
+     *
+     * @access private
+     *
+     */",
+ "/**
+ * package.xml encapsulator
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * PEAR_Command_Install constructor.
+     *
+     * @access public
+     */",
+ "/**
+     * For unit testing purposes
+     */",
+ "/**
+     * For unit testing purposes
+     */",
+ "/**
+     * Given a list of packages, filter out those ones that are already up to date
+     *
+     * @param $packages: packages, in parsed array format !
+     * @return list of packages that can be upgraded
+     */",
+ "/**
+ * PEAR commands for installation or deinstallation/upgrading of
+ * packages.
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+     * @param object PEAR_Error object
+     */",
+ "/**
+     * @param object PEAR_Error object
+     */",
+ "/**
+     * Instruct the runInstallScript method to skip a paramgroup that matches the
+     * id value passed in.
+     *
+     * This method is useful for dynamically configuring which sections of a post-install script
+     * will be run based on the user\'s setup, which is very useful for making flexible
+     * post-install scripts without losing the cross-Frontend ability to retrieve user input
+     * @param string
+     */",
+ "/**
+     * @param array $xml contents of postinstallscript tag
+     * @param object $script post-installation script
+     * @param string install|upgrade
+     */",
+ "/**
+     * Ask for user input, confirm the answers and continue until the user is satisfied
+     * @param array an array of arrays, format array(\'name\' => \'paramname\', \'prompt\' =>
+     *              \'text to display\', \'type\' => \'string\'[, default => \'default value\'])
+     * @return array
+     */",
+ "/**
+ * Command-line Frontend for the PEAR Installer
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+ * Last created PEAR_Config instance.
+ * @var object
+ */",
+ "/**
+     * Constructor.
+     *
+     * @param string file to read user-defined options from
+     * @param string file to read system-wide defaults from
+     * @param bool   determines whether a registry object \"follows\"
+     *               the value of php_dir (is automatically created
+     *               and moved when php_dir is changed)
+     * @param bool   if true, fails if configuration files cannot be loaded
+     *
+     * @access public
+     *
+     * @see PEAR_Config::singleton
+     */",
+ "/**
+     * Return the default locations of user and system configuration files
+     * @static
+     */",
+ "/**
+     * Static singleton method.  If you want to keep only one instance
+     * of this class in use, this method will give you a reference to
+     * the last created PEAR_Config object if one exists, or create a
+     * new object.
+     *
+     * @param string (optional) file to read user-defined options from
+     * @param string (optional) file to read system-wide defaults from
+     *
+     * @return object an existing or new PEAR_Config instance
+     *
+     * @access public
+     *
+     * @see PEAR_Config::PEAR_Config
+     */",
+ "/**
+     * Determine whether any configuration files have been detected, and whether a
+     * registry object can be retrieved from this configuration.
+     * @return bool
+     * @since PEAR 1.4.0a1
+     */",
+ "/**
+     * Reads configuration data from a file.  All existing values in
+     * the config layer are discarded and replaced with data from the
+     * file.
+     * @param string file to read from, if NULL or not specified, the
+     *               last-used file for the same layer (second param) is used
+     * @param string config layer to insert data into (\'user\' or \'system\')
+     * @return bool TRUE on success or a PEAR error on failure
+     */",
+ "/**
+     * @param string url to the remote config file, like ftp://www.example.com/pear/config.ini
+     * @return true|PEAR_Error
+     */",
+ "/**
+     * Reads the existing configurations and creates the _channels array from it
+     */",
+ "/**
+     * Merges data into a config layer from a file.  Does the same
+     * thing as readConfigFile, except it does not replace all
+     * existing values in the config layer.
+     * @param string file to read from
+     * @param bool whether to overwrite existing data (default TRUE)
+     * @param string config layer to insert data into (\'user\' or \'system\')
+     * @param string if true, errors are returned if file opening fails
+     * @return bool TRUE on success or a PEAR error on failure
+     */",
+ "/**
+     * @param array
+     * @param array
+     * @return array
+     * @static
+     */",
+ "/**
+     * Writes data into a config layer from a file.
+     *
+     * @param string|null file to read from, or null for default
+     * @param string config layer to insert data into (\'user\' or
+     *               \'system\')
+     * @param string|null data to write to config file or null for internal data [DEPRECATED]
+     * @return bool TRUE on success or a PEAR error on failure
+     */",
+ "/**
+     * Reads configuration data from a file and returns the parsed data
+     * in an array.
+     *
+     * @param string file to read from
+     * @return array configuration data or a PEAR error on failure
+     * @access private
+     */",
+ "/**
+    * Gets the file used for storing the config for a layer
+    *
+    * @param string $layer \'user\' or \'system\'
+    */",
+ "/**
+     * @param string Configuration class name, used for detecting duplicate calls
+     * @param array information on a role as parsed from its xml file
+     * @return true|PEAR_Error
+     * @access private
+     */",
+ "/**
+     * Encodes/scrambles configuration data before writing to files.
+     * Currently, \'password\' values will be base64-encoded as to avoid
+     * that people spot cleartext passwords by accident.
+     *
+     * @param array (reference) array to encode values in
+     * @return bool TRUE on success
+     * @access private
+     */",
+ "/**
+     * Decodes/unscrambles configuration data after reading from files.
+     *
+     * @param array (reference) array to encode values in
+     * @return bool TRUE on success
+     * @access private
+     *
+     * @see PEAR_Config::_encodeOutput
+     */",
+ "/**
+     * Retrieve the default channel.
+     *
+     * On startup, channels are not initialized, so if the default channel is not
+     * pear.php.net, then initialize the config.
+     * @param string registry layer
+     * @return string|false
+     */",
+ "/**
+     * Returns a configuration value, prioritizing layers as per the
+     * layers property.
+     *
+     * @param string config key
+     * @return mixed the config value, or NULL if not found
+     * @access public
+     */",
+ "/**
+     * Returns a channel-specific configuration value, prioritizing layers as per the
+     * layers property.
+     *
+     * @param string config key
+     * @return mixed the config value, or NULL if not found
+     * @access private
+     */",
+ "/**
+     * Set a config value in a specific layer (defaults to \'user\').
+     * Enforces the types defined in the configuration_info array.  An
+     * integer config variable will be cast to int, and a set config
+     * variable will be validated against its legal values.
+     *
+     * @param string config key
+     * @param string config value
+     * @param string (optional) config layer
+     * @param string channel to set this value for, or null for global value
+     * @return bool TRUE on success, FALSE on failure
+     */",
+ "/**
+     * Set the list of channels.
+     *
+     * This should be set via a call to {@link PEAR_Registry::listChannels()}
+     * @param array
+     * @param bool
+     * @return bool success of operation
+     */",
+ "/**
+     * Get the type of a config value.
+     *
+     * @param string  config key
+     *
+     * @return string type, one of \"string\", \"integer\", \"file\",
+     * \"directory\", \"set\" or \"password\".
+     *
+     * @access public
+     *
+     */",
+ "/**
+     * Get the documentation for a config value.
+     *
+     * @param string  config key
+     * @return string documentation string
+     *
+     * @access public
+     *
+     */",
+ "/**
+     * Get the short documentation for a config value.
+     *
+     * @param string  config key
+     * @return string short documentation string
+     *
+     * @access public
+     *
+     */",
+ "/**
+     * Get the parameter group for a config key.
+     *
+     * @param string  config key
+     * @return string parameter group
+     *
+     * @access public
+     *
+     */",
+ "/**
+     * Get the list of parameter groups.
+     *
+     * @return array list of parameter groups
+     *
+     * @access public
+     *
+     */",
+ "/**
+     * Get the list of the parameters in a group.
+     *
+     * @param string $group parameter group
+     * @return array list of parameters in $group
+     *
+     * @access public
+     *
+     */",
+ "/**
+     * Get the list of allowed set values for a config value.  Returns
+     * NULL for config values that are not sets.
+     *
+     * @param string  config key
+     * @return array enumerated array of set values, or NULL if the
+     *               config key is unknown or not a set
+     *
+     * @access public
+     *
+     */",
+ "/**
+     * Get all the current config keys.
+     *
+     * @return array simple array of config keys
+     *
+     * @access public
+     */",
+ "/**
+     * Remove the a config key from a specific config layer.
+     *
+     * @param string config key
+     * @param string (optional) config layer
+     * @param string (optional) channel (defaults to default channel)
+     * @return bool TRUE on success, FALSE on failure
+     *
+     * @access public
+     */",
+ "/**
+     * Temporarily remove an entire config layer.  USE WITH CARE!
+     *
+     * @param string config key
+     * @param string (optional) config layer
+     * @return bool TRUE on success, FALSE on failure
+     *
+     * @access public
+     */",
+ "/**
+     * Stores configuration data in a layer.
+     *
+     * @param string config layer to store
+     * @return bool TRUE on success, or PEAR error on failure
+     *
+     * @access public
+     */",
+ "/**
+     * Tells what config layer that gets to define a key.
+     *
+     * @param string config key
+     * @param boolean return the defining channel
+     *
+     * @return string|array the config layer, or an empty string if not found.
+     *
+     *         if $returnchannel, the return is an array array(\'layer\' => layername,
+     *         \'channel\' => channelname), or an empty string if not found
+     *
+     * @access public
+     */",
+ "/**
+     * Tells whether a given key exists as a config value.
+     *
+     * @param string config key
+     * @return bool whether <config key> exists in this object
+     *
+     * @access public
+     */",
+ "/**
+     * Tells whether a given config layer exists.
+     *
+     * @param string config layer
+     * @return bool whether <config layer> exists in this object
+     *
+     * @access public
+     */",
+ "/**
+     * Returns the layers defined (except the \'default\' one)
+     *
+     * @return array of the defined layers
+     */",
+ "/**
+     * @return PEAR_Registry
+     */",
+ "/**
+     * This is to allow customization like the use of installroot
+     * @param PEAR_Registry
+     * @return bool
+     */",
+ "/**
+     * @return PEAR_REST
+     */",
+ "/**
+     * The ftp server is set in {@link readFTPConfigFile()}.  It exists only if a
+     * remote configuration file has been specified
+     * @return PEAR_FTP|false
+     */",
+ "/**
+*@paramstring|falseinstallationdirectorytoprependtoall_dirvariables,orfalseto
+*disable
+*/",
+ "/**
+*Thisisaclassforstoringconfigurationdata,keepingtrackof
+*whicharesystem-defined,user-definedordefaulted.
+*@categorypear
+*@packagePEAR
+*@authorStigBakken<ssb@php.net>
+*@authorGregBeaver<cellog@php.net>
+*@copyright1997-2009TheAuthors
+*@licensehttp://opensource.org/licenses/bsd-license.phpNewBSDLicense
+*@versionRelease:1.9.4
+*@linkhttp://pear.php.net/package/PEAR
+*@sinceClassavailablesinceRelease0.1
+*/",
+ "/**
+     * PEAR_Command_Package constructor.
+     *
+     * @access public
+     */",
+ "/**
+     * For unit-testing ease
+     *
+     * @return PEAR_Packager
+     */",
+ "/**
+     * For unit-testing ease
+     *
+     * @param PEAR_Config $config
+     * @param bool $debug
+     * @param string|null $tmpdir
+     * @return PEAR_PackageFile
+     */",
+ "/**
+ * PEAR commands for login/logout
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2005-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.1
+ */",
+ "/**
+     * Set up any additional configuration variables that file roles require
+     *
+     * Never call this directly, it is called by the PEAR_Config constructor
+     * @param PEAR_Config
+     * @access private
+     * @static
+     */",
+ "/**
+     * @param PEAR_PackageFile_v2
+     * @param string role name
+     * @param PEAR_Config
+     * @return PEAR_Installer_Role_Common
+     * @static
+     */",
+ "/**
+     * Get a list of file roles that are valid for the particular release type.
+     *
+     * For instance, src files serve no purpose in regular php releases.
+     * @param string
+     * @param bool clear cache
+     * @return array
+     * @static
+     */",
+ "/**
+     * Get a list of roles that require their files to be installed
+     *
+     * Most roles must be installed, but src and package roles, for instance
+     * are pseudo-roles.  src files are compiled into a new extension.  Package
+     * roles are actually fully bundled releases of a package
+     * @param bool clear cache
+     * @return array
+     * @static
+     */",
+ "/**
+     * Return an array of roles that are affected by the baseinstalldir attribute
+     *
+     * Most roles ignore this attribute, and instead install directly into:
+     * PackageName/filepath
+     * so a tests file tests/file.phpt is installed into PackageName/tests/filepath.php
+     * @param bool clear cache
+     * @return array
+     * @static
+     */",
+ "/**
+     * Return an array of file roles that should be analyzed for PHP content at package time,
+     * like the \"php\" role.
+     * @param bool clear cache
+     * @return array
+     * @static
+     */",
+ "/**
+     * Scan through the Command directory looking for classes
+     * and see what commands they implement.
+     * @param string which directory to look for classes, defaults to
+     *               the Installer/Roles subdirectory of
+     *               the directory from where this file (__FILE__) is
+     *               included.
+     *
+     * @return bool TRUE on success, a PEAR error on failure
+     * @access public
+     * @static
+     */",
+ "/**
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a1
+ */",
+ "/**
+     * Constructor.  Registers this object in
+     * $_PEAR_destructor_object_list for destructor emulation if a
+     * destructor object exists.
+     *
+     * @param string $error_class  (optional) which class to use for
+     *        error objects, defaults to PEAR_Error.
+     * @access public
+     * @return void
+     */",
+ "/**
+     * Destructor (the emulated type of...).  Does nothing right now,
+     * but is included for forward compatibility, so subclass
+     * destructors should always call it.
+     *
+     * See the note in the class desciption about output from
+     * destructors.
+     *
+     * @access public
+     * @return void
+     */",
+ "/**
+    * If you have a class that\'s mostly/entirely static, and you need static
+    * properties, you can use this method to simulate them. Eg. in your method(s)
+    * do this: $myVar = &PEAR::getStaticProperty(\'myclass\', \'myVar\');
+    * You MUST use a reference, or they will not persist!
+    *
+    * @access public
+    * @param  string $class  The calling classname, to prevent clashes
+    * @param  string $var    The variable to retrieve.
+    * @return mixed   A reference to the variable. If not set it will be
+    *                 auto initialised to NULL.
+    */",
+ "/**
+    * Use this function to register a shutdown method for static
+    * classes.
+    *
+    * @access public
+    * @param  mixed $func  The function name (or array of class/method) to call
+    * @param  mixed $args  The arguments to pass to the function
+    * @return void
+    */",
+ "/**
+     * Tell whether a value is a PEAR error.
+     *
+     * @param   mixed $data   the value to test
+     * @param   int   $code   if $data is an error object, return true
+     *                        only if $code is a string and
+     *                        $obj->getMessage() == $code or
+     *                        $code is an integer and $obj->getCode() == $code
+     * @access  public
+     * @return  bool    true if parameter is an error
+     */",
+ "/**
+     * Sets how errors generated by this object should be handled.
+     * Can be invoked both in objects and statically.  If called
+     * statically, setErrorHandling sets the default behaviour for all
+     * PEAR objects.  If called in an object, setErrorHandling sets
+     * the default behaviour for that object.
+     *
+     * @param int $mode
+     *        One of PEAR_ERROR_RETURN, PEAR_ERROR_PRINT,
+     *        PEAR_ERROR_TRIGGER, PEAR_ERROR_DIE,
+     *        PEAR_ERROR_CALLBACK or PEAR_ERROR_EXCEPTION.
+     *
+     * @param mixed $options
+     *        When $mode is PEAR_ERROR_TRIGGER, this is the error level (one
+     *        of E_USER_NOTICE, E_USER_WARNING or E_USER_ERROR).
+     *
+     *        When $mode is PEAR_ERROR_CALLBACK, this parameter is expected
+     *        to be the callback function or method.  A callback
+     *        function is a string with the name of the function, a
+     *        callback method is an array of two elements: the element
+     *        at index 0 is the object, and the element at index 1 is
+     *        the name of the method to call in the object.
+     *
+     *        When $mode is PEAR_ERROR_PRINT or PEAR_ERROR_DIE, this is
+     *        a printf format string used when printing the error
+     *        message.
+     *
+     * @access public
+     * @return void
+     * @see PEAR_ERROR_RETURN
+     * @see PEAR_ERROR_PRINT
+     * @see PEAR_ERROR_TRIGGER
+     * @see PEAR_ERROR_DIE
+     * @see PEAR_ERROR_CALLBACK
+     * @see PEAR_ERROR_EXCEPTION
+     *
+     * @since PHP 4.0.5
+     */",
+ "/**
+     * This method is used to tell which errors you expect to get.
+     * Expected errors are always returned with error mode
+     * PEAR_ERROR_RETURN.  Expected error codes are stored in a stack,
+     * and this method pushes a new element onto it.  The list of
+     * expected errors are in effect until they are popped off the
+     * stack with the popExpect() method.
+     *
+     * Note that this method can not be called statically
+     *
+     * @param mixed $code a single error code or an array of error codes to expect
+     *
+     * @return int     the new depth of the \"expected errors\" stack
+     * @access public
+     */",
+ "/**
+     * This method pops one element off the expected error codes
+     * stack.
+     *
+     * @return array   the list of error codes that were popped
+     */",
+ "/**
+     * This method checks unsets an error code if available
+     *
+     * @param mixed error code
+     * @return bool true if the error code was unset, false otherwise
+     * @access private
+     * @since PHP 4.3.0
+     */",
+ "/**
+     * This method deletes all occurences of the specified element from
+     * the expected error codes stack.
+     *
+     * @param  mixed $error_code error code that should be deleted
+     * @return mixed list of error codes that were deleted or error
+     * @access public
+     * @since PHP 4.3.0
+     */",
+ "/**
+     * This method is a wrapper that returns an instance of the
+     * configured error class with this object\'s default error
+     * handling applied.  If the $mode and $options parameters are not
+     * specified, the object\'s defaults are used.
+     *
+     * @param mixed $message a text error message or a PEAR error object
+     *
+     * @param int $code      a numeric error code (it is up to your class
+     *                  to define these if you want to use codes)
+     *
+     * @param int $mode      One of PEAR_ERROR_RETURN, PEAR_ERROR_PRINT,
+     *                  PEAR_ERROR_TRIGGER, PEAR_ERROR_DIE,
+     *                  PEAR_ERROR_CALLBACK, PEAR_ERROR_EXCEPTION.
+     *
+     * @param mixed $options If $mode is PEAR_ERROR_TRIGGER, this parameter
+     *                  specifies the PHP-internal error level (one of
+     *                  E_USER_NOTICE, E_USER_WARNING or E_USER_ERROR).
+     *                  If $mode is PEAR_ERROR_CALLBACK, this
+     *                  parameter specifies the callback function or
+     *                  method.  In other error modes this parameter
+     *                  is ignored.
+     *
+     * @param string $userinfo If you need to pass along for example debug
+     *                  information, this parameter is meant for that.
+     *
+     * @param string $error_class The returned error object will be
+     *                  instantiated from this class, if specified.
+     *
+     * @param bool $skipmsg If true, raiseError will only pass error codes,
+     *                  the error message parameter will be dropped.
+     *
+     * @access public
+     * @return object   a PEAR error object
+     * @see PEAR::setErrorHandling
+     * @since PHP 4.0.5
+     */",
+ "/**
+     * Simpler form of raiseError with fewer options.  In most cases
+     * message, code and userinfo are enough.
+     *
+     * @param mixed $message a text error message or a PEAR error object
+     *
+     * @param int $code      a numeric error code (it is up to your class
+     *                  to define these if you want to use codes)
+     *
+     * @param string $userinfo If you need to pass along for example debug
+     *                  information, this parameter is meant for that.
+     *
+     * @access public
+     * @return object   a PEAR error object
+     * @see PEAR::raiseError
+     */",
+ "/**
+     * Push a new error handler on top of the error handler options stack. With this
+     * you can easily override the actual error handler for some code and restore
+     * it later with popErrorHandling.
+     *
+     * @param mixed $mode (same as setErrorHandling)
+     * @param mixed $options (same as setErrorHandling)
+     *
+     * @return bool Always true
+     *
+     * @see PEAR::setErrorHandling
+     */",
+ "/**
+    * Pop the last error handler used
+    *
+    * @return bool Always true
+    *
+    * @see PEAR::pushErrorHandling
+    */",
+ "/**
+    * OS independant PHP extension load. Remember to take care
+    * on the correct extension name for case sensitive OSes.
+    *
+    * @param string $ext The extension name
+    * @return bool Success or not on the dl() call
+    */",
+ "/**
+ * Base class for other PEAR classes.  Provides rudimentary
+ * emulation of destructors.
+ *
+ * If you want a destructor in your class, inherit PEAR and make a
+ * destructor method called _yourclassname (same name as the
+ * constructor, but with a \"_\" prefix).  Also, in your constructor you
+ * have to call the PEAR constructor: $this->PEAR();.
+ * The destructor method will be called without parameters.  Note that
+ * at in some SAPI implementations (such as Apache), any output during
+ * the request shutdown (in which destructors are called) seems to be
+ * discarded.  If you need to get any debug information from your
+ * destructor, use error_log(), syslog() or something similar.
+ *
+ * IMPORTANT! To use the emulated destructors you need to create the
+ * objects by reference: $obj =& new PEAR_child;
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Tomas V.V. Cox <cox@idecnet.com>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2006 The PHP Group
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @see        PEAR_Error
+ * @since      Class available since PHP 4.0.2
+ * @link        http://pear.php.net/manual/en/core.pear.php#core.pear.pear
+ */",
+ "/**
+     * PEAR_Error constructor
+     *
+     * @param string $message  message
+     *
+     * @param int $code     (optional) error code
+     *
+     * @param int $mode     (optional) error mode, one of: PEAR_ERROR_RETURN,
+     * PEAR_ERROR_PRINT, PEAR_ERROR_DIE, PEAR_ERROR_TRIGGER,
+     * PEAR_ERROR_CALLBACK or PEAR_ERROR_EXCEPTION
+     *
+     * @param mixed $options   (optional) error level, _OR_ in the case of
+     * PEAR_ERROR_CALLBACK, the callback function or object/method
+     * tuple.
+     *
+     * @param string $userinfo (optional) additional user/debug info
+     *
+     * @access public
+     *
+     */",
+ "/**
+     * Get the error mode from an error object.
+     *
+     * @return int error mode
+     * @access public
+     */",
+ "/**
+     * Get the callback function/method from an error object.
+     *
+     * @return mixed callback function or object/method array
+     * @access public
+     */",
+ "/**
+     * Get the error message from an error object.
+     *
+     * @return  string  full error message
+     * @access public
+     */",
+ "/**
+     * Get error code from an error object
+     *
+     * @return int error code
+     * @access public
+     */",
+ "/**
+     * Get the name of this error/exception.
+     *
+     * @return string error/exception name (type)
+     * @access public
+     */",
+ "/**
+     * Get additional user-supplied information.
+     *
+     * @return string user-supplied information
+     * @access public
+     */",
+ "/**
+     * Get additional debug information supplied by the application.
+     *
+     * @return string debug information
+     * @access public
+     */",
+ "/**
+     * Get the call backtrace from where the error was generated.
+     * Supported with PHP 4.3.0 or newer.
+     *
+     * @param int $frame (optional) what frame to fetch
+     * @return array Backtrace, or NULL if not available.
+     * @access public
+     */",
+ "/**
+     * Make a string representation of this object.
+     *
+     * @return string a string with an object summary
+     * @access public
+     */",
+ "/**
+ * Standard PEAR error class for PHP 4
+ *
+ * This class is supserseded by {@link PEAR_Exception} in PHP 5
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Tomas V.V. Cox <cox@idecnet.com>
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  1997-2006 The PHP Group
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/manual/en/core.pear.pear-error.php
+ * @see        PEAR::raiseError(), PEAR::throwError()
+ * @since      Class available since PHP 4.0.2
+ */",
+ "/**
+ * Channel Validator for the pecl.php.net channel
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.4.0a5
+ */",
+ "/**
+     * PEAR_Command_Test constructor.
+     *
+     * @access public
+     */",
+ "/**
+ * PEAR commands for login/logout
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Martin Jansen <mj@php.net>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */",
+ "/**
+     * @param PEAR_Frontend_*
+     * @param array
+     * @param PEAR_Config
+     */",
+ "/**
+     * Attempt to discover a channel\'s remote capabilities from
+     * its server name
+     * @param string
+     * @return boolean
+     */",
+ "/**
+     * For simpler unit-testing
+     * @param PEAR_Downloader
+     * @return PEAR_Downloader_Package
+     */",
+ "/**
+     * For simpler unit-testing
+     * @param PEAR_Config
+     * @param array
+     * @param array
+     * @param int
+     */",
+ "/**
+     * @param array all packages to be installed
+     */",
+ "/**
+     * Retrieve the directory that downloads will happen in
+     * @access private
+     * @return string
+     */",
+ "/**
+     * @param array output of {@link parsePackageName()}
+     * @access private
+     */",
+ "/**
+     * @param array dependency array
+     * @access private
+     */",
+ "/**
+     * @deprecated in favor of _getPackageDownloadUrl
+     */",
+ "/**
+     * Retrieve a list of downloaded packages after a call to {@link download()}.
+     *
+     * Also resets the list of downloaded packages.
+     * @return array
+     */",
+ "/**
+*@paramstring
+*@paraminteger
+*/",
+ "/**
+*forBC
+*
+*@deprecated
+*/",
+ "/**
+*Sortalistofarraysofarray(downloadedpackagefilename)bydependency.
+*
+*Thisusesthetopologicalsortmethodfromgraphtheory,andthe
+*Structures_Graphpackagetoproperlysortdependenciesforinstallation.
+*@paramarrayanarrayofdownloadedPEAR_Downloader_Packages
+*@returnarrayarrayofarray(packagefilename,package.xmlcontents)
+*/",
+ "/**
+*Detectrecursivelinksbetweendependenciesandbreakthecycles
+*
+*@paramarray
+*@accessprivate
+*/",
+ "/**
+*Setupthedependencyforinstallationparsing
+*
+*@paramarray$tdependencyinformation
+*@paramPEAR_Registry$reg
+*@paramarray$deplinkslistofdependencylinksalreadyestablished
+*@paramarray$nodesallexistingpackagenodes
+*@paramstring$packageparentpackagename
+*@accessprivate
+*/",
+ "/**
+     * Download a file through HTTP.  Considers suggested file name in
+     * Content-disposition: header and can run a callback function for
+     * different events.  The callback will be called with two
+     * parameters: the callback type, and parameters.  The implemented
+     * callback types are:
+     *
+     *  \'setup\'       called at the very beginning, parameter is a UI object
+     *                that should be used for all output
+     *  \'message\'     the parameter is a string with an informational message
+     *  \'saveas\'      may be used to save with a different file name, the
+     *                parameter is the filename that is about to be used.
+     *                If a \'saveas\' callback returns a non-empty string,
+     *                that file name will be used as the filename instead.
+     *                Note that $save_dir will not be affected by this, only
+     *                the basename of the file.
+     *  \'start\'       download is starting, parameter is number of bytes
+     *                that are expected, or -1 if unknown
+     *  \'bytesread\'   parameter is the number of bytes read so far
+     *  \'done\'        download is complete, parameter is the total number
+     *                of bytes read
+     *  \'connfailed\'  if the TCP/SSL connection fails, this callback is called
+     *                with array(host,port,errno,errmsg)
+     *  \'writefailed\' if writing to disk fails, this callback is called
+     *                with array(destfile,errmsg)
+     *
+     * If an HTTP proxy has been configured (http_proxy PEAR_Config
+     * setting), the proxy will be used.
+     *
+     * @param string  $url       the URL to download
+     * @param object  $ui        PEAR_Frontend_* instance
+     * @param object  $config    PEAR_Config instance
+     * @param string  $save_dir  directory to save file in
+     * @param mixed   $callback  function/method to call for status
+     *                           updates
+     * @param false|string|array $lastmodified header values to check against for caching
+     *                           use false to return the header values from this download
+     * @param false|array $accept Accept headers to send
+     * @param false|string $channel Channel to use for retrieving authentication
+     * @return string|array  Returns the full path of the downloaded file or a PEAR
+     *                       error on failure.  If the error is caused by
+     *                       socket-related errors, the error object will
+     *                       have the fsockopen error code available through
+     *                       getCode().  If caching is requested, then return the header
+     *                       values.
+     *
+     * @access public
+     */",
+ "/**
+ * Administration class used to download anything from the internet (PEAR Packages,
+ * static URLs, xml files)
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Greg Beaver <cellog@php.net>
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Tomas V. V. Cox <cox@idecnet.com>
+ * @author     Martin Jansen <mj@php.net>
+ * @copyright  1997-2009 The Authors
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version    Release: 1.9.4
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.3.0
+ */"
+]

@@ -1,0 +1,5461 @@
+ ["/**
+ * parses through and gets the information from the different documents.
+ * this returns one section at a time.  You must keep track of the position
+ * so that it knows where to start to look for the next section.
+ */",
+ "/**
+ * Check if plugin is enabled
+ * @param string $plugin_name plugin name
+ * @return boolean
+ */",
+ "/**
+ * Function should clean layout of printed messages when user
+ * enables \"Printer Friendly Clean Display\" option.
+ *
+ * @param string unclean_string
+ * @param integer num_leading_spaces
+ * @return string
+ * @example $string = pf_clean_string($string, 9);
+ * @access private 
+ */",
+ "/**
+ * Displays attachment information
+ *
+ * Stripped version of formatAttachments() function from functions/mime.php.
+ * @param object $message SquirrelMail message object
+ * @param array $exclude_id message parts that are not attachments.
+ * @param string $mailbox mailbox name
+ * @param integer $id message id
+ * @since 1.5.1 and 1.4.6
+ * @return string html formated attachment information.
+ */",
+ "/**
+ * This function builds an array with all the information about
+ * the options available to the user, and returns it. The options
+ * are grouped by the groups in which they are displayed.
+ * For each option, the following information is stored:
+ * - name: the internal (variable) name
+ * - caption: the description of the option in the UI
+ * - type: one of SMOPT_TYPE_*
+ * - refresh: one of SMOPT_REFRESH_*
+ * - size: one of SMOPT_SIZE_*
+ * - save: the name of a function to call when saving this option
+ * @return array all option information
+ */",
+ "/**
+ * This function saves a new theme setting.
+ * It updates the theme array.
+ */",
+ "/**
+ * This function saves the javascript detection option.
+ */",
+ "/** @var mixed */",
+ "/**
+         * Language properties
+         * @var array 
+         */",
+ "/**
+     * Class constructor
+     * @param mixed $name
+     */",
+ "/**
+ * Class that can be used to handle language properties in MIME headers.
+ *
+ * @package squirrelmail
+ * @subpackage mime
+ * @since 1.3.0
+ */",
+ "/**
+ * Initialize the plugin
+ * @return void
+ */",
+ "/**
+ * Adds Calendar link to upper menu
+ * @return void
+ */",
+ "/**
+ * Show the button in the main bar
+ */",
+ "/**
+ * Register bug report option block
+ *
+ * @since 1.4.14
+ *
+ * @access private
+ *
+ */",
+ "/**
+ * Set a couple of constants and defaults. Don\'t change these,
+ * the configurable stuff is in sqspell_config.php
+ */",
+ "/**
+ * Get the MIME structure
+ *
+ * This function gets the structure of a message and stores it in the \"message\" class.
+ * It will return this object for use with all relevant header information and
+ * fully parsed into the standard \"message\" object format.
+ */",
+ "/**
+ * This returns a parsed string called $body. That string can then
+ * be displayed as the actual message in the HTML. It contains
+ * everything needed, including HTML Tags, Attachments at the
+ * bottom, etc.
+ */",
+ "/**
+         * quoted_printable_decode() function is broken in older
+         * php versions. Text with \r\n decoding was fixed only
+         * in php 4.3.0. Minimal code requirement 4.0.4 +
+         * str_replace(\"\r\n\", \"\n\", $body); call.
+         */",
+ "/**
+ * Decodes encoded message body
+ *
+ * This function decodes the body depending on the encoding type.
+ * Currently quoted-printable and base64 encodings are supported.
+ * decode_body hook was added to this function in 1.4.2/1.5.0
+ * @param string $body encoded message body
+ * @param string $encoding used encoding
+ * @return string decoded string
+ * @since 1.0
+ */",
+ "/**
+ * Decodes headers
+ *
+ * This functions decode strings that is encoded according to
+ * RFC1522 (MIME Part Two: Message Header Extensions for Non-ASCII Text).
+ * Patched by Christian Schmidt <christian@ostenfeld.dk>  23/03/2002
+ */",
+ "/**
+ * Encodes header as quoted-printable
+ *
+ * Encode a string according to RFC 1522 for use in headers if it
+ * contains 8-bit characters or anything that looks like it should
+ * be encoded.
+ */",
+ "/**
+     * header length = 75 symbols max (same as in encodeHeader)
+     * remove $charset length
+     * remove =? ? ?= (5 chars)
+     * remove 2 more chars (\r\n ?)
+     */",
+ "/**
+ * Encodes string according to rfc2047 B encoding header formating rules
+ *
+ * It is recommended way to encode headers with character sets that store
+ * symbols in more than one byte.
+ *
+ * Function requires mbstring support. If required mbstring functions are missing,
+ * function returns false and sets E_USER_WARNING level error message.
+ *
+ * Minimal requirements - php 4.0.6 with mbstring extension. Please note,
+ * that mbstring functions will generate E_WARNING errors, if unsupported
+ * character set is used. mb_encode_mimeheader function provided by php
+ * mbstring extension is not used in order to get better control of header
+ * encoding.
+ *
+ * Used php code functions - function_exists(), trigger_error(), strlen()
+ * (is used with charset names and base64 strings). Used php mbstring
+ * functions - mb_strlen and mb_substr.
+ *
+ * Related documents: rfc 2045 (BASE64 encoding), rfc 2047 (mime header
+ * encoding), rfc 2822 (header folding)
+ *
+ * @param string $string header string that must be encoded
+ * @param string $charset character set. Must be supported by mbstring extension.
+ * Use sq_mb_list_encodings() to detect supported charsets.
+ * @return string string encoded according to rfc2047 B encoding formating rules
+ * @since 1.5.1 and 1.4.6
+ */",
+ "/**
+*Thisfunctionchecksattributevaluesforentity-encodedvalues
+*andreturnsthemtranslatedinto8-bitstringssowecanrun
+*checksonthem.
+*
+*@param$attvalueAstringtorunentitycheckagainst.
+*@returnNothing,modifiesareferencevalue.
+*/",
+ "/**
+*Killanytabs,newlines,orcarriagereturns.Ourfriendsthe
+*makersofthebrowserwith95%marketvaluedecidedthatit\'d
+*befunnytomake\"java[tab]script\" be just as good as \"javascript\".
+ *
+ * @param  attvalue  The attribute value before extraneous spaces removed.
+ * @return attvalue  Nothing, modifies a reference value.
+ */",
+ "/**
+ * Translate all dangerous Unicode or Shift_JIS characters which are accepted by
+ * IE as regular characters.
+ *
+ * @param  attvalue  The attribute value before dangerous characters are translated.
+ * @return attvalue  Nothing, modifies a reference value.
+ * @author Marc Groot Koerkamp.
+ */",
+ "/**
+ * This function returns the final tag out of the tag name, an array
+ * of attributes, and the type of the tag. This function is called by
+ * sq_sanitize internally.
+ *
+ * @param  $tagname  the name of the tag.
+ * @param  $attary   the array of attributes and their values
+ * @param  $tagtype  The type of the tag (see in comments).
+ * @return           a string with the final tag representation.
+ */",
+ "/**
+ * A small helper function to use with array_walk. Modifies a by-ref
+ * value and makes it lowercase.
+ *
+ * @param  $val a value passed by-ref.
+ * @return      void since it modifies a by-ref value.
+ */",
+ "/**
+ * This function skips any whitespace from the current position within
+ * a string and to the next non-whitespace value.
+ *
+ * @param  $body   the string
+ * @param  $offset the offset within the string where we should start
+ *                 looking for the next non-whitespace character.
+ * @return         the location within the $body where the next
+ *                 non-whitespace char is located.
+ */",
+ "/**
+ * This function looks for the next character within a string.  It\'s
+ * really just a glorified \"strpos\", except it catches if failures
+ * nicely.
+ *
+ * @param  $body   The string to look for needle in.
+ * @param  $offset Start looking from this position.
+ * @param  $needle The character/string to look for.
+ * @return         location of the next occurance of the needle, or
+ *                 strlen($body) if needle wasn\'t found.
+ */",
+ "/**
+ * This function takes a PCRE-style regexp and tries to match it
+ * within the string.
+ *
+ * @param  $body   The string to look for needle in.
+ * @param  $offset Start looking from here.
+ * @param  $reg    A PCRE-style regex to match.
+ * @return         Returns a false if no matches found, or an array
+ *                 with the following members:
+ *                 - integer with the location of the match within $body
+ *                 - string with whatever content between offset and the match
+ *                 - string with whatever it is we matched
+ */",
+ "/**
+     * We are here:
+     * blah blah <tag attribute=\"value\">
+     * \---------^
+     */",
+ "/**
+     * There are 3 kinds of tags:
+     * 1. Opening tag, e.g.:
+     *    <a href=\"blah\">
+     * 2. Closing tag, e.g.:
+     *    </a>
+     * 3. XHTML-style content-less tag, e.g.:
+     *    <img src=\"blah\" />
+     */",
+ "/**
+             * Assume tagtype 1 for now. If it\'s type 3, we\'ll switch values
+             * later.
+             */",
+ "/**
+     * Look for next [\W-_], which will indicate the end of the tag name.
+     */",
+ "/**
+                 * This is an invalid tag! Look for the next closing \">\".
+                 */",
+ "/**
+     * At this point we\'re here:
+     * <tagname  attribute=\'blah\'>
+     * \-------^
+     *
+     * At this point we loop in order to find all attributes.
+     */",
+ "/**
+         * See if we arrived at a \">\" or \"/>\", which means that we reached
+         * the end of the tag.
+         */",
+ "/**
+             * Yep. So we did.
+             */",
+ "/**
+         * There are several types of attributes, with optional
+         * [:space:] between members.
+         * Type 1:
+         *   attrname[:space:]=[:space:]\'CDATA\'
+         * Type 2:
+         *   attrname[:space:]=[:space:]\"CDATA\"
+         * Type 3:
+         *   attr[:space:]=[:space:]CDATA
+         * Type 4:
+         *   attrname
+         *
+         * We leave types 1 and 2 the same, type 3 we check for
+         * \'\"\' and convert to \"&quot\" if needed, then wrap in
+         * double quotes. Type 4 we convert into:
+         * attrname=\"yes\".
+         */",
+ "/**
+                 * Skip whitespace and see what we arrive at.
+                 */",
+ "/**
+                     * Here are 3 possibilities:
+                     * \"\'\"  attribute type 1
+                     * \'\"\'  attribute type 2
+                     * everything else is the content of tag type 3
+                     */",
+ "/**
+                         * These are hateful. Look for \s, or >.
+                         */",
+ "/**
+                         * If it\'s \">\" it will be caught at the top.
+                         */",
+ "/**
+                     * That was attribute type 4.
+                     */",
+ "/**
+                     * An illegal character. Find next \'>\' and return.
+                     */",
+ "/**
+ * This function looks for the next tag.
+ *
+ * @param  $body   String where to look for the next tag.
+ * @param  $offset Start looking from here.
+ * @return         false if no more tags exist in the body, or
+ *                 an array with the following members:
+ *                 - string with the name of the tag
+ *                 - array with attributes and their values
+ *                 - integer with tag type (1, 2, or 3)
+ *                 - integer where the tag starts (starting \"<\")
+ *                 - integer where the tag ends (ending \">\")
+ *                 first three members will be false, if the tag is invalid.
+ */",
+ "/**
+ * Translates entities into literal values so they can be checked.
+ *
+ * @param $attvalue the by-ref value to check.
+ * @param $regex    the regular expression to check against.
+ * @param $hex      whether the entites are hexadecimal.
+ * @return          True or False depending on whether there were matches.
+ */",
+ "/**
+         * Remove any backslashes, entities, and extraneous whitespace.
+         */",
+ "/**
+ * This function runs various checks against the attributes.
+ *
+ * @param  $tagname         String with the name of the tag.
+ * @param  $attary          Array with all tag attributes.
+ * @param  $rm_attnames     See description for sq_sanitize
+ * @param  $bad_attvals     See description for sq_sanitize
+ * @param  $add_attr_to_tag See description for sq_sanitize
+ * @param  $message         message object
+ * @param  $id              message id
+ * @param  $mailbox         mailbox
+ * @return                  Array with modified attributes.
+ */",
+ "/**
+                         * \"Hack\" fix for Outlook using propriatary outbind:// protocol in img tags.
+                         * One day MS might actually make it match something useful, for now, falling
+                         * back to using cid2http, so we can grab the blank.png.
+                         */",
+ "/**
+                            * Turn cid: urls into http-friendly ones.
+                            */",
+ "/**
+ * This function filters url\'s
+ *
+ * @param  $attvalue        String with attribute value to filter
+ * @param  $message         message object
+ * @param  $id               message id
+ * @param  $mailbox         mailbox
+ * @param  $sQuote          quoting characters around url\'s
+ */",
+ "/**
+     * First look for general BODY style declaration, which would be
+     * like so:
+     * body {background: blah-blah}
+     * and change it to .bodyclass so we can just assign it to a <div>
+     */",
+ "/**
+     * Remove any backslashes, entities, and extraneous whitespace.
+     */",
+ "/**
+     * Fix stupid css declarations which lead to vulnerabilities
+     * in IE.
+     *
+     * Also remove \"position\" attribute, as it can easily be set
+     * to \"fixed\" or \"absolute\" with \"left\" and \"top\" attributes
+     * of zero, taking over the whole content frame.  It can also
+     * be set to relative and move itself anywhere it wants to,
+     * displaying content in areas it shouldn\'t be allowed to touch.
+     */",
+ "/**
+ * This function edits the style definition to make them friendly and
+ * usable in SquirrelMail.
+ *
+ * @param  $message  the message object
+ * @param  $id       the message id
+ * @param  $content  a string with whatever is between <style> and </style>
+ * @param  $mailbox  the message mailbox
+ * @return           a string with edited content.
+ */",
+ "/**
+     * Get rid of quotes.
+     */",
+ "/**
+         * If we couldn\'t generate a proper img url, drop in a blank image
+         * instead of sending back empty, otherwise it causes unusual behaviour
+         */",
+ "/**
+ * This function converts cid: url\'s into the ones that can be viewed in
+ * the browser.
+ *
+ * @param  $message  the message object
+ * @param  $id       the message id
+ * @param  $cidurl   the cid: url.
+ * @param  $mailbox  the message mailbox
+ * @return           a string with a http-friendly url
+ */",
+ "/**
+ * This function changes the <body> tag into a <div> tag since we
+ * can\'t really have a body-within-body.
+ *
+ * @param  $attary   an array of attributes and values of <body>
+ * @param  $mailbox  mailbox we\'re currently reading (for cid2http)
+ * @param  $message  current message (for cid2http)
+ * @param  $id       current message id (for cid2http)
+ * @return           a modified array of attributes to be set for <div>
+ */",
+ "/**
+     * See if tag_list is of tags to remove or tags to allow.
+     * false  means remove these tags
+     * true   means allow these tags
+     */",
+ "/**
+     * Take care of netscape\'s stupid javascript entities like
+     * &{alert(\'boo\')};
+     */",
+ "/**
+                     * Got to the end of tag we needed to remove.
+                     */",
+ "/**
+ * This is the main function and the one you should actually be calling.
+ * There are several variables you should be aware of an which need
+ * special description.
+ *
+ * Since the description is quite lengthy, see it here:
+ * http://linux.duke.edu/projects/mini/htmlfilter/
+ *
+ * @param $body                 the string with HTML you wish to filter
+ * @param $tag_list             see description above
+ * @param $rm_tags_with_content see description above
+ * @param $self_closing_tags    see description above
+ * @param $force_tag_closing    see description above
+ * @param $rm_attnames          see description above
+ * @param $bad_attvals          see description above
+ * @param $add_attr_to_tag      see description above
+ * @param $message              message object
+ * @param $id                   message id
+ * @return                      sanitized html safe to show on your pages.
+ */",
+ "/**
+     * Don\'t display attached images in HTML mode.
+     */",
+ "/**
+ * This is a wrapper function to call html sanitizing routines.
+ *
+ * @param  $body  the body of the message
+ * @param  $id    the id of the message
+ * @param  boolean $take_mailto_links When TRUE, converts mailto: links
+ *                                    into internal SM compose links
+ *                                    (optional; default = TRUE)
+ * @return        a string with html safe to display in the browser.
+ */",
+ "/**
+ * function SendDownloadHeaders - send file to the browser
+ *
+ * Original Source: SM core src/download.php
+ * moved here to make it available to other code, and separate
+ * front end from back end functionality.
+ *
+ * @param string $type0 first half of mime type
+ * @param string $type1 second half of mime type
+ * @param string $filename filename to tell the browser for downloaded file
+ * @param boolean $force whether to force the download dialog to pop
+ * @param optional integer $filesize send the Content-Header and length to the browser
+ * @return void
+ */",
+ "/**
+ * Converts .po file into array and stores it in session.
+ *
+ * Used internally by _($str) function
+ *
+ * @internal function is used internally by functions/gettext.php code
+ */",
+ "/**
+ * Alternative php gettext function (short form)
+ *
+ * @link http://www.php.net/function.gettext
+ *
+ * @param string $str English string
+ * @return string translated string
+ */",
+ "/**
+ * Alternative php bindtextdomain function
+ *
+ * Sets path to directory containing domain translations
+ *
+ * @link http://www.php.net/function.bindtextdomain
+ * @param string $name gettext domain name
+ * @param string $dir directory that contains all translations
+ * @return string path to translation directory
+ */",
+ "/**
+ * Alternative php textdomain function
+ *
+ * Sets default domain name
+ *
+ * @link http://www.php.net/function.textdomain
+ * @param string $name gettext domain name
+ * @return string gettext domain name
+ */",
+ "/**
+ * Unimplemented class.
+ * @package squirrelmail
+ * @subpackage mime
+ * @todo implement smime parsing
+ */",
+ "/**
+ * setup.php
+ *
+ * Copyright (c) 1999-2011 The SquirrelMail Project Team
+ * Licensed under the GNU GPL. For full terms see the file COPYING.
+ *
+ * Implementation of RFC 2369 for SquirrelMail.
+ * When viewing a message from a mailinglist complying with this RFC,
+ * this plugin displays a menu which gives the user a choice of mailinglist
+ * commands such as (un)subscribe, help and list archives.
+ *
+ * $Id: setup.php 14084 2011-01-06 02:44:03Z pdontthink $
+ * @package plugins
+ * @subpackage listcommands
+ */",
+ "/**
+     * Array of commands we can deal with from the header. The Reply option
+     * is added later because we generate it using the Post information.
+     */",
+ "/**
+ * Generate html tags
+ *
+ * @param string $tag Tag to output
+ * @param string $val Value between tags
+ * @param string $align Alignment (left, center, etc)
+ * @param string $bgcolor Back color in hexadecimal
+ * @param string $xtra Extra options
+ * @return string HTML ready for output
+ */",
+ "/**
+ * This function is used to add, modify or delete GET variables in a URL. 
+ * It is especially useful when $url = $PHP_SELF
+ *
+ * Set $val to NULL to remove $var from $url.
+ * To ensure compatibility with older versions, use $val=\'0\' to set $var to 0. 
+ *
+ * @param string $url url that must be modified
+ * @param string $var GET variable name
+ * @param string $val variable value
+ * @param boolean $link controls sanitizing of ampersand in urls (since 1.3.2)
+ *
+ * @return string $url modified url
+ *
+ * @since 1.3.0
+ *
+ */",
+ "/**
+ * Adds message that informs about non fatal error that can happen while saving preferences
+ * @param string $message error message
+ * @since 1.5.1 and 1.4.5
+ */",
+ "/**
+ * Decode iso-ir-111 encoded strings
+ * @param string $string Encoded string
+ * @return string Decoded string
+ */",
+ "/**
+ * Init plugin
+ * @access private
+ */",
+ "/**
+ * Show fortune
+ * @access private
+ */",
+ "/**
+ * Add fortune options
+ * @access private
+ */",
+ "/**
+ * In case the last session was not terminated properly, make sure
+ * we get a new one, but make sure we preserve session_expired_*
+ */",
+ "/**
+ * Decode cp1257-encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * us-ascii decoding function.
+ *
+ * @param string $string string that has to be cleaned
+ * @return string cleaned string
+ */",
+ "/** generate random color **/",
+ "/**
+ * Decode cp1253-encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Displays confirmation form when event is deleted
+ * @return void
+ */",
+ "/**
+     * Constructor
+     * @param array $param address book backend options
+     */",
+ "/**
+     * Open the database.
+     * @param bool $new new connection if it is true
+     * @return bool
+     */",
+ "/**
+     * Close the file and forget the filehandle
+     */",
+ "/**
+     * Determine internal database field name given one of
+     * the SquirrelMail SM_ABOOK_FIELD_* constants
+     *
+     * @param integer $field The SM_ABOOK_FIELD_* contant to look up
+     *
+     * @return string The desired field name, or the string \"ERROR\"
+     *                if the $field is not understood (the caller
+     *                is responsible for handing errors)
+     *
+     */",
+ "/**
+*Searchthedatabase
+*@paramstring$exprsearchexpression
+*@returnarraysearchresults
+*/",
+ "/**
+*Lookupbytheindicatedfield
+*
+*@paramstring$valueValuetolookup
+*@paraminteger$fieldThefieldtolookin,shouldbeone
+*oftheSM_ABOOK_FIELD_*constants
+*definedinfunctions/constants.php
+*(OPTIONAL;defaultstonicknamefield)
+*NOTE:uniquenessisonlyguaranteed
+*whenthenicknamefieldisusedhere;
+*otherwise,thefirstmatchingaddress
+*isreturned.
+*
+*@returnarraysearchresults
+*
+*/",
+ "/**
+*Listalladdresses
+*@returnarraysearchresults
+*/",
+ "/**
+     * Add address
+     * @param array $userdata added data
+     * @return bool
+     */",
+ "/**
+     * Delete address
+     * @param string $alias alias that has to be deleted
+     * @return bool
+     */",
+ "/**
+     * Modify address
+     * @param string $alias modified alias
+     * @param array $userdata new data
+     * @return bool
+     */",
+ "/**
+ * Address book in a database backend
+ *
+ * Backend for personal/shared address book stored in a database,
+ * accessed using the DB-classes in PEAR.
+ *
+ * IMPORTANT:  The PEAR modules must be in the include path
+ * for this class to work.
+ *
+ * An array with the following elements must be passed to
+ * the class constructor (elements marked ? are optional):
+ * <pre>
+ *   dsn       => database DNS (see PEAR for syntax)
+ *   table     => table to store addresses in (must exist)
+ *   owner     => current user (owner of address data)
+ * ? name      => name of address book
+ * ? writeable => set writeable flag (true/false)
+ * ? listing   => enable/disable listing
+ * </pre>
+ * The table used should have the following columns:
+ * owner, nickname, firstname, lastname, email, label
+ * The pair (owner,nickname) should be unique (primary key).
+ *
+ *  NOTE. This class should not be used directly. Use the
+ *        \"AddressBook\" class instead.
+ * @package squirrelmail
+ * @subpackage addressbook
+ */",
+ "/**
+ * Converts string to koi8-r
+ * @param string $string text with numeric unicode entities
+ * @return string koi8-r encoded text
+ */",
+ "/**
+ * Return koi8-r symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_koi8_r
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/koi8_r.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string koi8-r character
+ */",
+ "/**
+ * Decode a cp866-encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode iso8859-7 encoded strings
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode iso8859-16 string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode iso8859-3 encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/** First create the top node in the tree **/",
+ "/**
+ * Generates a new session ID by incrementing the last one used;
+ * this ensures that each command has a unique ID.
+ * @param bool unique_id
+ * @return string IMAP session id of the form \'A000\'.
+ */",
+ "/**
+ * Both send a command and accept the result from the command.
+ * This is to allow proper session number handling.
+ */",
+ "/**
+ * Custom fgets function: gets a line from the IMAP server,
+ * no matter how big it may be.
+ * @param stream imap_stream the stream to read from
+ * @return string a line
+ */",
+ "/**
+ * Reads the output from the IMAP stream.  If handle_errors is set to true,
+ * this will also handle all errors that are received.  If it is not set,
+ * the errors will be sent back through $response and $message.
+ */",
+ "/**
+ * Logs the user into the IMAP server.  If $hide is set, no error messages
+ * will be displayed.  This function returns the IMAP connection handle.
+ */",
+ "/**
+ * Simply logs out the IMAP session
+ * @param stream imap_stream the IMAP connection to log out.
+ * @return void
+ */",
+ "/**
+ * Retreive the CAPABILITY string from the IMAP server.
+ * If capability is set, returns only that specific capability,
+ * else returns array of all capabilities.
+ */",
+ "/**
+ * Returns the delimeter between mailboxes: INBOX/Test, or INBOX.Test
+ */",
+ "/**
+ * Gets the number of messages in the current mailbox.
+ */",
+ "/**
+ * Parses an address string.
+FIXME: the original author should step up and document this - the following is a guess based on a couple simple tests of *using* the function, not knowing the code inside
+ *
+ * @param string $address Generic email address(es) in any format, including 
+ *                        possible personal information as well as the 
+ *                        actual address (such as \"Jose\" <jose@example.org>
+ *                        or \"Jose\" <jose@example.org>, \"Keiko\" <keiko@example.org>)
+ * @param int $max        The most email addresses to parse out of the given string
+ *
+ * @return array An array with one sub-array for each address found in the
+ *               given string.  Each sub-array contains two (?) entries, the
+ *               first containing the actual email address, the second
+ *               containing any personal information that was in the address
+ *               string
+ *
+ */",
+ "/**
+ * Returns the number of unseen messages in this folder.
+ */",
+ "/**
+ * Returns the number of unseen/total messages in this folder
+ */",
+ "/**
+ * Saves a message to a given folder -- used for saving sent messages
+ */",
+ "/**
+ * This is an example that gets IMAP servers from yellowpages (NIS).
+ * you can simple put map:map_yp_alias in your $imap_server_address
+ * in config.php use your own function instead map_yp_alias to map your
+ * LDAP whatever way to find the users IMAP server.
+ */",
+ "/** light(1) or dark(0) background? **/",
+ "/** range delimiter **/",
+ "/** background **/",
+ "/** text **/",
+ "/** generate random color **/",
+ "/** set array element as hex string with hashmark (for HTML output) **/",
+ "/**
+ * Converts string to cp1255
+ * @param string $string text with numeric unicode entities
+ * @return string cp1255 encoded text
+ */",
+ "/**
+ * Return cp1255 symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_cp1255
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/cp1255.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string cp1255 character
+ */",
+ "/**
+     * Create vcard from information stored in array
+     * @todo implement vcard creation from array
+     * @param array $value_array
+     * @return string
+     */",
+ "/**
+     * Read vcard and convert it to array
+     * @todo implement vcard parsing
+     * @param string $vcard
+     * @return array
+     */",
+ "/**
+ * Unimplemented class that should handle vcards
+ * Don\'t use it unless it is marked as implemented.
+ * @package squirrelmail
+ */",
+ "/**
+ * Converts string to cp1251
+ * @param string $string text with numeric unicode entities
+ * @return string cp1251 encoded text
+ */",
+ "/**
+ * Return cp1251 symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_cp1251
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/cp1251.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string cp1251 character
+ */",
+ "/** Initialize the translation plugin */",
+ "/** Show the translation for a message you\'re reading */",
+ "/** Closes translation engine form */",
+ "/** Unimplemented. Translation in compose*/",
+ "/** Registers translation option block */",
+ "/** gets translation preferences */",
+ "/**
+ * This function could be sped up.
+ * It basically negates the process if a ! is found in the beginning and
+ * matches a * at the end with 0 or more characters.
+ */",
+ "/** creates translation engine language selection */",
+ "/**
+ * Starts translation box
+ *
+ * @param string $action url that has to recieve message for translation
+ * @param string $charset (since sm 1.5.1 and 1.4.9) character set, that
+ * should be used to submit 8bit information.
+ * @access private
+ */",
+ "/**
+ * Babelfish translation engine functions
+ *
+ * @param string $message text that has to be translated.
+ * @access private
+ */",
+ "/**
+ * go.com translation engine (disabled)
+ *
+ * @param string $message text that has to be translated
+ * @access private
+ */",
+ "/**
+ * intertran translation engine
+ *
+ * @param string $message text that has to be translated
+ * @access private
+ */",
+ "/**
+ * gpltrans translation engine
+ *
+ * @param string $message text that has to be translated
+ * @access private
+ */",
+ "/**
+ * reference.com (dictionary) translation engine
+ *
+ * @param string $message text that has to be translated
+ * @access private
+ */",
+ "/**
+ * otenet translation engine
+ *
+ * @param string $message text that has to be translated
+ * @access private
+ */",
+ "/**
+ * promt translation engine
+ *
+ * @param string $message text that has to be translated
+ * @access private
+ */",
+ "/**
+ * google translation engine
+ *
+ * @param string $message text that has to be translated
+ * @access private
+ */",
+ "/**
+ * Decode a cp855-encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Converts string to utf-8
+ * @param string $string text with numeric unicode entities
+ * @return string utf-8 encoded text
+ */",
+ "/**
+ * Return utf8 symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_utf_8
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/utf_8.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string utf8 character
+ */",
+ "/**
+     * Hairy code... But let\'s leave it like it is since I am not certain
+     * a different approach would be any easier to read. ;)
+     */",
+ "/**
+ * Function to include JavaScript code
+ * @return void
+ */",
+ "/**
+ * List search results
+ * @param array $res Array of search results
+ * @param bool $includesource [Default=true]
+ * @return void
+ */",
+ "/**
+ * There are some PHP settings that SquirrelMail is incompatible with
+ * and cannot be changed by software at run-time; refuse to run if such
+ * settings are being used...
+ */",
+ "/**
+ * Detect SSL connections
+ */",
+ "/**
+ * Make sure to have $base_uri always initialized to avoid having session
+ * cookie set separately for each $base_uri subdirectory that receives direct
+ * requests from user\'s browser (typically $base_uri and $base_uri/src).
+ */",
+ "/**
+ * returns true if current php version is at mimimum a.b.c
+ *
+ * Called: check_php_version(4,1)
+ * @param int a major version number
+ * @param int b minor version number
+ * @param int c release number
+ * @return bool
+ */",
+ "/**
+ * returns true if the current internal SM version is at minimum a.b.c
+ * These are plain integer comparisons, as our internal version is
+ * constructed by us, as an array of 3 ints.
+ *
+ * Called: check_sm_version(1,3,3)
+ * @param int a major version number
+ * @param int b minor version number
+ * @param int c release number
+ * @return bool
+ */",
+ "/**
+ * Recursively strip slashes from the values of an array.
+ * @param array array the array to strip, passed by reference
+ * @return void
+ */",
+ "/**
+ * Squelch error output to screen (only) for the given function.
+ *
+ * This provides an alternative to the @ error-suppression
+ * operator where errors will not be shown in the interface
+ * but will show up in the server log file (assuming the
+ * administrator has configured PHP logging).
+ * 
+ * @since 1.4.12 and 1.5.2
+ * 
+ * @param string $function The function to be executed
+ * @param array  $args     The arguments to be passed to the function
+ *                         (OPTIONAL; default no arguments)
+ *                         NOTE: The caller must take extra action if
+ *                               the function being called is supposed
+ *                               to use any of the parameters by 
+ *                               reference.  In the following example,
+ *                               $x is passed by reference and $y is
+ *                               passed by value to the \"my_func\"
+ *                               function.
+ * sq_call_function_suppress_errors(\'my_func\', array(&$x, $y));
+ * 
+ * @return mixed The return value, if any, of the function being
+ *               executed will be returned.
+ * 
+ */",
+ "/**
+ * Add a variable to the session.
+ * @param mixed $var the variable to register
+ * @param string $name the name to refer to this variable
+ * @return void
+ */",
+ "/**
+ * Delete a variable from the session.
+ * @param string $name the name of the var to delete
+ * @return void
+ */",
+ "/**
+ * Checks to see if a variable has already been registered
+ * in the session.
+ * @param string $name the name of the var to check
+ * @return bool whether the var has been registered
+ */",
+ "/**
+ * Search for the var $name in $_SESSION, $_POST, $_GET,
+ * $_COOKIE, or $_SERVER and set it in provided var.
+ *
+ * If $search is not provided,  or == SQ_INORDER, it will search
+ * $_SESSION, then $_POST, then $_GET. Otherwise,
+ * use one of the defined constants to look for
+ * a var in one place specifically.
+ *
+ * Note: $search is an int value equal to one of the
+ * constants defined above.
+ *
+ * example:
+ *    sqgetGlobalVar(\'username\',$username,SQ_SESSION);
+ *  -- no quotes around last param!
+ *
+ * @param string name the name of the var to search
+ * @param mixed value the variable to return
+ * @param int search constant defining where to look
+ * @return bool whether variable is found.
+ */",
+ "/**
+ * Deletes an existing session, more advanced than the standard PHP
+ * session_destroy(), it explicitly deletes the cookies and global vars.
+ */",
+ "/**
+ * Function to verify a session has been started.  If it hasn\'t
+ * start a session up.  php.net doesn\'t tell you that $_SESSION
+ * (even though autoglobal), is not created unless a session is
+ * started, unlike $_POST, $_GET and such
+ */",
+ "/**
+ * Function to start the session and store the cookie with the session_id as
+ * HttpOnly cookie which means that the cookie isn\'t accessible by javascript
+ * (IE6 only)
+ * Note that as sqsession_is_active() no longer discriminates as to when
+ * it calls this function, session_start() has to have E_NOTICE suppression
+ * (thus the @ sign).
+ *
+ * @return void
+ *
+ * @since 1.4.16
+ *
+ */",
+ "/**
+ * Set a cookie
+ *
+ * @param string  $sName     The name of the cookie.
+ * @param string  $sValue    The value of the cookie.
+ * @param int     $iExpire   The time the cookie expires. This is a Unix
+ *                           timestamp so is in number of seconds since
+ *                           the epoch.
+ * @param string  $sPath     The path on the server in which the cookie
+ *                           will be available on.
+ * @param string  $sDomain   The domain that the cookie is available.
+ * @param boolean $bSecure   Indicates that the cookie should only be
+ *                           transmitted over a secure HTTPS connection.
+ * @param boolean $bHttpOnly Disallow JS to access the cookie (IE6/FF2)
+ * @param boolean $bReplace  Replace previous cookies with same name?
+ *
+ * @return void
+ *
+ * @since 1.4.16 and 1.5.1
+ *
+ */",
+ "/**
+ * Detect whether or not we have a SSL secured (HTTPS)
+ * connection to the browser
+ *
+ * It is thought to be so if you have \'SSLOptions +StdEnvVars\'
+ * in your Apache configuration,
+ *     OR if you have HTTPS set to a non-empty value (except \"off\")
+ *        in your HTTP_SERVER_VARS,
+ *     OR if you have HTTP_X_FORWARDED_PROTO=https in your HTTP_SERVER_VARS,
+ *     OR if you are on port 443.
+ *
+ * Note: HTTP_X_FORWARDED_PROTO could be sent from the client and
+ *       therefore possibly spoofed/hackable - for now, the
+ *       administrator can tell SM to ignore this value by setting 
+ *       $sq_ignore_http_x_forwarded_headers to boolean TRUE in
+ *       config/config_local.php, but in the future we may
+ *       want to default this to TRUE and make administrators
+ *       who use proxy systems turn it off (see 1.5.2+).
+ *
+ * Note: It is possible to run SSL on a port other than 443, and
+ *       if that is the case, the administrator should set
+ *       $sq_https_port to the applicable port number in
+ *       config/config_local.php
+ *
+ * @return boolean TRUE if the current connection is SSL-encrypted;
+ *                 FALSE otherwise.
+ *
+ * @since 1.4.17 and 1.5.2 
+ *
+ */",
+ "/**
+ * Determine if there are lines in a file longer than a given length
+ *
+ * @param string $filename   The full file path of the file to inspect
+ * @param int    $max_length If any lines in the file are GREATER THAN
+ *                           this number, this function returns TRUE.
+ *
+ * @return boolean TRUE as explained above, otherwise, (no long lines
+ *                 found) FALSE is returned.
+ *
+ */",
+ "/**
+ * display upper part of month calendar view
+ * @return void
+ * @access private
+ */",
+ "/**
+ * main logic for month view of calendar
+ * @return void
+ * @access private
+ */",
+ "/**
+ * end of monthly view and form to jump to any month and year
+ * @return void
+ * @access private
+ */",
+ "/**
+ * Converts string to iso-8859-9
+ * @param string $string text with numeric unicode entities
+ * @return string iso-8859-9 encoded text
+ */",
+ "/**
+ * Return iso-8859-9 symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_iso_8859_9
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/iso_8859_9.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string iso-8859-9 character
+ */",
+ "/** generate random color **/",
+ "/** set array element as hex string with hashmark (for HTML output) **/",
+ "/**
+ * FIXME: Undocumented function
+ * @access private
+ */",
+ "/**
+ * Loads the DNS Cache from disk
+ * @access private
+ */",
+ "/**
+ * Uses the BulkQuery executable to query all the RBLs at once
+ * @param array $filters Array of SPAM Filters
+ * @param array $IPs Array of IP Addresses
+ * @param array $read TODO: Document this parameter
+ * @access private
+ */",
+ "/**
+ * Starts the filtering process
+ * @access private
+ */",
+ "/**
+ * Does the loop through each filter
+ * @param stream imap_stream the stream to read from
+ * @access private
+ */",
+ "/**
+ * Creates and runs the IMAP command to filter messages
+ * @param string $imap TODO: Document this parameter
+ * @param string $where Which part of the message to search (TO, CC, SUBJECT, etc...)
+ * @param string $what String to search for
+ * @param string $where_to Folder it will move to
+ * @param string $user_scan Whether to search all or just unseen
+ * @param string $del_id TODO: Document this parameter
+ * @access private
+ */",
+ "/**
+ * Loops through all the Received Headers to find IP Addresses
+ * @param stream imap_stream the stream to read from
+ * @access private
+ */",
+ "/**
+                 * RFC allows . on end of hostname to force domain lookup to
+                 * not use search domain from resolv.conf, i.e. to ensure
+                 * search domain isn\'t used if no hostname is found
+                 */",
+ "/**
+ * Does the loop through each enabled filter for the specified IP address.
+ * IP format:  $a.$b.$c.$d
+ * @param int $a First subset of IP
+ * @param int $b Second subset of IP
+ * @param int $c Third subset of IP
+ * @param int $d Forth subset of IP
+ * @param array $filters The Spam Filters
+ * @return boolean Whether the IP is Spam
+ * @access private
+ */",
+ "/**
+ * Loads the filters from the user preferences
+ * @return array All the user filters
+ * @access private
+ */",
+ "/**
+ * Loads the Spam Filters and checks the preferences for the enabled status
+ * @return array All the spam filters
+ * @access private
+ */",
+ "/**
+ * Removes a User filter
+ * @param int $id ID of the filter to remove
+ * @access private
+ */",
+ "/**
+ * Swaps two filters
+ * @param int $id1 ID of first filter to swap
+ * @param int $id2 ID of second filter to swap
+ * @access private
+ */",
+ "/**
+ * This updates the filter rules when renaming or deleting folders
+ * @param array $args
+ * @access private
+ */",
+ "/**
+ * Display formated error message
+ * @param string $string text message
+ * @return string html formated text message
+ * @access private
+ */",
+ "/**
+ * Controls use of unsubscribed folders in plugin
+ * @global boolean $mail_fetch_allow_unsubscribed
+ * @since 1.5.1 and 1.4.5
+ */",
+ "/**
+  * Validate a requested POP3 port number
+  *
+  * Allowable port numbers are configured in config.php
+  * (see config_example.php for an example and more
+  * rules about how the list of allowable port numbers
+  * can be specified)
+  *
+  * @param int $requested_port The port number given by the user
+  *
+  * @return string An error string is returned if the port
+  *                number is not allowable, otherwise an
+  *                empty string is returned.
+  *
+  */",
+ "/**
+  * Validate a requested POP3 server address
+  *
+  * Blocked server addresses are configured in config.php
+  * (see config_example.php for more details)
+  *
+  * @param int $requested_address The server address given by the user
+  *
+  * @return string An error string is returned if the server
+  *                address is not allowable, otherwise an
+  *                empty string is returned.
+  *
+  */",
+ "/**
+ * check mail folder
+ * @param stream $imap_stream imap connection resource
+ * @param string $imap_folder imap folder name
+ * @return boolean true, when folder can be used to store messages.
+ * @since 1.5.1 and 1.4.5
+ */",
+ "/**
+ * Checks if folder is noselect (can\'t store messages)
+ * 
+ * Function does not check if folder subscribed.
+ * @param stream $imap_stream imap connection resource
+ * @param string $imap_folder imap folder name
+ * @return boolean true, when folder has noselect flag. false in any other case.
+ * @since 1.5.1 and 1.4.5
+ */",
+ "/**
+ * Converts string to iso-8859-1
+ * @param string $string text with numeric unicode entities
+ * @return string iso-8859-1 encoded text
+ */",
+ "/**
+ * Return iso-8859-1 symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_iso_8859_1
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/iso_8859_1.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string iso-8859-1 character
+ */",
+ "/**
+ * this is array that contains all events
+ * it is three dimensional array with fallowing structure
+ * $calendardata[date][time] = array(length,priority,title,message,reminder);
+ */",
+ "/**
+     * replace html line breaks with ASCII line feeds
+     * replace htmlencoded | with ASCII vertical bar
+     */",
+ "/**
+ * Reads multilined calendar data
+ * 
+ * Plugin stores multiline texts converted to single line with PHP nl2br().
+ * Function undoes nl2br() conversion and html encoding of ASCII vertical bar.
+ *
+ * Older plugin versions sanitized data with htmlspecialchars. Since 1.5.1 calendar 
+ * data is not sanitized. Output functions must make sure that data is correctly 
+ * encoded and sanitized.
+ * @param string $string calendar string
+ * @return string calendar string converted to multiline text
+ * @access private
+ * @since 1.5.1 and 1.4.7
+ */",
+ "/**
+     * add html line breaks
+     * remove original ASCII line feeds and carriage returns
+     * replace ASCII vertical bar with html code in order to sanitize field delimiter
+     */",
+ "/**
+ * Callback function used to sanitize calendar data before saving it to file
+ * @param string $sValue array value 
+ * @param string $sKey array key
+ * @access private
+ * @since 1.5.1 and 1.4.7
+ */",
+ "/**
+ * read events into array
+ *
+ * data is | delimited, just like addressbook
+ * files are structured like this:
+ * date|time|length|priority|title|message
+ * files are divided by year for performance increase
+ */",
+ "/**
+ * Saves calendar data
+ * @return void
+ * @access private
+ */",
+ "/**
+ * deletes event from file
+ * @return void
+ * @access private
+ */",
+ "/**
+ * same as delete but does not save calendar
+ * saving is done inside event_edit.php
+ * @return void
+ * @access private
+ * @todo code reuse
+ */",
+ "/** generate random color **/",
+ "/** generate random color **/",
+ "/**
+ * parse the config file
+ *
+ * @param string $cfg_file
+ * @access private
+ */",
+ "/**
+ * Change paths containing SM_PATH to admin-friendly paths
+ * relative to the config dir, i.e.:
+ *    \'\'                          --> <empty string>
+ *    SM_PATH . \'images/logo.gif\' --> ../images/logo.gif
+ *    \'/absolute/path/logo.gif\'   --> /absolute/path/logo.gif
+ *    \'http://whatever/\'          --> http://whatever
+ *  Note removal of quotes in returned value
+ *  
+ * @param string $old_path path that has to be converted
+ * @return string new path
+ * @access private
+ */",
+ "/**
+ * Change relative path (relative to config dir) to 
+ *  internal SM_PATH, i.e.:
+ *     empty_string            --> \'\'
+ *     ../images/logo.gif      --> SM_PATH . \'images/logo.gif\'
+ *     images/logo.gif         --> SM_PATH . \'config/images/logo.gif\'
+ *     /absolute/path/logo.gif --> \'/absolute/path/logo.gif\'
+ *     C:/absolute/win/path    --> \'C:/absolute/win/path\'
+ *     http://whatever/        --> \'http://whatever\'
+ *  
+ * @param string $old_path path that has to be converted
+ * @return string new path
+ * @access private
+*/",
+ "/** Convenience function that identifies which types of
+        widgets are stored as (serialized) array values. */",
+ "/**
+     * Create text box
+     *
+     * @param boolean $password When TRUE, the text in the input
+     *                          widget will be obscured (OPTIONAL;
+     *                          default = FALSE).
+     *
+     * @return string html formated text input
+     *
+     */",
+ "/**
+     * Create selection box or radio group
+     *
+     * When $this->htmlencoded is TRUE, the keys and values in
+     * $this->possible_values are assumed to be display-safe.
+     * Use with care!
+     *
+     * Note that when building radio buttons instead of a select
+     * widget, if the \"size\" attribute is SMOPT_SIZE_TINY, the
+     * radio buttons will be output one after another without
+     * linebreaks between them.  Otherwise, each radio button
+     * goes on a line of its own.
+     *
+     * @param boolean $multiple_select When TRUE, the select widget
+     *                                 will allow multiple selections
+     *                                 (OPTIONAL; default is FALSE
+     *                                 (single select list))
+     * @param boolean $radio_buttons   When TRUE, the widget will
+     *                                 instead be built as a group
+     *                                 of radio buttons (and
+     *                                 $multiple_select will be
+     *                                 forced to FALSE) (OPTIONAL;
+     *                                 default is FALSE (select widget))
+     *
+     * @return string html formated selection box or radio buttons
+     *
+     */",
+ "/**
+     * Create folder selection box
+     *
+     * @param boolean $multiple_select When TRUE, the select widget
+     *                                 will allow multiple selections
+     *                                 (OPTIONAL; default is FALSE
+     *                                 (single select list))
+     *
+     * @return string html formated selection box
+     *
+     */",
+ "/**
+     * Create boolean widget
+     *
+     * When creating Yes/No radio buttons, the \"yes_text\"
+     * and \"no_text\" option attributes are used to override
+     * the typical \"Yes\" and \"No\" text.
+     *
+     * @param boolean $checkbox When TRUE, the widget will be
+     *                          constructed as a checkbox,
+     *                          otherwise it will be a set of
+     *                          Yes/No radio buttons (OPTIONAL;
+     *                          default is TRUE (checkbox)).
+     *
+     * @return string html formated boolean widget
+     *
+     */",
+ "/**
+     * Creates an edit list
+     *
+     * Note that multiple layout types are supported for this widget.
+     * $this->layout_type must be one of the SMOPT_EDIT_LIST_LAYOUT_*
+     * constants.
+     *
+     * @return string html formated list of edit fields and
+     *                their associated controls
+     */",
+ "/**
+     * Creates a submit button
+     *
+     * @return string html formated submit button widget
+     *
+     */",
+ "/**
+ * SquirrelOption: An option for Squirrelmail.
+ *
+ * This class is a work in progress. When complete, it will handle
+ * presentation and saving of Squirrelmail user options in a simple,
+ * streamline manner. Stay tuned for more stuff.
+ *
+ * Also, I\'d like to ask that people leave this alone (mostly :) until
+ * I get it a little further along. That should only be a day or two or
+ * three. I will remove this message when it is ready for primetime usage.
+ * @package squirrelmail
+ */",
+ "/**
+     * 1) Remove the addresses we\'ll be sending the message \'to\'
+     */",
+ "/**
+     * 3) get the addresses.
+     */",
+ "/**
+     * 4) generate the string.
+     */",
+ "/**
+         * To translators: %s is for author\'s name
+         */",
+ "/**
+         * To translators:
+         *  first %s is for date string, second %s is for author\'s name. Date uses
+         *  formating from \"D, F j, Y g:i a\" and \"D, F j, Y H:i\" translations.
+         * Example string:
+         *  \"On Sat, December 24, 2004 23:59, Santa wrote:\"
+         * If you have to put author\'s name in front of date string, check comments about
+         * argument swapping at http://www.php.net/sprintf
+         */",
+ "/**
+         * This is to change all newlines to \n
+         * We\'ll change them to \r\n later (in the sendMessage function)
+         */",
+ "/**
+         * Rewrap $body so that no line is bigger than $editor_size
+         * This should only really kick in the sqWordWrap function
+         * if the browser doesn\'t support \"VIRTUAL\" as the wrap type.
+         */",
+ "/**
+ * temporary function to make use of the deliver class.
+ * In the future the responsible backend should be automaticly loaded
+ * and conf.pl should show a list of available backends.
+ * The message also should be constructed by the message class.
+ *
+ * @param object $composeMessage The message being sent.  Please note
+ *                               that it is passed by reference and
+ *                               will be returned modified, with additional
+ *                               headers, such as Message-ID, Date, In-Reply-To,
+ *                               References, and so forth.
+ *
+ * @return boolean FALSE if delivery failed, or some non-FALSE value
+ *                 upon success.
+ *
+ */",
+ "/**
+ * @return bool whether this is a Noselect mailbox.
+ */",
+ "/**
+ * If $haystack is a full mailbox name, and $needle is the mailbox
+ * separator character, returns the second last part of the full
+ * mailbox name (i.e. the mailbox\'s parent mailbox)
+ */",
+ "/**
+ * Check if $subbox is below the specified $parentbox
+ */",
+ "/**
+ * Defines special mailboxes: given a mailbox name, it checks if this is a
+ * \"special\" one: INBOX, Trash, Sent or Draft.
+ *
+ * Since 1.2.5 function includes special_mailbox hook.
+ *
+ * Since 1.4.3 hook supports more than one plugin.
+ *
+//FIXME: make $subfolders_of_inbox_are_special a configuration setting in conf.pl and config.php
+ * Since 1.4.22/1.5.2, the administrator can add
+ * $subfolders_of_inbox_are_special = TRUE;
+ * to config/config_local.php and all subfolders
+ * of the INBOX will be treated as special.
+ *
+ * @param string $box mailbox name
+ * @param boolean $include_subs (since 1.5.2 and 1.4.9) if true, subfolders of 
+ *  system folders are special. if false, subfolders are not special mailboxes 
+ *  unless they are tagged as special in \'special_mailbox\' hook.
+ * @return boolean
+ * @since 1.2.3
+ */",
+ "/**
+ * Detects if mailbox is the Inbox folder or subfolder of the Inbox
+ *
+ * @param string $box The mailbox name to test
+ * @param boolean $include_subs If true, subfolders of system folders
+ *                              are special.  If false, subfolders are
+ *                              not special mailboxes.
+ *
+ * @return boolean Whether this is the Inbox or a child thereof.
+ *
+ * @since 1.4.22
+ */",
+ "/**
+ * Detects if mailbox is a Trash folder or subfolder of Trash
+ * @param string $box mailbox name
+ * @param boolean $include_subs (since 1.5.2 and 1.4.9) if true, subfolders of 
+ *  system folders are special. if false, subfolders are not special mailboxes.
+ * @return bool whether this is a Trash folder
+ * @since 1.4.0
+ */",
+ "/**
+ * Detects if mailbox is a Sent folder or subfolder of Sent
+ * @param string $box mailbox name
+ * @param boolean $include_subs (since 1.5.2 and 1.4.9) if true, subfolders of 
+ *  system folders are special. if false, subfolders are not special mailboxes.
+ * @return bool whether this is a Sent folder
+ * @since 1.4.0
+ */",
+ "/**
+ * Detects if mailbox is a Drafts folder or subfolder of Drafts
+ * @param string $box mailbox name
+ * @param boolean $include_subs (since 1.5.2 and 1.4.9) if true, subfolders of 
+ *  system folders are special. if false, subfolders are not special mailboxes.
+ * @return bool whether this is a Draft folder
+ * @since 1.4.0
+ */",
+ "/**
+ * Expunges a mailbox, ie. delete all contents.
+ */",
+ "/**
+ * Checks whether or not the specified mailbox exists
+ */",
+ "/**
+ * Selects a mailbox
+ */",
+ "/**
+ * Creates a folder.
+ */",
+ "/**
+ * Subscribes to an existing folder.
+ */",
+ "/**
+ * Unsubscribes from an existing folder
+ */",
+ "/**
+ * Deletes the given folder
+ */",
+ "/**
+ * Determines if the user is subscribed to the folder or not
+ */",
+ "/**
+ * Renames a mailbox.
+ */",
+ "/**
+*Formatsamailboxintopartsforthe$boxesallarray
+*
+*Thepartsare:
+*
+*raw-RawLIST/LSUBresponsefromtheIMAPserver
+*formatted-nicelyformattedfoldername
+*unformatted-unformatted,butwithdelimiteratendremoved
+*unformatted-dm-foldernameasitappearsinrawresponse
+*unformatted-disp-unformattedwithout$folder_prefix
+*/",
+ "/**
+*Sortingfunctionusedtosortmailboxnames.
+*+Originalpatchfromdave_michmerhuizen@yahoo.com
+*+Allowscaseinsensitivitywhensortingfolders
+*+Takescareofthedelimiterbeingsortedtotheend,causing
+*subfolderstobelistedinbelowfoldersthatareprefixed
+*withtheirparentfoldersname.
+*
+*Forexample:INBOX.foo,INBOX.foobar,andINBOX.foo.bar
+*Withoutspecialsortfunction:foobarbetweenfooandfoo.bar
+*Withspecialsortfunction:foobarAFTERfooandfoo.bar:)
+*/",
+ "/**
+ * Returns list of options (to be echoed into select statement
+ * based on available mailboxes and separators
+ * Caller should surround options with <select ...> </select> and
+ * any formatting.
+ *   $imap_stream - $imapConnection to query for mailboxes
+ *   $show_selected - array containing list of mailboxes to pre-select (0 if none)
+ *   $folder_skip - array of folders to keep out of option list (compared in lower)
+ *   $boxes - list of already fetched boxes (for places like folder panel, where
+ *            you know these options will be shown 3 times in a row.. (most often unset).
+ *   $flag - flag to check for in mailbox flags, used to filter out mailboxes.
+ *           \'noselect\' by default to remove unselectable mailboxes.
+ *           \'noinferiors\' used to filter out folders that can not contain subfolders.
+ *           NULL to avoid flag check entirely.
+ *   $use_long_format - override folder display preference and always show full folder name.
+ */",
+ "/**
+ * Mailboxes with some chars (like -) can mess up the order, this fixes it
+ */",
+ "/**
+ * Returns sorted mailbox lists in several different ways.
+ * See comment on sqimap_mailbox_parse() for info about the returned array.
+ */",
+ "/**
+*Returnsalistofallfolders,subscribedornot
+*/",
+ "/**
+     * Sets header variable
+     * @param string $var
+     * @param mixed $value
+     */",
+ "/**
+     * Gets parameter value from $parameters array
+     * @param string $p
+     * @return mixed
+     */",
+ "/**
+     * Sets parameter value in $parameters array
+     * @param string $parameter
+     * @param mixed $value
+     */",
+ "/**
+ * Message header class
+ * Class contains all variables available in a bodystructure
+ * entity like described in rfc2060
+ * It was called msg_header in 1.3.0 and 1.3.1.
+ * @package squirrelmail
+ * @subpackage mime
+ * @since 1.3.2
+ */",
+ "/**
+ * Function to show fortune
+ * @access private
+ */",
+ "/**
+ * Add fortune options
+ * @access private
+ */",
+ "/** background **/",
+ "/** text **/",
+ "/** generate random color **/",
+ "/** set array element as hex string with hashmark (for HTML output) **/",
+ "/**
+ * Decode utf-8 strings
+ * @param string $string Encoded string
+ * @return string Decoded string
+ */",
+ "/**
+ * Checks if mailbox contains new messages.
+ *
+ * @param stream $imapConnection
+ * @param string $mailbox FIXME: option is not used
+ * @param string $real_box unformated mailbox name
+ * @param string $delimeter FIXME: option is not used
+ * @param string $unseen FIXME: option is not used
+ * @param integer $total_new number of new messages
+ * @return bool true, if there are new messages
+ */",
+ "/**
+ * Set loadinfo data
+ *
+ * Used by option page when saving settings.
+ */",
+ "/**
+ * Decode koi8-u encoded strings
+ * @param string $string Encoded string
+ * @return string Decoded string
+ */",
+ "/**
+ * Wraps text at $wrap characters
+ *
+ * Has a problem with special HTML characters, so call this before
+ * you do character translation.
+ *
+ * Specifically, &#039 comes up as 5 characters instead of 1.
+ * This should not add newlines to the end of lines.
+ */",
+ "/**
+ * Does the opposite of sqWordWrap()
+ * @param string body the text to un-wordwrap
+ * @return void
+ */",
+ "/**
+  * Truncates the given string so that it has at
+  * most $max_chars characters.  NOTE that a \"character\"
+  * may be a multibyte character, or (optionally), an
+  * HTML entity, so this function is different than
+  * using substr() or mb_substr().
+  * 
+  * NOTE that if $elipses is given and used, the returned
+  *      number of characters will be $max_chars PLUS the
+  *      length of $elipses
+  * 
+  * @param string  $string    The string to truncate
+  * @param int     $max_chars The maximum allowable characters
+  * @param string  $elipses   A string that will be added to
+  *                           the end of the truncated string
+  *                           (ONLY if it is truncated) (OPTIONAL;
+  *                           default not used)
+  * @param boolean $html_entities_as_chars Whether or not to keep
+  *                                        HTML entities together
+  *                                        (OPTIONAL; default ignore
+  *                                        HTML entities)
+  *
+  * @return string The truncated string
+  *
+  * @since 1.4.20 and 1.5.2 (replaced truncateWithEntities())
+  *
+  */",
+ "/**
+ * If $haystack is a full mailbox name and $needle is the mailbox
+ * separator character, returns the last part of the mailbox name.
+ *
+ * @param string haystack full mailbox name to search
+ * @param string needle the mailbox separator character
+ * @return string the last part of the mailbox name
+ */",
+ "/**
+ * php_self
+ *
+ * Attempts to determine the path and filename and any arguments
+ * for the currently executing script.  This is usually found in
+ * $_SERVER[\'REQUEST_URI\'], but some environments may differ, so
+ * this function tries to standardize this value.
+ *
+ * @since 1.2.3
+ * @return string The path, filename and any arguments for the
+ *                current script
+ */",
+ "/**
+ * Find out where squirrelmail lives and try to be smart about it.
+ * The only problem would be when squirrelmail lives in directories
+ * called \"src\", \"functions\", or \"plugins\", but people who do that need
+ * to be beaten with a steel pipe anyway.
+ *
+ * @return string the base uri of squirrelmail installation.
+ */",
+ "/**
+ * get_location
+ *
+ * Determines the location to forward to, relative to your server.
+ * This is used in HTTP Location: redirects.
+ * If set, it uses $config_location_base as the first part of the URL,
+ * specifically, the protocol, hostname and port parts. The path is
+ * always autodetected.
+ *
+ * @return string the base url for this SquirrelMail installation
+ */",
+ "/**
+ * Encrypts password
+ *
+ * These functions are used to encrypt the password before it is
+ * stored in a cookie. The encryption key is generated by
+ * OneTimePadCreate();
+ *
+ * @param string string the (password)string to encrypt
+ * @param string epad the encryption key
+ * @return string the base64-encoded encrypted password
+ */",
+ "/**
+ * Decrypts a password from the cookie
+ *
+ * Decrypts a password from the cookie, encrypted by OneTimePadEncrypt.
+ * This uses the encryption key that is stored in the session.
+ *
+ * @param string string the string to decrypt
+ * @param string epad the encryption key from the session
+ * @return string the decrypted password
+ */",
+ "/**
+ * Randomizes the mt_rand() function.
+ *
+ * Toss this in strings or integers and it will seed the generator
+ * appropriately. With strings, it is better to get them long.
+ * Use md5() to lengthen smaller strings.
+ *
+ * @param mixed val a value to seed the random number generator
+ * @return void
+ */",
+ "/**
+ * Init random number generator
+ *
+ * This function initializes the random number generator fairly well.
+ * It also only initializes it once, so you don\'t accidentally get
+ * the same \'random\' numbers twice in one session.
+ *
+ * @return void
+ */",
+ "/**
+ * Creates encryption key
+ *
+ * Creates an encryption key for encrypting the password stored in the cookie.
+ * The encryption key itself is stored in the session.
+ *
+ * @param int length optional, length of the string to generate
+ * @return string the encryption key
+ */",
+ "/**
+ * Returns a string showing the size of the message/attachment.
+ *
+ * @param int bytes the filesize in bytes
+ * @return string the filesize in human readable format
+ */",
+ "/**
+ * Generates a random string from the caracter set you pass in
+ *
+ * @param int size the size of the string to generate
+ * @param string chars a string containing the characters to use
+ * @param int flags a flag to add a specific set to the characters to use:
+ *     Flags:
+ *       1 = add lowercase a-z to $chars
+ *       2 = add uppercase A-Z to $chars
+ *       4 = add numbers 0-9 to $chars
+ * @return string the random string
+ */",
+ "/**
+ * Escapes special characters for use in IMAP commands.
+ *
+ * @param string the string to escape
+ * @return string the escaped string
+ */",
+ "/**
+ * Trims array
+ *
+ * Trims every element in the array, ie. remove the first char of each element
+ * Obsolete: will probably removed soon
+ * @param array array the array to trim
+ * @obsolete
+ */",
+ "/**
+ * Removes slashes from every element in the array
+ */",
+ "/**
+ * Create compose link
+ *
+ * Returns a link to the compose-page, taking in consideration
+ * the compose_in_new and javascript settings.
+ * @param string url the URL to the compose page
+ * @param string text the link text, default \"Compose\"
+ * @return string a link to the compose page
+ */",
+ "/**
+ * Print variable
+ *
+ * sm_print_r($some_variable, [$some_other_variable [, ...]]);
+ *
+ * Debugging function - does the same as print_r, but makes sure special
+ * characters are converted to htmlentities first.  This will allow
+ * values like <some@email.address> to be displayed.
+ * The output is wrapped in <<pre>> and <</pre>> tags.
+ *
+ * @return void
+ */",
+ "/**
+ * version of fwrite which checks for failure
+ */",
+ "/**
+ * Tests if string contains 8bit symbols.
+ *
+ * If charset is not set, function defaults to default_charset.
+ * $default_charset global must be set correctly if $charset is
+ * not used.
+ * @param string $string tested string
+ * @param string $charset charset used in a string
+ * @return bool true if 8bit symbols are detected
+ * @since 1.5.1 and 1.4.4
+ */",
+ "/**
+ * Function returns number of characters in string.
+ *
+ * Returned number might be different from number of bytes in string,
+ * if $charset is multibyte charset. Detection depends on mbstring
+ * functions. If mbstring does not support tested multibyte charset,
+ * vanilla string length function is used.
+ * @param string $str string
+ * @param string $charset charset
+ * @since 1.5.1 and 1.4.6
+ * @return integer number of characters in string
+ */",
+ "/**
+  * This is a replacement for PHP\'s strpos() that is
+  * multibyte-aware.
+  *
+  * @param string $haystack The string to search within
+  * @param string $needle   The substring to search for
+  * @param int    $offset   The offset from the beginning of $haystack
+  *                         from which to start searching
+  *                         (OPTIONAL; default none)
+  * @param string $charset  The charset of the given string.  A value of NULL
+  *                         here will force the use of PHP\'s standard strpos().
+  *                         (OPTIONAL; default is \"auto\", which indicates that
+  *                         the user\'s current charset should be used).
+  *
+  * @return mixed The integer offset of the next $needle in $haystack,
+  *               if found, or FALSE if not found
+  *
+  */",
+ "/**
+  * This is a replacement for PHP\'s substr() that is
+  * multibyte-aware.
+  *
+  * @param string $string  The string to operate upon
+  * @param int    $start   The offset at which to begin substring extraction
+  * @param int    $length  The number of characters after $start to return
+  *                        NOTE that if you need to specify a charset but
+  *                        want to achieve normal substr() behavior where
+  *                        $length is not specified, use NULL (OPTIONAL;
+  *                        default from $start to end of string)
+  * @param string $charset The charset of the given string.  A value of NULL
+  *                        here will force the use of PHP\'s standard substr().
+  *                        (OPTIONAL; default is \"auto\", which indicates that
+  *                        the user\'s current charset should be used).
+  *
+  * @return string The desired substring
+  *
+  * Of course, you can use more advanced (e.g., negative) values
+  * for $start and $length as needed - see the PHP manual for more
+  * information:  http://www.php.net/manual/function.substr.php
+  *
+  */",
+ "/**
+  * This is a replacement for PHP\'s substr_replace() that is
+  * multibyte-aware.
+  *
+  * @param string $string      The string to operate upon
+  * @param string $replacement The string to be inserted
+  * @param int    $start       The offset at which to begin substring replacement
+  * @param int    $length      The number of characters after $start to remove
+  *                            NOTE that if you need to specify a charset but
+  *                            want to achieve normal substr_replace() behavior
+  *                            where $length is not specified, use NULL (OPTIONAL;
+  *                            default from $start to end of string)
+  * @param string $charset     The charset of the given string.  A value of NULL
+  *                            here will force the use of PHP\'s standard substr().
+  *                            (OPTIONAL; default is \"auto\", which indicates that
+  *                            the user\'s current charset should be used).
+  *
+  * @return string The manipulated string
+  *
+  * Of course, you can use more advanced (e.g., negative) values
+  * for $start and $length as needed - see the PHP manual for more
+  * information:  http://www.php.net/manual/function.substr-replace.php
+  *
+  */",
+ "/**
+ * Replacement of mb_list_encodings function
+ *
+ * This function provides replacement for function that is available only
+ * in php 5.x. Function does not test all mbstring encodings. Only the ones
+ * that might be used in SM translations.
+ *
+ * Supported strings are stored in session in order to reduce number of
+ * mb_internal_encoding function calls.
+ *
+ * If mb_list_encodings() function is present, code uses it. Main difference
+ * from original function behaviour - array values are lowercased in order to
+ * simplify use of returned array in in_array() checks.
+ *
+ * If you want to test all mbstring encodings - fill $list_of_encodings
+ * array.
+ * @return array list of encodings supported by php mbstring extension
+ * @since 1.5.1 and 1.4.6
+ */",
+ "/**
+ * Callback function used to lowercase array values.
+ * @param string $val array value
+ * @param mixed $key array key
+ * @since 1.5.1 and 1.4.6
+ */",
+ "/**
+ * Callback function to trim whitespace from a value, to be used in array_walk
+ * @param string $value value to trim
+ * @since 1.5.2 and 1.4.7
+ */",
+ "/**
+  * Gathers the list of secuirty tokens currently
+  * stored in the user\'s preferences and optionally
+  * purges old ones from the list.
+  *
+  * @param boolean $purge_old Indicates if old tokens
+  *                           should be purged from the
+  *                           list (\"old\" is 2 days or
+  *                           older unless the administrator
+  *                           overrides that value using
+  *                           $max_token_age_days in
+  *                           config/config_local.php)
+  *                           (OPTIONAL; default is to always
+  *                           purge old tokens)
+  *
+  * @return array The list of tokens
+  *
+  * @since 1.4.19 and 1.5.2
+  *
+  */",
+ "/**
+  * Generates a security token that is then stored in
+  * the user\'s preferences with a timestamp for later
+  * verification/use.
+  *
+  * WARNING: If the administrator has turned the token system
+  *          off by setting $disable_security_tokens to TRUE in
+  *          config/config.php or the configuration tool, this
+  *          function will not store tokens in the user
+  *          preferences (but it will still generate and return
+  *          a random string).
+  *
+  * @return string A security token
+  *
+  * @since 1.4.19 and 1.5.2
+  *
+  */",
+ "/**
+  * Validates a given security token and optionally remove it
+  * from the user\'s preferences if it was valid.  If the token
+  * is too old but otherwise valid, it will still be rejected.
+  *
+  * \"Too old\" is 2 days or older unless the administrator
+  * overrides that value using $max_token_age_days in
+  * config/config_local.php
+  *
+  * WARNING: If the administrator has turned the token system
+  *          off by setting $disable_security_tokens to TRUE in
+  *          config/config.php or the configuration tool, this
+  *          function will always return TRUE.
+  *
+  * @param string  $token           The token to validate
+  * @param int     $validity_period The number of seconds tokens are valid
+  *                                 for (set to zero to remove valid tokens
+  *                                 after only one use; use 3600 to allow
+  *                                 tokens to be reused for an hour)
+  *                                 (OPTIONAL; default is to only allow tokens
+  *                                 to be used once)
+  * @param boolean $show_error      Indicates that if the token is not
+  *                                 valid, this function should display
+  *                                 a generic error, log the user out
+  *                                 and exit - this function will never
+  *                                 return in that case.
+  *                                 (OPTIONAL; default FALSE)
+  *
+  * @return boolean TRUE if the token validated; FALSE otherwise
+  *
+  * @since 1.4.19 and 1.5.2
+  *
+  */",
+ "/**
+ * @ignore
+ */",
+ "/**
+ * Completely undocumented class - someone document it!
+ * @package squirrelmail
+ */",
+ "/**
+ * returns the value for the pref $string
+ * @ignore
+ */",
+ "/**
+ * Remove the pref $string
+ * @ignore
+ */",
+ "/**
+ * sets the pref, $string, to $set_to
+ * @ignore
+ */",
+ "/**
+ * This checks if the prefs are available
+ * @ignore
+ */",
+ "/**
+ * Writes the Signature
+ * @ignore
+ */",
+ "/**
+ * Gets the signature
+ * @ignore
+ */",
+ "/**
+ * Check if user has previously logged in to the SquirrelMail session.  If user
+ * has not logged in, execution will stop inside this function.
+ *
+ * This function optionally checks the referrer of this page request.  If the
+ * administrator wants to impose a check that the referrer of this page request
+ * is another page on the same domain (otherwise, the page request is likely
+ * the result of a XSS or phishing attack), then they need to specify the
+ * acceptable referrer domain in a variable named $check_referrer in
+ * config/config.php (or the configuration tool) for which the value is
+ * usually the same as the $domain setting (for example:
+ *    $check_referrer = \'example.com\';
+ * However, in some cases (where proxy servers are in use, etc.), the
+ * acceptable referrer might be different.  If $check_referrer is set to
+ * \"###DOMAIN###\", then the current value of $domain is used (useful in
+ * situations where $domain might change at runtime (when using the Login
+ * Manager plugin to host multiple domains with one SquirrelMail installation,
+ * for example)):
+ *    $check_referrer = \'###DOMAIN###\';
+ * NOTE HOWEVER, that referrer checks are not foolproof - they can be spoofed
+ * by browsers, and some browsers intentionally don\'t send them, in which
+ * case SquirrelMail silently ignores referrer checks.
+ *
+ * @return void This function returns ONLY if user has previously logged in
+ * successfully (otherwise, execution terminates herein).
+ */",
+ "/**
+ * Given the challenge from the server, supply the response using cram-md5 (See
+ * RFC 2195 for details)
+ *
+ * @param string $username User ID
+ * @param string $password User password supplied by User
+ * @param string $challenge The challenge supplied by the server
+ * @return string The response to be sent to the IMAP server
+ *
+ */",
+ "/**
+ * Return Digest-MD5 response.
+ * Given the challenge from the server, calculate and return the
+ * response-string for digest-md5 authentication.  (See RFC 2831 for more
+ * details)
+ *
+ * @param string $username User ID
+ * @param string $password User password supplied by User
+ * @param string $challenge The challenge supplied by the server
+ * @param string $service The service name, usually \'imap\'; it is used to
+ *   define the digest-uri.
+ * @param string $host The host name, usually the server\'s FQDN; it is used to
+ *   define the digest-uri.
+ * @return string The response to be sent to the IMAP server
+ */",
+ "/**
+ * Parse Digest-MD5 challenge.
+ * This function parses the challenge sent during DIGEST-MD5 authentication and
+ * returns an array. See the RFC for details on what\'s in the challenge string.
+ *
+ * @param string $challenge Digest-MD5 Challenge
+ * @return array Digest-MD5 challenge decoded data
+ */",
+ "/**
+ * Creates a HMAC digest that can be used for auth purposes
+ * See RFCs 2104, 2617, 2831
+ * Uses mhash() extension if available
+ *
+ * @param string $data Data to apply hash function to.
+ * @param string $key Optional key, which, if supplied, will be used to
+ * calculate data\'s HMAC.
+ * @return string HMAC Digest string
+ */",
+ "/**
+ * Reads and decodes stored user password information
+ *
+ * Direct access to password information is deprecated.
+ * @return string password in plain text
+ * @since 1.4.11
+ */",
+ "/**
+ * Saves or updates user password information
+ *
+ * This function is used to update the password information that
+ * SquirrelMail stores in the existing PHP session. It does NOT
+ * modify the password stored in the authentication system used
+ * by the IMAP server.
+ *
+ * This function must be called before any html output is started.
+ * Direct access to password information is deprecated. The saved
+ * password information is available only to the SquirrelMail script
+ * that is called/executed AFTER the current one. If your script
+ * needs access to the saved password after a sqauth_save_password()
+ * call, use the returned OTP encrypted key.
+ *
+ * @param string $pass password
+ *
+ * @return string Password encrypted with OTP. In case the script
+ *                wants to access the password information before
+ *                the end of its execution.
+ *
+ * @since 1.4.16
+ *
+ */",
+ "/**
+ * Fillin user and password based on SMTP auth settings.
+ *
+ * @param string $user Reference to SMTP username
+ * @param string $pass Reference to SMTP password (unencrypted)
+ * @since 1.4.11
+ */",
+ "/**
+ * Recursive function that computes the collapsed status and parent
+ * (or not parent) status of this box, and the visiblity and collapsed
+ * status and parent (or not parent) status for all children boxes.
+ */",
+ "/**
+ * Create the link for a parent folder that will allow that
+ * parent folder to either be collapsed or expaned, as is
+ * currently appropriate.
+ */",
+ "/**
+ * create_unseen_string:
+ *
+ * Create unseen and total message count for both this folder and
+ * it\'s subfolders.
+ *
+ * @param string $boxName name of the current mailbox
+ * @param array $boxArray array for the current mailbox
+ * @param $imapConnection current imap connection in use
+ * @return array[0] unseen message string (for display)
+ * @return array[1] unseen message count
+ */",
+ "/**
+ * This simple function checks if a box is another box\'s parent.
+ */",
+ "/**
+ * Decde a cp1258-encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode cp1254-encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode a cp1250 string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Set up a couple of non-negotiable constants and
+ * defaults. Don\'t change these, * the setuppable stuff is in
+ * sqspell_config.php
+ */",
+ "/**
+ * Make an input field
+ * @param string $label
+ * @param string $field
+ * @param string $name
+ * @param string $size
+ * @param array $values
+ * @param string $add
+ */",
+ "/**
+ * Output form to add and modify address data
+ */",
+ "/**
+ * Provides list of writeable backends.
+ * Works only when address is added ($name=\'addaddr\')
+ * @param string $name name of form
+ * @return string html formated backend field (select or hidden)
+ */",
+ "/**
+                     * $editaddr is set, but $sel (address selection in address listing) 
+                     * and $doedit (address edit form) are not set. 
+                     * Assume that user clicked on \"Edit address\" without selecting any address.
+                     */",
+ "/**
+ * Example:
+ *
+ * $SQSPELL_APP = array( \'English\' => \'ispell -a\',
+ *                     \'Spanish\' => \'ispell -d spanish -a\' );
+ * You can replace ispell with aspell keeping the same commandline:
+ * $SQSPELL_APP = array( \'English\' => \'aspell -a\',
+ *                     \'Spanish\' => \'aspell -d spanish -a\' );
+ */",
+ "/**
+ * Decode iso8859-8 encoded strings
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode iso8859-13
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode iso8859-4 string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Converts string to cp1256
+ * @param string $string text with numeric unicode entities
+ * @return string cp1256 encoded text
+ */",
+ "/**
+ * Return cp1256 symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_cp1256
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/cp1256.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string cp1256 character
+ */",
+ "/** generate random color **/",
+ "/**
+ * This function adds a plugin.
+ * @param string $name Internal plugin name (ie. delete_move_next)
+ * @return void
+ */",
+ "/**
+ * This function executes a hook.
+ * @param string $name Name of hook to fire
+ * @return mixed $data
+ */",
+ "/**
+ * This function executes a hook and allows for parameters to be passed.
+ *
+ * @param string name the name of the hook
+ * @param mixed param the parameters to pass to the hook function
+ * @return mixed the return value of the hook function
+ */",
+ "/**
+ * This function executes a hook, concatenating the results of each
+ * plugin that has the hook defined.
+ *
+ * @param string name the name of the hook
+ * @param mixed parm optional hook function parameters
+ * @return string a concatenation of the results of each plugin function
+ */",
+ "/**
+ * This function is used for hooks which are to return true or
+ * false. If $priority is > 0, any one or more trues will override
+ * any falses. If $priority < 0, then one or more falses will
+ * override any trues.
+ * Priority 0 means majority rules.  Ties will be broken with $tie
+ *
+ * @param string name the hook name
+ * @param mixed parm the parameters for the hook function
+ * @param int priority
+ * @param bool tie
+ * @return bool the result of the function
+ */",
+ "/**
+ * This function checks whether the user\'s USER_AGENT is known to
+ * be broken. If so, returns true and the plugin is invisible to the
+ * offending browser.
+ * *** THIS IS A TEST FOR JAVASCRIPT SUPPORT ***
+ * FIXME: This function needs to have its name changed!
+ *
+ * @return bool whether this browser properly supports JavaScript
+ */",
+ "/**
+ * update event info
+ * @return void
+ * @access private
+ */",
+ "/**
+ * Confirms event update
+ * @return void
+ * @access private
+ */",
+ "/**
+ * Init plugin
+ * @access private
+ */",
+ "/**
+ * Report spam folder as special mailbox
+ * @param string $mb variable used by hook
+ * @return string spam folder name
+ * @access private 
+ */",
+ "/**
+ * Register option blocks
+ * @access private
+ */",
+ "/**
+     * @param string $ent entity id
+     */",
+ "/**
+     * Add nested message part
+     * @param object $msg
+     */",
+ "/**
+     * Get file name used for mime part
+     * @return string file name
+     * @since 1.3.2
+     */",
+ "/**
+     * Add header object to message object.
+     * WARNING: Unfinished code. Don\'t expect it to work in older sm versions.
+     * @param mixed $read array or string with message headers
+     * @todo FIXME: rfc822header->parseHeader() does not return rfc822header object
+     */",
+ "/**
+     * @param string $ent
+     * @return mixed (object or string?)
+     */",
+ "/**
+     * Set message body
+     * @param string $s message body
+     */",
+ "/**
+     * Clean message object
+     */",
+ "/**
+     * @return string
+     */",
+ "/**
+     * @param object $msg
+     * @param mixed $init
+     * @param integer $i
+     * @todo document me
+     * @since 1.4.0
+     */",
+ "/**
+     * @param string $read
+     * @param integer $i
+     * @param mixed $sub_msg
+     * @return object Message object
+     * @todo document me
+     * @since 1.4.0 (code was part of parseStructure() in 1.3.x)
+     */",
+ "/**
+     * @param string $read
+     * @param integer $i
+     * @return array
+     */",
+ "/**
+     * @param string $read
+     * @param integer $i
+     * @param object $hdr MessageHeader object
+     * @return object MessageHeader object
+     */",
+ "/**
+     * @param string $read
+     * @param integer $i
+     * @return string
+     * @todo document me
+     */",
+ "/**
+     * function parseQuote
+     *
+     * This extract the string value from a quoted string. After the end-quote
+     * character is found it returns the string. The offset $i when calling
+     * this function points to the first double quote. At the end it points to
+     * The ending quote. This function takes care of escaped double quotes.
+     * \"some \"string\"\"
+     * ^               ^
+     * initial $i      end position $i
+     *
+     * @param string $read
+     * @param integer $i offset in $read
+     * @return string string inbetween the double quotes
+     * @author Marc Groot Koerkamp
+     */",
+ "/**
+     * @param string $read
+     * @param integer $i
+     * @return object AddressStructure object
+     */",
+ "/**
+     * @param string $read
+     * @param integer $i
+     * @param object Disposition object or empty string
+     */",
+ "/**
+     * @param string $read
+     * @param integer $i
+     * @return object Language object or empty string
+     */",
+ "/**
+     * Parse message text enclosed in parenthesis
+     * @param string $read
+     * @param integer $i
+     * @return integer
+     */",
+ "/**
+*Functiontofillthemessagestructureincasethe
+*bodystructureisnotavailable
+*NOTFINISHEDYET
+*@paramstring$read
+*@paramstring$type0messageparttype
+*@paramstring$type1messagepartsubtype
+*@returnstring(onlywhentype0isnotmessageormultipart)
+*/",
+ "/**
+*@paramarray$entity
+*@paramarray$alt_order
+*@paramboolean$strict
+*@returnarray
+*/",
+ "/**
+*@paramarray$alt_order
+*@returnentity
+*/",
+ "/**
+*@returnarray
+*/",
+ "/**
+*@paramarray$exclude_id
+*@paramarray$result
+*@returnarray
+*/",
+ "/**
+*Addattachmenttomessageobject
+*@paramstring$typeattachmenttype
+*@paramstring$nameattachmentname
+*@paramstring$locationpathtoattachment
+*/",
+ "/**
+*Deleteallattachmentsfromthisobjectfromdisk.
+*@since1.4.6
+*/",
+ "/**
+*Theobjectthatcontainsamessage.
+*
+*messageistheobjectthatcontainsmessages.Itisarecursiveobjectin
+*thatthroughthe$entitiesvariable,itcancontainmoreobjectsoftype
+*message.Seedocumentationinmime.txtforabetterdescriptionofhowthis
+*works.
+*@packagesquirrelmail
+*@subpackagemime
+*@since1.3.0
+*/",
+ "/**
+ * Converts string to iso-8859-2
+ * @param string $string text with numeric unicode entities
+ * @return string iso-8859-2 encoded text
+ */",
+ "/**
+ * Return iso-8859-2 symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_iso_8859_2
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/iso_8859_2.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string iso-8859-2 character
+ */",
+ "/**
+ * Initialize the plugin
+ * @return void
+ */",
+ "/**
+     * Constructor. Connects to database
+     * @param array connection options
+     */",
+ "/**
+     * Open the LDAP server.
+     * @param bool $new is it a new connection
+     * @return bool
+     */",
+ "/**
+     * Converts string to the charset used by LDAP server
+     * @param string string that has to be converted
+     * @return string converted string
+     */",
+ "/**
+     * Convert from charset used by LDAP server to charset used by translation
+     *
+     * Output must be sanitized.
+     * @param string string that has to be converted
+     * @return string converted string
+     */",
+ "/**
+*Sanitizesldapsearchstrings.
+*Seerfc2254
+*@linkhttp://www.faqs.org/rfcs/rfc2254.html
+*@since1.5.1and1.4.5
+*@paramstring$string
+*@returnstringsanitizedstring
+*/",
+ "/**
+*SearchtheLDAPserver
+*@paramstring$exprsearchexpression
+*@returnarraysearchresults
+*/",
+ "/**
+*ListallentriespresentinLDAPserver
+*
+*IfyourunatinyLDAPserverandyouwantthe\"List All\" button
+     * to show EVERYONE, disable first return call and enable the second one.
+     * Remember that maxrows setting might limit list of returned entries.
+     *
+     * Careful with this -- it could get quite large for big sites.
+     * @return array all entries in ldap server
+     */",
+ "/**
+ * Address book backend for LDAP server
+ *
+ * An array with the following elements must be passed to
+ * the class constructor (elements marked ? are optional):
+ * <pre>
+ *    host      => LDAP server hostname/IP-address
+ *    base      => LDAP server root (base dn). Empty string allowed.
+ *  ? port      => LDAP server TCP port number (default: 389)
+ *  ? charset   => LDAP server charset (default: utf-8)
+ *  ? name      => Name for LDAP server (default \"LDAP: hostname\")
+ *                 Used to tag the result data
+ *  ? maxrows   => Maximum # of rows in search result
+ *  ? timeout   => Timeout for LDAP operations (in seconds, default: 30)
+ *                 Might not work for all LDAP libraries or servers.
+ *  ? binddn    => LDAP Bind DN.
+ *  ? bindpw    => LDAP Bind Password.
+ *  ? protocol  => LDAP Bind protocol.
+ * </pre>
+ * NOTE. This class should not be used directly. Use the
+ *       \"AddressBook\" class instead.
+ * @package squirrelmail
+ * @subpackage addressbook
+ */",
+ "/**
+ * Organization\'s name
+ * @global string $org_name
+ */",
+ "/**
+ * Organization\'s logo picture (blank if none)
+ * @global string $org_logo
+ */",
+ "/**
+ * The width of the logo (0 for default)
+ * @global string $org_logo_width
+ */",
+ "/**
+ * The height of the logo (0 for default)
+ * @global string $org_logo_height
+ */",
+ "/**
+ * Webmail Title
+ *
+ * This is the web page title that appears at the top of the browser window.
+ * @global string $org_title
+ */",
+ "/**
+ * Signout page
+ *
+ * Rather than going to the signout.php page (which only allows you
+ * to sign back in), setting signout_page allows you to sign the user
+ * out and then redirect to whatever page you want. For instance,
+ * the following would return the user to your home page:
+ *   $signout_page = \'/\';
+ * Set to the empty string to continue to use the default signout page.
+ * @global string $signout_page
+ */",
+ "/**
+ * Top frame
+ *
+ * By default SquirrelMail takes up the whole browser window,
+ * this allows you to embed it within sites using frames. Set
+ * this to the frame you want it to stay in.
+ * @global string $frame_top
+ */",
+ "/**
+ * Provider name
+ *
+ * Here you can set name of the link displayed on the right side of main page.
+ *
+ * Link will be displayed only if you have $hide_sm_attributions 
+ * option set to true.
+ * @global string $provider_name
+ */",
+ "/**
+ * Provider URI
+ *
+ * Here you can set URL of the link displayed on the right side of main page.
+ *
+ * Link will be displayed only if you have $hide_sm_attributions 
+ * option set to true.
+ * @global string $provider_uri
+ */",
+ "/**
+ * Default Domain
+ *
+ * The domain part of local email addresses.
+ *   This is for all messages sent out from this server.
+ *   Reply address is generated by $username@$domain
+ * Example: In bob@example.com, example.com is the domain.
+ * @global string $domain
+ */",
+ "/**
+ * Time offset inversion
+ *
+ * If you are running on a machine that doesn\'t have the tm_gmtoff
+ * value in your time structure and if you are in a time zone that
+ * has a negative offset, you need to set this value to 1. This is
+ * typically people in the US that are running Solaris 7.
+ * @global bool $invert_time
+ */",
+ "/**
+ * Default send transport
+ *
+ * What should be used when sending email.
+ * If it is set to false, SquirrelMail will use SMTP server settings.
+ * If it is set to true, SquirrelMail will use program defined in 
+ * $sendmail_path
+ * @global bool $useSendmail
+ */",
+ "/**
+ * Your SMTP server (usually the same as the IMAP server).
+ * @global string $smtpServerAddress
+ */",
+ "/**
+ * Your SMTP port number (usually 25).
+ * @global integer $smtpPort
+ */",
+ "/**
+ * SquirrelMail header encryption
+ *
+ * Encryption key allows to hide SquirrelMail Received: headers
+ * in outbound messages. Interface uses encryption key to encode
+ * username, remote address and proxied address, then stores encoded
+ * information in X-Squirrel-* headers.
+ *
+ * Warning: used encryption function is not bulletproof. When used
+ * with static encryption keys, it provides only minimal security
+ * measures and information can be decoded quickly.
+ *
+ * Encoded information can be decoded with decrypt_headers.php script
+ * from SquirrelMail contrib/ directory.
+ * @global string $encode_header_key
+ * @since 1.5.1 and 1.4.5
+ */",
+ "/**
+ * Path to Sendmail
+ *
+ * Program that should be used when sending email. SquirrelMail expects that
+ * this program will follow options used by original sendmail 
+ * (http://www.sendmail.org).
+ * @global string $sendmail_path
+ */",
+ "/**
+ * Extra sendmail command arguments.
+ *
+ * Sets additional sendmail command arguments. Make sure that arguments are
+ * supported by your sendmail program. -f argument is added automatically by
+ * SquirrelMail scripts. Variable defaults to standard /usr/sbin/sendmail
+ * arguments. If you use qmail-inject, nbsmtp or any other sendmail wrapper,
+ * which does not support -t and -i arguments, set variable to empty string
+ * or use arguments suitable for your mailer.
+ * @global string $sendmail_args
+ * @since 1.5.1 and 1.4.8
+ */",
+ "/**
+ * IMAP server address
+ *
+ * The dns name (or IP address) for your imap server.
+ * @global string $imapServerAddress
+ */",
+ "/**
+ * IMAP server port
+ *
+ * Port used by your imap server. (Usually 143)
+ * @global integer $imapPort
+ */",
+ "/**
+ * IMAP server type
+ *
+ * The type of IMAP server you are running.
+ * Valid type are the following (case is important):
+ *   courier
+ *   cyrus
+ *   exchange
+ *   uw
+ *   macosx
+ *   hmailserver
+ *   other
+ *
+ * Please note that this changes only some of server settings.
+ *
+ * In order to set everything correctly, you need to adjust several
+ * squirrelmail options. These options are listed in doc/presets.txt
+ * @global string $imap_server_type
+ */",
+ "/**
+ * Advanced IMAP authentication options control
+ *
+ * CRAM-MD5, DIGEST-MD5, Plain, and TLS
+ * Set reasonable defaults - you\'d never know this was there unless you ask for it
+ * @global bool $use_imap_tls
+ */",
+ "/**
+ * Advanced SMTP authentication options control
+ *
+ * CRAM-MD5, DIGEST-MD5, Plain, and TLS
+ * Set reasonable defaults - you\'d never know this was there unless you ask for it
+ * @global bool $use_smtp_tls
+ */",
+ "/**
+ * SMTP authentication mechanism
+ *
+ * auth_mech can be either \'none\', \'login\',\'plain\', \'cram-md5\', or \'digest-md5\'
+ * @global string $smtp_auth_mech
+ */",
+ "/**
+ * Custom SMTP Authentication Username
+ * 
+ * IMAP username is used if variable is set to an empty string. Variable is included in
+ * the main configuration file only in 1.4.11+ and 1.5.2+.
+ * @global string $smtp_sitewide_user
+ * @since 1.4.11
+ */",
+ "/**
+ * Custom SMTP Authentication Password
+ * 
+ * IMAP password is used if variable is set to an empty string.  Variable is included in 
+ * the main configuration file in 1.4.11+ and 1.5.2+
+ * @global string $smtp_sitewide_pass
+ * @since 1.4.11
+ */",
+ "/**
+ * IMAP authentication mechanism
+ *
+ * auth_mech can be either \'login\',\'plain\', \'cram-md5\', or \'digest-md5\'
+ * @global string $imap_auth_mech
+ */",
+ "/**
+ * IMAP folder delimiter
+ *
+ * This is the delimiter that your IMAP server uses to distinguish between
+ * folders.  For example, Cyrus uses \'.\' as the delimiter and a complete
+ * folder would look like \'INBOX.Friends.Bob\', while UW uses \'/\' and would
+ * look like \'INBOX/Friends/Bob\'.  Normally this should be left at \'detect\'
+ * but if you are sure you know what delimiter your server uses, you can
+ * specify it here.
+ *
+ * To have it autodetect the delimiter, set it to \'detect\'.
+ * @global string $optional_delimiter
+ */",
+ "/**
+ * POP before SMTP setting
+ *
+ * Do you wish to use POP3 before SMTP?  Your server must
+ * support this in order for SquirrelMail to work with it.
+ * @global bool $pop_before_smtp
+ */",
+ "/**
+ * POP before SMTP server address
+ *
+ * When using POP3 before SMTP, if the POP server address is
+ * not the same as the SMTP server address, specify it here.
+ * If this is left empty, the SMTP server address will be
+ * used by default.
+ * @global bool $pop_before_smtp_host
+ */",
+ "/**
+ * Default IMAP folder prefix
+ *
+ * Many servers store mail in your home directory. With this, they
+ * store them in a subdirectory: mail/ or Mail/, etc. If your server
+ * does this, please set this to what the default mail folder should
+ * be. This is still a user preference, so they can change it if it
+ * is different for each user.
+ *
+ * Example:
+ *     $default_folder_prefix = \'mail/\';
+ *        -- or --
+ *     $default_folder_prefix = \'Mail/folders/\';
+ *
+ * If you do not use this, set it to the empty string.
+ * @global string $default_folder_prefix
+ */",
+ "/**
+ * User level prefix control
+ *
+ * If you do not wish to give them the option to change this, set it
+ * to false. Otherwise, if it is true, they can change the folder prefix
+ * to be anything.
+ * @global bool $show_prefix_option
+ */",
+ "/**
+ * The following are related to deleting messages.
+ *   $default_move_to_trash
+ *      If this is set to \'true\', when \'delete\' is pressed, it
+ *      will attempt to move the selected messages to the folder
+ *      named $trash_folder. If it\'s set to \'false\', we won\'t even
+ *      attempt to move the messages, just delete them.
+ *   $default_move_to_sent
+ *      If this is set to \'true\', sent messages will be stored in
+ *      $sent_folder by default.
+ *   $default_save_as_draft
+ *      If this is set to \'true\', users are able to use $draft_folder
+ *      to store their unfinished messages.
+ *   $trash_folder
+ *      This is the path to the default trash folder. For Cyrus
+ *      IMAP, it would be \'INBOX.Trash\', but for UW it would be
+ *      \'Trash\'. We need the full path name here.
+ *   $draft_folder
+ *      This is the patch to where Draft messages will be stored.
+ *   $auto_expunge
+ *      If this is true, when a message is moved or copied, the
+ *      source mailbox will get expunged, removing all messages
+ *      marked \'Deleted\'.
+ *   $sent_folder
+ *      This is the path to where Sent messages will be stored.
+ *   $delete_folder
+ *      If this is true, when a folder is deleted then it will
+ *      not get moved into the Trash folder.
+ * @global bool $default_move_to_trash
+ * @global bool $default_move_to_sent
+ * @global bool $default_save_as_draft
+ * @global string $trash_folder
+ * @global string $sent_folder
+ * @global string $draft_folder
+ * @global bool $auto_expunge
+ * @global bool $delete_folder
+ */",
+ "/**
+ * Special Folder Color Control
+ *
+ * Whether or not to use a special color for special folders. If not,
+ * special folders will be the same color as the other folders.
+ * @global bool $use_special_folder_color
+ */",
+ "/**
+ * Create Special Folders Control
+ *
+ * Should I create the Sent and Trash folders automatically for
+ * a new user that doesn\'t already have them created?
+ * @global bool $auto_create_special
+ */",
+ "/**
+ * List Special Folders First Control
+ *
+ * Whether or not to list the special folders first (true/false).
+ * @global bool $list_special_folders_first 
+ */",
+ "/**
+ * Subfolder Layout Control
+ *
+ * Are all your folders subfolders of INBOX (i.e. cyrus IMAP server).
+ * If you are unsure, set it to false.
+ * @global bool $default_sub_of_inbox
+ */",
+ "/**
+ * Subfolder Format Control
+ *
+ * Some IMAP daemons (UW) handle folders weird. They only allow a
+ * folder to contain either messages or other folders, not both at
+ * the same time. This option controls whether or not to display an
+ * option during folder creation. The option toggles which type of
+ * folder it should be.
+ *
+ * If this option confuses you, just set it to \'true\'. You can not hurt 
+ * anything if it\'s true, but some servers will respond weird if it\'s
+ * false. (Cyrus works fine whether it\'s true OR false).
+ * @global bool $show_contain_subfolders_option
+ */",
+ "/**
+ * These next two options set the defaults for the way that the
+ * users see their folder list.
+ *   $default_unseen_notify
+ *       Specifies whether or not the users will see the number of 
+ *       unseen in each folder by default and also which folders to
+ *       do this to. Valid values are: 1=none, 2=inbox, 3=all.
+ *   $default_unseen_type
+ *       Specifies the type of notification to give the users by
+ *       default. Valid choice are: 1=(4), 2=(4,25).
+ * @global integer $default_unseen_notify
+ * @global integer $default_unseen_type
+ */",
+ "/**
+ * NoSelect Fix Control
+ *
+ * This enables the no select fix for Cyrus when subfolders
+ * exist but parent folders do not
+ * @global bool $noselect_fix_enable
+ */",
+ "/**
+ * Path to the data/ directory
+ *
+ *   It is a possible security hole to have a writable directory
+ *   under the web server\'s root directory (ex: /home/httpd/html).
+ *   It is possible to put the data directory anywhere you would like;
+ *   it is strongly advised that it is NOT directly web-accessible.
+ *
+ *   The path name can be absolute or relative (to the config directory).
+ *   If it is relative, it must use the SM_PATH constant.
+ *   Here are two examples:
+ *
+ * Absolute:
+ *   $data_dir = \'/var/local/squirrelmail/data/\';
+ *
+ * Relative (to main SM directory):
+ *   $data_dir = SM_PATH . \'data/\';
+ *   (NOT recommended: you need to secure apache to make sure these
+ *   files are not world readable)
+ *
+ * @global string $data_dir
+ */",
+ "/**
+ * Attachments directory
+ *
+ * Path to directory used for storing attachments while a mail is
+ * being sent. There are a few security considerations regarding
+ * this directory:
+ *    + It should have the permission 733 (rwx-wx-wx) to make it
+ *      impossible for a random person with access to the webserver to
+ *      list files in this directory. Confidential data might be laying
+ *      around there.
+ *    + Since the webserver is not able to list the files in the content
+ *      is also impossible for the webserver to delete files lying around 
+ *      there for too long.
+ *    + It should probably be another directory than data_dir.
+ * @global string $attachment_dir
+ */",
+ "/**
+ * Hash level used for data directory.
+ * 
+ * This option allows spliting file based squirrelmail user
+ * data storage directory into several subfolders. Number from
+ * 0 to 4 allows allows having up to four subfolder levels.
+ *
+ * Hashing should speed up directory access if you have big number 
+ * of users (500 and more).
+ * @global integer $dir_hash_level
+ */",
+ "/**
+ * Default Size of Folder List
+ *
+ * This is the default size of the folder list. Default
+ * is 150, but you can set it to whatever you wish.
+ * @global string $default_left_size
+ */",
+ "/**
+ * Username Case Control
+ *
+ * Some IMAP servers allow a username (like \'bob\') to log in if they use
+ * uppercase in their name (like \'Bob\' or \'BOB\'). This creates extra
+ * preference files.  Toggling this option to true will transparently
+ * change all usernames to lowercase.
+ * @global bool $force_username_lowercase
+ */",
+ "/**
+ * Email Priority Control
+ *
+ * This option enables use of email priority flags by end users.
+ * @global bool $default_use_priority
+ */",
+ "/**
+ * SquirrelMail Attributions Control
+ *
+ * This option disables display of \"created by squirrelmail developers\" 
+ * strings and provider link
+ * @global bool $hide_sm_attributions
+ */",
+ "/**
+ * Delivery Receipts Control
+ *
+ * This option enables use of read/delivery receipts by end users.
+ * @global bool $default_use_mdn
+ */",
+ "/**
+ * Identity Controls
+ *
+ * If you don\'t want to allow users to change their email address
+ * then you can set $edit_identity to false, if you want them to
+ * not be able to change their full name too then set $edit_name
+ * to false as well. $edit_name has no effect unless $edit_identity
+ * is false;
+ * @global bool $edit_identity
+ * @global bool $edit_name
+ */",
+ "/**
+ * SquirrelMail adds username information to every sent email.
+ * It is done in order to prevent possible sender forging when 
+ * end users are allowed to change their email and name 
+ * information.
+ *
+ * You can disable this header, if you think that it violates
+ * user\'s privacy or security. Please note, that setting will
+ * work only when users are not allowed to change their identity.
+ *
+ * See SquirrelMail bug tracker #847107 for more details about it.
+ * @global bool $hide_auth_header
+ * @since 1.5.1 and 1.4.5
+ */",
+ "/**
+ * Server Side Threading Control
+ *
+ * If you want to enable server side thread sorting options
+ * Your IMAP server must support the THREAD extension for 
+ * this to work.
+ * @global bool $allow_thread_sort
+ */",
+ "/**
+ * Server Side Sorting Control
+ *
+ * to use server-side sorting instead of SM client side.
+ * Your IMAP server must support the SORT extension for this
+ * to work.
+ * @global bool $allow_server_sort
+ */",
+ "/**
+ * IMAP Charset Use Control
+ *
+ * This option allows you to choose if SM uses charset search
+ * Your imap server should support SEARCH CHARSET command for 
+ * this to work.
+ * @global bool $allow_charset_search
+ */",
+ "/**
+ * IMAP UID control
+ *
+ * This option allows you to enable unique identifier (UID) support.
+ * @global bool $uid_support
+ */",
+ "/**
+ * PHP session name.
+ *
+ * Leave this alone unless you know what you are doing.
+ * @global string $session_name
+ */",
+ "/**
+ * Location base
+ * 
+ * This is used to build the URL to the SquirrelMail location.
+ * It should contain only the protocol and hostname/port parts
+ * of the URL; the full path will be appended automatically.
+ *
+ * If not specified or empty, it will be autodetected.
+ *
+ * Examples:
+ * http://webmail.example.org
+ * http://webmail.example.com:8080
+ * https://webmail.example.com:6691
+ *
+ * To be clear: do not include any of the path elements, so if
+ * SquirrelMail is at http://example.net/web/mail/src/login.php, you
+ * write: http://example.net
+ *
+ * @global string $config_location_base
+ * @since 1.4.8
+ */",
+ "/**
+ * Themes
+ *   You can define your own theme and put it in this directory.
+ *   You must call it as the example below. You can name the theme
+ *   whatever you want. For an example of a theme, see the ones
+ *   included in the config directory.
+ *
+ * To add a new theme to the options that users can choose from, just
+ * add a new number to the array at the bottom, and follow the pattern.
+ * 
+ * $theme_default sets theme that will be used by default
+ * $theme_css sets stylesheet (from theme/css directory) that will be 
+ * used by default.
+ * @global integer $theme_default
+ * @global string $theme_css
+ */",
+ "/**
+ * Listing of installed themes
+ * @global array $theme
+ */",
+ "/**
+ * Javascript in Addressbook Control
+ *
+ * Users may search their addressbook via either a plain HTML or Javascript
+ * enhanced user interface. This option allows you to set the default choice.
+ * Set this default choice as either:
+ *    true  = javascript
+ *    false = html
+ * @global bool $default_use_javascript_addr_book
+ */",
+ "/**
+ * Shared filebased address book
+ * @global string $abook_global_file
+ * @since 1.5.1 and 1.4.4
+ */",
+ "/**
+ * Writing into shared address book control
+ * @global bool $abook_global_file_writeable
+ * @since 1.5.1 and 1.4.4
+ */",
+ "/**
+ * Listing of shared address book control
+ * @global bool $abook_global_file_listing
+ * @since 1.5.1 and 1.4.9
+ */",
+ "/**
+ * Controls file based address book entry size
+ * 
+ * This setting controls space allocated to file based address book records.
+ * End users will be unable to save address book entry, if total entry size 
+ * (quoted address book fields + 4 delimiters + linefeed) exceeds allowed
+ * address book length size.
+ *
+ * Same setting is applied to personal and global file based address books.
+ *
+ * It is strongly recommended to keep default setting value. Change it only
+ * if you really want to store address book entries that are bigger than two
+ * kilobytes (2048).
+ * @global integer $abook_file_line_length
+ * @since 1.5.2 and 1.4.9
+ */",
+ "/**
+ * MOTD
+ *
+ * This is a message that is displayed immediately after a user logs in. 
+ * @global string $motd
+ */",
+ "/**
+ * Database-driven private addressbooks
+ *   DSN (Data Source Name) for a database where the private
+ *   addressbooks are stored.  See the administrator\'s manual for more info.
+ *   If it is not set, the addressbooks are stored in files
+ *   in the data dir.
+ *   The DSN is in the format: mysql://user:pass@hostname/dbname
+ *   The table is the name of the table to use within the
+ *   specified database.
+ *
+ *   NOTE: please see security note at the top of this file when
+ *   entering a password.
+ */",
+ "/**
+ * Database used to store user data
+ */",
+ "/**
+ * DSN of global address book database
+ * @global string $addrbook_global_dsn
+ * @since 1.5.1 and 1.4.4
+ */",
+ "/**
+ * Table used for global database address book
+ * @global string $addrbook_global_table
+ * @since 1.5.1 and 1.4.4
+ */",
+ "/**
+ * Control writing into global database address book
+ * @global boolean $addrbook_global_writeable
+ * @since 1.5.1 and 1.4.4
+ */",
+ "/**
+ * Control listing of global database address book
+ * @global boolean $addrbook_global_listing
+ * @since 1.5.1 and 1.4.4
+ */",
+ "/**
+ * Default language
+ *
+ * This is the default language. It is used as a last resort
+ * if SquirrelMail can\'t figure out which language to display.
+ * Language names usually consist of language code, undercore 
+ * symbol and country code
+ * @global string $squirrelmail_default_language
+ */",
+ "/**
+ * Default Charset
+ *
+ * This option controls what character set is used when sending mail
+ * and when sending HTML to the browser. Do not set this to US-ASCII,
+ * use ISO-8859-1 instead.
+ *
+ * This option is active only when default language is en_US. In other
+ * cases SquirrelMail uses charset that depends on default language.
+ * See $squirrelmail_default_language
+ *
+ * @global string $default_charset
+ */",
+ "/**
+ * Lossy Encoding Control
+ *
+ * This option allows charset conversions when output charset does not support
+ * all symbols used in original charset. Symbols unsupported by output charset
+ * will be replaced with question marks.
+ * @global bool $lossy_encoding
+ * @since 1.4.4 and 1.5.1
+ */",
+ "/**
+ * Subscribe Listing Control
+ *
+ * this disables listing all of the folders on the IMAP Server to
+ * generate the folder subscribe listbox (this can take a long time
+ * when you have a lot of folders).  Instead, a textbox will be
+ * displayed allowing users to enter a specific folder name to subscribe to
+ * 
+ * This option can\'t be changed by conf.pl
+ * @global bool $no_list_for_subscribe
+ */",
+ "/**
+ * Color in config control
+ *
+ * This option is used only by conf.pl script to generate configuration
+ * menu with some colors and is provided here only as reference. 
+ * @global integer $config_use_color
+ */",
+ "/**
+ * This function builds an array with all the information about
+ * the options available to the user, and returns it. The options
+ * are grouped by the groups in which they are displayed.
+ * For each option, the following information is stored:
+ * - name: the internal (variable) name
+ * - caption: the description of the option in the UI
+ * - type: one of SMOPT_TYPE_*
+ * - refresh: one of SMOPT_REFRESH_*
+ * - size: one of SMOPT_SIZE_*
+ * - save: the name of a function to call when saving this option
+ * @return array all option information
+ */",
+ "/**
+ * Saves the trash folder option.
+ * @param object $option SquirrelOption object
+ * @since 1.3.2
+ */",
+ "/**
+ * Saves the sent folder option.
+ * @param object $option SquirrelOption object
+ * @since 1.3.2
+ */",
+ "/**
+ * Saves the draft folder option.
+ * @param object $option SquirrelOption object
+ * @since 1.3.2
+ */",
+ "/**
+     * @param mixed $hdr string or array with message headers
+     */",
+ "/**
+*@paramstring$value
+*@returnstring
+*/",
+ "/**
+*Parseheaderfieldaccordingtofieldtype
+*@paramstring$fieldfieldname
+*@paramstring$valuefieldvalue
+*/",
+ "/**
+*@paramstring$address
+*@returnarray
+*/",
+ "/**
+*@paramarray$aStack
+*@paramarray$aComment
+*@paramstring$sEmail
+*@paramstring$sGroup
+*@returnobjectAddressStructureobject
+*/",
+ "/**
+     * recursive function for parsing address strings and storing them in an address stucture object.
+     *  personal name: encoded: =?charset?Q|B?string?=
+     *                 quoted:  \"string\"
+     *                 normal:  string
+     *  email        : <mailbox@host>
+     *               : mailbox@host
+     *  This function is also used for validating addresses returned from compose
+     *  That\'s also the reason that the function became a little bit huge
+     * @param string $address
+     * @param boolean $ar return array instead of only the first element
+     * @param array $addr_ar (obsolete) array with parsed addresses
+     * @param string $group (obsolete)
+     * @param string $host default domainname in case of addresses without a domainname
+     * @param string $lookup (since) callback function for lookup of address strings which are probably nicks (without @)
+     * @return mixed array with AddressStructure objects or only one address_structure object.
+     */",
+ "/**
+     * Normalise the different Priority headers into a uniform value,
+     * namely that of the X-Priority header (1, 3, 5). Supports:
+     * Priority, X-Priority, Importance.
+     * X-MS-Mail-Priority is not parsed because it always coincides
+     * with one of the other headers.
+     *
+     * NOTE: this is actually a duplicate from the function in
+     * functions/imap_messages. I\'m not sure if it\'s ok here to call
+     * that function?
+     * @param string $sValue literal priority name
+     * @return integer
+     */",
+ "/**
+     * @param string $value content type header
+     */",
+ "/**
+     * RFC2184
+     * @param array $aParameters
+     * @return array
+     */",
+ "/**
+     * @param string $value
+     * @return array
+     */",
+ "/**
+     * Fills disposition object in rfc822Header object
+     * @param string $value
+     */",
+ "/**
+     * Fills mlist array keys in rfc822Header object 
+     * @param string $field
+     * @param string $value
+     */",
+ "/**
+     * Parses the X-Spam-Status header
+     * @param string $value
+     */",
+ "/**
+     * function to get the address strings out of the header.
+     * example1: header->getAddr_s(\'to\').
+     * example2: header->getAddr_s(array(\'to\', \'cc\', \'bcc\'))
+     * @param mixed $arr string or array of strings
+     * @param string $separator
+     * @param boolean $encoded (since 1.4.0) return encoded or plain text addresses
+     * @param boolean $unconditionally_quote (since 1.4.21/1.5.2) When TRUE, always
+     *                                                      quote the personal part,
+     *                                                      whether or not it is
+     *                                                      encoded, otherwise quoting
+     *                                                      is only added if the
+     *                                                      personal part is not encoded
+     * @return string
+     */",
+ "/**
+     * function to get the array of addresses out of the header.
+     * @param mixed $arg string or array of strings
+     * @param array $excl_arr array of excluded email addresses
+     * @param array $arr array of added email addresses
+     * @return array
+     */",
+ "/**
+//FIXME: This needs some documentation (inside the function too)!  Don\'t code w/out comments!
+     * @param mixed $address array or string
+     * @param boolean $recurs
+     * @return mixed array, boolean
+     * @since 1.3.2
+     */",
+ "/**
+     * @param string $type0 media type
+     * @param string $type1 media subtype
+     * @return array media properties
+     * @todo check use of media type arguments
+     */",
+ "/**
+ * MIME header class
+ * input: header_string or array
+ * You must call parseHeader() function after creating object in order to fill object\'s
+ * parameters.
+ * @todo FIXME: there is no constructor function and class should ignore all input args.
+ * @package squirrelmail
+ * @subpackage mime
+ * @since 1.3.0
+ */",
+ "/**
+* Returns an array of all the identities.
+* Array is keyed: full_name, reply_to, email_address, index, signature
+* @return array full_name,reply_to,email_address,index,signature
+*/",
+ "/**
+ * Function to save the identities array
+ *
+ * @param  array     $identities     Array of identities
+ */",
+ "/**
+ * Returns an array with a fixed set of identities
+ *
+ * @param   array       $identities      Array of identities
+ * @param   int         $id             Identity to modify
+ * @param   string      $action         Action to perform
+ * @return  array
+ */",
+ "/**
+ * Function to test if identity is empty
+ *
+ * @param   array   $identity   Identitiy Array
+ * @return  boolean
+ */",
+ "/**
+  * Add link to menu at top of content pane
+  *
+  * @return void
+  *
+  */",
+ "/**
+ * Undocumented class
+ * @package squirrelmail
+ */",
+ "/**
+ * Decode koi8r strings
+ * @param string $string Encoded string
+ * @return string Decoded string
+ */",
+ "/**
+     * Constructor function.
+     * Prepared type0 and type1 properties
+     * @param string $type content type string without auxiliary information
+     */",
+ "/**
+ * Class that handles content-type headers
+ * Class was named content_type in 1.3.0 and 1.3.1. It is used internally
+ * by rfc822header class.
+ * @package squirrelmail
+ * @subpackage mime
+ * @since 1.3.2
+ */",
+ "/**
+ * Wrapper for textdomain(), bindtextdomain() and
+ * bind_textdomain_codeset() primarily intended for
+ * plugins when changing into their own text domain
+ * and back again.
+ *
+ * Note that if plugins using this function have
+ * their translation files located in the SquirrelMail
+ * locale directory, the second argument is optional.
+ *
+ * @param string $domain_name The name of the text domain
+ *                            (usually the plugin name, or
+ *                            \"squirrelmail\") being switched to.
+ * @param string $directory   The directory that contains
+ *                            all translations for the domain
+ *                            (OPTIONAL; default is SquirrelMail
+ *                            locale directory).
+ *
+ * @return string The name of the text domain that was set
+ *                *BEFORE* it is changed herein - NOTE that
+ *                this differs from PHP\'s textdomain()
+ *
+ * @since 1.4.10 and 1.5.2
+ */",
+ "/**
+ * Gettext bindtextdomain wrapper.
+ *
+ * Wrapper solves differences between php versions in order to provide
+ * ngettext support. Should be used if translation uses ngettext
+ * functions.
+ *
+ * This also provides a bind_textdomain_codeset call to make sure the
+ * domain\'s encoding will not be overridden.
+ *
+ * @since 1.4.10 and 1.5.1
+ * @param string $domain gettext domain name
+ * @param string $dir directory that contains all translations (OPTIONAL;
+ *                    if not specified, defaults to SquirrelMail locale
+ *                    directory)
+ * @return string path to translation directory
+ */",
+ "/**
+         * Welcome to We-Don\'t-Follow-Own-Fine-Manual department
+         * OpenBSD 3.8, 3.9-current and maybe later versions
+         * return invalid response to setlocale command.
+         * SM bug report #1427512.
+         */",
+ "/**
+ * php setlocale function wrapper
+ *
+ * From php 4.3.0 it is possible to use arrays in order to set locale.
+ * php gettext extension works only when locale is set. This wrapper
+ * function allows to use more than one locale name.
+ *
+ * @param int $category locale category name. Use php named constants
+ *     (LC_ALL, LC_COLLATE, LC_CTYPE, LC_MONETARY, LC_NUMERIC, LC_TIME)
+ * @param mixed $locale option contains array with possible locales or string with one locale
+ * @return string name of set locale or false, if all locales fail.
+ * @since 1.4.5 and 1.5.1
+ * @see http://php.net/setlocale
+ */",
+ "/**
+ * Converts string from given charset to charset, that can be displayed by user translation.
+ *
+ * Function by default returns html encoded strings, if translation uses different encoding.
+ * If Japanese translation is used - function returns string converted to euc-jp
+ * If $charset is not supported - function returns unconverted string.
+ *
+ * sanitizing of html tags is also done by this function.
+ *
+ * @param string $charset
+ * @param string $string Text to be decoded
+ * @param boolean $force_decode converts string to html without $charset!=$default_charset check.
+ * Argument is available since 1.4.5 and 1.5.1.
+ * @param boolean $save_html disables htmlspecialchars() in order to preserve
+ *  html formating. Use with care. Available since 1.4.6 and 1.5.1
+ * @return string decoded string
+ */",
+ "/**
+         * fix for yahoo users that remove all us-ascii related things
+         */",
+ "/**
+ * Converts html string to given charset
+ * @since 1.4.4 and 1.5.1
+ * @param string $string
+ * @param string $charset
+ * @param boolean $htmlencode keep htmlspecialchars encoding
+ * @return string
+ */",
+ "/**
+ * Combined decoding and encoding functions
+ *
+ * If conversion is done to charset different that utf-8, unsupported symbols
+ * will be replaced with question marks.
+ * @since 1.4.4 and 1.5.1
+ * @param string $in_charset initial charset
+ * @param string $string string that has to be converted
+ * @param string $out_charset final charset
+ * @param boolean $htmlencode keep htmlspecialchars encoding
+ * @return string converted string
+ */",
+ "/**
+ * Makes charset name suitable for decoding cycles
+ *
+ * ks_c_5601_1987, x-euc-* and x-windows-* charsets are supported
+ * since 1.4.6 and 1.5.1.
+ *
+ * @since 1.4.4 and 1.5.0
+ * @param string $charset Name of charset
+ * @return string $charset Adjusted name of charset
+ */",
+ "/**
+ * Set up the language to be output
+ * if $do_search is true, then scan the browser information
+ * for a possible language that we know
+ *
+ * Function sets system locale environment (LC_ALL, LANG, LANGUAGE),
+ * gettext translation bindings and html header information.
+ *
+ * Function returns error codes, if there is some fatal error.
+ *  0 = no error,
+ *  1 = mbstring support is not present,
+ *  2 = mbstring support is not present, user\'s translation reverted to en_US.
+ *
+ * @param string $sm_language  Translation used by user\'s interface
+ * @param bool   $do_search    Use browser\'s preferred language detection functions.
+ *                             Defaults to false.
+ * @param bool   $default      Set $sm_language to $squirrelmail_default_language if
+ *                             language detection fails or language is not set.
+ *                             Defaults to false.
+ * @return int function execution error codes.
+ *
+ */",
+ "/**
+ * Sets default_charset variable according to the one that is used by user\'s
+ * translations.
+ *
+ * Function changes global $default_charset variable in order to be sure, that
+ * it contains charset used by user\'s translation. Sanity of
+ * $squirrelmail_language and $default_charset combination provided in the
+ * SquirrelMail configuration is also tested.
+ *
+ * There can be a $default_charset setting in the
+ * config.php file, but the user may have a different language
+ * selected for a user interface. This function checks the
+ * language selected by the user and tags the outgoing messages
+ * with the appropriate charset corresponding to the language
+ * selection. This is \"more right\" (tm), than just stamping the
+ * message blindly with the system-wide $default_charset.
+ */",
+ "/**
+ * Function informs if it is safe to convert given charset to the one that is used by user.
+ *
+ * It is safe to use conversion only if user uses utf-8 encoding and when
+ * converted charset is similar to the one that is used by user.
+ *
+ * @param string $input_charset Charset of text that needs to be converted
+ * @return bool is it possible to convert to user\'s charset
+ */",
+ "/**
+                 * Minimize dependency on mb_mime_encodeheader(). PHP 4.4.1 bug
+                 * and maybe other bugs.
+                 *
+                 * Convert text from euc-jp (internal encoding) to iso-2022-jp
+                 * (commonly used Japanese encoding) with mbstring functions.
+                 *
+                 * Use SquirrelMail internal B encoding function. \'encodeheader\'
+                 * XTRA_CODE is executed in encodeHeader() function, so
+                 * functions/mime.php (encodeHeaderBase64) and functions/strings.php
+                 * (sq_is8bit) are already loaded.
+                 */",
+ "/**
+ * Japanese charset extra function
+ */",
+ "/**
+ * This array specifies the available translations.
+ *
+ * Structure of array:
+ * $languages[\'language\'][\'variable\'] = \'value\'
+ *
+ * Possible \'variable\' names:
+ *  NAME      - Translation name in English
+ *  CHARSET   - Encoding used by translation
+ *  ALIAS     - used when \'language\' is only short name and \'value\' should provide long language name
+ *  ALTNAME   - Native translation name. Any 8bit symbols must be html encoded.
+ *  LOCALE    - Full locale name (in xx_XX.charset format). It can use array with more than one locale name since 1.4.5 and 1.5.1
+ *  DIR       - Text direction. Used to define Right-to-Left languages. Possible values \'rtl\' or \'ltr\'. If undefined - defaults to \'ltr\'
+ *  XTRA_CODE - translation uses special functions. See http://squirrelmail.org/docs/devel/devel-3.html
+ *
+ * Each \'language\' definition requires NAME+CHARSET or ALIAS variables.
+ *
+ * @name $languages
+ * @global array $languages
+ */",
+ "/**
+       * Function is used as replacement in broken installs
+       * @ignore
+       */",
+ "/**
+       * Function is used as replacement in broken installs
+       * @ignore
+       */",
+ "/**
+       * Function is used as replacemet in broken installs
+       * @ignore
+       */",
+ "/**
+ * Decode cp1255-encoded string
+ * @param string $string Encoded string
+ * @return string $string decoded string
+ */",
+ "/**
+ * Decode cp1251-encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+     * Return address information from mime headers.
+     * @param boolean $full return full address (true) or only personal if it exists, otherwise email (false)
+     * @param boolean $encoded (since 1.4.0) return rfc2047 encoded address (true) or plain text (false).
+     * @param boolean $unconditionally_quote (since 1.4.21/1.5.2) when TRUE, always quote the personal part, whether or not it is encoded, otherwise quoting is only added if the personal part is not encoded
+     * @return string
+     */",
+ "/**
+     * Shorter version of getAddress() function
+     * Returns full encoded address.
+     * @param boolean $unconditionally_quote (since 1.4.21) when TRUE, always quote the personal part, whether or not it is encoded, otherwise quoting is only added if the personal part is not encoded
+     * @return string
+     * @since 1.4.0
+     */",
+ "/**
+ * Class used to work with email address headers
+ * @package squirrelmail
+ * @subpackage mime
+ * @since 1.3.2
+ */",
+ "/**
+ * Name: Alien Glow Theme
+ * Date: May 2, 2002
+ *
+ * @author Todd Hammer <thammer at rtccom.com>
+ * @copyright 2002-2011 The SquirrelMail Project Team
+ * @license http://opensource.org/licenses/gpl-license.php GNU Public License
+ * @version $Id: alien_glow.php 14084 2011-01-06 02:44:03Z pdontthink $
+ * @package squirrelmail
+ * @subpackage themes
+ */",
+ "/**
+   Create and initialize an addressbook object.
+   Returns the created object
+*/",
+ "/**
+ * Sort array by the key \"name\"
+ */",
+ "/**
+ * Address book sorting options
+ *
+ * returns address book sorting order
+ * @return integer book sorting options order
+ */",
+ "/**
+ * This function shows the address book sort button.
+ *
+ * @param integer $abook_sort_order current sort value
+ * @param string $alt_tag alt tag value (string visible to text only browsers)
+ * @param integer $Down sort value when list is sorted ascending
+ * @param integer $Up sort value when list is sorted descending
+ * @return string html code with sorting images and urls
+ * @since 1.5.1 and 1.4.6
+ */",
+ "/**
+ * This is the main address book class that connect all the
+ * backends and provide services to the functions above.
+ * @package squirrelmail
+ */",
+ "/**
+ * Generic backend that all other backends extend
+ * @package squirrelmail
+ */",
+ "/**
+ * Decode iso8859-9 encoded strings
+ * @param string $string Encoded string
+ * @return string Decoded string
+ */",
+ "/**
+ * Decode iso8859-5 encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode iso8859-14 encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Calculates id of MIME entity
+ * @param string $entString
+ * @param integer $direction
+ * @return string
+ * @access private
+ */",
+ "/**
+ * Decode iso-8859-10 encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode iso8859-1 string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * This function is the GUI wrapper for the options page. SquirrelSpell
+ * uses it for creating all Options pages.
+ *
+ * @param  string $title     The title of the page to display
+ * @param  string $scriptsrc This is used to link a file.js into the
+ *                    <script src=\"file.js\"></script> format. This
+ *                    allows to separate javascript from the rest of the
+ *                    plugin and place it into the js/ directory.
+ * @param  string $body      The body of the message to display.
+ * @return            void
+ */",
+ "/**
+ * Function similar to the one above. This one is a general wrapper
+ * for the Squirrelspell pop-up window. It\'s called form nearly
+ * everywhere, except the check_me module, since that one is highly
+ * customized.
+ *
+ * @param  string $onload    Used to indicate and pass the name of a js function
+ *                    to call in a <body onload=\"function()\" for automatic
+ *                    onload script execution.
+ * @param  string $title     Title of the page.
+ * @param  string $scriptsrc If defined, link this javascript source page into
+ *                    the document using <script src=\"file.js\"> format.
+ * @param  string $body      The content to include.
+ * @return            void
+ */",
+ "/**
+   * Setup mcrypt routines.
+   */",
+ "/**
+ * This function does the encryption and decryption of the user
+ * dictionary. It is only available when PHP is compiled with
+ * mcrypt support (--with-mcrypt). See doc/CRYPTO for more
+ * information.
+ *
+ * @param  $mode  A string with either of the two recognized values:
+ *                \"encrypt\" or \"decrypt\".
+ * @param  $ckey  The key to use for processing (the user\'s password
+ *                in our case.
+ * @param  $input Content to decrypt or encrypt, according to $mode.
+ * @return        encrypted/decrypted content, or \"PANIC\" if the
+ *                process bails out.
+ */",
+ "/**
+   * Define just one dictionary for this user -- the default.
+   * If the user wants more, s/he can set them up in personal
+   * preferences. See doc/UPGRADING for more info.
+   */",
+ "/**
+ * This function transparently upgrades the 0.2 dictionary format to the
+ * 0.3 format, since user-defined languages have been added in 0.3 and
+ * the new format keeps user dictionaries selection in the file.
+ *
+ * This function will be retired soon, as it\'s been a while since anyone
+ * has been using SquirrelSpell-0.2.
+ *
+ * @param  $words_string Contents of the 0.2-style user dictionary.
+ * @return               Contents of the 0.3-style user dictionary.
+ */",
+ "/**
+       * User doesn\'t have a personal dictionary. Grab the default
+       * system setting.
+       */",
+ "/**
+     * There is no need to read the \".words\" file as there is only one
+     * dictionary defined system-wide.
+     */",
+ "/**
+ * Right now it just returns an array with the dictionaries
+ * available to the user for spell-checking. It will probably
+ * do more in the future, as features are added.
+ *
+ * @param string $words The contents of the user\'s \".words\" file.
+ * @return array a strings array with dictionaries available
+ *                to this user, e.g. {\"English\", \"Spanish\"}, etc.
+ */",
+ "/**
+   * The words list will end with a new directive, which will start
+   * with \"#\". Locate the next \"#\" and thus find out where the
+   * words end.
+   */",
+ "/**
+ * This function returns only user-defined dictionary words that correspond
+ * to the requested language.
+ *
+ * @param  $words The contents of the user\'s \".words\" file.
+ * @param  $lang  Which language words to return, e.g. requesting
+ *                \"English\" will return ONLY the words from user\'s
+ *                English dictionary, disregarding any others.
+ * @return        The list of words corresponding to the language
+ *                requested.
+ */",
+ "/**
+     * Gobble it up.
+     */",
+ "/**
+       * Get user\'s password (the key).
+       */",
+ "/**
+     * Invoke the decryption routines.
+     */",
+ "/**
+       * AAAAAAAAAAAH!!!!! OK, ok, breathe!
+       * Let\'s hope the decryption failed because the user changed his
+       * password. Bring up the option to key in the old password
+       * or wipe the file and start over if everything else fails.
+       *
+       * The _(\"SquirrelSpell...) line has to be on one line, otherwise
+       * gettext will bork. ;(
+       */",
+ "/**
+       * Add some string vars so they can be i18n\'d.
+       */",
+ "/**
+       * OK! Phew. Set the encryption flag to true so we can later on
+       * encrypt it again before saving to HDD.
+       */",
+ "/**
+     * No encryption is/was used. Set $SQSPELL_CRYPTO to false,
+     * in case we have to save the dictionary later.
+     */",
+ "/**
+ * This function operates the user dictionary. If the format is
+ * clear-text, then it just reads the file and returns it. However, if
+ * the file is encrypted (well, \"garbled\"), then it tries to decrypt
+ * it, checks whether the decryption was successful, troubleshoots if
+ * not, then returns the clear-text dictionary to the app.
+ *
+ * @return the contents of the user\'s \".words\" file, decrypted if
+ *         necessary.
+ */",
+ "/**
+     * Try encrypting it. If fails, scream bloody hell.
+     */",
+ "/**
+   * Do the actual writing.
+   */",
+ "/**
+ * Writes user dictionary into the $username.words file, then changes mask
+ * to 0600. If encryption is needed -- does that, too.
+ *
+ * @param  $words The contents of the \".words\" file to write.
+ * @return        void
+ */",
+ "/**
+ * Creates an empty user dictionary for the sake of saving prefs or
+ * whatever.
+ *
+ * @return The template to use when storing the user dictionary.
+ */",
+ "/**
+*Thisfunctionchecksforsecurityattacks.A$MODvariableis
+*providedintheQUERY_STRINGandincludesoneofthefilesfromthe
+*modulesdirectory($MOD.mod).Seeifsomeoneistryingtogetout
+*ofthemodulesdirectorybyprovidingdots,unicodestrings,or
+*slashes.
+*
+*@paramstring$rMODthenameofthemodulerequestedtoinclude.
+*@returnvoid,sinceitbailsoutwithanaccesserrorifneeded.
+*/",
+ "/**
+*SquirrelSpellversion.Don\'tmodify,sinceitidentifiestheformat
+*oftheuserdictionaryfilesandmessingwiththiscandougly
+*stuff.:)
+*/",
+ "/**
+ * Converts string to us-ascii
+ * @param string $string text with numeric unicode entities
+ * @return string us-ascii encoded text
+ */",
+ "/**
+ * Return us-ascii symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_us_ascii
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/us_ascii.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string us-ascii character
+ */",
+ "/**
+ * Check the preferences into the session cache.
+ */",
+ "/**
+ * Return the value for the preference given by $string.
+ */",
+ "/**
+ * Save the preferences for this user.
+ */",
+ "/**
+ * Remove a preference for the current user.
+ */",
+ "/**
+ * Set a there preference $string to $value.
+ */",
+ "/**
+ * Check for a preferences file. If one can not be found, create it.
+ */",
+ "/**
+ * Write the User Signature.
+ */",
+ "/**
+ * Get the signature.
+ */",
+ "/**
+ * Adds second layer of calendar links to upper menu
+ * @return void
+ */",
+ "/**
+ * Generates html option tags with length values
+ * 
+ * Hardcoded values from 0 minutes to 6 hours
+ * @param integer $selected selected option length
+ * @return void
+ */",
+ "/**
+ * Generates html option tags with minute values
+ *
+ * Hardcoded values in 5 minute intervals
+ * @param integer $selected selected value
+ * @return void
+ */",
+ "/**
+ * Generates html option tags with hour values
+ * @param integer $selected selected value
+ * @return void
+ * @todo 12/24 hour format
+ */",
+ "/**
+ * Generates html option tags with priority values
+ * @param integer $selected selected value
+ * @return void
+ */",
+ "/**
+ * Generates html option tags with year values
+ * 
+ * Hardcoded values from 1902 to 2037
+ * @param integer $selected selected value
+ * @return void
+ */",
+ "/**
+ * Generates html option tags with month values
+ * @param integer $selected selected value
+ * @return void
+ */",
+ "/**
+ * Generates html option tags with day of month values
+ * 
+ * Hardcoded values from 1 to 31
+ * @param integer $selected selected value
+ * @return void
+ */",
+ "/**
+ * This function builds an array with all the information about
+ * the options available to the user, and returns it. The options
+ * are grouped by the groups in which they are displayed.
+ * For each option, the following information is stored:
+ * - name: the internal (variable) name
+ * - caption: the description of the option in the UI
+ * - type: one of SMOPT_TYPE_*
+ * - refresh: one of SMOPT_REFRESH_*
+ * - size: one of SMOPT_SIZE_*
+ * - save: the name of a function to call when saving this option
+ * @return array all option information
+ */",
+ "/**
+ * Saves the signature option.
+ */",
+ "/**
+ * Converts string to iso-8859-7
+ * @param string $string text with numeric unicode entities
+ * @return string iso-8859-7 encoded text
+ */",
+ "/**
+ * Return iso-8859-7 symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_iso_8859_7
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/iso_8859_7.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string iso-8859-7 character
+ */",
+ "/**
+ * Author:      Lucas Austin-Howe <lucash@slic.com>
+ * Name:        Blue on Blue
+ * Date:        December 29, 2005
+ * Theme Name:  \"Blue on Blue\"
+ * @copyright 2005-2011 The SquirrelMail Project Team
+ * @license http://opensource.org/licenses/gpl-license.php GNU Public License
+ * @version $Id: blue_on_blue.php 14084 2011-01-06 02:44:03Z pdontthink $
+ * @package squirrelmail
+ * @subpackage themes
+ */",
+ "/**
+  * Save submitted options and calculate the most 
+  * we need to refresh the page
+  *
+  * @param string $optpage      The name of the page being submitted
+  * @param array  $optpage_data An array of all the submitted options
+  *
+  * @return int The highest level of screen refresh needed per
+  *             the options that were changed.  This value will
+  *             correspond to the SMOPT_REFRESH_* constants found
+  *             in functions/options.php.
+  *
+  */",
+ "/**
+ * This function prints out an option page row.
+ */",
+ "/**
+ * Standard SquirrelMail plugin initialization API.
+ *
+ * @return void
+ */",
+ "/**
+     * The browser checks out.
+     * Register Squirrelspell with the $optionpages array.
+     */",
+ "/**
+ * This function formats and adds the plugin and its description to the
+ * Options screen.
+ *
+ * @return void
+ */",
+ "/**
+ * This function adds a \"Check Spelling\" link to the \"Compose\" row
+ * during message composition.
+ *
+ * @return void
+ */",
+ "/**
+  * Add link to menu at top of content pane
+  *
+  * @return void
+  *
+  */",
+ "/**
+  * Inserts an option block in the main SM options page
+  *
+  */",
+ "/**
+  * Validate that this plugin is configured correctly
+  *
+  * @return boolean Whether or not there was a
+  *                 configuration error for this plugin.
+  *
+  */",
+ "/**
+ * mail_fetch/setup.php
+ *
+ * Copyright (c) 1999-2011 CDI (cdi@thewebmasters.net) All Rights Reserved
+ * Modified by Philippe Mingo 2001-2009 mingo@rotedic.com
+ * An RFC 1939 compliant wrapper class for the POP3 protocol.
+ *
+ * Licensed under the GNU GPL. For full terms see the file COPYING.
+ *
+ * POP3 class
+ *
+ * @copyright 1999-2011 The SquirrelMail Project Team
+ * @license http://opensource.org/licenses/gpl-license.php GNU Public License
+ * @version $Id: class.POP3.php 14084 2011-01-06 02:44:03Z pdontthink $
+ * @package plugins
+ * @subpackage mail_fetch
+ */",
+ "/**
+ * Deliver messages using SMTP
+ * @package squirrelmail
+ */",
+ "/**
+ * We\'ll need this to later have a noframes version
+ *
+ * Check if the user has a language preference, but no cookie.
+ * Send him a cookie with his language preference, if there is
+ * such discrepancy.
+ */",
+ "/**
+ * converts hex string to ip address
+ * @param string $hex hexadecimal string created with squirrelmail ip2hex 
+ *  function in delivery class.
+ * @return string ip address
+ * @since 1.5.1 and 1.4.5
+ */",
+ "/**
+     * Constructor function
+     * @param array configuration options. array key = option name, 
+     * array value = option value.
+     * @return void
+     * @since 1.5.1 and 1.4.8
+     */",
+ "/**
+    * function preWriteToStream
+    *
+    * Sendmail needs LF\'s as line endings instead of CRLF.
+    * This function translates the line endings to LF and should be called
+    * before each line is written to the stream.
+    *
+    * @param string $s Line to process
+    * @return void
+    * @access private
+    */",
+ "/**
+    * function initStream
+    *
+    * Initialise the sendmail connection.
+    *
+    * @param Message $message Message object containing the from address
+    * @param string $sendmail_path Location of sendmail binary
+    * @return void
+    * @access public
+    */",
+ "/**
+    * function finalizeStream
+    *
+    * Close the stream.
+    *
+    * @param resource $stream
+    * @return boolean
+    * @access public
+    */",
+ "/**
+    * function getBcc
+    *
+    * In case of sendmail, the rfc822header must contain the bcc header.
+    *
+    * @return boolean true if rfc822header should include the bcc header.
+    * @access private
+    */",
+ "/**
+    * function clean_crlf
+    *
+    * Cleans each line to only end in a LF
+    * Returns the length of the line including a CR,
+    * so that length is correct when the message is saved to imap
+    * Implemented to fix sendmail->postfix rejection of messages with
+    * attachments because of stray LF\'s
+    *
+    * @param string $s string to strip of CR\'s
+    * @return integer length of string including a CR for each LF
+    * @access private
+    */",
+ "/**
+ * Delivers messages using the sendmail binary
+ * @package squirrelmail
+ */",
+ "/**
+ * Undocumented - complain, then patch.
+ */",
+ "/**
+                 * \'+\' characters in a mailto URI don\'t need to be percent-encoded.
+                 * However, when mailto URI data is transported via HTTP, \'+\' must
+                 * be percent-encoded as %2B so that when the HTTP data is
+                 * percent-decoded, you get \'+\' back and not a space.
+                 */",
+ "/**
+ * Parses a body and converts all found URLs to clickable links.
+ *
+ * @param string body the body to process, by ref
+ * @return void
+ */",
+ "/**
+ * Finds first occurrence of 8bit data in the string
+ *
+ * Function finds first 8bit symbol or html entity that represents 8bit character.
+ * Search start is defined by $offset argument. Search ends at $maxlength position.
+ * If $maxlength is not defined or bigger than provided string, search ends when 
+ * string ends.
+ *
+ * Check returned data type in order to avoid confusion between bool(false) 
+ * (not found) and int(0) (first char in the string).
+ * @param string $haystack
+ * @param integer $offset
+ * @param integer $maxlength
+ * @return mixed integer with first 8bit character position or boolean false 
+ * @since 1.5.2 and 1.4.7
+ */",
+ "/**
+ * Init the plugin
+ * @access private
+ */",
+ "/**
+ * Register option block
+ * @access private
+ */",
+ "/** now find what the server is at **/",
+ "/**
+ * Corrects a time stamp to be the local time.
+ *
+ * @param int stamp the timestamp to adjust
+ * @param string tzc the timezone correction
+ * @return int the corrected timestamp
+ */",
+ "/**
+ * Returns the (localized) string for a given day number.
+ * Switch system has been intentionaly chosen for the
+ * internationalization of month and day names. The reason
+ * is to make sure that _(\"\") strings will go into the
+ * main po.
+ *
+ * @param int day_number the day number
+ * @return string the day in human readable form
+ */",
+ "/**
+ * Like getDayName, but returns the short form
+ * @param int day_number the day number
+ * @return string the day in short human readable form
+ */",
+ "/**
+ * Returns the (localized) string for a given month number.
+ *
+ * @param string month_number the month number (01..12)
+ * @return string the month name in human readable form
+ */",
+ "/**
+ * Returns the (localized) string for a given month number,
+ * short representation.
+ *
+ * @param string month_number the month number (01..12)
+ * @return string the shortened month in human readable form
+ */",
+ "/**
+ * Returns the localized representation of the date/time.
+ *
+ * @param string date_format The format for the date, like the input for the PHP date() function.
+ * @param int stamp the timestamp to convert
+ * @return string a full date representation
+ */",
+ "/**
+ * This returns a date of the format \"Wed, Oct 29, 2003 9:52 am\",
+ * or the same in 24H format (depending on the user\'s settings),
+ * and taking localization into accout.
+ *
+ * @param int stamp the timestamp
+ * @param string fallback string to use when stamp not valid
+ * @return string the long date string
+ */",
+ "/**
+ * Returns a short representation of the date,
+ * taking timezones and localization into account.
+ * Depending on user\'s settings, this string can be
+ * of the form: \"14:23\" or \"Jun 14, 2003\" depending
+ * on whether the stamp is \"today\" or not.
+ *
+ * @param int stamp the timestamp
+ * @return string the date string
+ */",
+ "/**
+ * Decodes a RFC 822 Date-header into a timestamp
+ *
+ * @param array dateParts the Date-header split by whitespace
+ * @return int the timestamp calculated from the header
+ */",
+ "/**
+ * Adds plugin to squirrelmail hooks
+ */",
+ "/**
+ * Loads sent_subfolders settings
+ */",
+ "/**
+ * Adds sent_subfolders options in folder preferences
+ */",
+ "/**
+ * Defines folder filtering rules
+ *
+ * Callback function that should exclude some folders from folder listing.
+ * @param array $fldr list of folders. See sqimap_mailbox_list
+ * @return boolean returns true, if folder has to included in folder listing
+ * @access private 
+ */",
+ "/**
+ * Saves sent_subfolder_options
+ */",
+ "/**
+ * Update sent_subfolders settings
+ *
+ * function updates default sent folder value and 
+ * creates required imap folders
+ */",
+ "/**
+ * Update the folder settings/auto-create new subfolder
+ */",
+ "/**
+ * Sets quarter subfolder names
+ *
+ * @param string $month numeric month
+ * @return string quarter name (Q + number)
+ */",
+ "/**
+ * detects if mailbox is part of sent_subfolders
+ *
+ * @param string $mb imap folder name
+ * @return boolean 1 - is part of sent_subfolders, 0 - is not part of sent_subfolders
+ */",
+ "/**
+  * Register this plugin with SquirrelMail
+  *
+  * @return void
+  *
+  */",
+ "/**
+  * Returns info about this plugin
+  *
+  * @return array An array of plugin information.
+  *
+  */",
+ "/**
+  * Returns version info about this plugin
+  *
+  */",
+ "/**
+  * Add link to menu at top of content pane
+  *
+  * @return void
+  *
+  */",
+ "/**
+  * Inserts an option block in the main SM options page
+  *
+  * @return void
+  *
+  */",
+ "/**
+  * Validate that this plugin is configured correctly
+  *
+  * @return boolean Whether or not there was a
+  *                 configuration error for this plugin.
+  *
+  */",
+ "/**
+ * Converts string to iso-8859-15
+ * @param string $string text with numeric unicode entities
+ * @return string iso-8859-15 encoded text
+ */",
+ "/**
+ * Return iso-8859-15 symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_iso_8859_15
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/iso_8859_15.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string iso-8859-15 character
+ */",
+ "/**
+ * Initialize the plugin
+ * @access private
+ */",
+ "/**
+ * Add message details link in message view
+ * @access private
+ */",
+ "/**
+ * ns_4551_1 decoding function
+ *
+ * @param string $string
+ * @return string
+ */",
+ "/**
+ * displays head of day calendar view
+ * @return void
+ * @access private
+ */",
+ "/**
+ * events for specific day  are inserted into \"daily\" array
+ * @return void
+ * @access private
+ */",
+ "/**
+ * main loop for displaying daily events
+ * @return void
+ * @access private
+ */",
+ "/**
+ * Copies a set of messages ($id) to another mailbox ($mailbox)
+ * 
+ * NOTE: Verions of this function BEFORE SquirrelMail 1.4.18
+ *       actually *moved* messages instead of copying them
+ * 
+ * @param int    $imap_stream The resource ID for the IMAP socket
+ * @param mixed  $id          A string or array of messages to copy
+ * @param string $mailbox     The mailbox to copy messages to
+ *
+ * @return bool Returns true on successful copy, false on failure
+ *
+ */",
+ "/**
+ * Moves a set of messages ($id) to another mailbox ($mailbox)
+ * 
+ * @param int    $imap_stream   The resource ID for the IMAP socket
+ * @param mixed  $id            A string or array of messages to copy
+ * @param string $mailbox       The destination mailbox
+ * @param bool   $handle_errors Show error messages in case of a NO, BAD, or BYE response
+ *
+ * @return bool If move completed without error.
+ *
+ * @since 1.4.18
+ *
+ */",
+ "/**
+         * turn off internal error handling (third argument = false) and
+         * ignore copy to trash errors (allows to delete messages when overquota)
+         */",
+ "/**
+ * Deletes one or more message(s) and move
+ * it/them to trash or expunge the mailbox
+ * 
+ * @param int    $imap_stream The resource ID for the IMAP socket
+ * @param string $mailbox     The mailbox to delete messages from
+ * @param mixed  $id          A string or array of messages to delete
+ *
+ */",
+ "/**
+ * Sort the message list and crunch to be as small as possible
+ * (overflow could happen, so make it small if possible)
+ */",
+ "/**
+ * Returns the references header lines
+ */",
+ "/**
+ * Get sort order from server and return it as the $id array for mailbox_display
+ */",
+ "/**
+ * Get sort order from server if server does not have the SORT extension
+ * and return it as array for mailbox_display.
+ *
+ * @param  resource $imap_stream
+ * @param  array    $mbxresponse response from a sqimap_mailbox_select
+ * @return array    $php_sort_array
+ */",
+ "/**
+ * Returns an indent array for printMessageinfo()
+ * This represents the amount of indent needed (value),
+ * for this message number (key)
+ *
+ * @param  resource $imap_stream
+ * @return array message ID to indent level mappings
+ */",
+ "/**
+ * Returns an array with each element as a string representing one
+ * message-thread as returned by the IMAP server.
+ */",
+ "/**
+*Parsesastringinanimapresponse.Stringstartswith\" or { which means it
+ * can handle double quoted strings and literal strings
+ *
+ * @param string $read imap response
+ * @param integer $i (reference) offset in string
+ * @return string $s parsed string without the double quotes or literal count
+ */",
+ "/**
+ * Parses a string containing an array from an imap response. String starts with ( and end with )
+ *
+ * @param string $read imap response
+ * @param integer $i (reference) offset in string
+ * @return array $a
+ */",
+ "/**
+ * Parses a fetch response
+ * 
+ * @param array		$aResponse IMAP Response
+ * @param array		$aMessageList Placeholder array for results.  The keys of the 
+ * 							placeholder array should be the UID so we can reconstruct the order.
+ * @return array	$aMessageList Associative array with messages.
+ */",
+ "/**
+ * Normalise the different Priority headers into a uniform value,
+ * namely that of the X-Priority header (1, 3, 5). Supports:
+ * Prioirty, X-Priority, Importance.
+ * X-MS-Mail-Priority is not parsed because it always coincides
+ * with one of the other headers.
+ *
+ * DUPLICATE CODE ALERT:
+ * NOTE: this is actually a duplicate from the function in
+ * class/mime/Rfc822Header.php.
+ */",
+ "/**
+ * Retrieves a list with headers, flags, size or internaldate from the imap server
+ */",
+ "/**
+ * Obsolete?
+ */",
+ "/**
+ * Returns a message array with all the information about a message.
+ * See the documentation folder for more information about this array.
+ */",
+ "/**
+ * Recursively parse embedded messages (if any) in the given
+ * message, building correct rfc822 headers for each one
+ *
+ * @param object $msg The message object to scan for attached messages
+ *                    NOTE: this is passed by reference!  Changes made
+ *                    within will affect the caller\'s copy of $msg!
+ * @param int $id The top-level message UID on the IMAP server, even
+ *                if the $msg being passed in is only an attached entity
+ *                thereof.
+ * @param resource $imap_stream A live connection to the IMAP server.
+ *
+ * @return void
+ *
+ * @since 1.4.11
+ *
+ */",
+ "/**
+ * Copies specified messages to specified folder
+ *
+ * This function is removed from SquirrelMail 1.5.1 and later versions.
+ * @param stream $imap_stream IMAP connection resource
+ * @param string $start starting message id or uid.
+ * @param string $end end message id or uid
+ * @param string $mailbox target mailbox
+ * @param boolean $handle_errors (since 1.4.8) handle errors 
+ * @return boolean (since 1.4.8) true, if message copy command was successful.
+ *  false on error.
+ * @since 0.4
+ * @deprecated Use sqimap_msgs_list_copy() instead.
+ */",
+ "/**
+ * Deletes specified messages and moves them to trash if possible
+ * Obsolete
+ */",
+ "/**
+*Setsthespecifiedmessageswithspecifiedflag
+*/",
+ "/**
+*Obsolete?
+*/",
+ "/**
+ * Given a username and datafilename, this will return the path to the
+ * hashed location of that datafile.
+ *
+ * @param string username the username of the current user
+ * @param string dir the squirrelmail datadir
+ * @param string datafile the name of the file to open
+ * @param bool hash_seach default true
+ * @return string the hashed location of datafile
+ */",
+ "/**
+ * Helper function for getHashedFile(), given a username returns 
+ * the hashed dir for that username.  
+ *
+ * NOTE that the hashed dir will be created if it doesn\'t 
+ * already exist.
+ *
+ * @param string username the username of the current user
+ * @param string dir the squirrelmail datadir
+ * @param string hash_dirs default \'\'
+ * @return the path to the hash dir for username
+ */",
+ "/**
+ * Helper function for getHashDir which does the actual hash calculation.
+ *
+ * @param string username the username to calculate the hash dir for
+ * @return array a list of hash dirs for this username
+ */",
+ "/**
+ * Recursive function to find the correct parent for a new node.
+ *
+ * @param mixed value the value to find a parent for
+ * @param int treeIndexToStart where to start the search, usually the root node (0)
+ * @param array tree the tree to search
+ * @return int the index of the parent
+ */",
+ "/**
+ * Will insert a new value into the tree, based on a given comparison value.
+ *
+ * @param mixed comparisonValue the value to determine where the new element should be placed.
+ * @param mixed value the new node to insert
+ * @param array tree the tree to insert the node in, by ref
+ */",
+ "/**
+ * Recursively walk the tree of trash mailboxes and delete all folders and messages
+ *
+ * @param int index the place in the tree to start, usually 0
+ * @param stream imap_stream the IMAP connection to send commands to
+ * @param array tree the tree to walk
+ * @return void
+ */",
+ "/**
+ * Recursively delete a tree of mail folders.
+ *
+ * @param int index the place in the tree to start, usually 0
+ * @param stream imap_stream the IMAP connection to send commands to
+ * @param array tree the tree to walk
+ * @return void
+ */",
+ "/**
+ * Recursively walk a tree of folders to create them under the trash folder.
+ */",
+ "/**
+ * Recursive function that outputs a tree In-Pre-Order.
+ * @param int index the node to start (usually 0)
+ * @param array tree the tree to walk
+ * @return void
+ */",
+ "/**
+ * decode cp1256-encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Helper function to create form fields, not to be called directly,
+ * only by other functions below.
+ */",
+ "/**
+ * Password input field
+ */",
+ "/**
+ * Form checkbox
+ */",
+ "/**
+ * Form radio box
+ */",
+ "/**
+ * A hidden form field.
+ */",
+ "/**
+ * An input textbox.
+ */",
+ "/**
+ * Function to create a selectlist from an array.
+ * Usage:
+ * name: html name attribute
+ * values: array ( key => value )  ->     <option value=\"key\">value</option>
+ * default: the key that will be selected
+ * usekeys: use the keys of the array as option value or not
+ */",
+ "/**
+ * Form submission button
+ * Note the switched value/name parameters!
+ */",
+ "/**
+ * Form reset button, $value = caption
+ */",
+ "/**
+ * Textarea form element.
+ */",
+ "/**
+ * Make a <form> start-tag.
+ *
+ * @param string $action
+ * @param string $method
+ * @param string $name
+ * @param string $enctype
+ * @param string $charset
+ * @param string $extra     Any other attributes can be added with this parameter;
+ *                          they should use double quotes around attribute values
+ *                          (OPTIONAL; default empty)
+ * @param mixed  $add_token When given as a string or as boolean TRUE, a hidden
+ *                          input is also added to the form containing a security
+ *                          token.  When given as TRUE, the input name is \"smtoken\";
+ *                          otherwise the name is the string that is given for this
+ *                          parameter.  When FALSE, no hidden token input field is
+ *                          added.  (OPTIONAL; default not used)
+ *
+ */",
+ "/**
+  * Register this plugin with SquirrelMail
+  * 
+  * @return void
+  *
+  */",
+ "/**
+  * Add link to menu at top of content pane
+  *
+  * @return void
+  *
+  */",
+ "/**
+  * Returns info about this plugin
+  *
+  * @return array An array of plugin information.
+  *
+  */",
+ "/**
+  * Returns version info about this plugin
+  *
+  */",
+ "/**
+ * Decode cp1252-encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Converts string to tis-620
+ * @param string $string text with numeric unicode entities
+ * @return string tis-620 encoded text
+ */",
+ "/**
+ * Return tis-620 symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_tis_620
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/tis_620.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string tis-620 character
+ */",
+ "/**
+ * Insert hidden data
+ */",
+ "/**
+ * List search results
+ * @param array $res Array containing results of search
+ * @param bool $includesource If true, adds backend column to address listing
+ */",
+ "/** light(1) or dark(0) background toggle **/",
+ "/** range delimiter **/",
+ "/** background **/",
+ "/** generate random color **/",
+ "/** text **/",
+ "/** generate random color **/",
+ "/**
+ * Converts string to koi8-u
+ * @param string $string text with numeric unicode entities
+ * @return string koi8-u encoded text
+ */",
+ "/**
+ * Return koi8-u symbol when unicode character number is provided
+ *
+ * This function is used internally by charset_encode_koi8_u
+ * function. It might be unavailable to other SquirrelMail functions.
+ * Don\'t use it or make sure, that functions/encode/koi8_u.php is
+ * included.
+ *
+ * @param int $var decimal unicode value
+ * @return string koi8-u character
+ */",
+ "/** background **/",
+ "/** text **/",
+ "/** generate random color **/",
+ "/** set array element as hex string with hashmark (for HTML output) **/",
+ "/**
+     * Constructor function
+     * @param string $name
+     */",
+ "/**
+     * Returns value of content disposition property
+     * @param string $par content disposition property name
+     * @return string
+     * @since 1.3.1
+     */",
+ "/**
+ * Class that handles content disposition header
+ * @package squirrelmail
+ * @subpackage mime
+ * @since 1.3.0
+ * @todo FIXME: do we have to declare vars ($name and $properties)?
+ */",
+ "/**
+ * Check if user has access to administrative functions
+ *
+ * @return boolean
+ */",
+ "/**
+ * Removes whitespace from array values
+ * @param string $value array value that has to be trimmed
+ * @param string $key array key
+ * @since 1.5.1 and 1.4.5
+ * @access private
+ */",
+ "/**
+ * Decode iso8859-6 strings
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode iso8859-15 encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+     * function send_mail - send the message parts to the IMAP stream
+     *
+     * Overridden from parent class so that we can insert some 
+     * IMAP APPEND commands before and after the message is 
+     * sent on the IMAP stream.
+     *
+     * @param Message  $message      Message object to send
+     * @param string   $header       Headers ready to send
+     * @param string   $boundary     Message parts boundary
+     * @param resource $stream       Handle to the SMTP stream
+     *                               (when FALSE, nothing will be
+     *                               written to the stream; this can
+     *                               be used to determine the actual
+     *                               number of bytes that will be
+     *                               written to the stream)
+     * @param int     &$raw_length   The number of bytes written (or that
+     *                               would have been written) to the 
+     *                               output stream - NOTE that this is
+     *                               passed by reference
+     * @param string   $folder       The IMAP folder to which the 
+     *                               message is being sent
+     *
+     * @return void
+     *
+     */",
+ "/**
+ * This class is incomplete and entirely undocumented.
+ * @package squirrelmail
+ */",
+ "/**
+ * Decode iso8859-2 encoded string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * Decode iso8859-11 string
+ * @param string $string Encoded string
+ * @return string $string Decoded string
+ */",
+ "/**
+ * @param string $str
+ * @param string $to_encoding
+ * @param string $from_encoding
+ * @param string $default_charset
+ * @return string
+ */",
+ "/**
+ * penguin.php
+ * Name:    Penguin
+ * Date:    Jult 25, 2002
+ * Comment: This theme is my attempt at using the colors of the
+ *          ever-popular Linux penguin.  :)
+ *
+ * @author Peter J. Vasquez Sr.
+ * @copyright 2001-2011 The SquirrelMail Project Team
+ * @license http://opensource.org/licenses/gpl-license.php GNU Public License
+ * @version $Id: penguin.php 14084 2011-01-06 02:44:03Z pdontthink $
+ * @package squirrelmail
+ * @subpackage themes
+ */",
+ "/**
+ * Decode tis620 encoded strings
+ * @param string $string Encoded string
+ * @return string Decoded string
+ */",
+ "/**
+     * function mail - send the message parts to the SMTP stream
+     *
+     * @param Message  $message      Message object to send
+     *                               NOTE that this is passed by
+     *                               reference and will be modified
+     *                               upon return with updated
+     *                               fields such as Message ID, References,
+     *                               In-Reply-To and Date headers.
+     * @param resource $stream       Handle to the outgoing stream
+     *                               (when FALSE, nothing will be
+     *                               written to the stream; this can
+     *                               be used to determine the actual
+     *                               number of bytes that will be 
+     *                               written to the stream)
+     * @param string   $reply_id     Identifies message being replied to
+     *                               (OPTIONAL; caller should ONLY specify
+     *                               a value for this when the message
+     *                               being sent is a reply)
+     * @param string   $reply_ent_id Identifies message being replied to
+     *                               in the case it was an embedded/attached
+     *                               message inside another (OPTIONAL; caller
+     *                               should ONLY specify a value for this 
+     *                               when the message being sent is a reply)
+     * @param resource $imap_stream  If there is an open IMAP stream in 
+     *                               the caller\'s context, it should be
+     *                               passed in here.  This is OPTIONAL,
+     *                               as one will be created if not given,
+     *                               but as some IMAP servers may baulk
+     *                               at opening more than one connection
+     *                               at a time, the caller should always
+     *                               abide if possible.  Currently, this
+     *                               stream is only used when $reply_id
+     *                               is also non-zero, but that is subject
+     *                               to change.
+     * @param mixed    $extra        Any implementation-specific variables
+     *                               can be passed in here and used in
+     *                               an overloaded version of this method
+     *                               if needed.
+     *
+     * @return integer The number of bytes written (or that would have been
+     *                 written) to the output stream.
+     *
+     */",
+ "/**
+     * function send_mail - send the message parts to the IMAP stream
+     *
+     * @param Message  $message      Message object to send
+     * @param string   $header       Headers ready to send
+     * @param string   $boundary     Message parts boundary
+     * @param resource $stream       Handle to the SMTP stream
+     *                               (when FALSE, nothing will be
+     *                               written to the stream; this can
+     *                               be used to determine the actual
+     *                               number of bytes that will be
+     *                               written to the stream)
+     * @param int     &$raw_length   The number of bytes written (or that
+     *                               would have been written) to the 
+     *                               output stream - NOTE that this is
+     *                               passed by reference
+     * @param mixed    $extra        Any implementation-specific variables
+     *                               can be passed in here and used in
+     *                               an overloaded version of this method
+     *                               if needed.
+     *
+     * @return void
+     *
+     */",
+ "/**
+     * function writeBody - generate and write the mime boundaries around each part to the stream
+     *
+     * Recursively formats and writes the MIME boundaries of the $message
+     * to the output stream.
+     *
+     * @param Message   $message      Message object to transform
+     * @param resource  $stream       SMTP output stream
+     *                                (when FALSE, nothing will be
+     *                                written to the stream; this can
+     *                                be used to determine the actual
+     *                                number of bytes that will be 
+     *                                written to the stream)
+     * @param integer  &$length_raw   raw length of the message (part)
+     *                                as returned by mail fn
+     * @param string    $boundary     custom boundary to call, usually for subparts
+     *
+     * @return void
+     */",
+ "/**
+     * function writeBodyPart - write each individual mimepart
+     *
+     * Recursively called by WriteBody to write each mime part to the SMTP stream
+     *
+     * @param Message   $message      Message object to transform
+     * @param resource  $stream       SMTP output stream
+     *                                (when FALSE, nothing will be
+     *                                written to the stream; this can
+     *                                be used to determine the actual
+     *                                number of bytes that will be 
+     *                                written to the stream)
+     * @param integer  &$length       length of the message part
+     *                                as returned by mail fn
+     *
+     * @return void
+     */",
+ "/**
+     * function clean_crlf - change linefeeds and newlines to legal characters
+     *
+     * The SMTP format only allows CRLF as line terminators.
+     * This function replaces illegal teminators with the correct terminator.
+     *
+     * @param string &$s string to clean linefeeds on
+     *
+     * @return void
+     */",
+ "/**
+     * function strip_crlf - strip linefeeds and newlines from a string
+     *
+     * The SMTP format only allows CRLF as line terminators.
+     * This function strips all line terminators from the string.
+     *
+     * @param string &$s string to clean linefeeds on
+     *
+     * @return void
+     */",
+ "/**
+     * function preWriteToStream - reserved for extended functionality
+     *
+     * This function is not yet implemented.
+     * Reserved for extended functionality.
+     *
+     * @param string &$s string to operate on
+     *
+     * @return void
+     */",
+ "/**
+     * function writeToStream - write data to the SMTP stream
+     *
+     * @param resource $stream  SMTP output stream
+     * @param string   $data    string with data to send to the SMTP stream
+     *
+     * @return void
+     */",
+ "/**
+     * function initStream - reserved for extended functionality
+     *
+     * This function is not yet implemented.
+     * Reserved for extended functionality.
+     *
+     * @param Message $message  Message object
+     * @param string  $host     host name or IP to connect to
+     * @param string  $user     username to log into the SMTP server with
+     * @param string  $pass     password to log into the SMTP server with
+     * @param integer $length
+     *
+     * @return handle $stream file handle resource to SMTP stream
+     */",
+ "/**
+     * function getBCC - reserved for extended functionality
+     *
+     * This function is not yet implemented.
+     * Reserved for extended functionality.
+     *
+     */",
+ "/**
+     * function prepareMIME_Header - creates the mime header
+     *
+     * @param Message $message  Message object to act on
+     * @param string  $boundary mime boundary from fn MimeBoundary
+     *
+     * @return string $header properly formatted mime header
+     */",
+ "/**
+         * SquirrelMail header
+         *
+         * This Received: header provides information that allows to track
+         * user and machine that was used to send email. Don\'t remove it
+         * unless you understand all possible forging issues or your
+         * webmail installation does not prevent changes in user\'s email address.
+         * See SquirrelMail bug tracker #847107 for more details about it.
+         *
+         * Add hide_squirrelmail_header as a candidate for config_local.php
+         * (must be defined as a constant:  define(\'hide_squirrelmail_header\', 1);
+         * to allow completely hiding SquirrelMail participation in message
+         * processing; This is dangerous, especially if users can modify their
+         * account information, as it makes mapping a sent message back to the
+         * original sender almost impossible.
+         */",
+ "/**
+     * function prepareRFC822_Header - prepares the RFC822 header string from Rfc822Header object(s)
+     *
+     * This function takes the Rfc822Header object(s) and formats them
+     * into the RFC822Header string to send to the SMTP server as part
+     * of the SMTP message.
+     *
+     * @param Rfc822Header  $rfc822_header
+     * @param Rfc822Header  $reply_rfc822_header
+     * @param integer      &$raw_length length of the message
+     *
+     * @return string $header
+     */",
+ "/**
+      * Fold header lines per RFC 2822/2.2.3 and RFC 822/3.1.1
+      *
+      * Herein \"soft\" folding/wrapping (with whitespace tokens) is
+      * what we refer to as the preferred method of wrapping - that
+      * which we\'d like to do within the $soft_wrap limit, but if
+      * not possible, we will try to do as soon as possible after
+      * $soft_wrap up to the $hard_wrap limit.  Encoded words don\'t
+      * need to be detected in this phase, since they cannot contain
+      * spaces.
+      *
+      * \"Hard\" folding/wrapping (with \"hard\" tokens) is what we refer
+      * to as less ideal wrapping that will be done to keep within
+      * the $hard_wrap limit.  This adds other syntactical breaking
+      * elements such as commas and encoded words.
+      *
+      * @param string  $header    The header content being folded
+      * @param integer $soft_wrap The desirable maximum line length
+      *                           (OPTIONAL; default is 78, per RFC)
+      * @param string  $indent    Wrapped lines will already have
+      *                           whitespace following the CRLF wrap,
+      *                           but you can add more indentation (or
+      *                           whatever) with this.  The use of this
+      *                           parameter is DISCOURAGED, since it
+      *                           can corrupt the redisplay (unfolding)
+      *                           of headers whose content is space-
+      *                           sensitive, like subjects, etc.
+      *                           (OPTIONAL; default is an empty string)
+      * @param string  $hard_wrap The absolute maximum line length
+      *                           (OPTIONAL; default is 998, per RFC)
+      *
+      * @return string The folded header content, with a trailing CRLF.
+      *
+      */",
+ "/**
+     * function mimeBoundary - calculates the mime boundary to use
+     *
+     * This function will generate a random mime boundary base part
+     * for the message if the boundary has not already been set.
+     *
+     * @return string $mimeBoundaryString random mime boundary string
+     */",
+ "/**
+     * function timezone - Time offset for correct timezone
+     *
+     * @return string $result with timezone and offset
+     */",
+ "/**
+     * function calculate_references - calculate correct References string
+     * Adds the current message ID, and makes sure it doesn\'t grow forever,
+     * to that extent it drops message-ID\'s in a smart way until the string
+     * length is under the recommended value of 1000 (\"References: <986>\r\n\").
+     * It always keeps the first and the last three ID\'s.
+     *
+     * @param   Rfc822Header $hdr    message header to calculate from
+     *
+     * @return  string       $refer  concatenated and trimmed References string
+     */",
+ "/**
+     * Converts ip address to hexadecimal string
+     *
+     * Function is used to convert ipv4 and ipv6 addresses to hex strings.
+     * It removes all delimiter symbols from ip addresses, converts decimal
+     * ipv4 numbers to hex and pads strings in order to present full length
+     * address. ipv4 addresses are represented as 8 byte strings, ipv6 addresses
+     * are represented as 32 byte string.
+     *
+     * If function fails to detect address format, it returns unprocessed string.
+     * @param string $string ip address string
+     * @return string processed ip address string
+     * @since 1.5.1 and 1.4.5
+     */",
+ "/**
+ * Deliver Class - called to actually deliver the message
+ *
+ * This class is called by compose.php and other code that needs
+ * to send messages.  All delivery functionality should be centralized
+ * in this class.
+ *
+ * Do not place UI code in this class, as UI code should be placed in templates
+ * going forward.
+ *
+ * @author  Marc Groot Koerkamp
+ * @package squirrelmail
+ */",
+ "/**
+     * This hook was added in 1.5.2 and 1.4.10. Each plugins should print an error
+     * message and return TRUE if there are any errors in its setup/configuration.
+     */",
+ "/** Can we open a connection? */",
+ "/** Is the first response \'OK\'? */",
+ "/** Here is the header and wrapping table **/",
+ "/**
+* This theme as a failsafe if no themes were found. It makes
+* no sense to cause the whole thing to exit just because themes
+* were not found. This is the absolute last resort.
+* Moved here to provide \'sane\' defaults for incomplete themes.
+*/",
+ "/**
+     * Constructor
+     * @param array $param backend options
+     * @return bool
+     */",
+ "/**
+     * Open the addressbook file and store the file pointer.
+     * Use $file as the file to open, or the class\' own
+     * filename property. If $param is empty and file is
+     * open, do nothing.
+     * @param bool $new is file already opened
+     * @return bool
+     */",
+ "/** Close the file and forget the filehandle */",
+ "/** Lock the datafile - try 20 times in 5 seconds */",
+ "/** Unlock the datafile */",
+ "/**
+     * Overwrite the file with data from $rows
+     * NOTE! Previous locks are broken by this function
+     * @param array $rows new data
+     * @return bool
+     */",
+ "/**
+     * Search the file
+     * @param string $expr search expression
+     * @return array search results
+     */",
+ "/**
+     * Lookup by the indicated field
+     *
+     * @param string  $value Value to look up
+     * @param integer $field The field to look in, should be one
+     *                       of the SM_ABOOK_FIELD_* constants
+     *                       defined in functions/constants.php
+     *                       (OPTIONAL; defaults to nickname field)
+     *                       NOTE: uniqueness is only guaranteed
+     *                       when the nickname field is used here;
+     *                       otherwise, the first matching address
+     *                       is returned.
+     *
+     * @return array search results
+     *
+     */",
+ "/**
+     * List all addresses
+     * @return array list of all addresses
+     */",
+ "/**
+     * Add address
+     * @param array $userdata new data
+     * @return bool
+     */",
+ "/**
+     * Delete address
+     * @param string $alias alias that has to be deleted
+     * @return bool
+     */",
+ "/**
+     * Modify address
+     * @param string $alias modified alias
+     * @param array $userdata new data
+     * @return bool true, if operation successful
+     */",
+ "/**
+     * Function for quoting values before saving
+     * @param string $value string that has to be quoted
+     * @param string quoted string
+     */",
+ "/**
+ * Backend for address book as a pipe separated file
+ *
+ * Stores the address book in a local file
+ *
+ * An array with the following elements must be passed to
+ * the class constructor (elements marked ? are optional):
+ *<pre>
+ *   filename  => path to addressbook file
+ * ? create    => if true: file is created if it does not exist.
+ * ? umask     => umask set before opening file.
+ * ? name      => name of address book.
+ * ? detect_writeable => detect address book access permissions by
+ *                checking file permissions.
+ * ? writeable => allow writing into address book. Used only when
+ *                detect_writeable is set to false.
+ * ? listing   => enable/disable listing
+ * ? line_length => allowed address book record size
+ *</pre>
+ * NOTE. This class should not be used directly. Use the
+ *       \"AddressBook\" class instead.
+ * @package squirrelmail
+ */",
+ "/**
+ * Given an IMAP message id number, this will look it up in the cached
+ * and sorted msgs array and return the index. Used for finding the next
+ * and previous messages.
+ *
+ * @return the index of the next valid message from the array
+ */",
+ "/** returns the index of the previous message from the array. */",
+ "/**
+ * Displays a link to a page where the message is displayed more
+ * \"printer friendly\".
+ */",
+ "/**
+ * $message contains all information about the message
+ * including header and body
+ */"
+]

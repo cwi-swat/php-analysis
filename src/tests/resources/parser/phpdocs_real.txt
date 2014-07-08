@@ -1,0 +1,249 @@
+["/**
+     * filterSet
+     * defines an implementation for filtering the set() method of Doctrine_Record
+     *
+     * @param mixed $name                       name of the property or related component
+     */",
+"/**
+     * filterGet
+     * defines an implementation for filtering the get() method of Doctrine_Record
+     *
+     * @param mixed $name                       name of the property or related component
+     */",
+"/**
+ * Doctrine_Record_Filter
+ * Filters the record getters and setters
+ *
+ * @package     Doctrine
+ * @subpackage  Record
+ * @author      Konsta Vesterinen <kvesteri@cc.hut.fi>
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link        www.phpdoctrine.org
+ * @since       1.0
+ * @version     $Revision: 1298 $
+     */",
+"/**
+     * Connect to the remote server
+     *
+     * Will try to connect to the proxy server. If no proxy was set, will
+     * fall back to the target server (behave like regular Socket adapter)
+     *
+     * @param string  $host
+     * @param int     $port
+     * @param boolean $secure
+     */",
+"/**
+     * Send request to the proxy server
+     *
+     * @param string        $method
+     * @param Zend_Uri_Http $uri
+     * @param string        $http_ver
+     * @param array         $headers
+     * @param string        $body
+     * @return string Request as string
+     */",
+"/**
+     * Preform handshaking with HTTPS proxy using CONNECT method
+     *
+     * @param string  $host
+     * @param integer $port
+     * @param string  $http_ver
+     * @param array   $headers
+     */",
+"/**
+     * Close the connection to the server
+     *
+     */",
+"/**
+     * Destructor: make sure the socket is disconnected
+     *
+     */",
+"/**
+ * HTTP Proxy-supporting Zend_Http_Client adapter class, based on the default
+ * socket based adapter.
+ *
+ * Should be used if proxy HTTP access is required. If no proxy is set, will
+ * fall back to Zend_Http_Client_Adapter_Socket behavior. Just like the
+ * default Socket adapter, this adapter does not require any special extensions
+ * installed.
+ *
+ * @category   Zend
+ * @package    Zend_Http
+ * @subpackage Client_Adapter
+ * @copyright  Copyright (c) 2005-2011 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license    http://framework.zend.com/license/new-bsd     New BSD License
+ */",
+"/**
+     * Configures frontend app
+     */",
+"/** @var sfWebRequest $request */",
+"/**
+     * When the user doesn't have an access token but does have the remember-me cookie.
+     * Redirect the user to the remember-me page, to make the user automatically login.
+     *
+     * Because we need to generate an URL we need the Symfony routing.
+     * Unfortunalty the routing isn't available in the hook \"request.filter_parameters\".
+     * Therefore routing hook \"routing.load_configuration\" is used.
+     *
+     * @param sfEvent $event
+     * @param array   $parameters
+     */",
+"/**
+     * Craftsman has finished the questionnaire.
+     * Assign credit(s) to craftsman, and close the fancybox.
+     *
+     * @param   sfEvent $event
+     * @author  M.Bax <marco.bax@freshheads.com>
+     * @since   2.1.19RC1
+     * @redmine #15354
+     */",
+"/**
+ * Frontend configuration
+ *
+ * @package    frontend
+ * @subpackage config
+ * @author     Ralf Claassens <ralf@freshheads.com>, M.Bax <marco.bax@freshheads.com>
+ */",
+"/**
+   * How does it work demo page.
+   *
+   * @param  sfWebRequest $request
+   * @return string
+   */",
+"/**
+   * Explanation page for craftsmen cooperation.
+   *
+   * @param  sfWebRequest $request
+   * @return string
+   */",
+"/**
+   * Order guarantee
+   *
+   * @param sfWebRequest $request
+   * @return void
+   */",
+"/**
+   * Redirect url algemene-voorwaarden to the new url
+   * @return void
+   */",
+"/**
+   * Tips for consumers.
+   *
+   * @param   sfWebRequest $request
+   * @return  void
+   * @since   2.1.8RC1
+   * @author  M.Bax <marco.bax@freshheads.com>
+   * @redmine #11570
+   */",
+"/**
+   * Off action.
+   *
+   * @param   sfWebRequest $request
+   * @return  void
+   * @since   2.1.14RC1
+   * @author  T.vd.Wiel <thomas.van.de.wiel@freshheads.com>
+   * @author  M.Bax <marco.bax@freshheads.com>
+   */",
+"/**
+   * @redmine #13461, #13704
+   */",
+"/**
+   * Media campaign landing page
+   *
+   * @param   sfWebRequest $request
+   * @since   2.1.18RC1
+   * @author  T.vd.Wiel <thomas.van.de.wiel@freshheads.com>
+   * @redmine #15210
+   */",
+"/**
+   * WS Mobile app promotional page.
+   *
+   * @param   sfWebRequest $request
+   * @since   2.1.18RC1
+   * @author  M.Bax <marco.bax@freshheads.com>
+   * @redmine #15211
+   */",
+"/**
+   * WS Mobile app promotional page.
+   *
+   * @param   sfWebRequest $request
+   * @since   2.1.18RC1
+   * @author  M.Bax <marco.bax@freshheads.com>
+   * @redmine #15211
+   */",
+"/**
+   * WS Mobile app landing page for mobile devices
+   *
+   * @param   sfWebRequest $request
+   * @since   2.1.18RC1
+   * @author  T.vd.Wiel <thomas.van.de.wiel@freshheads.com>
+   * @redmine #15211
+   */",
+"/**
+   * View and test mail messages.
+   *
+   * @param sfWebRequest $request
+   */",
+"/**
+   * Serves general Werkspot info
+   */",
+"/**
+   * Serves general craftsman app info
+   */",
+"/**
+   * Serves general Werkspot info
+   */",
+"/**
+   * Serves general Werkspot info
+   */",
+"/**
+ * Article form.
+ *
+ * @package    form
+ * @subpackage article
+ * @version    SVN: $Id: ArticleForm.class.php 14010 2008-12-13 14:27:57Z Kris.Wallsmith $
+ */",
+"/**
+     * Set table definition for SoftDelete behavior
+     *
+     * @return void
+     */",
+"/**
+     * Add a hardDelete() method to any of the models who act as SoftDelete behavior
+     *
+     * @param Doctrine_Connection $conn
+     * @return integer $result Number of affected rows.
+     */",
+"/**
+ * Doctrine_Template_SoftDelete
+ *
+ * @package     Doctrine
+ * @subpackage  Template
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link        www.phpdoctrine.org
+ * @since       1.0
+ * @version     $Revision$
+ * @author      Konsta Vesterinen <kvesteri@cc.hut.fi>
+ * @author      Jonathan H. Wage <jonwage@gmail.com>
+ */",
+"/**
+     * Overridden super-method for automatic updating of created_at + updated_at fields.
+     */",
+"/**
+ * PluginCraftsmanReason
+ *
+ * This class has been auto-generated by the Doctrine ORM Framework
+ *
+ * @package    ##PACKAGE##
+ * @subpackage ##SUBPACKAGE##
+ * @author     ##NAME## <##EMAIL##>
+ * @version    SVN: $Id: Builder.php 6820 2009-11-30 17:27:49Z jwage $
+ */",
+"/**
+   * An array with elements that match the given matchers.
+   *
+   * @factory containsInAnyOrder ...
+   */",
+"/**
+ * Matches if an array contains a set of items satisfying nested matchers.
+ */"]
