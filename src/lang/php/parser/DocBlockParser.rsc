@@ -20,16 +20,31 @@ lexical Whitespace
 // Class names should start with a Capital letter or a backslash like \Object
 lexical ClassName 
 	//= [a-z] !<< [a-z]+ !>> [a-z]; // longest match
-	= [a-z A-Z _ \\] !<< [A-Z \\] [a-z A-Z _ \\]* !>> [a-z A-Z _ \\]
+	//= [a-z A-Z _ \\] !<< [A-Z \\] [a-z A-Z _ \\]* !>> [a-z A-Z _ \\] // this one works fine, but forces classnames to start with a capital
+	= [a-z A-Z _ \\] !<< ([a-z A-Z _ \\] [a-z A-Z _ \\ 0-9]*) !>> [a-z A-Z _ \\]
 		\ Keywords
 	;
 
 // borrowed from: lexical Id = [a-z A-Z 0-9 _] !<< [a-z A-Z][a-z A-Z 0-9 _]* !>> [a-z A-Z 0-9 _];	
 lexical Var 
-	= [$] !<< "$" [$ { } a-z A-Z 0-9 _ \u007f-\u00ff]+ !>> [$ { } a-z A-Z 0-9 _ \u007f-\u00ff]
+	= [$] !<< ("$" [$ { } a-z A-Z 0-9 _ \u007f-\u00ff]+) !>> [$ { } a-z A-Z 0-9 _ \u007f-\u00ff]
 	//= "$" [$ { } a-z A-Z 0-9 _ \u007f-\u00ff]+ // $ and { } are needed for variable variables
 	;
-   
+
+// Description is everything that does not start with @ (annotation).
+// used !<< and !>> for longest match
+lexical Description 
+	= description: 
+			[$ a-z A-Z 0-9 { } ( ) \[ \] \< \> & @ # ^ + % = : ; ? ! ~ ` \' \" / \\ _ \- | . , \u007f-\u00ff] 
+		!<<  
+			(![@] [a-z A-Z 0-9 $ { } ( ) \[ \] \< \> & @ # ^ + % = : ; ? ! ~ ` \' \" / \\ _ \- | . , \  \u007f-\u00ff]*)
+		!>> 
+			[a-z A-Z 0-9 $ { } ( ) \[ \] \< \> & @ # ^ + % = : ; ? ! ~ ` \' \" / \\ _ \- | . , \  \u007f-\u00ff] 
+		//\ Var
+		//\ Keywords
+		//\ ClassName
+	;
+  
 // keywords to match, use single quote for case insensitivity
 keyword Keywords
 	// annotations
@@ -48,23 +63,13 @@ keyword Keywords
 	| "null"
 	| "string"
 	| "unset"
+	| "object"
+	| "void"
 	;
 	
 syntax DocBlock 
-	= docBlock: "/" Description? Annotation* "/"
-	;
-
-// Description is everything that is no Keyword.
-// used !<< and !>> for longest match
-lexical Description 
-	= description: 
-			[$ { } a-z A-Z 0-9 _ . \u007f-\u00ff] 
-		!<<  
-			![$ @] [$ { } a-z A-Z 0-9 _ . \  \u007f-\u00ff]+ 
-		!>> 
-			[$ { } a-z A-Z 0-9 _ . \  \u007f-\u00ff] 
-		\ Keywords
-		//\ ClassName
+	= docBlock: "/" Description* Annotation* "/"
+	// known issue: a line cannot start with two slashes, like: * // comment
 	;
 	
 syntax Annotation
@@ -72,15 +77,52 @@ syntax Annotation
 	;
 
 syntax AnnotationType
-	= param: "@param" Types Variable Description?
-	| param: "@param" Variable Types Description?
-	| \return: "@return" Types Description?
-	| var: "@var" Variable Types Description?
-	| var: "@var" Types Variable Description?
-	| var: "@type" Variable Types Description?
-	| var: "@type" Types Variable Description?
+	= param: ("@param" Types Variable Description*)
+	//| param: ("@param" Variable Types Description*)
+	| \return: ("@return" Types Description*)
+	| var: ("@var" Types Variable Description*)
+	//| var: ("@var" Variable Types Description*)
+	//| var: ("@type" Types Variable Description*)
+	//| var: ("@type" Variable Types Description*)
+	// other non supported annotations, added them so it wont fail to parse
+	| \throws: ("@throws" Description*)
+	> other: OtherAnnotation
+	;
+
+// list of 'unsupported' annotations, they need to be implemented 
+syntax OtherAnnotation
+	=  OtherAnnotationTag Description*
 	;
 	
+lexical OtherAnnotationTag
+	= "@access" 
+	//| "@api" 
+	| "@author" 
+	| "@category" 
+	| "@copyright"
+	| "@dataProvider" 
+	| "@deprecated"
+	//| "@exception" 
+	| "@expectedException"
+	| "@expectedExceptionMessage"
+	//| "@factory" 
+	| "@group" 
+	| "@license" 
+	| "@lastmodified" 
+	| "@link" 
+	//| "@method" 
+	| "@modifiedby" 
+	| "@outputBuffering"
+	| "@package" 
+	| "@property"
+	//| "@redmine" 
+	| "@see" 
+	| "@since" 
+	| "@subpackage" 
+	| "@todo" 
+	| "@uses" 
+	| "@version" 
+	;
 
 syntax Variable
 	= variable: Var
@@ -119,4 +161,6 @@ syntax PredefinedPhpType
 	| \null: "null"
 	| string: "string"
 	| unset: "unset"
+	| object: "object"
+	| \void: "void"
 	;
