@@ -104,7 +104,7 @@ public test bool testVariables()
         ;
     lrel[str input, node expectedResult] inputs = [ <i, makeNode("variable", i)> | i <- input ];
 
-    return testParser(#Variable, inputs);	
+    return testParser(#Var, inputs);	
 }
 
 public test bool testDescriptions() 
@@ -144,17 +144,12 @@ public test bool testAnnotations()
 {
     lrel[str input, node expectedResult] inputs
         = [ <"@param int $var",    makeAnnotationNode("param", [makeNode("int")], "$var", [])> ]
-        //+ [ <"@param $var int",    makeAnnotationNode("param", "$var", [makeNode("int")], [])> ]
         + [ <"@param int $var some text",    makeAnnotationNode("param", [makeNode("int")], "$var", ["some text"])> ]
-        //+ [ <"@param $var int some text",    makeAnnotationNode("param", "$var", [makeNode("int")], ["some text"])> ]
 
         + [ <"@var mixed $var",    makeAnnotationNode("var", [makeNode("mixed")], "$var", [])> ]
-        //+ [ <"@var $var mixed",    makeAnnotationNode("var", "$var", [makeNode("mixed")], [])> ]
         + [ <"@var mixed $var some text",    makeAnnotationNode("var", [makeNode("mixed")], "$var", ["some text"])> ]
-        //+ [ <"@var $var mixed some text",    makeAnnotationNode("var", "$var", [makeNode("mixed")], ["some text"])> ]
         
         + [ <"@var RandomClass $var some text",    makeAnnotationNode("var", [makeNode("class", "RandomClass")], "$var", ["some text"])> ]
-        //+ [ <"@var $var RandomClass some text",    makeAnnotationNode("var", "$var", [makeNode("class", "RandomClass")], ["some text"])> ]
         ;
 	
     return testParser(#Annotation, inputs);	
@@ -166,17 +161,9 @@ private node makeAnnotationNode(str annoType, list[node] varTypes, str var, list
 	node varNode = makeNode("variable", var);
 	descNodes = isEmpty(descriptions) ? [] : makeDescriptionNode(descriptions);	
 	
-	return makeNode("annotation", makeNode(annoType, <typesNodes, varNode, descNodes> ));
+	return makeNode("annotation", makeNode(annoType, <typesNodes, varNode>), descNodes);
 }
  
-private node makeAnnotationNode(str annoType, str var, list[node] varTypes, list[str] descriptions) {
-	typesNodes = isEmpty(varTypes) ? [] : makeNode("types", [[ vt | vt <- varTypes ]]);	
-	node varNode = makeNode("variable", var);
-	descNodes = isEmpty(descriptions) ? [] : makeDescriptionNode(descriptions);	
-	
-	return makeNode("annotation", makeNode(annoType, <varNode, typesNodes, descNodes> ));
-}
-
 public test bool testDocBlocks()
 {
     lrel[str input, node expectedResult] inputs
