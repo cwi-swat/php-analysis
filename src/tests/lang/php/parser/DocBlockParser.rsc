@@ -14,7 +14,8 @@ public void main()
     int numberOfTests = 50;	
     print("Testing <numberOfTests> random multiple types ..."); if (testMultipleTypes(numberOfTests)) println("Done.");
 
-    print("Testing docblocks...");      if (testDocBlocks())    println("Done.");
+    print("Testing docblocks...");      if (testDocBlocks())     println("Done.");
+    print("Testing real docblocks..."); testFullDocBlocks();
 }
 
 // test the parser with some inputs
@@ -24,8 +25,6 @@ public bool testParser(type[&T<:Tree] t, lrel[str input, node expectedResult] in
         try { 
             // try to parse
             node n = implode(#node, parse(t, i.input));
-        	
-            //println(n);
         	
             // check if the result is the expected result
             assert n == i.expectedResult : println("Expected:\n<i.expectedResult>\nActual:\n<delAnnotationsRec(n)>");
@@ -38,59 +37,58 @@ public bool testParser(type[&T<:Tree] t, lrel[str input, node expectedResult] in
     return true;
 }
 
-// helper methods to create nodes
-private node expectedTypeNode(str nodeName) 
-    = makeNode("types", [ [ makeNode(nodeName) ] ]);	
-    
-private node expectedArrayTypeNode(str nodeName) 
-    = makeNode("types", [ [ makeNode("arrayOf", makeNode(nodeName)) ] ]);
-
 public test bool testPhpTypes() 
 {
     lrel[str input, node expectedResult] inputs
-        = [ <"array",   expectedTypeNode("array")> ] 
-        + [ <"array()", expectedTypeNode("array")> ] 
+        = [ <"array",   makeTypeNode("array")> ] 
+        + [ <"array()", makeTypeNode("array")> ] 
     	
-        + [ <"mixed",   expectedTypeNode("mixed")> ] 
-        + [ <"mixed()", expectedTypeNode("mixed")> ] 
+        + [ <"mixed",   makeTypeNode("mixed")> ] 
+        + [ <"mixed()", makeTypeNode("mixed")> ] 
     	
-        + [ <"bool",   expectedTypeNode("bool")> ] 
-        + [ <"bool()", expectedTypeNode("bool")> ] 
-        + [ <"bool[]", expectedArrayTypeNode("bool")> ] 
-        + [ <"boolean",   expectedTypeNode("bool")> ] 
-        + [ <"boolean()", expectedTypeNode("bool")> ] 
-        + [ <"boolean[]", expectedArrayTypeNode("bool")> ] 
+        + [ <"bool",   makeTypeNode("bool")> ] 
+        + [ <"bool()", makeTypeNode("bool")> ] 
+        + [ <"bool[]", makeArrayTypeNode("bool")> ] 
+        + [ <"boolean",   makeTypeNode("bool")> ] 
+        + [ <"boolean()", makeTypeNode("bool")> ] 
+        + [ <"boolean[]", makeArrayTypeNode("bool")> ] 
     	
-        + [ <"int",   expectedTypeNode("int")> ] 
-        + [ <"int()", expectedTypeNode("int")> ] 
-        + [ <"int[]", expectedArrayTypeNode("int")> ] 
+        + [ <"int",   makeTypeNode("int")> ] 
+        + [ <"int()", makeTypeNode("int")> ] 
+        + [ <"int[]", makeArrayTypeNode("int")> ] 
         
-        + [ <"float",   expectedTypeNode("float")> ] 
-        + [ <"float()", expectedTypeNode("float")> ] 
-        + [ <"float[]", expectedArrayTypeNode("float")> ] 
+        + [ <"float",   makeTypeNode("float")> ] 
+        + [ <"float()", makeTypeNode("float")> ] 
+        + [ <"float[]", makeArrayTypeNode("float")> ] 
         
-        + [ <"string",   expectedTypeNode("string")> ] 
-        + [ <"string()", expectedTypeNode("string")> ] 
-        + [ <"string[]", expectedArrayTypeNode("string")> ] 
+        + [ <"string",   makeTypeNode("string")> ] 
+        + [ <"string()", makeTypeNode("string")> ] 
+        + [ <"string[]", makeArrayTypeNode("string")> ] 
         
-        + [ <"resource",   expectedTypeNode("resource")> ] 
-        + [ <"resource()", expectedTypeNode("resource")> ] 
-        + [ <"resource[]", expectedArrayTypeNode("resource")> ] 
+        + [ <"resource",   makeTypeNode("resource")> ] 
+        + [ <"resource()", makeTypeNode("resource")> ] 
+        + [ <"resource[]", makeArrayTypeNode("resource")> ] 
         
-        + [ <"unset",   expectedTypeNode("unset")> ] 
-        + [ <"unset()", expectedTypeNode("unset")> ] 
-        + [ <"unset[]", expectedArrayTypeNode("unset")> ] 
+        + [ <"unset",   makeTypeNode("unset")> ] 
+        + [ <"unset()", makeTypeNode("unset")> ] 
+        + [ <"unset[]", makeArrayTypeNode("unset")> ] 
         ;
 
     return testParser(#Types, inputs);	
 }
+
+// helper methods to create nodes
+private node makeTypeNode(str nodeName) = makeNode("types", [ [ makeNode(nodeName) ] ]);	
+private node makeTypesNode(list[str] keywords) = makeNode("types", [[ makeNode(k) | k <- keywords ]]);
+private node makeArrayTypeNode(str nodeName) = makeNode("types", [ [ makeNode("arrayOf", makeNode(nodeName)) ] ]);
+private list[node] makeDescriptionNode(list[str] descriptions) = [ makeNode("description", desc) | desc <- descriptions ];
 
 public test bool testClassTypes() 
 {
     list[str] input 
         = [ "C", "ClassName", "Object" ]
         + [ "OldStyleClasses", "Old_Style_Classes"] 
-    //    + ["class_lowercased" ] // does not work because of case sensitivity
+        + [ "class_lowercased" ] 
         + [ "\\ClassName", "\\Package\\ClassName", "\\Package\\SubPackage\\ClassName" ];
     	
     lrel[str input, node expectedResult] inputs = [ <i, makeNode("types", [[makeNode("class", i)]])> | i <- input ];
@@ -132,7 +130,7 @@ public test bool testMultipleTypes(int numberOfTests)
     list[list[str]] lists = [ dup(getMixedKeywordsList(keywords)) | n <- [0 .. numberOfTests] ];	
     
     // create x random inputs	
-    lrel[str input, node expectedResult] inputs = [ <listToString(l), listToExpectedOutput(l)> | l <- lists ];
+    lrel[str input, node expectedResult] inputs = [ <listToString(l), makeTypesNode(l)> | l <- lists ];
     inputs += [ <"ClassName|null", makeNode("types", [[ makeNode("class", "ClassName"), makeNode("null") ]])> ];
 
     return testParser(#Types, inputs);
@@ -140,30 +138,45 @@ public test bool testMultipleTypes(int numberOfTests)
 
 // Helper methods for testMultipleTypes
 private str listToString(list[str] keywords) = intercalate(getOneFrom(["|", "|", "|", "|", "|", "|", " |", "| ", " | "]), keywords);
-private node listToExpectedOutput(list[str] keywords) = makeNode("types", [[ makeNode(k) | k <- keywords ]]);
 private list[str] getMixedKeywordsList(list[str] keywords) { return for (i <- [0..getOneFrom([2..5])]) append getOneFrom(keywords); }
 
 public test bool testAnnotations() 
 {
     lrel[str input, node expectedResult] inputs
-        = [ <"@param int $var",     makeNode("annotation", makeNode("param", makeNode("types", [ [ makeNode("int") ] ]), makeNode("variable", "$var"), [] ))> ]
-        + [ <"@param $var int",     makeNode("annotation", makeNode("param", makeNode("variable", "$var"), makeNode("types", [ [ makeNode("int") ] ]), [] ))> ]
-        + [ <"@param int $var some text",     makeNode("annotation", makeNode("param", makeNode("types", [ [ makeNode("int") ] ]), makeNode("variable", "$var"), [makeNode("description", "some text")] ))> ]
-        + [ <"@param $var int some text",     makeNode("annotation", makeNode("param", makeNode("variable", "$var"), makeNode("types", [ [ makeNode("int") ] ]), [makeNode("description", "some text")] ))> ]
-    	
-        + [ <"@var mixed $var",     makeNode("annotation", makeNode("var", makeNode("types", [ [ makeNode("mixed") ] ]), makeNode("variable", "$var"), [] ))> ]
-        + [ <"@var $var mixed",     makeNode("annotation", makeNode("var", makeNode("variable", "$var"), makeNode("types", [ [ makeNode("mixed") ] ]), [] ))> ]
-        + [ <"@var mixed $var some text",     makeNode("annotation", makeNode("var", makeNode("types", [ [ makeNode("mixed") ] ]), makeNode("variable", "$var"), [makeNode("description", "some text")] ))> ]
-        + [ <"@var $var mixed some text",     makeNode("annotation", makeNode("var", makeNode("variable", "$var"), makeNode("types", [ [ makeNode("mixed") ] ]), [makeNode("description", "some text")] ))> ]
-    	
-        + [ <"@var RandomClass $var some text",     makeNode("annotation", makeNode("var", makeNode("types", [ [ makeNode("class", "RandomClass") ] ]), makeNode("variable", "$var"), [makeNode("description", "some text")] ))> ]
-        + [ <"@var $var RandomClass some text",     makeNode("annotation", makeNode("var", makeNode("variable", "$var"), makeNode("types", [ [ makeNode("class", "RandomClass") ] ]), [makeNode("description", "some text")] ))> ]
+        = [ <"@param int $var",    makeAnnotationNode("param", [makeNode("int")], "$var", [])> ]
+        //+ [ <"@param $var int",    makeAnnotationNode("param", "$var", [makeNode("int")], [])> ]
+        + [ <"@param int $var some text",    makeAnnotationNode("param", [makeNode("int")], "$var", ["some text"])> ]
+        //+ [ <"@param $var int some text",    makeAnnotationNode("param", "$var", [makeNode("int")], ["some text"])> ]
+
+        + [ <"@var mixed $var",    makeAnnotationNode("var", [makeNode("mixed")], "$var", [])> ]
+        //+ [ <"@var $var mixed",    makeAnnotationNode("var", "$var", [makeNode("mixed")], [])> ]
+        + [ <"@var mixed $var some text",    makeAnnotationNode("var", [makeNode("mixed")], "$var", ["some text"])> ]
+        //+ [ <"@var $var mixed some text",    makeAnnotationNode("var", "$var", [makeNode("mixed")], ["some text"])> ]
+        
+        + [ <"@var RandomClass $var some text",    makeAnnotationNode("var", [makeNode("class", "RandomClass")], "$var", ["some text"])> ]
+        //+ [ <"@var $var RandomClass some text",    makeAnnotationNode("var", "$var", [makeNode("class", "RandomClass")], ["some text"])> ]
         ;
-
-
+	
     return testParser(#Annotation, inputs);	
 }
-    
+
+// helper methods for testAnnotations
+private node makeAnnotationNode(str annoType, list[node] varTypes, str var, list[str] descriptions) {
+	typesNodes = isEmpty(varTypes) ? [] : makeNode("types", [[ vt | vt <- varTypes ]]);	
+	node varNode = makeNode("variable", var);
+	descNodes = isEmpty(descriptions) ? [] : makeDescriptionNode(descriptions);	
+	
+	return makeNode("annotation", makeNode(annoType, <typesNodes, varNode, descNodes> ));
+}
+ 
+private node makeAnnotationNode(str annoType, str var, list[node] varTypes, list[str] descriptions) {
+	typesNodes = isEmpty(varTypes) ? [] : makeNode("types", [[ vt | vt <- varTypes ]]);	
+	node varNode = makeNode("variable", var);
+	descNodes = isEmpty(descriptions) ? [] : makeDescriptionNode(descriptions);	
+	
+	return makeNode("annotation", makeNode(annoType, <varNode, typesNodes, descNodes> ));
+}
+
 public test bool testDocBlocks()
 {
     lrel[str input, node expectedResult] inputs
@@ -172,7 +185,8 @@ public test bool testDocBlocks()
         + [ <"/** \n * * */",     makeNode("docBlock", [ [],[] ] )> ] 
     	
         + [ <"/** this is some description */",     makeNode("docBlock", [ [ makeNode("description", "this is some description ") ] , [] ])> ]
-        + [ <"/** \n * @var int $number \n */",     makeNode("docBlock", [], [ makeNode("annotation", makeNode("var", makeNode("types", [ [makeNode("int")] ]), makeNode("variable", "$number"), [] )) ] )> ]
+        + [ <"/** \n * this is some description */",     makeNode("docBlock", [ [ makeNode("description", "this is some description ") ] , [] ])> ]
+        + [ <"/** \n * @var int $number \n */",     makeNode("docBlock", [], [ makeAnnotationNode("var", [makeNode("int")], "$number", [] ) ] )> ]
     	
         // todo: add more complex tests
         //+ [ <"/** @param int */",     "docBlock"> ]
@@ -189,3 +203,48 @@ public test bool testDocBlocks()
 
     return testParser(#DocBlock, inputs);	
 }
+
+public void testFullDocBlocks()
+{
+    loc baseDir = |project://PHPAnalysis/src/tests/resources/parser|;
+   
+    for (l <- baseDir.ls, l.extension == "txt") {
+        int success = 0, total = 0;
+    
+        list[str] phpdocs = readTextValueFile(#list[str],l);
+            
+        for(phpdoc <- phpdocs)
+        {
+            total += 1;
+            if (canParse(#DocBlock, phpdoc)) 
+                success += 1;
+        }
+
+        // parse results
+        println("<100*success/total>% :: (<success>/<total>) :: <l>");  
+    }
+}
+
+public bool canParse(type[&T<:Tree] t, str input)
+{
+    try {
+        //println(input); 
+        node res = implode(#node, parse(t, input));
+        //println(res);
+        
+    } catch ParseError(loc l): {
+        //println("Stopped. Failed to parse:");
+        //println(input);
+        //println(parse(t, input)); 
+        //exit();
+        return false;
+    } catch: {
+    	//println("Unknown error... ambigious grammar??");
+     //   println(input);
+     //   println(implode(#node, parse(t, input)));
+    	//exit;
+    	return false;
+    }
+   
+    return true;
+} 
