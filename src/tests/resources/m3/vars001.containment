@@ -1,6 +1,0 @@
-{
-	<|php+namespace:///|,   |php+function:///f|>,
-	<|php+namespace:///|,   |php+globalVar:///i|>,
-	
-	<|php+function:///f|,   |php+functionVar:///f/i|>
-}
