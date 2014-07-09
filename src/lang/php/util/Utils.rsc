@@ -63,7 +63,7 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	if (l.scheme notin {"file","home"}) return errscript("Only file and home locations are supported");
 	if (!isFile(l)) return errscript("Location <l> must be a file");
 
-	logMessage("Loading file <l>", 2);
+	//logMessage("Loading file <l>", 2);
 	
 	list[str] opts = [ ];
 	if (addLocationAnnotations) opts += "-l";
@@ -117,16 +117,18 @@ private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) lo
 	
 	increaseFolderCounter();
 	if (folderTotal == 0) setFolderTotal(l);
-		
-	logMessage("[<folderCounter>/<folderTotal>] Parsing directory: <l>.", 2);
-	for (e <- phpEntries) {
-		try {
-			Script scr = loader(e, addLocationAnnotations, addUniqueIds);
-			phpNodes[e] = scr;
-		} catch IO(msg) : {
-			println("<msg>");
-		} catch Java(msg) : {
-			println("<msg>");
+	
+	if (size(phpEntries) > 0) {	
+		logMessage("<((folderCounter * 100) / folderTotal)>% [<folderCounter>/<folderTotal>] Parsing <size(phpEntries)> files in directory: <l>", 2);
+		for (e <- phpEntries) {
+			try {
+				Script scr = loader(e, addLocationAnnotations, addUniqueIds);
+				phpNodes[e] = scr;
+			} catch IO(msg) : {
+				println("<msg>");
+			} catch Java(msg) : {
+				println("<msg>");
+			}
 		}
 	}
 	
@@ -148,7 +150,9 @@ public void buildBinaries(str product, str version, loc l, bool addLocationAnnot
 	files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 	
 	loc binLoc = parsedDir + "<product>-<version>.pt";
+	logMessage("Now writing file: <binLoc>...", 2);
 	writeBinaryValueFile(binLoc, files);
+	logMessage("... done.", 2);
 }
 
 @doc{Build the serialized ASTs for a specific system at the default location}
