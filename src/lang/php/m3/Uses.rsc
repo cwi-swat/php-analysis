@@ -172,35 +172,35 @@ public M3 calculateUsesAfterTypes(M3 m3, Script script)
     // note: first, the types of variables must be known.
     visit (script)
     {		
-        case methodCall(e, methodName, _):
+        case c:methodCall(e, methodName, _):
 		{
 			m3 = addUseClass(m3, e);		
-			m3 = addUseClassItem(m3, e, methodName, "method");		
+			m3 = addUseClassItem(m3, e, methodName, c@at, "method");		
 		}
 		
-        case propertyFetch(e, propertyName):    		
+        case p:propertyFetch(e, propertyName):    		
 		{
 			m3 = addUseClass(m3, e);		
-			m3 = addUseClassItem(m3, e, propertyName, "field");		
+			m3 = addUseClassItem(m3, e, propertyName, p@at, "field");		
 		}
 		
-        case fetchClassConst(className, constName):	
+        case c:fetchClassConst(className, constName):	
 		{
 			m3 = addUseClass(m3, className);		
-			m3 = addUseClassItem(m3, className, constName, "classConstant");		
+			m3 = addUseClassItem(m3, className, constName, c@at, "classConstant");		
 		}
         
          // static references
-        case staticCall(className, methodName, _):            
+        case c:staticCall(className, methodName, _):            
         {
 			m3 = addUseClass(m3, className);		
-			m3 = addUseClassItem(m3, className, methodName, "method");
+			m3 = addUseClassItem(m3, className, methodName, c@at, "method");
         }
         
-        case staticPropertyFetch(className, propertyName):    
+        case p:staticPropertyFetch(className, propertyName):    
         {
 			m3 = addUseClass(m3, className);		
-			m3 = addUseClassItem(m3, className, propertyName, "field");		
+			m3 = addUseClassItem(m3, className, propertyName, p@at, "field");		
         }
    	}
     
@@ -236,13 +236,13 @@ public M3 addUseFullyQualified(M3 m3, loc at, str name, str \type, loc scope)
 }
 
 // `wrapper` methods 
-public M3 addUseClassItem(M3 m3, NameOrExpr className, Name nameNode, str \type) 
+public M3 addUseClassItem(M3 m3, NameOrExpr className, Name nameNode, loc at, str \type) 
 	// convert Name to NameOrExpr
-    = addUseClassItem(m3, className, setAnnotations(name(nameNode), getAnnotations(nameNode)), \type);
+    = addUseClassItem(m3, className, setAnnotations(name(nameNode), getAnnotations(nameNode)), at, \type);
     
-public M3 addUseClassItem(M3 m3, Expr className, NameOrExpr nameOrExpr, str \type) 
+public M3 addUseClassItem(M3 m3, Expr className, NameOrExpr nameOrExpr, loc at, str \type) 
 	// convert Expr to NameOrExpr
-    = addUseClassItem(m3, setAnnotations(expr(className), getAnnotations(className)), nameOrExpr, \type);
+    = addUseClassItem(m3, setAnnotations(expr(className), getAnnotations(className)), nameOrExpr, at, \type);
 
 private M3 addUseClass(M3 m3, Expr exprNode) 
 	// convert Expr to NameOrExpr
@@ -288,26 +288,28 @@ private M3 addUseClass(M3 m3, NameOrExpr className)
 	return m3;
 }
 
-private M3 addUseClassItem(M3 m3, NameOrExpr className, NameOrExpr itemName, str \type) 
+private M3 addUseClassItem(M3 m3, NameOrExpr className, NameOrExpr itemName, loc at, str \type) 
 {
 	switch (itemName) 
 	{
 		// `::class` refers to the classname
 		case name(name(/class/i)): 
 		{
-			m3@uses += { <itemName@at, usedClass> | usedClass <- m3@uses[className@at] };
+			m3@uses += { <lhs, usedClass> | lhs <- [itemName@at,at], usedClass <- m3@uses[className@at] };
 		}
 			
 		// some call to literal name
 		case name(n): 
 		{ 
-			m3@uses += { <itemName@at, |php+<\type>://<usedClass.path>/<toLowerCase(n.name)>|> | usedClass <- m3@uses[className@at] };
+			m3@uses += { <lhs, |php+<\type>://<usedClass.path>/<toLowerCase(n.name)>|> | lhs <- [itemName@at,at], usedClass <- m3@uses[className@at] };
 		}
 		
 		// some call on an expression
 		case expr(e): 
 		{ 
-			m3@uses += { <itemName@at, |php+unresolved+<\type>:///|> };
+			println("Adding expressions:");
+			println({ <lhs, |php+unresolved+<\type>:///|> | lhs <- [itemName@at,at] });
+			m3@uses += { <lhs, |php+unresolved+<\type>:///|> | lhs <- [itemName@at,at] };
 		}
 	}
 	
@@ -457,7 +459,7 @@ M3 addVarUse(M3 m3, str name, loc pos, loc scope, bool isUnResolved)
     return m3;
 }
 
-M3 addUseClassItemStatic(m3, node classItem, node classNode, str \type)
+M3 addUseClassItemStatic(m3, node classItem, node classNode, loc at, str \type)
 {
     //println(classItem);
     loc pos = classItem@at;
