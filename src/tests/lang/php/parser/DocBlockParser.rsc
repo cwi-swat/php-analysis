@@ -1,8 +1,20 @@
 module tests::lang::php::parser::DocBlockParser
 extend lang::php::parser::DocBlockParser;
 
+import ParseTree;
+import IO;
+import Node;
+import List;
+import ValueIO;
+
+// hardcoded test inputs:
+private list[str] phpTypes = ["array", "mixed", "bool", "boolean", "int", "integer", "float", "string", "resource", "unset"];
+private list[str] variables = [ "$var", "$object", "$OBJ", "$_OBJ", "$_OBJ_o", "$_OBJ_ÿ", "$_{$O_ÿ}", "$a_b_c", "$randomName" ];
+private list[str] classNames = [ "C", "ClassName", "Object" , "OldStyleClasses", "Old_Style_Classes", "class_lowercased", "\\ClassName", "\\Package\\ClassName", "\\Package\\SubPackage\\ClassName" ];
+private list[str] descriptions = [ "var", "object", "OBJ", "_OBJ", "_OBJ_o", "_OBJ_ÿ", "_{$OB_ÿ}", "$var", "a_b_c", "random text", " random text ", "This is some random comment", "  This is some random comment  " ];
+
 // run main to run all the tests
-// errors will be printed in the console.
+// output will be printed in the console.
 public void main()
 {
     print("Testing php types ...");     if (testPhpTypes())     println("Done.");
@@ -39,88 +51,52 @@ public bool testParser(type[&T<:Tree] t, lrel[str input, node expectedResult] in
 
 public test bool testPhpTypes() 
 {
+    // for all phpTypes, create int, int[], int()[] and int()
     lrel[str input, node expectedResult] inputs
-        = [ <"array",   makeTypeNode("array")> ] 
-        + [ <"array()", makeTypeNode("array")> ] 
-    	
-        + [ <"mixed",   makeTypeNode("mixed")> ] 
-        + [ <"mixed()", makeTypeNode("mixed")> ] 
-    	
-        + [ <"bool",   makeTypeNode("bool")> ] 
-        + [ <"bool()", makeTypeNode("bool")> ] 
-        + [ <"bool[]", makeArrayTypeNode("bool")> ] 
-        + [ <"boolean",   makeTypeNode("bool")> ] 
-        + [ <"boolean()", makeTypeNode("bool")> ] 
-        + [ <"boolean[]", makeArrayTypeNode("bool")> ] 
-    	
-        + [ <"int",   makeTypeNode("int")> ] 
-        + [ <"int()", makeTypeNode("int")> ] 
-        + [ <"int[]", makeArrayTypeNode("int")> ] 
-        
-        + [ <"float",   makeTypeNode("float")> ] 
-        + [ <"float()", makeTypeNode("float")> ] 
-        + [ <"float[]", makeArrayTypeNode("float")> ] 
-        
-        + [ <"string",   makeTypeNode("string")> ] 
-        + [ <"string()", makeTypeNode("string")> ] 
-        + [ <"string[]", makeArrayTypeNode("string")> ] 
-        
-        + [ <"resource",   makeTypeNode("resource")> ] 
-        + [ <"resource()", makeTypeNode("resource")> ] 
-        + [ <"resource[]", makeArrayTypeNode("resource")> ] 
-        
-        + [ <"unset",   makeTypeNode("unset")> ] 
-        + [ <"unset()", makeTypeNode("unset")> ] 
-        + [ <"unset[]", makeArrayTypeNode("unset")> ] 
+        = [ <phpType,       makeTypeNode(labelForType(phpType))>, 
+            <phpType+"()",  makeTypeNode(labelForType(phpType))>, 
+            <phpType+"()[]",makeArrayTypeNode(labelForType(phpType))>,
+            <phpType+"[]",  makeArrayTypeNode(labelForType(phpType))> 
+            | phpType <- phpTypes 
+          ] 
         ;
 
     return testParser(#Types, inputs);	
 }
+// rename boolean to bool in the result
+private str labelForType("boolean") = "bool";
+private str labelForType("integer") = "int";
+private str labelForType(str \type) = \type;
 
 // helper methods to create nodes
 private node makeTypeNode(str nodeName) = makeNode("types", [ [ makeNode(nodeName) ] ]);	
 private node makeTypesNode(list[str] keywords) = makeNode("types", [[ makeNode(k) | k <- keywords ]]);
 private node makeArrayTypeNode(str nodeName) = makeNode("types", [ [ makeNode("arrayOf", makeNode(nodeName)) ] ]);
+private node makeClassTypesNode(str className) = makeNode("types", [[makeNode("class", className)]]);
 private list[node] makeDescriptionNode(list[str] descriptions) = [ makeNode("description", desc) | desc <- descriptions ];
 
 public test bool testClassTypes() 
 {
-    list[str] input 
-        = [ "C", "ClassName", "Object" ]
-        + [ "OldStyleClasses", "Old_Style_Classes"] 
-        + [ "class_lowercased" ] 
-        + [ "\\ClassName", "\\Package\\ClassName", "\\Package\\SubPackage\\ClassName" ];
-    	
-    lrel[str input, node expectedResult] inputs = [ <i, makeNode("types", [[makeNode("class", i)]])> | i <- input ];
+    lrel[str input, node expectedResult] inputs = [ <i, makeClassTypesNode(i)> | i <- classNames ];
 
     return testParser(#Types, inputs);	
 }
 
 public test bool testVariables() 
 {
-    list[str] input 
-        = [ "$var", "$object", "$OBJ", "$_OBJ", "$_OBJ_o" ]
-        + [ "$_OBJ_ÿ", "$_{$O_ÿ}", "$a_b_c", "$randomName" ]
-        ;
-    lrel[str input, node expectedResult] inputs = [ <i, makeNode("variable", i)> | i <- input ];
+    lrel[str input, node expectedResult] inputs = [ <i, makeNode("variable", i)> | i <- variables ];
 
     return testParser(#Var, inputs);	
 }
 
 public test bool testDescriptions() 
-{
-    list[str] input 
-        = [ "var", "object", "OBJ", "_OBJ", "_OBJ_o", "_OBJ_ÿ", "_{$OB_ÿ}",  "a_b_c" ] 
-        + [ "random text", " random text ", "This is some random comment", "  This is some random comment  " ]
-        ;
-    	
-    lrel[str input, node expectedResult] inputs = [ <i, makeNode("description", i)> | i <- input ];
+{	
+    lrel[str input, node expectedResult] inputs = [ <i, makeNode("description", i)> | i <- descriptions ];
 
     return testParser(#Description, inputs);	
 }
 
-@doc { Test multiple types, devided by |; example: int|mixed }
-
+@doc { Test multiple types, devided by `|`; example: int|mixed, Object|void }
 public test bool testMultipleTypes(int numberOfTests)
 {
     // list of php types
@@ -131,6 +107,7 @@ public test bool testMultipleTypes(int numberOfTests)
     
     // create x random inputs	
     lrel[str input, node expectedResult] inputs = [ <listToString(l), makeTypesNode(l)> | l <- lists ];
+    // add one hardcoded mixed class
     inputs += [ <"ClassName|null", makeNode("types", [[ makeNode("class", "ClassName"), makeNode("null") ]])> ];
 
     return testParser(#Types, inputs);
@@ -144,24 +121,33 @@ public test bool testAnnotations()
 {
     lrel[str input, node expectedResult] inputs
         = [ <"@param int $var",    makeAnnotationNode("param", [makeNode("int")], "$var", [])> ]
-        + [ <"@param int $var some text",    makeAnnotationNode("param", [makeNode("int")], "$var", ["some text"])> ]
-
         + [ <"@var mixed $var",    makeAnnotationNode("var", [makeNode("mixed")], "$var", [])> ]
+        + [ <"@param int $var some text",    makeAnnotationNode("param", [makeNode("int")], "$var", ["some text"])> ]
         + [ <"@var mixed $var some text",    makeAnnotationNode("var", [makeNode("mixed")], "$var", ["some text"])> ]
-        
         + [ <"@var RandomClass $var some text",    makeAnnotationNode("var", [makeNode("class", "RandomClass")], "$var", ["some text"])> ]
+        + [ <"@return RandomClass",    makeAnnotationNode("return", [makeNode("class", "RandomClass")], [])> ]
+        + [ <"@throws Exception",    makeNode("annotation", [ makeNode("other", "@throws"), [ makeNode("description", "Exception") ] ] )> ]
         ;
 	
     return testParser(#Annotation, inputs);	
 }
 
 // helper methods for testAnnotations
-private node makeAnnotationNode(str annoType, list[node] varTypes, str var, list[str] descriptions) {
+private node makeAnnotationNode(str annoType, list[node] varTypes, str var, list[str] descriptions) 
+{
 	typesNodes = isEmpty(varTypes) ? [] : makeNode("types", [[ vt | vt <- varTypes ]]);	
 	node varNode = makeNode("variable", var);
 	descNodes = isEmpty(descriptions) ? [] : makeDescriptionNode(descriptions);	
-	
+
 	return makeNode("annotation", makeNode(annoType, <typesNodes, varNode>), descNodes);
+}
+ 
+private node makeAnnotationNode(str annoType, list[node] varTypes, list[str] descriptions) 
+{
+	typesNodes = isEmpty(varTypes) ? [] : makeNode("types", [[ vt | vt <- varTypes ]]);	
+	descNodes = isEmpty(descriptions) ? [] : makeDescriptionNode(descriptions);	
+
+	return makeNode("annotation", makeNode(annoType, typesNodes), descNodes);
 }
  
 public test bool testDocBlocks()
@@ -172,7 +158,7 @@ public test bool testDocBlocks()
         + [ <"/** \n * * */",     makeNode("docBlock", [ [],[] ] )> ] 
     	
         + [ <"/** this is some description */",     makeNode("docBlock", [ [ makeNode("description", "this is some description ") ] , [] ])> ]
-        + [ <"/** \n * this is some description */",     makeNode("docBlock", [ [ makeNode("description", "this is some description ") ] , [] ])> ]
+        + [ <"/** \n * this is some description */",makeNode("docBlock", [ [ makeNode("description", "this is some description ") ] , [] ])> ]
         + [ <"/** \n * @var int $number \n */",     makeNode("docBlock", [], [ makeAnnotationNode("var", [makeNode("int")], "$number", [] ) ] )> ]
     	
         // todo: add more complex tests
@@ -227,8 +213,8 @@ public bool canParse(type[&T<:Tree] t, str input)
         return false;
     } catch: {
     	//println("Unknown error... ambigious grammar??");
-     //   println(input);
-     //   println(implode(#node, parse(t, input)));
+        //println(input);
+        //println(implode(#node, parse(t, input)));
     	//exit;
     	return false;
     }
