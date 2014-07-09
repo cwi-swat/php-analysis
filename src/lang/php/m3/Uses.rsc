@@ -501,26 +501,31 @@ rel[loc, loc] resolveUsesToPossibleDeclarations(M3 m3)
 }
 public map[int, int] calculateResolutionHistogram(rel[loc, loc] useDecl)
 {
-    map[int, int] counts = ();
-    map[loc, int] countPerLoc = countNumPossibleDeclarations(useDecl);
-
-    // calculation written for efficiency
-    for (i <- [0..20])
-    {
-        int c = 0;
-        for (loc l <- countPerLoc)
-        {
-            if (countPerLoc[l] == i)
-        	{
-                c += 1;
-        	}
-        }
-
-        counts[i] = c;
-    }
-
-    return counts;
+	return calculateResolutionHistogram(countNumPossibleDeclarations(useDecl));
 }
+
+public map[int, int] calculateResolutionHistogram(map[loc, int] countPerLoc)
+{
+	map[int, int] counts = ();
+
+	// calculation written for efficiency
+	for (i <- [0..20])
+	{
+		int c = 0;
+		for (loc l <- countPerLoc)
+		{
+			if (countPerLoc[l] == i)
+			{
+				c += 1;
+			}
+		}
+
+		counts[i] = c;
+	}
+
+	return counts;
+}
+
 
 @doc{
     Count the number of declarations that are matched to each use.

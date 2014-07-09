@@ -1,6 +1,9 @@
 module lang::php::m3::FillM3
 extend lang::php::m3::Core;
 
+import Message;
+
+import lang::php::m3::Containment;
 import lang::php::m3::Aliases;
 import lang::php::m3::Containment;
 import lang::php::m3::Declarations;
@@ -9,6 +12,7 @@ import lang::php::m3::Uses;
 
 import lang::php::ast::NormalizeAST;
 import lang::php::ast::Scopes;
+import lang::php::ast::System;
 
 import Set;
 
@@ -17,18 +21,32 @@ public M3 createM3forScript(loc filename, Script script)
 {
 	M3 m3 = createEmptyM3(filename);
 
-	script = setEmptyModifiersToPublic(script); // set Modifiers when they are not provided, like function => public function
-   	m3 = fillDeclarations(m3, script); // fill @declarations and @names	
-   	script = propagateDeclToScope(script); // propagate @decl to @scope
+	if (errscript(m) := script)
+	{
+		m3@messages += error(m, filename);
+		return m3;
+	}
+	
+	try
+	{
+		script = setEmptyModifiersToPublic(script); // set Modifiers when they are not provided, like function => public function
+   		m3 = fillDeclarations(m3, script); // fill @declarations and @names	
+	   	script = propagateDeclToScope(script); // propagate @decl to @scope
    	
-	m3 = fillContainment(m3, script); // fill containment with declarations 
-	m3 = fillExtendsAndImplements(m3, script); // fill extends, implements and traitUse, by trying to look up class names 
-	m3 = fillModifiers(m3, script); // fill modifiers for classes, class fields and class methods 
-	m3 = fillPhpDocAnnotations(m3, script); // fill documentation, defined as @phpdoc
+		m3 = fillContainment(m3, script); // fill containment with declarations 
+		m3 = fillExtendsAndImplements(m3, script); // fill extends, implements and traitUse, by trying to look up class names 
+		m3 = fillModifiers(m3, script); // fill modifiers for classes, class fields and class methods 
+		m3 = fillPhpDocAnnotations(m3, script); // fill documentation, defined as @phpdoc
 	
-	m3 = calculateAliasesFlowInsensitive(m3, script); // fill aliases 
-	m3 = calculateUsesFlowInsensitive(m3, script); // fill uses which are resolvable without type information
-	
+		m3 = calculateAliasesFlowInsensitive(m3, script); // fill aliases 
+		m3 = calculateUsesFlowInsensitive(m3, script); // fill uses which are resolvable without type information
+	}
+	catch Exception e:
+	{
+		logMessage("Error: <e>", 1);
+		m3@messages += error("<e>", |unknown:///|);
+	}
+
 	return m3;
 }
 
@@ -86,13 +104,12 @@ private M3 propagateUsesForUnresolvedItems(M3 m3)
 	return m3;
 }
 
-
 private bool useCacheDefault = false;
 // get a system for a specific location
 public System getSystem(loc l) = getSystem(l, useCacheDefault);
 public System getSystem(loc l, bool useCache) = isCacheUsed(l, useCache) ? readSystemFromCache(l) : loadSystem(l, useCache);
 
-public M3 M3CollectionToM3 (M3Collection m3s, loc l) = composePhpM3(l, range(m3s));
+public M3 M3CollectionToM3 (M3Collection m3s, loc l) = composeM3(l, range(m3s));
 
 public M3Collection getM3CollectionForSystem(System system, loc l) = (filename:createM3forScript(filename, system[filename]) | filename <- system);
 
