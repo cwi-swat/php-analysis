@@ -260,42 +260,7 @@
 	 *
 	 * @since   11.1
 	 */",
- "/**
-	*Addunobtrusivejavascriptsupportfortheadvanceduploader.
-	*
-	*@paramstring$idAnindex.
-	*@paramarray$paramsAnarrayofoptionsfortheuploader.
-	*@paramstring$upload_queueTheHTMLidoftheuploadqueueelement(??).
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*Addunobtrusivejavascriptsupportforacollapsibletree.
-	*
-	*@paramstring$idAnindex
-	*@paramarray$paramsAnarrayofoptions.
-	*@paramarray$rootTherootnode
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*Addunobtrusivejavascriptsupportforacalendarcontrol.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*Addunobtrusivejavascriptsupportforacolorpicker.
-	*
-	*@returnvoid
-	*
-	*@since11.2
-	*/",
+
  "/**
 	 * Keep session alive, for example, while editing or creating an article.
 	 *
@@ -327,15 +292,7 @@
 	 *
 	 * @since   11.1
 	 */",
- "/**
-	*InternalmethodtogetaJavaScriptobjectnotationstringfromanarray
-	*
-	*@paramarray$arrayThearraytoconverttoJavaScriptobjectnotation
-	*
-	*@returnstringJavaScriptobjectnotationrepresentationofthearray
-	*
-	*@since11.1
-	*/",
+
  "/**
 	 * Internal method to translate the JavaScript Calendar
 	 *
@@ -691,81 +648,8 @@
 	 * @link    http://docs.joomla.org/JTableNested/rebuild
 	 * @since   11.1
 	 */",
- "/**
-	*Methodtorebuildthenode\'spathfieldfromthealiasvaluesofthe
-	*nodesfromthecurrentnodetotherootnodeofthetree.
-	*
-	*@paraminteger$pkPrimarykeyofthenodeforwhichtogetthepath.
-	*
-	*@returnbooleanTrueonsuccess.
-	*
-	*@linkhttp://docs.joomla.org/JTableNested/rebuildPath
-	*@since11.1
-	*/",
- "/**
-	*Methodtoupdateorderoftablerows
-	*
-	*@paramarray$idArrayidnumbersofrowstobereordered.
-	*@paramarray$lft_arraylftvaluesofrowstobereordered.
-	*
-	*@returninteger1+valueofrootrgtonsuccess,falseonfailure.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtogetnestedsetpropertiesforanodeinthetree.
-	*
-	*@paraminteger$idValuetolookupthenodeby.
-	*@paramstring$keyKeytolookupthenodeby.
-	*
-	*@returnmixedBooleanfalseonfailureornodeobjectonsuccess.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtogetvariousdatanecessarytomakeroominthetreeatalocation
-	*foranodeanditschildren.Thereturneddataobjectincludesconditions
-	*forSQLWHEREclausesforupdatingleftandrightidvaluestomakeroomfor
-	*thenodeaswellasthenewleftandrightidsforthenode.
-	*
-	*@paramobject$referenceNodeAnodeobjectwithatleasta\'lft\'and\'rgt\'with
-	*whichtomakeroominthetreearoundforanewnode.
-	*@paraminteger$nodeWidthThewidthofthenodeforwhichtomakeroominthetree.
-	*@paramstring$positionThepositionrelativetothereferencenodewheretheroom
-	*shouldbemade.
-	*
-	*@returnmixedBooleanfalseonfailureordataobjectonsuccess.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtocreatealogtableinthebufferoptionallyshowingthequeryand/ordata.
-	*
-	*@paramboolean$showDataTruetoshowdata
-	*@paramboolean$showQueryTruetoshowquery
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtorunanupdatequeryandcheckforadatabaseerror
-	*
-	*@paramstring$queryThequery.
-	*@paramstring$errorMessageUnused.
-	*
-	*@returnbooleanFalseonexception
-	*
-	*@since11.1
-	*/",
- "/**
-*Tableclasssupportingmodifiedpre-ordertreetraversalbehavior.
-*
-*@packageJoomla.Platform
-*@subpackageDatabase
-*@linkhttp://docs.joomla.org/JTableNested
-*@since11.1
-*/",
+
+
  "/**
 	 * Removes an item
 	 */",
@@ -1165,12 +1049,7 @@
  * @subpackage	com_redirect
  * @since		1.6
  */",
- "/**
-	*Buildimagelist
-	*
-	*@paramstring$listFolderTheimagedirectorytodisplay
-	*@since1.5
-	*/",
+
  "/**
 *MediaComponentListModel
 *
@@ -1853,15 +1732,7 @@
 	 *
 	 * @since   11.1
 	 */",
- "/**
-	*ConvertsadotnotationIPaddresstonetaddress(e.g.forNetware,etc)
-	*
-	*@paramstring$ipIPAddress(e.g.xxx.xxx.xxx.xxx)
-	*
-	*@returnstringNetaddress
-	*
-	*@since11.1
-	*/",
+
  "/**
 	*ExtractreadablenetworkaddressfromtheLDAPencodednetworkAddressattribute.
 	*
@@ -4233,28 +4104,9 @@
      * @param string The name of the language to use
      * @since 1.0.0
      */",
- "/**
-*Setsthepathtothedirectorycontainingthelanguagefiles.Note
-*thatthispathisrelativetothedirectoryofthescriptthatincluded
-*geshi.php,NOTgeshi.phpitself.
-*
-*@paramstringThepathtothelanguagedirectory
-*@since1.0.0
-*@deprecatedThepathtothelanguagefilesshouldnowbeautomatically
-*detected,sothismethodshouldnolongerbeneeded.The
-*1.1.Xbranchhandlesmanualsettingofthepathdifferently
-*sothismethodwilldisappearin1.2.0.
-*/",
- "/**
-*Getsupportedlangsoranassociativearraylang=>full_name.
-*@paramboolean$longnames
-*@returnarray
-*/",
- "/**
-*Getfull_nameforalangorfalse.
-*@paramstring$languageshortlangname(html4strictforexample)
-*@returnmixed
-*/",
+
+
+
  "/**
 *Setsthetypeofheadertobeused.
 *
@@ -4861,16 +4713,7 @@
      * @since 1.0.8
      * @access private
      */",
- "/**
-*handlesnewlinesinREGEXPSmatches.Setthe_hmr_*varsbeforecallingthis
-*
-*@notethisisacallback,don\'tuseitdirectly
-*
-*@paramarraythematchesarray
-*@returnstring
-*@since1.0.8
-*@accessprivate
-*/",
+
  "/**
      * Takes a string that has no strings or comments in it, and highlights
      * stuff like keywords, numbers and methods.
@@ -5014,21 +4857,7 @@
      * @access private
      * @since 1.0.7.21
      */",
- "/**
-*thisfunctionscreatesanoptimizedregularexpressionlist
-*ofanarrayofstrings.
-*
-*Example:
-*<code>$list=array(\'faa\',\'foo\',\'foobar\');
-*=>string\'f(aa|oo(bar)?)\'</code>
-*
-*@param$listarrayof(unquoted)strings
-*@param$regexp_delimiteryourregularexpressiondelimiter,@seepreg_quote()
-*@returnstringforregularexpression
-*@authorMilianWolff<mail@milianw.de>
-*@since1.0.8
-*@accessprivate
-*/",
+
  "/**
     * this function creates the appropriate regexp string of an token array
     * you should not call this function directly, @see $this->optimize_regexp_list().
@@ -6769,62 +6598,11 @@
 	 *
 	 * @access private
 	 */",
- "/**
-	*Seewhatstatetomovetowhilewithinquotedheadervalues
-	*
-	*@accessprivate
-	*/",
- "/**
-	*Parseaheadervaluewhilewithinquotes
-	*
-	*@accessprivate
-	*/",
- "/**
-	*Parseanescapedcharacterwithinquotes
-	*
-	*@accessprivate
-	*/",
- "/**
-	*Parsethebody
-	*
-	*@accessprivate
-	*/",
- "/**
-*HTTPResponseParser
-*
-*@packageSimplePie
-*/",
- "/**
-	*Don\'tallowanythingtobeset
-	*
-	*@accesspublic
-	*/",
- "/**
-	*Setthecompressedstringandrelatedproperties
-	*
-	*@accesspublic
-	*/",
- "/**
-	*DecodetheGZIPstream
-	*
-	*@accesspublic
-	*/",
- "/**
-*gzdecode
-*
-*@packageSimplePie
-*/",
- "/**
-	*Don\'tcalltheconstructor.Please.
-	*
-	*@accessprivate
-	*/",
- "/**
-	*CreateanewSimplePie_Cacheobject
-	*
-	*@static
-	*@accesspublic
-	*/",
+
+
+
+
+
  "/**
 	 * If a file has been cached, retrieve and display it.
 	 *
@@ -6881,56 +6659,7 @@
 	 * @param string $data Input data
 	 * @return string Output data
 	 */",
- "/**
-	*RemoveRFC822comments
-	*
-	*@accesspublic
-	*@paramstring$dataDatatostripcommentsfrom
-	*@returnstringCommentstrippedstring
-	*/",
- "/**
-	*ConvertsaunicodecodepointtoaUTF-8character
-	*
-	*@static
-	*@accesspublic
-	*@paramint$codepointUnicodecodepoint
-	*@returnstringUTF-8character
-	*/",
- "/**
-	*Re-implementationofPHP5\'sstripos()
-	*
-	*Returnsthenumericpositionofthefirstoccurrenceofneedleinthe
-	*haystackstring.
-	*
-	*@static
-	*@accessstring
-	*@paramobject$haystack
-	*@paramstring$needleNotethattheneedlemaybeastringofoneormore
-	*characters.Ifneedleisnotastring,itisconvertedtoaninteger
-	*andappliedastheordinalvalueofacharacter.
-	*@paramint$offsetTheoptionaloffsetparameterallowsyoutospecifywhich
-	*characterinhaystacktostartsearching.Thepositionreturnedisstill
-	*relativetothebeginningofhaystack.
-	*@returnboolIfneedleisnotfound,stripos()willreturnbooleanfalse.
-	*/",
- "/**
-	*Similartoparse_str()
-	*
-	*Returnsanassociativearrayofname/valuepairs,wherethevalueisan
-	*arrayofvaluesthathaveusedthesamename
-	*
-	*@static
-	*@accessstring
-	*@paramstring$strTheinputstring.
-	*@returnarray
-	*/",
- "/**
-	*DetectXMLencoding,asperXML1.0AppendixF.1
-	*
-	*@todoAddsupportforEBCDIC
-	*@paramstring$dataXMLdata
-	*@returnarrayPossibleencodings
-	*/",
+
  "/**
 	 * Create an instance of the class with the input data
 	 *
@@ -7237,106 +6966,11 @@
 	 * @access protected
 	 * @return int Timestamp
 	 */",
- "/**
-	*RemoveRFC822comments
-	*
-	*@accessprotected
-	*@paramstring$dataDatatostripcommentsfrom
-	*@returnstringCommentstrippedstring
-	*/",
- "/**
-	*ParseRFC2822\'sdateformat
-	*
-	*@accessprotected
-	*@returnintTimestamp
-	*/",
- "/**
-	*ParseRFC850\'sdateformat
-	*
-	*@accessprotected
-	*@returnintTimestamp
-	*/",
- "/**
-	*ParseC99\'sasctime()\'sdateformat
-	*
-	*@accessprotected
-	*@returnintTimestamp
-	*/",
- "/**
-	*Parsedatesusingstrtotime()
-	*
-	*@accessprotected
-	*@returnintTimestamp
-	*/",
- "/**
-*DateParser
-*
-*@packageSimplePie
-*/",
- "/**
-	*Createaninstanceoftheclasswiththeinputfile
-	*
-	*@accesspublic
-	*@paramSimplePie_Content_Type_Sniffer$fileInputfile
-	*/",
- "/**
-	*GettheContent-Typeofthespecifiedfile
-	*
-	*@accesspublic
-	*@returnstringActualContent-Type
-	*/",
- "/**
-	*Snifftextorbinary
-	*
-	*@accessprivate
-	*@returnstringActualContent-Type
-	*/",
- "/**
-	*Sniffunknown
-	*
-	*@accessprivate
-	*@returnstringActualContent-Type
-	*/",
- "/**
-	*Sniffimages
-	*
-	*@accessprivate
-	*@returnstringActualContent-Type
-	*/",
- "/**
-	*SniffHTML
-	*
-	*@accessprivate
-	*@returnstringActualContent-Type
-	*/",
- "/**
-*Content-typesniffing
-*
-*@packageSimplePie
-*/",
- "/**
-	*Createaninstanceoftheclasswiththeinputdata
-	*
-	*@accesspublic
-	*@paramstring$dataInputdata
-	*/",
- "/**
-	*Parsetheinputdata
-	*
-	*@accesspublic
-	*@returnbooltrueonsuccess,falseonfailure
-	*/",
- "/**
-	*Checkwhetherthereisdatabeyondthepointer
-	*
-	*@accessprivate
-	*@returnbooltrueifthereisfurtherdata,falseifnot
-	*/",
- "/**
-	*Advancepastanywhitespace
-	*
-	*@returnintNumberofwhitespacecharacterspassed
-	*/",
+
+
+
+
+
  "/**
 	 * Read value
 	 */",
@@ -10466,105 +10100,7 @@
 	 *
 	 * @since   11.1
 	 */",
- "/**
-	*Addsashortcuticon(favicon)
-	*
-	*Thisaddsalinktotheiconshowninthefavoriteslistoron
-	*theleftoftheurlintheaddressbar.Somebrowsersdisplay
-	*itonthetab,aswell.
-	*
-	*@paramstring$hrefThelinkthatisbeingrelated.
-	*@paramstring$typeFiletype
-	*@paramstring$relationRelationoflink
-	*
-	*@returnJDocumentHTMLinstanceof$thistoallowchaining
-	*
-	*@since11.1
-	*/",
- "/**
-	*AddsacustomHTMLstringtotheheadblock
-	*
-	*@paramstring$htmlTheHTMLtoaddtothehead
-	*
-	*@returnJDocumentHTMLinstanceof$thistoallowchaining
-	*
-	*@since11.1
-	*/",
- "/**
-	*Getthecontentsofadocumentinclude
-	*
-	*@paramstring$typeThetypeofrenderer
-	*@paramstring$nameThenameoftheelementtorender
-	*@paramarray$attribsAssociativearrayofremainingattributes.
-	*
-	*@returnTheoutputoftherenderer
-	*
-	*@since11.1
-	*/",
- "/**
-	*Setthecontentsadocumentincludes
-	*
-	*@paramstring$contentThecontenttobesetinthebuffer.
-	*@paramarray$optionsArrayofoptionalelements.
-	*
-	*@returnJDocumentHTMLinstanceof$thistoallowchaining
-	*
-	*@since11.1
-	*/",
- "/**
-	*Parsesthetemplateandpopulatesthebuffer
-	*
-	*@paramarray$paramsParametersforfetchingthetemplate
-	*
-	*@returnJDocumentHTMLinstanceof$thistoallowchaining
-	*
-	*@since11.1
-	*/",
- "/**
-	*Outputsthetemplatetothebrowser.
-	*
-	*@paramboolean$cachingIftrue,cachetheoutput
-	*@paramarray$paramsAssociativearrayofattributes
-	*
-	*@returnTherendereddata
-	*
-	*@since11.1
-	*/",
- "/**
-	*Countthemodulesbasedonthegivencondition
-	*
-	*@paramstring$conditionTheconditiontouse
-	*
-	*@returnintegerNumberofmodulesfound
-	*
-	*@since11.1
-	*/",
- "/**
-	*Countthenumberofchildmenuitems
-	*
-	*@returnintegerNumberofchildmenuitems
-	*
-	*@since11.1
-	*/",
- "/**
-	*Loadatemplatefile
-	*
-	*@paramstring$directoryThenameofthetemplate
-	*@paramstring$filenameTheactualfilename
-	*
-	*@returnstringThecontentsofthetemplate
-	*
-	*@since11.1
-	*/",
- "/**
-	*Fetchthetemplate,andinitialisetheparams
-	*
-	*@paramarray$paramsParameterstodeterminethetemplate
-	*
-	*@returnJDocumentHTMLinstanceof$thistoallowchaining
-	*
-	*@since11.1
-	*/",
+
  "/**
 	 * Parse a document template
 	 *
@@ -22377,69 +21913,7 @@
 	 *
 	 * @since   11.1
 	 */",
- "/**
-	*ExtractaZIPcompressedfiletoagivenpathusingaphpbasedalgorithmthatonlyrequireszlibsupport
-	*
-	*@paramstring$archivePathtoZIParchivetoextract.
-	*@paramstring$destinationPathtoextractarchiveinto.
-	*@paramarray$optionsExtractionoptions[unused].
-	*
-	*@returnbooleanTrueifsuccessful
-	*
-	*@since11.1
-	*/",
- "/**
-	*ExtractaZIPcompressedfiletoagivenpathusingnativephpapicallsforspeed
-	*
-	*@paramstring$archivePathtoZIParchivetoextract
-	*@paramstring$destinationPathtoextractarchiveinto
-	*@paramarray$optionsExtractionoptions[unused]
-	*
-	*@returnbooleanTrueifsuccessful
-	*
-	*@since11.1
-	*/",
- "/**
-	*Getthelistoffiles/datafromaZIParchivebuffer.
-	*
-	*<pre>
-	*KEY:Positioninzipfile
-	*VALUES:\'attr\'--Fileattributes
-	*\'crc\'--CRCchecksum
-	*\'csize\'--Compressedfilesize
-	*\'date\'--Filemodificationtime
-	*\'name\'--Filename
-	*\'method\'--Compressionmethod
-	*\'size\'--Originalfilesize
-	*\'type\'--Filetype
-	*</pre>
-	*
-	*@paramstring&$dataTheZIParchivebuffer.
-	*
-	*@returnbooleanTrueonsuccess.
-	*
-	*@since11.1
-	*/",
- "/**
-	*ReturnsthefiledataforafilebyoffsestintheZIParchive
-	*
-	*@paraminteger$keyThepositionofthefileinthearchive.
-	*
-	*@returnstringUncompressedfiledatabuffer.
-	*
-	*@since11.1
-	*/",
- "/**
-	*ConvertsaUNIXtimestamptoa4-byteDOSdateandtimeformat
-	*(dateinhigh2-bytes,timeinlow2-bytesallowingmagnitude
-	*comparison).
-	*
-	*@paraminteger$unixtimeThecurrentUNIXtimestamp.
-	*
-	*@returnintegerThecurrentdateina4-byteDOSformat.
-	*
-	*@since11.1
-	*/",
+
  "/**
 	*Addsa\"file\" to the ZIP archive.
 	 *
@@ -27739,22 +27213,8 @@
 	 *
 	 * @since   11.1
 	 */",
- "/**
-	*Returnsthename,withoutanypath.
-	*
-	*@paramstring$fileFilepath
-	*
-	*@returnstringfilename
-	*
-	*@since11.1
-	*/",
- "/**
-*AFilehandlingclass
-*
-*@packageJoomla.Platform
-*@subpackageFileSystem
-*@since11.1
-*/",
+
+
  "/**
 	 * Constructor.
 	 *
@@ -34313,72 +33773,10 @@
  * @subpackage	com_cache
  * @since 1.6
  */",
- "/**
-	*Classconstructor
-	*
-	*@paramarray$optionsAssociativearrayofoptions
-	*
-	*@since11.1
-	*/",
- "/**
-	*Renderthedocument
-	*
-	*@paramboolean$cacheIftrue,cachetheoutput
-	*@paramarray$paramsAssociativearrayofattributes
-	*
-	*@returnTherendereddata
-	*
-	*@since11.1
-	*/",
- "/**
-	*Setstheshortname
-	*
-	*@paramstring$nameThename.
-	*
-	*@returnJDocumentOpensearchinstanceof$thistoallowchaining
-	*
-	*@since11.1
-	*/",
- "/**
-	*AddsanURLtotheOpenSearchdescription.
-	*
-	*@paramJOpenSearchUrl&$urlTheurltoaddtothedescription.
-	*
-	*@returnJDocumentOpensearchinstanceof$thistoallowchaining
-	*
-	*@since11.1
-	*/",
- "/**
-	*AddsanimagetotheOpenSearchdescription.
-	*
-	*@paramJOpenSearchImage&$imageTheimagetoaddtothedescription.
-	*
-	*@returnJDocumentOpensearchinstanceof$thistoallowchaining
-	*
-	*@since11.1
-	*/",
- "/**
-*OpenSearchclass,providesaneasyinterfacetodisplayanOpenSearchdocument
-*
-*@packageJoomla.Platform
-*@subpackageDocument
-*@seehttp://www.opensearch.org/
-*@since11.1
-*/",
- "/**
-*JOpenSearchUrlisaninternalclassthatstoresthesearchURLsfortheOpenSearchdescription
-*
-*@packageJoomla.Platform
-*@subpackageDocument
-*@since11.1
-*/",
- "/**
-*JOpenSearchImageisaninternalclassthatstoresImagesfortheOpenSearchDescription
-*
-*@packageJoomla.Platform
-*@subpackageDocument
-*@since11.1
-*/",
+
+
+
+
  "/**
 	 * Method to get the results of the query.
 	 *
@@ -35121,92 +34519,7 @@
 	 * @see     JFormHelper::loadRuleType()
 	 * @since   11.1
 	 */",
- "/**
-	*Methodtosynchronizeanyfield,formorrulepathscontainedintheXMLdocument.
-	*
-	*@returnbooleanTrueonsuccess.
-	*
-	*@since11.1
-	*@todoMaybeweshouldreceivealladdXXXpathsattributesatonce?
-	*/",
- "/**
-	*MethodtovalidateaJFormFieldobjectbasedonfielddata.
-	*
-	*@paramstring$elementTheXMLelementobjectrepresentationoftheformfield.
-	*@paramstring$groupTheoptionaldot-separatedformgrouppathonwhichtofindthefield.
-	*@parammixed$valueTheoptionalvaluetouseasthedefaultforthefield.
-	*@paramobject$inputAnoptionalJRegistryobjectwiththeentiredatasettovalidate
-	*againsttheentireform.
-	*
-	*@returnmixedBooleantrueiffieldvalueisvalid,JExceptiononfailure.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Proxyfor{@linkJFormHelper::addFieldPath()}.
-	*
-	*@parammixed$newApathorarrayofpathstoadd.
-	*
-	*@returnarrayThelistofpathsthathavebeenadded.
-	*
-	*@since11.1
-	*/",
- "/**
-	*ProxyforJFormHelper::addFormPath().
-	*
-	*@parammixed$newApathorarrayofpathstoadd.
-	*
-	*@returnarrayThelistofpathsthathavebeenadded.
-	*
-	*@seeJFormHelper::addFormPath()
-	*@since11.1
-	*/",
- "/**
-	*ProxyforJFormHelper::addRulePath().
-	*
-	*@parammixed$newApathorarrayofpathstoadd.
-	*
-	*@returnarrayThelistofpathsthathavebeenadded.
-	*
-	*@seeJFormHelper::addRulePath()
-	*@since11.1
-	*/",
- "/**
-	*Methodtogetaninstanceofaform.
-	*
-	*@paramstring$nameThenameoftheform.
-	*@paramstring$dataThenameofanXMLfileorstringtoloadastheformdefinition.
-	*@paramarray$optionsAnarrayofformoptions.
-	*@paramstring$replaceFlagtotogglewhetherformfieldsshouldbereplacedifafield
-	*alreadyexistswiththesamegroup/name.
-	*@paramstring$xpathAnoptionalxpathtosearchforthefields.
-	*
-	*@returnobjectJForminstance.
-	*
-	*@since11.1
-	*@throwsExceptionifanerroroccurs.
-	*/",
- "/**
-	*AddsanewchildSimpleXMLElementnodetothesource.
-	*
-	*@paramSimpleXMLElement$sourceThesourceelementonwhichtoappend.
-	*@paramSimpleXMLElement$newThenewelementtoappend.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*@throwsExceptionifanerroroccurs.
-	*/",
- "/**
-	*AddsanewchildSimpleXMLElementnodetothesource.
-	*
-	*@paramSimpleXMLElement$sourceThesourceelementonwhichtoappend.
-	*@paramSimpleXMLElement$newThenewelementtoappend.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
+
  "/**
 	 * Merges new elements into a source <fields> element.
 	 *
@@ -35684,23 +34997,8 @@
 	 * @see     JTable::check
 	 * @since   11.1
 	 */",
- "/**
-	*Overloadedstorefunction
-	*
-	*@paramboolean$updateNullsTruetoupdatefieldseveniftheyarenull.
-	*
-	*@returnmixedFalseonfailure,positiveintegeronsuccess.
-	*
-	*@seeJTable::store
-	*@since11.1
-	*/",
- "/**
-*Menutable
-*
-*@packageJoomla.Platform
-*@subpackageTable
-*@since11.1
-*/",
+
+
  "/**
 	 * @param	int $value	The state value
 	 * @param	int $i
@@ -39747,275 +39045,7 @@
 	 *
 	 * @since   11.1
 	 */",
- "/**
-	*MethodtoescapeastringforusageinanSQLstatement.
-	*
-	*TheescapingforMSSQLisn\'thandledinthedriverthoughthatwouldbenice.Becauseofthisweneed
-	*tohandletheescapingourselves.
-	*
-	*@paramstring$textThestringtobeescaped.
-	*@paramboolean$extraOptionalparametertoprovideextraescaping.
-	*
-	*@returnstringTheescapedstring.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Determinesiftheconnectiontotheserverisactive.
-	*
-	*@returnbooleanTrueifconnectedtothedatabaseengine.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Dropsatablefromthedatabase.
-	*
-	*@paramstring$tableNameThenameofthedatabasetabletodrop.
-	*@paramboolean$ifExistsOptionallyspecifythatthetablemustexistbeforeitisdropped.
-	*
-	*@returnJDatabaseSQLSrvReturnsthisobjecttosupportchaining.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*GetthenumberofaffectedrowsforthepreviousexecutedSQLstatement.
-	*
-	*@returnintegerThenumberofaffectedrows.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtogetthedatabasecollationinusebysamplingatextfieldofatableinthedatabase.
-	*
-	*@returnmixedThecollationinusebythedatabaseorbooleanfalseifnotsupported.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Getsanexporterclassobject.
-	*
-	*@returnJDatabaseExporterSQLAzureAnexporterobject.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Getsanimporterclassobject.
-	*
-	*@returnJDatabaseImporterSQLAzureAnimporterobject.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*GetthenumberofreturnedrowsforthepreviousexecutedSQLstatement.
-	*
-	*@paramresource$cursorAnoptionaldatabasecursorresourcetoextracttherowcountfrom.
-	*
-	*@returnintegerThenumberofreturnedrows.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Getthecurrentorquery,ornewJDatabaseQueryobject.
-	*
-	*@paramboolean$newFalsetoreturnthelastqueryset,TruetoreturnanewJDatabaseQueryobject.
-	*
-	*@returnmixedThecurrentvalueoftheinternalSQLvariableoranewJDatabaseQueryobject.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Retrievesfieldinformationaboutthegiventables.
-	*
-	*@parammixed$tableAtablename
-	*@paramboolean$typeOnlyTruetoonlyreturnfieldtypes.
-	*
-	*@returnarrayAnarrayoffields.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*ShowsthetableCREATEstatementthatcreatesthegiventables.
-	*
-	*ThisisunsupportedbyMSSQL.
-	*
-	*@parammixed$tablesAtablenameoralistoftablenames.
-	*
-	*@returnarrayAlistofthecreateSQLforthetables.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Getthedetailslistofkeysforatable.
-	*
-	*@paramstring$tableThenameofthetable.
-	*
-	*@returnarrayAnarrayofthecolumnspecificationforthetable.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtoquoteandoptionallyescapeastringtodatabaserequirementsforinsertionintothedatabase.
-	*
-	*@paramstring$textThestringtoquote.
-	*@paramboolean$escapeTruetoescapethestring,falsetoleaveitunchanged.
-	*
-	*@returnstringThequotedinputstring.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtogetanarrayofalltablesinthedatabase.
-	*
-	*@returnarrayAnarrayofallthetablesinthedatabase.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Gettheversionofthedatabaseconnector.
-	*
-	*@returnstringThedatabaseconnectorversion.
-	*
-	*@since11.1
-	*/",
- "/**
-	*DeterminesifthedatabaseenginesupportsUTF-8characterencoding.
-	*
-	*@returnbooleanTrueifsupported.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Insertsarowintoatablebasedonanobject\'sproperties.
-	*
-	*@paramstring$tableThenameofthedatabasetabletoinsertinto.
-	*@paramobject&$objectAreferencetoanobjectwhosepublicpropertiesmatchthetablefields.
-	*@paramstring$keyThenameoftheprimarykey.Ifprovidedtheobjectpropertyisupdated.
-	*
-	*@returnbooleanTrueonsuccess.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogettheauto-incrementedvaluefromthelastINSERTstatement.
-	*
-	*@returnintegerThevalueoftheauto-incrementfieldfromthelastinsertedrow.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtogetthefirstfieldofthefirstrowoftheresultsetfromthedatabasequery.
-	*
-	*@returnmixedThereturnvalueornullifthequeryfailed.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*ExecutetheSQLstatement.
-	*
-	*@returnmixedAdatabasecursorresourceonsuccess,booleanfalseonfailure.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Thisfunctionreplacesastringidentifier<var>$prefix</var>withthestringheldisthe
-	*<var>tablePrefix</var>classvariable.
-	*
-	*@paramstring$sqlTheSQLstatementtoprepare.
-	*@paramstring$prefixThecommontableprefix.
-	*
-	*@returnstringTheprocessedSQLstatement.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Selectadatabaseforuse.
-	*
-	*@paramstring$databaseThenameofthedatabasetoselectforuse.
-	*
-	*@returnbooleanTrueifthedatabasewassuccessfullyselected.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*SettheconnectiontouseUTF-8characterencoding.
-	*
-	*@returnbooleanTrueonsuccess.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtocommitatransaction.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtorollbackatransaction.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtoinitializeatransaction.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtofetcharowfromtheresultsetcursorasanarray.
-	*
-	*@parammixed$cursorTheoptionalresultsetcursorfromwhichtofetchtherow.
-	*
-	*@returnmixedEitherthenextrowfromtheresultsetorfalseiftherearenomorerows.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtofetcharowfromtheresultsetcursorasanassociativearray.
-	*
-	*@parammixed$cursorTheoptionalresultsetcursorfromwhichtofetchtherow.
-	*
-	*@returnmixedEitherthenextrowfromtheresultsetorfalseiftherearenomorerows.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtofetcharowfromtheresultsetcursorasanobject.
-	*
-	*@parammixed$cursorTheoptionalresultsetcursorfromwhichtofetchtherow.
-	*@paramstring$classTheclassnametouseforthereturnedrowobject.
-	*
-	*@returnmixedEitherthenextrowfromtheresultsetorfalseiftherearenomorerows.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtofreeupthememoryusedfortheresultset.
-	*
-	*@parammixed$cursorTheoptionalresultsetcursorfromwhichtofetchtherow.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
+
  "/**
 	 * Diagnostic method to return explain information for a query.
 	 *
@@ -40579,11 +39609,7 @@
  * @subpackage	com_users
  * @since		1.6
  */",
- "/**
-*GetsaqueryparameterfromGETorPOSTdata
-*@param$key
-*@param$default
-*/",
+
  "/**
 	*constructsanewJSONinstance
 	*
@@ -40650,21 +39676,7 @@
 	    * @return   string  string value stripped of comments and whitespace
 	    * @access   private
 	    */",
- "/**
-	*decodesaJSONstringintoappropriatevariable
-	*
-	*@paramstring$strJSON-formattedstring
-	*
-	*@returnmixednumber,boolean,string,array,orobject
-	*correspondingtogivenJSONinputstring.
-	*Seeargument1toAkeeba_Services_JSON()aboveforobject-outputbehavior.
-	*Notethatdecode()alwaysreturnsstrings
-	*inASCIIorUTF-8format!
-	*@accesspublic
-	*/",
- "/**
-	*Publicconstructor,makessureweareinstanciatedonlybythefactoryclass
-	*/",
+
  "/**
 	*Getthemostrecenterrormessage
 	*@param	integer	$iOptionalerrorindex
@@ -40678,9 +39690,7 @@
 	*Addanerrormessage
 	*@param	string$errorErrormessage
 	*/",
- "/**
-	*Resetsallerrormessages
-	*/",
+
  "/**
 	*Getthemostrecentwarningmessage
 	*@param	integer	$iOptionalwarningindex
@@ -40694,129 +39704,13 @@
 	*Addanerrormessage
 	*@param	string$errorErrormessage
 	*/",
- "/**
-	*Resetsallwarningmessages
-	*/",
- "/**
-	*Propagateserrorsandwarningstoaforeignobject.TheforeignobjectSHOULD
-	*implementthesetError()and/orsetWarning()methodsbutDOESN\'THAVETObeof
-	*AKAbstractObjecttype.Forexample,thiscanevenbeusedtopropagatetoa
-	*JObjectinstanceinJoomla!.Propagateditemswillberemovedfromourself.
-	*@paramobject$objectTheobjecttopropagateerrorsandwarningsto.
-	*/",
- "/**
-	*Propagateserrorsandwarningsfromaforeignobject.Eachpropagatedlistis
-	*thenclearedontheforeignobject,aslongasitimplementsresetErrors()and/or
-	*resetWarnings()methods.
-	*@paramobject$objectTheobjecttopropagateerrorsandwarningsfrom
-	*/",
- "/**
-	*Setsthesizeoftheerrorqueue(actslikeaLIFObuffer)
-	*@paramint$newSizeThenewqueuesize.Setto0forinfinitelength.
-	*/",
- "/**
-	*Setsthesizeofthewarningsqueue(actslikeaLIFObuffer)
-	*@paramint$newSizeThenewqueuesize.Setto0forinfinitelength.
-	*/",
- "/**
-	*ReturnsthelastitemofaLIFOstringmessagequeue,oraspecificitem
-	*ifsospecified.
-	*@paramarray$arrayAnarrayofstrings,holdingmessages
-	*@paramint$iOptionalmessageindex
-	*@returnmixedThemessagestring,orfalseifthekeydoesn\'texist
-	*/",
- "/**
-*ThebaseclassofAkeebaEngineobjects.Allowsforerrorandwarningslogging
-*andpropagation.LargelybasedontheJoomla!1.5JObjectclass.
-*/",
- "/**
-	*Processesthecurrentfile,e.g.movesitfromtemptofinallocationbyFTP
-	*/",
- "/**
-	*Theunarchivertellsusthepathtothefilenameitwantstoextractandwegiveit
-	*adifferentpathinstead.
-	*@paramstring$filenameThepathtotherealfile
-	*@paramint$permsThepermissionsweneedthefiletohave
-	*@returnstringThepathtothetemporaryfile
-	*/",
- "/**
-	*Recursivelycreatesadirectoryifitdoesn\'texist
-	*@paramstring$dirNameThedirectorytocreate
-	*@paramint$permsThepermissionstogivetothatdirectory
-	*/",
- "/**
-*Filepostprocessorenginesbaseclass
-*/",
- "/**
-	*Publicconstructor
-	*/",
- "/**
-	*Wakeupfunction,calledwhenevertheclassisunserialized
-	*/",
- "/**
-	*Sleepfunction,calledwhenevertheclassisserialized
-	*/",
- "/**
-	*Implementstheabstract_prepare()method
-	*/",
- "/**
-	*Returnsthebaseextensionofthefile,e.g.\'.jpa\'
-	*@returnstring
-	*/",
- "/**
-	*Scansforarchiveparts
-	*/",
- "/**
-	*Opensthenextpartfileforreading
-	*/",
- "/**
-	*Returnstrueifwehavereachedtheendoffile
-	*@param$localboolTruetoreturnEOFofthelocalfile,false(default)toreturnifwehavereachedtheendofthearchiveset
-	*@returnboolTrueifwehavereachedEndOfFile
-	*/",
- "/**
-	*Triestomakeadirectoryuser-writablesothatwecanwriteafiletoit
-	*@param$pathstringApathtoafile
-	*/",
- "/**
-	*Concreteclassesaresupposedtousethismethodinordertoreadthearchive\'sheaderand
-	*preparethemselvestothepointofbeingreadytoextractthefirstfile.
-	*/",
- "/**
-	*Concreteclassesmustusethismethodtoreadthefileheader
-	*@returnboolTrueifreadingthefilewassuccessful,falseifanerroroccuredorwereachedendofarchive
-	*/",
- "/**
-	*Concreteclassesmustusethismethodtoprocessfiledata.Itmustset$runStatetoAK_STATE_DATAREADwhen
-	*it\'sfinishedprocessingthefiledata.
-	*@returnboolTrueifprocessingthefiledatawassuccessful,falseifanerroroccured
-	*/",
- "/**
-	*Readsdatafromthearchiveandnotifiestheobserverwiththe\'reading\'message
-	*@param$fp
-	*@param$length
-	*/",
- "/**
-*Thebaseclassofunarchiverclasses
-*/",
- "/**
-	*Runsthepreparationforthispart.Shouldset_isPrepared
-	*totrue
-	*/",
- "/**
-	*Runsthefinalisationprocessforthispart.Shouldset
-	*_isFinishedtotrue.
-	*/",
- "/**
-	*Runsthemainfunctionalityloopforthispart.Uponcalling,
-	*shouldsetthe_isRunningtotrue.Whenitfinished,shouldset
-	*the_hasRantotrue.Ifanerrorisencountered,setErrorshould
-	*beused.
-	*/",
- "/**
-	*SetstheBREAKFLAG,whichinstructsthisenginepartthatthecurrentstepmustbreakimmediately,
-	*infearoftimingout.
-	*/",
+
+
+
+
+
+
+
  "/**
 	*Setstheenginepart\'sinternalstate,inaneasytousemanner
 	*
@@ -40829,42 +39723,8 @@
 	*run-finalisationcycleofoperationandreturnaproperreponsearray.
 	*@return	array	AReponseArray
 	*/",
- "/**
-	*Returnsacopyoftheclass\'sstatusarray
-	*@returnarray
-	*/",
- "/**
-	*Sendsanykindofsetupinformationtotheenginepart.Usingthis,
-	*weavoidpassingparameterstotheconstructoroftheclass.These
-	*parametersshouldbepassedasanindexedarrayandshouldbetaken
-	*intoaccountduringthepreparationprocessonly.Thisfunctionwill
-	*settheerrorflagifit\'scalledaftertheenginepartisprepared.
-	*
-	*@paramarray$parametersArrayTheparameterstobepassedtothe
-	*enginepart.
-	*/",
- "/**
-	*Returnsthestateofthisenginepart.
-	*
-	*@returnstringThestateofthisenginepart.Itcanbeoneof
-	*error,init,prepared,running,postrun,finished.
-	*/",
- "/**
-	*ConstructsaResponseArraybasedontheenginepart\'sstate.
-	*@returnarrayTheResponseArrayforthecurrentstate
-	*/",
- "/**
-	*Attachesanobserverobject
-	*@paramAKAbstractPartObserver$obs
-	*/",
- "/**
-	*Dettachesanobserverobject
-	*@paramAKAbstractPartObserver$obs
-	*/",
- "/**
-*Notifiesobserverseachtimesomethinginterestinghappenedtothepart
-*@parammixed$messageTheeventobject
-*/",
+
+
  "/**
 *ThesuperclassofallAkeebaKickstartparts.The\"parts\" are intelligent stateful
  * classes which perform a single procedure and have preparation, running and
@@ -40877,54 +39737,13 @@
  * @author Nicholas
  *
  */",
- "/**
-*Directfilewriter
-*/",
- "/**
-*FTPfilewriter
-*/",
- "/**
-	*Concreteclassesmustusethismethodtoreadthefileheader
-	*@returnboolTrueifreadingthefilewassuccessful,falseifanerroroccuredorwereachedendofarchive
-	*/",
- "/**
-	*Concreteclassesmustusethismethodtoprocessfiledata.Itmustset$runStatetoAK_STATE_DATAREADwhen
-	*it\'sfinishedprocessingthefiledata.
-	*@returnboolTrueifprocessingthefiledatawassuccessful,falseifanerroroccured
-	*/",
- "/**
-	*Processthefiledataofalinkentry
-	*@returnbool
-	*/",
- "/**
-	*Processthefiledataofadirectoryentry
-	*@returnbool
-	*/",
- "/**
-	*Createsthedirectorythisfilepointsto
-	*/",
- "/**
-*JPAarchiveextractionclass
-*/",
- "/**
-	*Concreteclassesmustusethismethodtoreadthefileheader
-	*@returnboolTrueifreadingthefilewassuccessful,falseifanerroroccuredorwereachedendofarchive
-	*/",
- "/**
-*ZIParchiveextractionclass
-*
-*SincethefiledataportionofZIPandJPAaresimilarlystructured(it\'semptyfordirs,
-*linkednodenameforsymlinks,dumpedbinarydatafornocompressionsanddumpedgzipped
-*binarydataforgzipcompression)wejusthavetosubclassAKUnarchiverJPAandchangethe
-*headerreadingbits.Reusablecode;)
-*/",
- "/**
-	*Publicconstructor,createsthetimerobjectandcalculatestheexecutiontimelimits
-	*@returnAECoreTimer
-	*/",
- "/**
-	*Wake-upfunctiontoresetinternaltimerwhenwegetunserialized
-	*/",
+
+
+
+
+
+
+
  "/**
 	*Getsthenumberofsecondsleft,beforewehitthe\"must break\" threshold
 	 * @return float
@@ -41655,19 +40474,7 @@
 	 *
 	 * @since   11.1
 	 */",
- "/**
-	*Translatefunction,mimicsthephpgettext(alias_)function.
-	*
-	*Thefunctionchecksif$jsSafeistrue,thenif$interpretBackslashesistrue.
-	*
-	*@paramstring$stringThestringtotranslate
-	*@paramboolean$jsSafeMaketheresultjavascriptsafe
-	*@paramboolean$interpretBackSlashesInterpret\tand\n
-	*
-	*@returnstringThetranslationofthestring
-	*
-	*@since11.1
-	*/",
+
  "/**
 	*Transliteratefunction
 	*
@@ -46051,31 +44858,9 @@
 	 *
 	 * @since   11.3
 	 */",
- "/**
-	*MethodtoloadthesystemURIstringsfortheapplication.
-	*
-	*@paramstring$requestUriAnoptionalrequestURItouseinsteadofdetectingonefromthe
-	*serverenvironmentvariables.
-	*
-	*@returnvoid
-	*
-	*@since11.3
-	*/",
- "/**
-*BaseclassforaJoomla!Webapplication.
-*
-*@packageJoomla.Platform
-*@subpackageApplication
-*@since11.4
-*/",
- "/**
-*Deprecatedclassplaceholder.YoushoulduseJApplicationWebinstead.
-*
-*@packageJoomla.Platform
-*@subpackageApplication
-*@since11.3
-*@deprecated12.3
-*/",
+
+
+
  "/**
 	 * Constructor
 	 *
@@ -46249,410 +45034,7 @@
 	 *
 	 * @since   11.1
 	 */",
- "/**
-	*Splitsastringofmultiplequeriesintoanarrayofindividualqueries.
-	*
-	*@paramstring$sqlInputSQLstringwithwhichtosplitintoindividualqueries.
-	*
-	*@returnarrayThequeriesfromtheinputstringseparatedintoanarray.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Magicmethodtoprovidemethodaliassupportforquote()andquoteName().
-	*
-	*@paramstring$methodThecalledmethod.
-	*@paramarray$argsThearrayofargumentspassedtothemethod.
-	*
-	*@returnstringThealiasedmethod\'sreturnvalueornull.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Constructor.
-	*
-	*@paramarray$optionsListofoptionsusedtoconfiguretheconnection
-	*
-	*@since11.1
-	*/",
- "/**
-	*Addsafieldorarrayoffieldnamestothelistthataretobequoted.
-	*
-	*@parammixed$quotedFieldnameorarrayofnames.
-	*
-	*@returnvoid
-	*
-	*@deprecated12.1
-	*@since11.1
-	*/",
- "/**
-	*Determinesiftheconnectiontotheserverisactive.
-	*
-	*@returnbooleanTrueifconnectedtothedatabaseengine.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Dropsatablefromthedatabase.
-	*
-	*@paramstring$tableThenameofthedatabasetabletodrop.
-	*@paramboolean$ifExistsOptionallyspecifythatthetablemustexistbeforeitisdropped.
-	*
-	*@returnJDatabaseReturnsthisobjecttosupportchaining.
-	*
-	*@since11.4
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*MethodtoescapeastringforusageinanSQLstatement.
-	*
-	*@paramstring$textThestringtobeescaped.
-	*@paramboolean$extraOptionalparametertoprovideextraescaping.
-	*
-	*@returnstringTheescapedstring.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtofetcharowfromtheresultsetcursorasanarray.
-	*
-	*@parammixed$cursorTheoptionalresultsetcursorfromwhichtofetchtherow.
-	*
-	*@returnmixedEitherthenextrowfromtheresultsetorfalseiftherearenomorerows.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtofetcharowfromtheresultsetcursorasanassociativearray.
-	*
-	*@parammixed$cursorTheoptionalresultsetcursorfromwhichtofetchtherow.
-	*
-	*@returnmixedEitherthenextrowfromtheresultsetorfalseiftherearenomorerows.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtofetcharowfromtheresultsetcursorasanobject.
-	*
-	*@parammixed$cursorTheoptionalresultsetcursorfromwhichtofetchtherow.
-	*@paramstring$classTheclassnametouseforthereturnedrowobject.
-	*
-	*@returnmixedEitherthenextrowfromtheresultsetorfalseiftherearenomorerows.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtofreeupthememoryusedfortheresultset.
-	*
-	*@parammixed$cursorTheoptionalresultsetcursorfromwhichtofetchtherow.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*GetthenumberofaffectedrowsforthepreviousexecutedSQLstatement.
-	*
-	*@returnintegerThenumberofaffectedrows.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtogetthedatabasecollationinusebysamplingatextfieldofatableinthedatabase.
-	*
-	*@returnmixedThecollationinusebythedatabaseorbooleanfalseifnotsupported.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodthatprovidesaccesstotheunderlyingdatabaseconnection.Usefulforwhenyouneedtocalla
-	*proprietarymethodsuchaspostgresql\'slo_*methods.
-	*
-	*@returnresourceTheunderlyingdatabaseconnectionresource.
-	*
-	*@since11.1
-	*/",
- "/**
-	*GetthetotalnumberofSQLstatementsexecutedbythedatabasedriver.
-	*
-	*@returninteger
-	*
-	*@since11.1
-	*/",
- "/**
-	*Getsthenameofthedatabaseusedbythisconneciton.
-	*
-	*@returnstring
-	*
-	*@since11.4
-	*/",
- "/**
-	*ReturnsaPHPdate()functioncompliantdateformatforthedatabasedriver.
-	*
-	*@returnstringTheformatstring.
-	*
-	*@since11.1
-	*/",
- "/**
-	*GetthedatabasedriverSQLstatementlog.
-	*
-	*@returnarraySQLstatementsexecutedbythedatabasedriver.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Getthenullorzerorepresentationofatimestampforthedatabasedriver.
-	*
-	*@returnstringNullorzerorepresentationofatimestamp.
-	*
-	*@since11.1
-	*/",
- "/**
-	*GetthenumberofreturnedrowsforthepreviousexecutedSQLstatement.
-	*
-	*@paramresource$cursorAnoptionaldatabasecursorresourcetoextracttherowcountfrom.
-	*
-	*@returnintegerThenumberofreturnedrows.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Getthecommontableprefixforthedatabasedriver.
-	*
-	*@returnstringThecommondatabasetableprefix.
-	*
-	*@since11.1
-	*/",
- "/**
-	*GetthecurrentqueryobjectoranewJDatabaseQueryobject.
-	*
-	*@paramboolean$newFalsetoreturnthecurrentqueryobject,TruetoreturnanewJDatabaseQueryobject.
-	*
-	*@returnJDatabaseQueryThecurrentqueryobjectoranewobjectextendingtheJDatabaseQueryclass.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Retrievesfieldinformationaboutthegiventables.
-	*
-	*@paramstring$tableThenameofthedatabasetable.
-	*@paramboolean$typeOnlyTrue(default)toonlyreturnfieldtypes.
-	*
-	*@returnarrayAnarrayoffieldsbytable.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*ShowsthetableCREATEstatementthatcreatesthegiventables.
-	*
-	*@parammixed$tablesAtablenameoralistoftablenames.
-	*
-	*@returnarrayAlistofthecreateSQLforthetables.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Retrievesfieldinformationaboutthegiventables.
-	*
-	*@parammixed$tablesAtablenameoralistoftablenames.
-	*
-	*@returnarrayAnarrayofkeysforthetable(s).
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetanarrayofalltablesinthedatabase.
-	*
-	*@returnarrayAnarrayofallthetablesinthedatabase.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*DeterminewhetherornotthedatabaseenginesupportsUTF-8characterencoding.
-	*
-	*@returnbooleanTrueifthedatabaseenginesupportsUTF-8characterencoding.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Gettheversionofthedatabaseconnector
-	*
-	*@returnstringThedatabaseconnectorversion.
-	*
-	*@since11.1
-	*/",
- "/**
-	*DeterminesifthedatabaseenginesupportsUTF-8characterencoding.
-	*
-	*@returnbooleanTrueifsupported.
-	*
-	*@since11.1
-	*
-	*@deprecated12.1
-	*/",
- "/**
-	*Methodtogettheauto-incrementedvaluefromthelastINSERTstatement.
-	*
-	*@returnintegerThevalueoftheauto-incrementfieldfromthelastinsertedrow.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Insertsarowintoatablebasedonanobject\'sproperties.
-	*
-	*@paramstring$tableThenameofthedatabasetabletoinsertinto.
-	*@paramobject&$objectAreferencetoanobjectwhosepublicpropertiesmatchthetablefields.
-	*@paramstring$keyThenameoftheprimarykey.Ifprovidedtheobjectpropertyisupdated.
-	*
-	*@returnbooleanTrueonsuccess.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetthefirstrowoftheresultsetfromthedatabasequeryasanassociativearray
-	*of[\'field_name\'=>\'row_value\'].
-	*
-	*@returnmixedThereturnvalueornullifthequeryfailed.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetanarrayoftheresultsetrowsfromthedatabasequerywhereeachrowisanassociativearray
-	*of[\'field_name\'=>\'row_value\'].Thearrayofrowscanoptionallybekeyedbyafieldname,butdefaultsto
-	*asequentialnumericarray.
-	*
-	*NOTE:Chosingtokeytheresultarraybyanon-uniquefieldnamecanresultinunwanted
-	*behaviorandshouldbeavoided.
-	*
-	*@paramstring$keyThenameofafieldonwhichtokeytheresultarray.
-	*@paramstring$columnAnoptionalcolumnname.Insteadofthewholerow,onlythiscolumnvaluewillbein
-	*theresultarray.
-	*
-	*@returnmixedThereturnvalueornullifthequeryfailed.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetanarrayofvaluesfromthe<var>$offset</var>fieldineachrowoftheresultsetfrom
-	*thedatabasequery.
-	*
-	*@paraminteger$offsetTherowoffsettousetobuildtheresultarray.
-	*
-	*@returnmixedThereturnvalueornullifthequeryfailed.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetthenextrowintheresultsetfromthedatabasequeryasanobject.
-	*
-	*@paramstring$classTheclassnametouseforthereturnedrowobject.
-	*
-	*@returnmixedTheresultofthequeryasanarray,falseiftherearenomorerows.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetthenextrowintheresultsetfromthedatabasequeryasanarray.
-	*
-	*@returnmixedTheresultofthequeryasanarray,falseiftherearenomorerows.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetthefirstrowoftheresultsetfromthedatabasequeryasanobject.
-	*
-	*@paramstring$classTheclassnametouseforthereturnedrowobject.
-	*
-	*@returnmixedThereturnvalueornullifthequeryfailed.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetanarrayoftheresultsetrowsfromthedatabasequerywhereeachrowisanobject.Thearray
-	*ofobjectscanoptionallybekeyedbyafieldname,butdefaultstoasequentialnumericarray.
-	*
-	*NOTE:Choosingtokeytheresultarraybyanon-uniquefieldnamecanresultinunwanted
-	*behaviorandshouldbeavoided.
-	*
-	*@paramstring$keyThenameofafieldonwhichtokeytheresultarray.
-	*@paramstring$classTheclassnametouseforthereturnedrowobjects.
-	*
-	*@returnmixedThereturnvalueornullifthequeryfailed.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetthefirstfieldofthefirstrowoftheresultsetfromthedatabasequery.
-	*
-	*@returnmixedThereturnvalueornullifthequeryfailed.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetthefirstrowoftheresultsetfromthedatabasequeryasanarray.Columnsareindexed
-	*numericallysothefirstcolumnintheresultsetwouldbeaccessiblevia<var>$row[0]</var>,etc.
-	*
-	*@returnmixedThereturnvalueornullifthequeryfailed.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtogetanarrayoftheresultsetrowsfromthedatabasequerywhereeachrowisanarray.Thearray
-	*ofobjectscanoptionallybekeyedbyafieldoffset,butdefaultstoasequentialnumericarray.
-	*
-	*NOTE:Choosingtokeytheresultarraybyanon-uniquefieldcanresultinunwanted
-	*behaviorandshouldbeavoided.
-	*
-	*@paramstring$keyThenameofafieldonwhichtokeytheresultarray.
-	*
-	*@returnmixedThereturnvalueornullifthequeryfailed.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Locksatableinthedatabase.
-	*
-	*@paramstring$tableNameThenameofthetabletounlock.
-	*
-	*@returnJDatabaseReturnsthisobjecttosupportchaining.
-	*
-	*@since11.4
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*ExecutetheSQLstatement.
-	*
-	*@returnmixedAdatabasecursorresourceonsuccess,booleanfalseonfailure.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtoquoteandoptionallyescapeastringtodatabaserequirementsforinsertionintothedatabase.
-	*
-	*@paramstring$textThestringtoquote.
-	*@paramboolean$escapeTrue(default)toescapethestring,falsetoleaveitunchanged.
-	*
-	*@returnstringThequotedinputstring.
-	*
-	*@since11.1
-	*/",
+
  "/**
 	*WrapanSQLstatementidentifiernamesuchascolumn,tableordatabasenamesinquotestopreventinjection
 	*risksandreservedwordconflicts.
@@ -46666,259 +45048,8 @@
 	*
 	*@since11.1
 	*/",
- "/**
-	*QuotestringscomingfromquoteNamecall.
-	*
-	*@paramarray$strArrArrayofstringscomingfromquoteNamedot-explosion.
-	*
-	*@returnstringDot-implodedstringofquotedparts.
-	*
-	*@since11.3
-	*/",
- "/**
-	*Thisfunctionreplacesastringidentifier<var>$prefix</var>withthestringheldisthe
-	*<var>tablePrefix</var>classvariable.
-	*
-	*@paramstring$sqlTheSQLstatementtoprepare.
-	*@paramstring$prefixThecommontableprefix.
-	*
-	*@returnstringTheprocessedSQLstatement.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Renamesatableinthedatabase.
-	*
-	*@paramstring$oldTableThenameofthetabletoberenamed
-	*@paramstring$newTableThenewnameforthetable.
-	*@paramstring$backupTableprefix
-	*@paramstring$prefixForthetable-usedtorenameconstraintsinnon-mysqldatabases
-	*
-	*@returnJDatabaseReturnsthisobjecttosupportchaining.
-	*
-	*@since11.4
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Selectadatabaseforuse.
-	*
-	*@paramstring$databaseThenameofthedatabasetoselectforuse.
-	*
-	*@returnbooleanTrueifthedatabasewassuccessfullyselected.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Setsthedatabasedebuggingstateforthedriver.
-	*
-	*@paramboolean$levelTruetoenabledebugging.
-	*
-	*@returnbooleanTheolddebugginglevel.
-	*
-	*@since11.1
-	*/",
- "/**
-	*SetstheSQLstatementstringforlaterexecution.
-	*
-	*@parammixed$queryTheSQLstatementtoseteitherasaJDatabaseQueryobjectorastring.
-	*@paraminteger$offsetTheaffectedrowoffsettoset.
-	*@paraminteger$limitThemaximumaffectedrowstoset.
-	*
-	*@returnJDatabaseThisobjecttosupportmethodchaining.
-	*
-	*@since11.1
-	*/",
- "/**
-	*SettheconnectiontouseUTF-8characterencoding.
-	*
-	*@returnbooleanTrueonsuccess.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtocommitatransaction.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtorollbackatransaction.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtoinitializeatransaction.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Methodtotruncateatable.
-	*
-	*@paramstring$tableThetabletotruncate
-	*
-	*@returnvoid
-	*
-	*@since11.3
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Updatesarowinatablebasedonanobject\'sproperties.
-	*
-	*@paramstring$tableThenameofthedatabasetabletoupdate.
-	*@paramobject&$objectAreferencetoanobjectwhosepublicpropertiesmatchthetablefields.
-	*@paramstring$keyThenameoftheprimarykey.
-	*@paramboolean$nullsTruetoupdatenullfieldsorfalsetoignorethem.
-	*
-	*@returnbooleanTrueonsuccess.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Unlockstablesinthedatabase.
-	*
-	*@returnJDatabaseReturnsthisobjecttosupportchaining.
-	*
-	*@since11.4
-	*@throwsJDatabaseException
-	*/",
- "/**
-	*Setsthedebuglevelonoroff
-	*
-	*@paraminteger$level0todisabledebuggingand1toenableit.
-	*
-	*@returnvoid
-	*
-	*@deprecated12.1
-	*@since11.1
-	*/",
- "/**
-	*Diagnosticmethodtoreturnexplaininformationforaquery.
-	*
-	*@returnstringTheexplainoutput.
-	*
-	*@deprecated12.1
-	*@since11.1
-	*/",
- "/**
-	*Getstheerrormessagefromthedatabaseconnection.
-	*
-	*@paramboolean$escapedTruetoescapethemessagestringforuseinJavaScript.
-	*
-	*@returnstringTheerrormessageforthemostrecentquery.
-	*
-	*@deprecated12.1
-	*@since11.1
-	*/",
- "/**
-	*Getstheerrornumberfromthedatabaseconnection.
-	*
-	*@returnintegerTheerrornumberforthemostrecentquery.
-	*
-	*@since11.1
-	*@deprecated12.1
-	*/",
- "/**
-	*MethodtoescapeastringforusageinanSQLstatement.
-	*
-	*@paramstring$textThestringtobeescaped.
-	*@paramboolean$extraOptionalparametertoprovideextraescaping.
-	*
-	*@returnstringTheescapedstring.
-	*
-	*@since11.1
-	*@deprecated12.1
-	*/",
- "/**
-	*Retrievesfieldinformationaboutthegiventables.
-	*
-	*@parammixed$tablesAtablenameoralistoftablenames.
-	*@paramboolean$typeOnlyTruetoonlyreturnfieldtypes.
-	*
-	*@returnarrayAnarrayoffieldsbytable.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*@deprecated12.1
-	*/",
- "/**
-	*GetthetotalnumberofSQLstatementsexecutedbythedatabasedriver.
-	*
-	*@returninteger
-	*
-	*@since11.1
-	*@deprecated12.1
-	*/",
- "/**
-	*Checksiffieldnameneedstobequoted.
-	*
-	*@paramstring$fieldThefieldnametobechecked.
-	*
-	*@returnbool
-	*
-	*@deprecated12.1
-	*@since11.1
-	*/",
- "/**
-	*Methodtogetanarrayofvaluesfromthe<var>$offset</var>fieldineachrowoftheresultsetfrom
-	*thedatabasequery.
-	*
-	*@paraminteger$offsetTherowoffsettousetobuildtheresultarray.
-	*
-	*@returnmixedThereturnvalueornullifthequeryfailed.
-	*
-	*@since11.1
-	*@throwsJDatabaseException
-	*@deprecated12.1
-	*/",
- "/**
-	*WrapanSQLstatementidentifiernamesuchascolumn,tableordatabasenamesinquotestopreventinjection
-	*risksandreservedwordconflicts.
-	*
-	*@paramstring$nameTheidentifiernametowrapinquotes.
-	*
-	*@returnstringThequotewrappedname.
-	*
-	*@since11.1
-	*@deprecated12.1
-	*/",
- "/**
-	*Executeaquerybatch.
-	*
-	*@paramboolean$abortOnErrorAbortonerror.
-	*@paramboolean$transactionSafeTransactionsafequeries.
-	*
-	*@returnmixedAdatabaseresourceifsuccessful,falseifnot.
-	*
-	*@deprecated12.1
-	*@since11.1
-	*/",
- "/**
-	*Returnthemostrecenterrormessageforthedatabaseconnector.
-	*
-	*@paramboolean$showSQLTruetodisplaytheSQLstatementsenttothedatabaseaswellastheerror.
-	*
-	*@returnstringTheerrormessageforthemostrecentquery.
-	*
-	*@deprecated12.1
-	*@since11.1
-	*/",
- "/**
-*Databaseconnectorclass.
-*
-*@packageJoomla.Platform
-*@subpackageDatabase
-*@since11.1
-*/",
+
+
  "/**
 	 * Method to stem a token and return the root.
 	 *
@@ -47389,227 +45520,7 @@
 	 *
 	 * @since   11.1
 	 */",
- "/**
-	*ReturnsthebaseURIfortherequest.
-	*
-	*@paramboolean$pathonlyIffalse,prependthescheme,hostandportinformation.Defaultisfalse.
-	*
-	*@returnstringThebaseURIstring
-	*
-	*@since11.1
-	*/",
- "/**
-	*ReturnstherootURIfortherequest.
-	*
-	*@paramboolean$pathonlyIffalse,prependthescheme,hostandportinformation.Defaultisfalse.
-	*@paramstring$pathThepath
-	*
-	*@returnstringTherootURIstring.
-	*
-	*@since11.1
-	*/",
- "/**
-	*ReturnstheURLfortherequest,minusthequery.
-	*
-	*@returnstring
-	*
-	*@since11.1
-	*/",
- "/**
-	*Methodtoresetclassstaticmembersfortestingandothervariousissues.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*ParseagivenURIandpopulatetheclassfields.
-	*
-	*@paramstring$uriTheURIstringtoparse.
-	*
-	*@returnbooleanTrueonsuccess.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Returnsfulluristring.
-	*
-	*@paramarray$partsAnarrayspecifyingthepartstorender.
-	*
-	*@returnstringTherenderedURIstring.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Addsaqueryvariableandvalue,replacingthevalueifit
-	*alreadyexistsandreturningtheoldvalue.
-	*
-	*@paramstring$nameNameofthequeryvariabletoset.
-	*@paramstring$valueValueofthequeryvariable.
-	*
-	*@returnstringPreviousvalueforthequeryvariable.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Checksifvariableexists.
-	*
-	*@paramstring$nameNameofthequeryvariabletocheck.
-	*
-	*@returnbooleanTrueifthevariableexists.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Returnsaqueryvariablebyname.
-	*
-	*@paramstring$nameNameofthequeryvariabletoget.
-	*@paramstring$defaultDefaultvaluetoreturnifthevariableisnotset.
-	*
-	*@returnarrayQueryvariables.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Removesanitemfromthequerystringvariablesifitexists.
-	*
-	*@paramstring$nameNameofvariabletoremove.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*Setsthequerytoasuppliedstringinformat:
-	*foo=bar&x=y
-	*
-	*@parammixed$queryThequerystringorarray.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*Returnsflatquerystring.
-	*
-	*@paramboolean$toArrayTruetoreturnthequeryasakey=>valuepairarray.
-	*
-	*@returnstringQuerystring.
-	*
-	*@since11.1
-	*/",
- "/**
-	*Buildaqueryfromaarray(reverseofthePHPparse_str()).
-	*
-	*@paramarray$paramsThearrayofkey=>valuepairstoreturnasaquerystring.
-	*
-	*@returnstringTheresultingquerystring.
-	*
-	*@seeparse_str()
-	*@since11.1
-	*/",
- "/**
-	*GetURIscheme(protocol)
-	*ie.http,https,ftp,etc...
-	*
-	*@returnstringTheURIscheme.
-	*
-	*@since11.1
-	*/",
- "/**
-	*SetURIscheme(protocol)
-	*ie.http,https,ftp,etc...
-	*
-	*@paramstring$schemeTheURIscheme.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*GetURIusername
-	*Returnstheusername,ornullifnousernamewasspecified.
-	*
-	*@returnstringTheURIusername.
-	*
-	*@since11.1
-	*/",
- "/**
-	*SetURIusername.
-	*
-	*@paramstring$userTheURIusername.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*GetURIpassword
-	*Returnsthepassword,ornullifnopasswordwasspecified.
-	*
-	*@returnstringTheURIpassword.
-	*
-	*@since11.1
-	*/",
- "/**
-	*SetURIpassword.
-	*
-	*@paramstring$passTheURIpassword.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*GetURIhost
-	*Returnsthehostname/ipornullifnohostname/ipwasspecified.
-	*
-	*@returnstringTheURIhost.
-	*
-	*@since11.1
-	*/",
- "/**
-	*SetURIhost.
-	*
-	*@paramstring$hostTheURIhost.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*GetURIport
-	*Returnstheportnumber,ornullifnoportwasspecified.
-	*
-	*@returnintegerTheURIportnumber.
-	*
-	*@since11.1
-	*/",
- "/**
-	*SetURIport.
-	*
-	*@paraminteger$portTheURIportnumber.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
- "/**
-	*GetstheURIpathstring.
-	*
-	*@returnstringTheURIpathstring.
-	*
-	*@since11.1
-	*/",
- "/**
-	*SettheURIpathstring.
-	*
-	*@paramstring$pathTheURIpathstring.
-	*
-	*@returnvoid
-	*
-	*@since11.1
-	*/",
+
  "/**
 	*GettheURIarchorstring
 	*Everythingafterthe\"#\".

@@ -167,16 +167,16 @@
  * @since 1.5.1 and 1.4.6
  */",
  "/**
-*Thisfunctionchecksattributevaluesforentity-encodedvalues
-*andreturnsthemtranslatedinto8-bitstringssowecanrun
-*checksonthem.
+
+
+
 *
-*@param$attvalueAstringtorunentitycheckagainst.
-*@returnNothing,modifiesareferencevalue.
+
+
 */",
  "/**
-*Killanytabs,newlines,orcarriagereturns.Ourfriendsthe
-*makersofthebrowserwith95%marketvaluedecidedthatit\'d
+
+
 *befunnytomake\"java[tab]script\" be just as good as \"javascript\".
  *
  * @param  attvalue  The attribute value before extraneous spaces removed.
@@ -644,29 +644,29 @@
      *
      */",
  "/**
-*Searchthedatabase
-*@paramstring$exprsearchexpression
-*@returnarraysearchresults
+
+
+
 */",
  "/**
-*Lookupbytheindicatedfield
+
 *
-*@paramstring$valueValuetolookup
-*@paraminteger$fieldThefieldtolookin,shouldbeone
-*oftheSM_ABOOK_FIELD_*constants
-*definedinfunctions/constants.php
-*(OPTIONAL;defaultstonicknamefield)
-*NOTE:uniquenessisonlyguaranteed
-*whenthenicknamefieldisusedhere;
-*otherwise,thefirstmatchingaddress
-*isreturned.
+
+
+
+
+
+
+
+
+
 *
-*@returnarraysearchresults
+
 *
 */",
  "/**
-*Listalladdresses
-*@returnarraysearchresults
+
+
 */",
  "/**
      * Add address
@@ -1683,27 +1683,27 @@ FIXME: the original author should step up and document this - the following is a
  * Renames a mailbox.
  */",
  "/**
-*Formatsamailboxintopartsforthe$boxesallarray
+
 *
-*Thepartsare:
+
 *
-*raw-RawLIST/LSUBresponsefromtheIMAPserver
-*formatted-nicelyformattedfoldername
-*unformatted-unformatted,butwithdelimiteratendremoved
-*unformatted-dm-foldernameasitappearsinrawresponse
-*unformatted-disp-unformattedwithout$folder_prefix
+
+
+
+
+
 */",
  "/**
-*Sortingfunctionusedtosortmailboxnames.
-*+Originalpatchfromdave_michmerhuizen@yahoo.com
-*+Allowscaseinsensitivitywhensortingfolders
-*+Takescareofthedelimiterbeingsortedtotheend,causing
-*subfolderstobelistedinbelowfoldersthatareprefixed
-*withtheirparentfoldersname.
+
+
+
+
+
+
 *
-*Forexample:INBOX.foo,INBOX.foobar,andINBOX.foo.bar
-*Withoutspecialsortfunction:foobarbetweenfooandfoo.bar
-*Withspecialsortfunction:foobarAFTERfooandfoo.bar:)
+
+
+
 */",
  "/**
  * Returns list of options (to be echoed into select statement
@@ -1729,7 +1729,7 @@ FIXME: the original author should step up and document this - the following is a
  * See comment on sqimap_mailbox_parse() for info about the returned array.
  */",
  "/**
-*Returnsalistofallfolders,subscribedornot
+
 */",
  "/**
      * Sets header variable
@@ -2589,52 +2589,52 @@ FIXME: the original author should step up and document this - the following is a
      * @return integer
      */",
  "/**
-*Functiontofillthemessagestructureincasethe
-*bodystructureisnotavailable
-*NOTFINISHEDYET
-*@paramstring$read
-*@paramstring$type0messageparttype
-*@paramstring$type1messagepartsubtype
-*@returnstring(onlywhentype0isnotmessageormultipart)
+
+
+
+
+
+
+
 */",
  "/**
-*@paramarray$entity
-*@paramarray$alt_order
-*@paramboolean$strict
-*@returnarray
+
+
+
+
 */",
  "/**
-*@paramarray$alt_order
-*@returnentity
+
+
 */",
  "/**
-*@returnarray
+
 */",
  "/**
-*@paramarray$exclude_id
-*@paramarray$result
-*@returnarray
+
+
+
 */",
  "/**
-*Addattachmenttomessageobject
-*@paramstring$typeattachmenttype
-*@paramstring$nameattachmentname
-*@paramstring$locationpathtoattachment
+
+
+
+
 */",
  "/**
-*Deleteallattachmentsfromthisobjectfromdisk.
-*@since1.4.6
+
+
 */",
  "/**
-*Theobjectthatcontainsamessage.
+
 *
-*messageistheobjectthatcontainsmessages.Itisarecursiveobjectin
-*thatthroughthe$entitiesvariable,itcancontainmoreobjectsoftype
-*message.Seedocumentationinmime.txtforabetterdescriptionofhowthis
-*works.
-*@packagesquirrelmail
-*@subpackagemime
-*@since1.3.0
+
+
+
+
+
+
+
 */",
  "/**
  * Converts string to iso-8859-2
@@ -2678,20 +2678,20 @@ FIXME: the original author should step up and document this - the following is a
      * @return string converted string
      */",
  "/**
-*Sanitizesldapsearchstrings.
-*Seerfc2254
-*@linkhttp://www.faqs.org/rfcs/rfc2254.html
-*@since1.5.1and1.4.5
-*@paramstring$string
-*@returnstringsanitizedstring
+
+
+
+
+
+
 */",
  "/**
-*SearchtheLDAPserver
-*@paramstring$exprsearchexpression
-*@returnarraysearchresults
+
+
+
 */",
  "/**
-*ListallentriespresentinLDAPserver
+
 *
 *IfyourunatinyLDAPserverandyouwantthe\"List All\" button
      * to show EVERYONE, disable first return call and enable the second one.
@@ -3430,24 +3430,24 @@ FIXME: the original author should step up and document this - the following is a
      * @param mixed $hdr string or array with message headers
      */",
  "/**
-*@paramstring$value
-*@returnstring
+
+
 */",
  "/**
-*Parseheaderfieldaccordingtofieldtype
-*@paramstring$fieldfieldname
-*@paramstring$valuefieldvalue
+
+
+
 */",
  "/**
-*@paramstring$address
-*@returnarray
+
+
 */",
  "/**
-*@paramarray$aStack
-*@paramarray$aComment
-*@paramstring$sEmail
-*@paramstring$sGroup
-*@returnobjectAddressStructureobject
+
+
+
+
+
 */",
  "/**
      * recursive function for parsing address strings and storing them in an address stucture object.
@@ -4064,19 +4064,19 @@ FIXME: the original author should step up and document this - the following is a
  * @return The template to use when storing the user dictionary.
  */",
  "/**
-*Thisfunctionchecksforsecurityattacks.A$MODvariableis
-*providedintheQUERY_STRINGandincludesoneofthefilesfromthe
-*modulesdirectory($MOD.mod).Seeifsomeoneistryingtogetout
-*ofthemodulesdirectorybyprovidingdots,unicodestrings,or
-*slashes.
+
+
+
+
+
 *
-*@paramstring$rMODthenameofthemodulerequestedtoinclude.
-*@returnvoid,sinceitbailsoutwithanaccesserrorifneeded.
+
+
 */",
  "/**
-*SquirrelSpellversion.Don\'tmodify,sinceitidentifiestheformat
-*oftheuserdictionaryfilesandmessingwiththiscandougly
-*stuff.:)
+
+
+
 */",
  "/**
  * Converts string to us-ascii
@@ -4737,10 +4737,10 @@ FIXME: the original author should step up and document this - the following is a
  * Obsolete
  */",
  "/**
-*Setsthespecifiedmessageswithspecifiedflag
+
 */",
  "/**
-*Obsolete?
+
 */",
  "/**
  * Given a username and datafilename, this will return the path to the
@@ -5426,7 +5426,7 @@ FIXME: the original author should step up and document this - the following is a
  *
  * An array with the following elements must be passed to
  * the class constructor (elements marked ? are optional):
- *<pre>
+
  *   filename  => path to addressbook file
  * ? create    => if true: file is created if it does not exist.
  * ? umask     => umask set before opening file.
@@ -5437,7 +5437,7 @@ FIXME: the original author should step up and document this - the following is a
  *                detect_writeable is set to false.
  * ? listing   => enable/disable listing
  * ? line_length => allowed address book record size
- *</pre>
+
  * NOTE. This class should not be used directly. Use the
  *       \"AddressBook\" class instead.
  * @package squirrelmail

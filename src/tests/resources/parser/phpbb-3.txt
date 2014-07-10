@@ -126,8 +126,8 @@
 * MCP Front Panel
 */",
  "/**
-*Asimplifiedfunctiontodeliveravatars
-*Theargumentneedstobecheckedbeforecallingthisfunction.
+
+
 */",
  "/**
 * Wraps an url into a simple html page. Used to display attachments in IE.
@@ -339,105 +339,105 @@
 * @package phpBB3
 */",
  "/**
-	*StandardparametersforFTPsession
+
 	*/",
  "/**
-	*Requestsdata
+
 	*/",
  "/**
-	*InitFTPSession
-	*@accessprivate
+
+
 	*/",
  "/**
-	*CreateDirectory(MKDIR)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Removedirectory(RMDIR)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Renamefile
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Changecurrentworkingdirectory(CHDIR)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*changefilepermissions(CHMOD)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Uploadfiletolocation(PUT)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Deletefile(DELETE)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Closeftpsession(CLOSE)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Returncurrentworkingdirectory(CWD)
-	*Atthemomentnotusedbyparentclass
-	*@accessprivate
+
+
+
 	*/",
  "/**
-	*Returnlistoffilesinagivendirectory(LS)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*FTPSITEcommand(ftp-onlyfunction)
-	*@accessprivate
+
+
 	*/",
  "/**
-*FTPtransferclass
-*@packagephpBB3
+
+
 */",
  "/**
-	*StandardparametersforFTPsession
+
 	*/",
  "/**
-	*Requestsdata
+
 	*/",
  "/**
-	*InitFTPSession
-	*@accessprivate
+
+
 	*/",
  "/**
-	*CreateDirectory(MKDIR)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Removedirectory(RMDIR)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*RenameFile
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Changecurrentworkingdirectory(CHDIR)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*changefilepermissions(CHMOD)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Uploadfiletolocation(PUT)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Deletefile(DELETE)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Closeftpsession(CLOSE)
-	*@accessprivate
+
+
 	*/",
  "/**
 	* Return current working directory (CWD)
@@ -445,30 +445,30 @@
 	* @access private
 	*/",
  "/**
-	*Returnlistoffilesinagivendirectory(LS)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Sendacommandtoserver(FTPfsockonlyfunction)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Opensaconnectiontosenddata(FTPfosckonlyfunction)
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Closesaconnectionusedtosenddata
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Checktomakesurecommandwassuccessful(FTPfsockonlyfunction)
-	*@accessprivate
+
+
 	*/",
  "/**
-*FTPfsocktransferclass
+
 *
-*@authorwGEric
-*@packagephpBB3
+
+
 */",
  "/**
 	* Set default language variables/header
@@ -489,13 +489,13 @@
 	* Compare two language files
 	*/",
  "/**
-	*Returnlanguagestringvalueforstorage
+
 	*/",
  "/**
-	*Formatlanguagearrayforstorage
+
 	*/",
  "/**
-*@packageacp
+
 */",
  "/**
 	* Add file to archive
@@ -526,7 +526,7 @@
 	* Close archive
 	*/",
  "/**
-	*Createthestructures...noteweassumeversionmadebyisMSDOS
+
 	*/",
  "/**
 	*file
@@ -703,19 +703,19 @@
 	* @access public
 	*/",
  "/**
-	*Validateenteredprofilefielddata
-	*@accesspublic
+
+
 	*/",
  "/**
-	*Buildprofilecache,usedfordisplay
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Getlanguageentriesforoptionsandstorethemhereforlateruse
+
 	*/",
  "/**
-	*Submitprofilefieldforvalidation
-	*@accesspublic
+
+
 	*/",
  "/**
 	* Update profile field data directly
@@ -1064,22 +1064,22 @@
 *
 */",
  "/**
-*UTF8-safebasename()function
+
 *
-*basename()hassomelimitationsandisdependentonthelocalesetting
-*accordingtothePHPmanual.Thereforeweprovideourownlocaleindependant
-*basenamefunction.
+
+
+
 *
-*@paramstring$filenameThefilenamebasename()shouldbeappliedto
-*@returnstringThebasenamedfilename
+
+
 */",
  "/**
-*UTF8-safestr_replace()function
+
 *
-*@paramstring$searchThevaluetosearchfor
-*@paramstring$replaceThereplacementstring
-*@paramstring$subjectThetargetstring
-*@returnstringTheresultantstring
+
+
+
+
 */",
  "/**
 	* File Class
@@ -1506,124 +1506,122 @@
 	* Resets all the data (address, template file, etc etc) to default
 	*/",
  "/**
-	*Setsanemailaddresstosendto
+
 	*/",
  "/**
-	*Setsanccaddresstosendto
+
 	*/",
  "/**
-	*Setsanbccaddresstosendto
+
 	*/",
  "/**
-	*Setsaimcontacttosendto
+
 	*/",
  "/**
-	*Setthereplytoaddress
+
 	*/",
  "/**
-	*Setthefromaddress
+
 	*/",
  "/**
-	*setupsubjectformail
+
 	*/",
  "/**
-	*setupextramailheaders
+
 	*/",
  "/**
-	*AddsX-AntiAbuseheaders
+
 	*
-	*@paramarray$config		Configurationarray
-	*@paramuser$user			Auserobject
 	*
-	*@returnnull
+
 	*/",
  "/**
-	*Settheemailpriority
+
 	*/",
  "/**
-	*Setemailtemplatetouse
+
 	*/",
  "/**
-	*assignvariablestoemailtemplate
+
 	*/",
  "/**
-	*Sendthemailouttotherecipientssetpreviouslyinvar$this->addresses
+
 	*/",
  "/**
-	*Adderrormessagetolog
+
 	*/",
  "/**
-	*Savetoqueue
+
 	*/",
  "/**
-	*Returnemailheader
+
 	*/",
  "/**
-	*Sendoutemails
+
 	*/",
  "/**
-	*Sendjabbermessageout
+
 	*/",
  "/**
-*Messenger
-*@packagephpBB3
+
+
 */",
  "/**
-	*constructor
+
 	*/",
  "/**
-	*Initaqueueobject
+
 	*/",
  "/**
-	*Putobjectinqueue
+
 	*/",
  "/**
-	*Obtainsexclusivelockonqueuecachefile.
-	*Returnsresourcerepresentingthelock
+
+
 	*/",
  "/**
-	*Releaseslockonqueuecachefile,usingresourceobtainedfromlock()
+
 	*/",
  "/**
-	*Processqueue
-	*Usinglockfile
+
+
 	*/",
  "/**
-	*Savequeue
+
 	*/",
  "/**
-*handlingemailandjabberqueue
-*@packagephpBB3
+
+
 */",
  "/**
-*ReplacementorsubstituteforPHP\'smailcommand
+
 */",
  "/**
-	*Addbacktracemessagefordebugging
+
 	*/",
  "/**
-	*Sendcommandtosmtpserver
+
 	*/",
  "/**
-	*Weusethelinetogivethesupportpeopleanindicationatwhichcommandtheerroroccurred
+
 	*/",
  "/**
-	*Closesession
+
 	*/",
  "/**
-	*Logintoserverandgetpossibleauthcodesifneccessary
+
 	*/",
  "/**
-	*Popbeforesmtpauthentication
+
 	*/",
  "/**
-	*Plainauthenticationmethod
+
 	*/",
  "/**
-	*Loginauthenticationmethod
+
 	*/",
  "/**
-	*cram_md5authenticationmethod
+
 	*/",
  "/**
 	* digest_md5 authentication method
@@ -1891,7 +1889,7 @@
 * @return				string	A filter string for ldap_search
 */",
  "/**
-*EscapesanLDAPAttributeValue
+
 */",
  "/**
 * This function is used to output any required fields in the authentication
@@ -2033,13 +2031,13 @@
 	* sets: $this->bbcode_cache with bbcode templates needed for bbcode_bitfield
 	*/",
  "/**
-	*Returnbbcodetemplate
+
 	*/",
  "/**
-	*Returnbbcodetemplatereplacement
+
 	*/",
  "/**
-	*Secondparselistbbcode
+
 	*/",
  "/**
 	* Second parse quote tag
@@ -2751,20 +2749,20 @@ function search_indexing($message = \'\')
 * @deprecated
 */",
  "/**
-*Usedtotestwhetherweareabletoconnecttothedatabasetheuserhasspecified
-*andidentifyanyproblems(egtherearealreadytableswiththenameswewanttouse
+
+
 *@param	array	$dbmsshouldbeoftheformatofanelementofthearrayreturnedby{@linkget_available_dbmsget_available_dbms()}
 *					necessaryextensionsshouldbeloadedalready
 */",
  "/**
-*remove_remarkswillstripthesqlcommentlinesoutofanuploadedsqlfile
+
 */",
  "/**
-*split_sql_filewillsplitanuploadedsqlfileintosinglesqlstatements.
-*Note:expectstrim()tohavealreadybeenrunon$sql.
+
+
 */",
  "/**
-*Forreplacing{L_*}stringswithpreg_replace_callback
+
 */",
  "/**
 	* Constructor.
@@ -3082,10 +3080,10 @@ function search_indexing($message = \'\')
 * Remote avatar linkage
 */",
  "/**
-*Avataruploadusingtheuploadclass
+
 */",
  "/**
-*Generatesavatarfilenamefromthedatabaseentry
+
 */",
  "/**
 * Avatar Gallery
@@ -3687,12 +3685,12 @@ function search_indexing($message = \'\')
 	* Returns the desired page title
 	*/",
  "/**
-	*GenerateanHTTP/1.1headertoredirecttheusertoanotherpage
-	*Thisisusedduringtheinstallationwhenwedonothaveadatabaseavailabletocallthenormalredirectfunction
-	*@paramstring$pageThepagetoredirecttorelativetotheinstallerrootpath
+
+
+
 	*/",
  "/**
-	*Generatethenavigationtabs
+
 	*/",
  "/**
 	* Output an error message
@@ -4036,25 +4034,25 @@ function search_indexing($message = \'\')
 * @package ucp
 */",
  "/**
-	*Connecttoserver
+
 	*/",
  "/**
-		*force$use_cachefalse.Ididn\'tresearchwhythecachingcodethereisnocachingcode
-		*butIassumeitsbecausetheIBextensionprovidesadirectmethodtoaccessit
-		*withoutaquery.
+
+
+
 		*/",
  "/**
-	*Versioninformationaboutuseddatabase
-	*@parambool$rawiftrue,onlyreturnthefetchedsql_server_version
-	*@parambool$use_cacheforcedtofalseforInterbase
-	*@returnstringsqlserverversion
+
+
+
+
 	*/",
  "/**
-	*SQLTransaction
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Basequerymethod
+
 	*
 	*@param	string	$query		ContainstheSQLquerywhichshallbeexecuted
 	*@param	int		$cache_ttl	Either0toavoidcachingorthetimeinsecondswhichtheresultshallbekeptincache
@@ -4063,51 +4061,51 @@ function search_indexing($message = \'\')
 	*@access	public
 	*/",
  "/**
-	*BuildLIMITquery
+
 	*/",
  "/**
-	*Returnnumberofaffectedrows
+
 	*/",
  "/**
-	*Fetchcurrentrow
+
 	*/",
  "/**
-	*Seektogivenrownumber
-	*rownumiszero-based
+
+
 	*/",
  "/**
-	*Getlastinsertedidafterinsertstatement
+
 	*/",
  "/**
-	*Freesqlresult
+
 	*/",
  "/**
-	*Escapestringusedinsqlquery
+
 	*/",
  "/**
-	*BuildLIKEexpression
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Builddb-specificquerydata
-	*@accessprivate
+
+
 	*/",
  "/**
-	*returnsqlerrorarray
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Closesqlconnection
-	*@accessprivate
+
+
 	*/",
  "/**
-	*Builddb-specificreport
-	*@accessprivate
+
+
 	*/",
  "/**
-*Firebird/InterbaseDatabaseAbstractionLayer
-*MinimumRequirementisFirebird2.1
-*@packagedbal
+
+
+
 */",
  "/**
 * Display Forums
@@ -4372,27 +4370,27 @@ function search_indexing($message = \'\')
 	* If needle is not found, stripos() will return boolean FALSE.
 	*/",
  "/**
-*Checksifapath($path)isabsoluteorrelative
+
 *
-*@paramstring$pathPathtocheckabsolutenessof
-*@returnboolean
+
+
 */",
  "/**
-*@authorChrisSmith<chris@project-minerva.org>
-*@copyright2006ProjectMinervaTeam
-*@paramstring$pathThepathwhichweshouldattempttoresolve.
-*@returnmixed
+
+
+
+
 */",
  "/**
-	*Awrapperforrealpath
-	*@ignore
+
+
 	*/",
  "/**
-	*Awrapperforrealpath
+
 	*/",
  "/**
-	*Awrapperforhtmlspecialchars_decode
-	*@ignore
+
+
 	*/",
  "/**
 * Pick a language, any language ...
@@ -4603,72 +4601,6 @@ function search_indexing($message = \'\')
 * If length is greater than 3 the complete IP will be returned
 */",
  "/**
-*Wrapperforphp\'scheckdnsrrfunction.
-*
-*@paramstring$host	Fully-QualifiedDomainName
-*@paramstring$type	Resourcerecordtypetolookup
-*						Supportedtypesare:MX(default),A,AAAA,NS,TXT,CNAME
-*						Othertypesmayworkormaynotwork
-*
-*@returnmixed		trueifentryfound,
-*					falseifentrynotfound,
-*					nullifthisfunctionisnotsupportedbythisenvironment
-*
-*Sincenullcanalsobereturned,youprobablywanttocomparetheresult
-*with===trueor===false,
-*
-*@authorbantu
-*/",
- "/**
-* Error and message handler, call with trigger_error if reqd
-*/",
- "/**
-*RemovesabsolutepathtophpBBrootdirectoryfromerrormessages
-*andconvertsbackslashestoforwardslashes.
-*
-*@paramstring$errfile	Absolutefilepath
-*							(e.g./var/www/phpbb3/phpBB/includes/functions.php)
-*							Pleasenotethatif$errfileisoutsideofthephpBBroot,
-*							therootpathwillnotbefoundandcannotbefiltered.
-*@returnstring			Relativefilepath
-*							(e.g./includes/functions.php)
-*/",
- "/**
-*Queriesthesessiontabletogetinformationaboutonlineguests
-*@paramint$item_idLimitsthesearchtotheitemwiththisid
-*@paramstring$itemThenameoftheitemwhichisstoredinthesessiontableassession_{$item}_id
-*@returnintThenumberofactivedistinctguestsessions
-*/",
- "/**
-*Queriesthesessiontabletogetinformationaboutonlineusers
-*@paramint$item_idLimitsthesearchtotheitemwiththisid
-*@paramstring$itemThenameoftheitemwhichisstoredinthesessiontableassession_{$item}_id
-*@returnarrayAnarraycontainingtheidsofonline,hiddenandvisibleusers,aswellasstatisticalinfo
-*/",
- "/**
-*Usestheresultofobtain_users_onlinetogeneratealocalized,readablerepresentation.
-*@parammixed$online_usersresultofobtain_users_online-arraywithuser_idlistsfortotal,hiddenandvisibleusers,andstatistics
-*@paramint$item_idIndicatethatthedataislimitedtooneitemandnotglobal
-*@paramstring$itemThenameoftheitemwhichisstoredinthesessiontableassession_{$item}_id
-*@returnarrayAnarraycontainingthestringforoutputtothetemplate
-*/",
- "/**
-*Getoptionbitfieldfromcustomdata
-*
-*@paramint	$bit		Thebit/valuetoget
-*@paramint	$data		Currentbitfieldtocheck
-*@returnbool	Returnstrueifvalueofconstantissetinbitfield,elsefalse
-*/",
- "/**
-*Setoptionbitfield
-*
-*@paramint	$bit		Thebit/valuetoset/unset
-*@parambool	$set		Trueifoptionshouldbeset,falseifoptionshouldbeunset.
-*@paramint	$data		Currentbitfieldtochange
-*
-*@returnint	Thenewbitfield
-*/",
- "/**
 * Login using http authenticate.
 *
 * @param array	$param		Parameter array, see $param_defaults array.
@@ -4721,13 +4653,13 @@ function search_indexing($message = \'\')
 * Build configuration template for acp configuration pages
 */",
  "/**
-*Goingthroughaconfigarrayandvalidatevalues,writingerrorsto$error.Thevalidationmethodacceptsparametersseparatedby\':\'forstringandint.
-*Thefirstparameterdefinesthetypetobeused,thesecondthelowerboundandthethirdtheupperbound.Onlythetypeisrequired.
+
+
 */",
  "/**
-*CheckswhateverornotavariableisOKforuseintheDatabase
-*parammixed$value_aryAnarrayoftheformarray(array(\'lang\'=>...,\'value\'=>...,\'column_type\'=>))\'
-*parammixed$errorTheerrorarray
+
+
+
 */",
  "/**
 * @todo normalize?
@@ -4774,26 +4706,26 @@ function search_indexing($message = \'\')
 	* @access private
 	*/",
  "/**
-	*CompileDEFINEtags
-	*@accessprivate
+
+
 	*/",
  "/**
-	*CompileINCLUDEtag
-	*@accessprivate
+
+
 	*/",
  "/**
-	*CompileINCLUDE_PHPtag
-	*@accessprivate
+
+
 	*/",
  "/**
-	*parseexpression
-	*ThisisfromSmarty
-	*@accessprivate
+
+
+
 	*/",
  "/**
-	*Generatesareferencetothegivenvariableinsidethegiven(possiblynested)
-	*blocknamespace.Thisisastringoftheform:
-	*\'.$this->_tpldata[\'parent\'][$_parent_i][\'$child1\'][$_child1_i][\'$child2\'][$_child2_i]...[\'varname\'].\'
+
+
+
 	*It\'sreadytobeinsertedintoan\"echo\" line in one of the templates.
 	* NOTE: expects a trailing \".\" on the namespace.
 	* @access private
@@ -5205,67 +5137,58 @@ function search_indexing($message = \'\')
 * @package module_install
 */",
  "/**
-	*Extractcurrentsessionpage
+
 	*
-	*@paramstring$root_pathcurrentrootpath(phpbb_root_path)
+
 	*/",
  "/**
-	*Getvalidhostname/port.HTTP_HOSTisused,SERVER_NAMEifHTTP_HOSTnotpresent.
+
 	*/",
  "/**
-	*Startsessionmanagement
+
 	*
-	*Thisiswhereallsessionactivitybegins.Wegathervariouspiecesof
-	*informationfromtheclientandserver.Wetesttoseeifasessionalready
-	*exists.Ifitdoes,fineanddandy.Ifitdoesn\'twe\'llgoontocreatea
-	*newone...prettylogicalheh?Wealsoexaminethesystemload(ifwe\'re
-	*runningonasystemwhichmakessuchinformationreadilyavailable)and
-	*haltifit\'saboveanadmindefinablelimit.
+
+
+
+
+
+
 	*
-	*@parambool$update_session_pageiftruethesessionpagegetsupdated.
+
 	*			Thiscanbesettocircumventcertainscriptstoupdatetheuserslastvisitedpage.
 	*/",
  "/**
-		*Herewedoabotcheck,ohersaucy!No,notthatkindofbot
-		*check.Weloopthroughthelistofbotsdefinedbytheadminand
-		*seeifwehaveanyuseragentand/orIPmatches.Ifwedo,thisisa
-		*bot,actaccordingly
+
+
+
+
 		*/",
  "/**
-	*Createanewsession
+
 	*
-	*Ifupontryingtostartasessionwediscoverthereisnothingexistingwe
-	*jumphere.Additionallythismethodiscalleddirectlyduringlogintoregenerate
-	*thesessionforthespecificuser.Inthismethodwecarryoutanumberoftasks;
-	*garbagecollection,(search)botchecking,bannedusercomparison.Basically
-	*thoughthismethodwillresultinanewsessionforaspecificuser.
+
+
+
+
+
 	*/",
  "/**
-	*Killsasession
+
 	*
-	*Thismethoddoeswhatitsaysonthetin.Itwilldeleteapre-existingsession.
-	*Itresetscookieinformation(destroyinganyautologinkeywithinthatcookiedata)
-	*andupdatetheusersinformationfromtherelevantsessiondata.Itwillthen
-	*grabguestuserinformation.
+
+
+
+
 	*/",
  "/**
-	*Sessiongarbagecollection
+
 	*
-	*Thislooksalotmorecomplexthanitreallyis.Effectivelyweare
-	*deletinganysessionsolderthananadmindefinablelimit.Duetothe
-	*wayinwhichwemaintainsessiondatawehavetoensureweupdateuser
-	*databeforethosesessionsaredestroyed.Inadditionthismethod
-	*removesautologinkeyinformationthatisolderthananadmindefined
-	*limit.
-	*/",
- "/**
-	*Setsacookie
-	*
-	*Setsacookieofthegivennamewiththespecifieddataforthegivenlengthoftime.Ifnotimeisspecified,asessioncookiewillbeset.
-	*
-	*@paramstring$name		Nameofthecookie,willbeautomaticallyprefixedwiththephpBBcookiename.trackbecomes[cookie_name]_trackthen.
-	*@paramstring$cookiedata	Thedatatoholdwithinthecookie
-	*@paramint$cookietime	TheexpirationtimeasUNIXtimestamp.If0isprovided,asessioncookieisset.
+
+
+
+
+
+
 	*/",
  "/**
 	* Check for banned user
@@ -5695,22 +5618,22 @@ function search_indexing($message = \'\')
 	* @access public
 	*/",
  "/**
-	*Listmodules
+
 	*
-	*Thiscreatesalist,storedin$this->module_aryofallavailable
-	*modulesforthegivenclass(ucp,mcpandacp).Additionally
-	*$this->module_y_aryiscreatedwithindentationinformationfor
-	*displayingthemodulelistappropriately.Onlymodulesforwhich
-	*theuserhasaccessrightsareincludedintheselists.
+
+
+
+
+
 	*/",
  "/**
-	*Checkifacertainmainmoduleisaccessible/loaded
-	*Bygivingthemodulemodeyouareabletoadditionallycheckforonlyonemodewithinthemainmodule
+
+
 	*
-	*@paramstring$module_basenameThemodulebasename,forexamplelogs,reports,main(forthemcp).
-	*@parammixed$module_modeThemodulemodetocheck.Ifprovidedthemodewillbecheckedinadditionforpresence.
+
+
 	*
-	*@returnboolReturnstrueifmoduleisloadedandaccessible,elsereturnsfalse
+
 	*/",
  "/**
 	* Check module authorisation
@@ -5780,16 +5703,16 @@ function search_indexing($message = \'\')
 	* Extension group select
 	*/",
  "/**
-	*SearchImagick
+
 	*/",
  "/**
-	*TestSettings
+
 	*/",
  "/**
-	*Performoperationsonsitesforexternallinking
+
 	*/",
  "/**
-	*Writedisplay_orderconfigfield
+
 	*/",
  "/**
 	* Adjust all three max_filesize config vars for display
@@ -6140,33 +6063,33 @@ function search_indexing($message = \'\')
 	* Get module branch
 	*/",
  "/**
-	*Removemodulescachefile
+
 	*/",
  "/**
-	*Returncorrectlanguagename
+
 	*/",
  "/**
-	*Update/Addmodule
+
 	*
-	*@parambool$run_inlineifsettotrueerrorswillbereturnedandnologsbeingwritten
+
 	*/",
  "/**
-	*Movemodulearoundthetree
+
 	*/",
  "/**
-	*Removemodulefromtree
+
 	*/",
  "/**
-		*Fetchallthesiblingsbetweenthemodule\'scurrentspot
-		*andwherewewanttomoveitto.Iftherearelessthan$steps
-		*siblingsbetweenthecurrentspotandthetargetthenthe
-		*modulewillmoveasfaraspossible
+
+
+
+
 		*/",
  "/**
-	*Movemodulepositionby$stepsup/down
+
 	*/",
  "/**
-*@packageacp
+
 */",
  "/**
 * @package acp
@@ -6531,7 +6454,7 @@ function search_indexing($message = \'\')
  * @param bool $warn_fail Trigger a warning if obtaining the latest version information fails. Defaults to false.
  * @param int $ttl Cache version information for $ttl seconds. Defaults to 86400 (24 hours).
  *
- * @return string | false Version info on success, false on failure.
+ * @return string|false Version info on success, false on failure.
  */",
  "/**
  * Enables a particular flag in a bitfield column of a given table.

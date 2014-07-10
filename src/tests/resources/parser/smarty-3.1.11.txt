@@ -238,7 +238,7 @@
      *
      * @param string $plugin_name    class plugin name to load
      * @param bool   $check          check if already loaded
-     * @return string |boolean filepath of loaded file or false
+     * @return string|boolean filepath of loaded file or false
      */",
  "/**
      * Compile all template files

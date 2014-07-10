@@ -7684,28 +7684,7 @@
  * @see template_preprocess_html()
  * @see html.tpl.php
  */",
- "/**
-*Generateanarrayofsuggestionsfrompatharguments.
-*
-*Thisistypicallycalledforaddingtothe\'theme_hook_suggestions\'or
-*\'classes_array\'variablesfromwithinpreprocessfunctions,whenwantingto
-*basetheadditionalsuggestionsonthepathofthecurrentpage.
-*
-*@param$args
-*Anarrayofpatharguments,suchasfromfunctionarg().
-*@param$base
-*Astringidentifyingthebase\'thing\'fromwhichmorespecificsuggestions
-*arederived.Forexample,\'page\'or\'html\'.
-*@param$delimiter
-*Thestringusedtodelimitincreasinglyspecificinformation.Thedefault
-*of\'__\'isappropriateforthemehooksuggestions.\'-\'isappropriatefor
-*extraclasses.
-*
-*@return
-*Anarrayofsuggestions,suitableforaddingto
-*$variables[\'theme_hook_suggestions\']withinapreprocessfunctionorto
-*$variables[\'classes_array\']ifthesuggestionsrepresentextraCSSclasses.
-*/",
+
  "/**
 *Thevariablesarraygeneratedhereisamirroroftemplate_preprocess_page().
 *Thispreprocessorwillrunitscoursewhentheme_maintenance_page()is
@@ -10507,47 +10486,14 @@
  "/**
    * Implements abstract public function getDirectoryPath()
    */",
- "/**
-*OverridesgetExternalUrl().
-*
-*ReturntheHTMLURIofapublicfile.
-*/",
- "/**
-*Drupalpublic(public://)streamwrapperclass.
-*
-*ProvidessupportforstoringpubliclyaccessiblefileswiththeDrupalfile
-*interface.
-*/",
- "/**
-*ImplementsabstractpublicfunctiongetDirectoryPath()
-*/",
- "/**
-*OverridesgetExternalUrl().
-*
-*ReturntheHTMLURIofaprivatefile.
-*/",
- "/**
-*Drupalprivate(private://)streamwrapperclass.
-*
-*ProvidessupportforstoringprivatelyaccessiblefileswiththeDrupalfile
-*interface.
-*
-*ExtendsDrupalPublicStreamWrapper.
-*/",
- "/**
-*ImplementsabstractpublicfunctiongetDirectoryPath()
-*/",
- "/**
-*OverridesgetExternalUrl().
-*/",
- "/**
-*Drupaltemporary(temporary://)streamwrapperclass.
-*
-*ProvidessupportforstoringtemporarilyaccessiblefileswiththeDrupal
-*fileinterface.
-*
-*ExtendsDrupalPublicStreamWrapper.
-*/",
+
+
+
+
+
+
+
+
  "/**
  * @file
  * User page callbacks for the statistics module.
@@ -15408,14 +15354,7 @@
      * @access private
      *
      */",
- "/**
-*Createsa(compressed)Tararchive
-*
-*@authorVincentBlavet<vincent@phpconcept.net>
-*@versionRevision:1.43
-*@licensehttp://www.opensource.org/licenses/bsd-license.phpNewBSDLicense
-*@packageArchive_Tar
-*/",
+
  "/**
  * This function is responsible for generating a comment reply form.
  * There are several cases that have to be handled, including:
@@ -23550,77 +23489,16 @@
    *
    * @return string
    */",
- "/**
-*Changesbackslashestoslashes,alsoremovesatrailingslash.
-*
-*@paramstring$path
-*@returnstring
-*/",
- "/**
-*Copiesadirectory.
-*
-*Weneedaseparatemethodtomakethe$destinationisinthejail.
-*
-*@param$source
-*Thesourcepath.
-*@param$destination
-*Thedestinationpath.
-*/",
- "/**
-*Createsadirectory.
-*
-*@param$directory
-*Thedirectorytobecreated.
-*/",
- "/**
-*Removesadirectory.
-*
-*@param$directory
-*Thedirectorytoberemoved.
-*/",
- "/**
-*Copiesafile.
-*
-*@param$source
-*Thesourcefile.
-*@param$destination
-*Thedestinationfile.
-*/",
- "/**
-*Removesafile.
-*
-*@param$destination
-*Thedestinationfiletoberemoved.
-*/",
- "/**
-*Checksifaparticularpathisadirectory
-*
-*@param$path
-*Thepathtocheck
-*
-*@returnboolean
-*/",
- "/**
-*Checksifaparticularpathisafile(notadirectory).
-*
-*@param$path
-*Thepathtocheck
-*
-*@returnboolean
-*/",
- "/**
-*Returnthechrootpropertyforthisconnection.
-*
-*Itdoesthisbymovingupthetreeuntilitfindsitself.Ifsuccessful,
-*itwillreturnthechroot,otherwiseFALSE.
-*
-*@return
-*ThechrootpathforthisconnectionorFALSE.
-*/",
- "/**
-*Setsthechrootandchangesthejailtomatchthecorrectpathscheme
-*
-*/",
+
+
+
+
+
+
+
+
+
+
  "/**
    * Returns a form to collect connection settings credentials.
    *
@@ -28626,7 +28504,7 @@
  * This \'abc\' object will then be passed into the callback functions defined
  * for the menu item, such as the page callback function mymodule_abc_edit()
  * to replace the integer 1 in the argument array. Note that a load function
- * should return FALSE when it is unable to provide a loadable object. For 
+ * should return FALSE when it is unable to provide a loadable object. For
  * example, the node_load() function for the \'node/%node/edit\' menu item will
  * return FALSE for the path \'node/999/edit\' if a node with a node ID of 999
  * does not exist. The menu routing system will return a 404 error in this case.
@@ -29872,21 +29750,7 @@
  *
  * @see file_download()
  */",
- "/**
-*AltertheURLtoafile.
-*
-*Thishookiscalledfromfile_create_url(),andiscalledfairly
-*frequently(10+timesperpage),dependingonhowmanyfilesthereareina
-*givenpage.
-*IfCSSandJSaggregationaredisabled,thiscanbecomeveryfrequently
-*(50+timesperpage)soperformanceiscritical.
-*
-*ThisfunctionshouldaltertheURI,ifitwantstorewritethefileURL.
-*
-*@param$uri
-*TheURItoafileforwhichweneedanexternalURL,orthepathtoa
-*shippedfile.
-*/",
+
  "/**
  * Check installation requirements and do status reporting.
  *
@@ -31677,198 +31541,17 @@
  *
  * @see http://drupal.org/node/515192
  */",
- "/**
-*Checksthatthedirectoryexistsandiswritable.
-*
-*Directoriesneedtohaveexecutepermissionstobeconsideredadirectoryby
-*FTPservers,etc.
-*
-*@param$directory
-*AstringreferencecontainingthenameofadirectorypathorURI.A
-*trailingslashwillbetrimmedfromapath.
-*@param$options
-*Abitmasktoindicateifthedirectoryshouldbecreatedifitdoes
-*notexist(FILE_CREATE_DIRECTORY)ormadewritableifitisread-only
-*(FILE_MODIFY_PERMISSIONS).
-*
-*@return
-*TRUEifthedirectoryexists(orwascreated)andiswritable.FALSE
-*otherwise.
-*/",
- "/**
-*Createsa.htaccessfileineachDrupalfilesdirectoryifitismissing.
-*/",
- "/**
-*Createsa.htaccessfileinthegivendirectory.
-*
-*@param$directory
-*Thedirectory.
-*@param$private
-*FALSEindicatesthat$directoryshouldbeanopenandpublicdirectory.
-*ThedefaultisTRUEwhichindicatesaprivateandprotecteddirectory.
-*/",
- "/**
-*Loadsfileobjectsfromthedatabase.
-*
-*@param$fids
-*AnarrayoffileIDs.
-*@param$conditions
-*(deprecated)Anassociativearrayofconditionsonthe{file_managed}
-*table,wherethekeysarethedatabasefieldsandthevaluesarethe
-*valuesthosefieldsmusthave.Instead,itispreferabletouse
-*EntityFieldQuerytoretrievealistofentityIDsloadableby
-*thisfunction.
-*
-*@return
-*Anarrayoffileobjects,indexedbyfid.
-*
-*@todoRemove$conditionsinDrupal8.
-*
-*@seehook_file_load()
-*@seefile_load()
-*@seeentity_load()
-*@seeEntityFieldQuery
-*/",
- "/**
-*Loadsasinglefileobjectfromthedatabase.
-*
-*@param$fid
-*AfileID.
-*
-*@return
-*Anobjectrepresentingthefile,orFALSEifthefilewasnotfound.
-*
-*@seehook_file_load()
-*@seefile_load_multiple()
-*/",
- "/**
-*Savesafileobjecttothedatabase.
-*
-*Ifthe$file->fidisnotsetanewrecordwillbeadded.
-*
-*@param$file
-*Afileobjectreturnedbyfile_load().
-*
-*@return
-*Theupdatedfileobject.
-*
-*@seehook_file_insert()
-*@seehook_file_update()
-*/",
- "/**
-*Determineswhereafileisused.
-*
-*@param$file
-*Afileobject.
-*
-*@return
-*Anestedarraywithusagedata.Thefirstleveliskeyedbymodulename,
-*thesecondbyobjecttypeandthethirdbytheobjectid.Thevalue
-*ofthethirdlevelcontainstheusagecount.
-*
-*@seefile_usage_add()
-*@seefile_usage_delete()
-*/",
- "/**
-*Recordsthatamoduleisusingafile.
-*
-*Thisusageinformationwillbequeriedduringfile_delete()toensurethat
-*afileisnotinusebeforeitisphysicallyremovedfromdisk.
-*
-*Examples:
-*-Amodulethatassociatesfileswithnodes,so$typewouldbe
-*\'node\'and$idwouldbethenode\'snid.Filesforallrevisionsarestored
-*withinasinglenid.
-*-TheUsermoduleassociatesanimagewithauser,so$typewouldbe\'user\'
-*andthe$idwouldbetheuser\'suid.
-*
-*@param$file
-*Afileobject.
-*@param$module
-*Thenameofthemoduleusingthefile.
-*@param$type
-*Thetypeoftheobjectthatcontainsthereferencedfile.
-*@param$id
-*Theunique,numericIDoftheobjectcontainingthereferencedfile.
-*@param$count
-*(optional)Thenumberofreferencestoaddtotheobject.Defaultsto1.
-*
-*@seefile_usage_list()
-*@seefile_usage_delete()
-*/",
- "/**
-*Removesarecordtoindicatethatamoduleisnolongerusingafile.
-*
-*Thefile_delete()functionistypicallycalledafterremovingafileusage
-*toremovetherecordfromthefile_managedtableanddeletethefileitself.
-*
-*@param$file
-*Afileobject.
-*@param$module
-*Thenameofthemoduleusingthefile.
-*@param$type
-*(optional)Thetypeoftheobjectthatcontainsthereferencedfile.May
-*beomittedifallmodulereferencestoafilearebeingdeleted.
-*@param$id
-*(optional)Theunique,numericIDoftheobjectcontainingthereferenced
-*file.Maybeomittedifallmodulereferencestoafilearebeingdeleted.
-*@param$count
-*(optional)Thenumberofreferencestodeletefromtheobject.Defaultsto
-*1.0maybespecifiedtodeleteallreferencestothefilewithina
-*specificobject.
-*
-*@seefile_usage_add()
-*@seefile_usage_list()
-*@seefile_delete()
-*/",
- "/**
-*Copiesafiletoanewlocationandaddsafilerecordtothedatabase.
-*
-*Thisfunctionshouldbeusedwhenmanipulatingfilesthathaverecords
-*storedinthedatabase.Thisisapowerfulfunctionthatinmanyways
-*performslikeanadvancedversionofcopy().
-*-Checksif$sourceand$destinationarevalidandreadable/writable.
-*-Checksthat$sourceisnotequalto$destination;iftheyareanerror
-*isreported.
-*-Iffilealreadyexistsin$destinationeitherthecallwillerrorout,
-*replacethefileorrenamethefilebasedonthe$replaceparameter.
-*-Addsthenewfiletothefilesdatabase.Ifthesourcefileisa
-*temporaryfile,theresultingfilewillalsobeatemporaryfile.See
-*file_save_upload()fordetailsontemporaryfiles.
-*
-*@param$source
-*Afileobject.
-*@param$destination
-*Astringcontainingthedestinationthat$sourceshouldbecopiedto.
-*ThismustbeastreamwrapperURI.
-*@param$replace
-*Replacebehaviorwhenthedestinationfilealreadyexists:
-*-FILE_EXISTS_REPLACE-Replacetheexistingfile.Ifamanagedfilewith
-*thedestinationnameexiststhenitsdatabaseentrywillbeupdated.If
-*nodatabaseentryisfoundthenanewonewillbecreated.
-*-FILE_EXISTS_RENAME-Append_{incrementingnumber}untilthefilenameis
-*unique.
-*-FILE_EXISTS_ERROR-DonothingandreturnFALSE.
-*
-*@return
-*Fileobjectifthecopyissuccessful,orFALSEintheeventofanerror.
-*
-*@seefile_unmanaged_copy()
-*@seehook_file_copy()
-*/",
- "/**
-*DetermineswhethertheURIhasavalidschemeforfileAPIoperations.
-*
-*TheremustbeaschemeanditmustbeaDrupal-providedschemelike
-*\'public\',\'private\',\'temporary\',oranextensionprovidedwith
-*hook_stream_wrappers().
-*
-*@param$uri
-*TheURItobetested.
-*
-*@return
-*TRUEiftheURIisallowed.
-*/",
+
+
+
+
+
+
+
+
+
+
+
  "/**
 *CopiesafiletoanewlocationwithoutinvokingthefileAPI.
 *
@@ -32556,9 +32239,7 @@
  * @see http://drupal.org/node/515192
  * @ingroup php_wrappers
  */",
- "/**
-*Getsthepathofsystem-appropriatetemporarydirectory.
-*/",
+
  "/**
  * Examines a file object and returns appropriate content headers for download.
  *
@@ -33575,12 +33256,7 @@
  *   report will only be issued if there are requirement errors. Defaults to
  *   FALSE.
  */",
- "/**
-*Retriveathenextidinasequence.
-*
-*PostgreSQLhasbuiltinsequences.We\'llusetheseinsteadofinserting
-*andupdatingasequencestable.
-*/",
+
  "/**
  * Implements hook_token_info().
  */",
@@ -34070,99 +33746,12 @@
  "/**
  * Validate the form for installing a new project via the update manager.
  */",
- "/**
-*Handleformsubmissionwheninstallingnewprojectsviatheupdatemanager.
-*
-*EitherdownloadsthefilespecifiedintheURLtoatemporarycache,or
-*uploadsthefileattachedtotheform,thenattemptstoextractthearchive
-*intoatemporarylocationandverifyit.Instantiatetheappropriate
-*Updaterclassforthisprojectandmakesureitisnotalreadyinstalledin
-*thelivewebroot.Ifeverythingissuccessful,setupanoperationtorun
-*viaauthorize.phpwhichwillcopytheextractedfilesfromthetemporary
-*locationintothelivesite.
-*
-*@seeupdate_authorize_run_install()
-*@seesystem_authorized_init()
-*@seesystem_authorized_get_url()
-*/",
- "/**
-*Unpackadownloadedarchivefile.
-*
-*@paramstring$project
-*Theshortnameoftheprojecttodownload.
-*@paramstring$file
-*Thefilenameofthearchiveyouwishtoextract.
-*@paramstring$directory
-*Thedirectoryyouwishtoextractthearchiveinto.
-*@returnArchiver
-*TheArchiverobjectusedtoextractthearchive.
-*@throwsExceptiononfailure.
-*/",
- "/**
-*Verifyanarchiveafterithasbeendownloadedandextracted.
-*
-*Thisfunctionisresponsibleforinvokinghook_verify_update_archive().
-*
-*@paramstring$project
-*Theshortnameoftheprojecttodownload.
-*@paramstring$archive_file
-*Thefilenameoftheunextractedarchive.
-*@paramstring$directory
-*Thedirectorythatthearchivewasextractedinto.
-*
-*@returnarray
-*Anarrayoferrormessagestodisplayifthearchivewasinvalid.If
-*therearenoerrors,itwillbeanemptyarray.
-*
-*/",
- "/**
-*Copiesafilefrom$urltothetemporarydirectoryforupdates.
-*
-*Ifthefilehasalreadybeendownloaded,returnsthethelocalpath.
-*
-*@param$url
-*TheURLofthefileontheserver.
-*
-*@returnstring
-*Pathtolocalfile.
-*/",
- "/**
-*Batchoperation:download,unpack,andverifyaproject.
-*
-*ThisfunctionassumesthattheprovidedURLpointstoafilearchiveof
-*somesort.TheURLcanhaveanyschemethatwehaveafilestreamwrapper
-*tosupport.Thefileisdownloadedtoalocalcache.
-*
-*@paramstring$project
-*Theshortnameoftheprojecttodownload.
-*@paramstring$url
-*TheURLtodownloadaspecificprojectreleasearchivefile.
-*@paramarray$context
-*ReferencetoanarrayusedforBatchAPIstorage.
-*
-*@seeupdate_manager_download_page()
-*/",
- "/**
-*Determinesiffiletransferswillbeperformedlocally.
-*
-*Iftheserverisconfiguredsuchthatwebserver-createdfileshavethesame
-*ownerastheconfigurationdirectory(e.g.sites/default)wherenewcode
-*willeventuallybeinstalled,theUpdatemanagercantransferfilesentirely
-*locally,withoutchangingtheirownership(inotherwords,withoutprompting
-*theuserforFTP,SSHorothercredentials).
-*
-*Thisserverconfigurationisaninherentsecurityweaknessbecauseitallows
-*amaliciouswebserverprocesstoappendarbitraryPHPcodeandthenexecute
-*it.However,itissupportedherebecauseitisacommonconfigurationon
-*sharedhosting,andthereisnothingDrupalcandotopreventit.
-*
-*@return
-*TRUEiflocalfiletransfersareallowedonthisserver,orFALSEifnot.
-*
-*@seeupdate_manager_update_ready_form_submit()
-*@seeupdate_manager_install_form_submit()
-*@seeinstall_check_requirements()
-*/",
+
+
+
+
+
+
  "/**
  * Renders a 403 access denied page for authorize.php.
  */",

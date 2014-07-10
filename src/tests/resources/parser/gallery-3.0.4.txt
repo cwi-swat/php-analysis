@@ -86,15 +86,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA  02110-1301, USA.
  */",
- "/**
-*Escapequotesinastringsdependingonthesurrounding
-*quotetypeused.
-*
-*@param$strThestringstoescape
-*/",
- "/**
-*Scansallsourcecodeformessagesthatneedtobelocalized.
-*/",
+
+
  "/**
 	 * Template loading and setup routine.
 	 */",
@@ -407,16 +400,7 @@
 	*@paramstring|arrayarrayoffilenames
 	*@returnbool
 	*/",
- "/**
-*Memcache-basedCachedriver.
-*
-*$Id:File.php46052009-09-1417:22:21Zkiall$
-*
-*@packageCache
-*@authorKohanaTeam
-*@copyright(c)2007-2009KohanaTeam
-*@licensehttp://kohanaphp.com/license
-*/",
+
  "/**
 	 * Opens a session.
 	 *
@@ -963,16 +947,7 @@
 	*Createsatemporaryimageandexecutesthegivenactions.Bycreatinga
 	*temporarycopyoftheimagebeforemanipulatingit,thisprocessisatomic.
 	*/",
- "/**
-*ImageMagickImageDriver.
-*
-*$Id:ImageMagick.php46792009-11-1001:45:52Zisaiah$
-*
-*@packageImage
-*@authorKohanaTeam
-*@copyright(c)2007-2009KohanaTeam
-*@licensehttp://kohanaphp.com/license
-*/",
+
  "/**
  * Gallery - a web based photo album viewer and editor
  * Copyright (C) 2000-2012 Bharat Mediratta
@@ -1288,157 +1263,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA  02110-1301, USA.
  */",
- "/**
-	*SetsupthePHPenvironment.Addserror/exceptionhandling,output
-	*buffering,andaddsanauto-loadingmethodforloadingclasses.
-	*
-	*Thismethodisrunimmediatelywhenthisfileisloaded,andis
-	*benchmarkedasenvironment_setup.
-	*
-	*Forsecurity,thisfunctionalsodestroysthe$_REQUESTglobalvariable.
-	*Usingtheproperglobal(GET,POST,COOKIE,etc)isinherentlymoresecure.
-	*TherecommendedwaytofetchaglobalvariableisusingtheInputlibrary.
-	*@seehttp://www.php.net/globals
-	*
-	*@returnvoid
-	*/",
- "/**
-	*CleansupthePHPenvironment.Disableserror/exceptionhandlingandthe
-	*auto-loadingmethodandclosestheoutputbuffer.
-	*
-	*Thismethoddoesnotneedtobecalledduringnormalsystemexecution,
-	*howeverinsomeadvancedsituationsitcanbehelpful.@see#1781
-	*
-	*@returnvoid
-	*/",
- "/**
-	*Loadsthecontrollerandinitializesit.Runsthepre_controller,
-	*post_controller_constructor,andpost_controllerevents.Triggers
-	*asystem.404eventwhentheroutecannotbemappedtoacontroller.
-	*
-	*Thismethodisbenchmarkedascontroller_setupandcontroller_execution.
-	*
-	*@returnobjectinstanceofcontroller
-	*/",
- "/**
-	*Getallincludepaths.APPPATHisthefirstpath,followedbymodule
-	*pathsintheordertheyareconfigured,followbytheSYSPATH.
-	*
-	*@parambooleanre-processtheincludepaths
-	*@returnarray
-	*/",
- "/**
-	*GetaconfigitemorgroupproxiesKohana_Config.
-	*
-	*@paramstringitemname
-	*@parambooleanforceaforwardslash(/)attheendoftheitem
-	*@parambooleanistheitemrequired?
-	*@returnmixed
-	*/",
- "/**
-	*Loaddatafromasimplecachefile.Thisshouldonlybeusedinternally,
-	*andisNOTareplacementfortheCachelibrary.
-	*
-	*@paramstringuniquenameofcache
-	*@paramintegerexpirationinseconds
-	*@returnmixed
-	*/",
- "/**
-	*Savedatatoasimplecachefile.Thisshouldonlybeusedinternally,and
-	*isNOTareplacementfortheCachelibrary.
-	*
-	*@paramstringcachename
-	*@parammixeddatatocache
-	*@paramintegerexpirationinseconds
-	*@returnboolean
-	*/",
- "/**
-	*Kohanaoutputhandler.Calledduringob_clean,ob_flush,andtheirvariants.
-	*
-	*@paramstringcurrentoutputbuffer
-	*@returnstring
-	*/",
- "/**
-	*Closesallopenoutputbuffers,eitherbyflushingorcleaning,andstores
-	*outputbufferfordisplayduringshutdown.
-	*
-	*@parambooleandisabletoclearbuffers,ratherthanflushing
-	*@returnvoid
-	*/",
- "/**
-	*TriggerstheshutdownofKohanabyclosingtheoutputbuffer,runsthesystem.displayevent.
-	*
-	*@returnvoid
-	*/",
- "/**
-	*InsertsglobalKohanavariablesintothegeneratedoutputandprintsit.
-	*
-	*@paramstringfinaloutputthatwilldisplayed
-	*@returnvoid
-	*/",
- "/**
-	*Providesclassauto-loading.
-	*
-	*@throwsKohana_Exception
-	*@paramstringnameofclass
-	*@returnbool
-	*/",
- "/**
-	*Findaresourcefileinagivendirectory.Fileswillbelocatedaccording
-	*totheorderoftheincludepaths.Configurationandi18nfileswillbe
-	*returnedinreverseorder.
-	*
-	*@throwsKohana_Exceptioniffileisrequiredandnotfound
-	*@paramstringdirectorytosearchin
-	*@paramstringfilenametolookfor(withoutextension)
-	*@parambooleanfilerequired
-	*@paramstringfileextension
-	*@returnarrayifthetypeisconfig,i18norl10n
-	*@returnstringifthefileisfound
-	*@returnFALSEifthefileisnotfound
-	*/",
- "/**
-	*Listsallfilesanddirectoriesinaresourcepath.
-	*
-	*@paramstringdirectorytosearch
-	*@parambooleanlistallfilestothemaximumdepth?
-	*@paramstringlistallfileshavingextension$ext
-	*@paramstringfullpathtosearch(usedforrecursion,*never*setthismanually)
-	*@returnarrayfilenamesanddirectories
-	*/",
- "/**
-	*Fetchamessageitem.
-	*
-	*@paramstringlanguagekeytofetch
-	*@paramarrayadditionalinformationtoinsertintotheline
-	*@returnstringi18nlanguagestring,ortherequestedkeyifthei18nitemisnotfound
-	*/",
- "/**
-	*Returnsthevalueofakey,definedbya\'dot-noted\'string,fromanarray.
-	*
-	*@paramarrayarraytosearch
-	*@paramstringdot-notedstring:foo.bar.baz
-	*@returnstringifthekeyisfound
-	*@returnvoidifthekeyisnotfound
-	*/",
- "/**
-	*Setsvaluesinanarraybyusinga\'dot-noted\'string.
-	*
-	*@paramarrayarraytosetkeysin(reference)
-	*@paramstringdot-notedstring:foo.bar.baz
-	*@returnmixedfillvalueforthekey
-	*@returnvoid
-	*/",
- "/**
-	*Quickdebuggingofanyvariable.Anynumberofparameterscanbeset.
-	*
-	*@returnstring
-	*/",
- "/**
-	*Savestheinternalcaches:configuration,includepaths,etc.
-	*
-	*@returnboolean
-	*/",
  "/**
  * Gallery - a web based photo album viewer and editor
  * Copyright (C) 2000-2012 Bharat Mediratta
@@ -4931,32 +4755,6 @@
  * Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA  02110-1301, USA.
  */",
  "/**
-	*Routersetuproutine.AutomaticallycalledduringKohanasetupprocess.
-	*
-	*@returnvoid
-	*/",
- "/**
-	*AttemptstodeterminethecurrentURIusingCLI,GET,PATH_INFO,ORIG_PATH_INFO,orPHP_SELF.
-	*
-	*@returnvoid
-	*/",
- "/**
-	*GeneratesroutedURIfromgivenURI.
-	*
-	*@paramstringURItoconvert
-	*@returnstringRouteduri
-	*/",
- "/**
-*Router
-*
-*$Id:Router.php47292009-12-2920:35:19Zisaiah$
-*
-*@packageKohana
-*@authorKohanaTeam
-*@copyright(c)2007-2009KohanaTeam
-*@licensehttp://kohanaphp.com/license
-*/",
- "/**
  * Message logging directory.
  */",
  "/**
@@ -5954,38 +5752,6 @@
 	 * @param   integer  current recursion level (internal)
 	 * @return  string
 	 */",
- "/**
-	*RemovesAPPPATH,SYSPATH,MODPATH,andDOCROOTfromfilenames,replacing
-	*themwiththeplaintextequivalents.
-	*
-	*@paramstringpathtosanitize
-	*@returnstring
-	*/",
- "/**
-	*Returnsanarrayoflinesfromafile.
-	*
-	*//Returnsthecurrentlineofthecurrentfile
-	*echoKohana_Exception::debug_source(__FILE__,__LINE__);
-	*
-	*@paramstringfiletoopen
-	*@paramintegerlinenumbertofind
-	*@paramintegernumberofpaddinglines
-	*@returnarray
-	*/",
- "/**
-	*Returnsanarrayofstringsthatrepresenteachstepinthebacktrace.
-	*
-	*@paramarraytracetoanalyze
-	*@returnarray
-	*/",
- "/**
-*KohanaExceptions
-*
-*@packageKohana
-*@authorKohanaTeam
-*@copyright(c)2007-2009KohanaTeam
-*@licensehttp://kohanaphp.com/license
-*/",
  "/**
  * Gallery - a web based photo album viewer and editor
  * Copyright (C) 2000-2012 Bharat Mediratta
@@ -7734,14 +7500,7 @@
 	*Createsatemporaryimageandexecutesthegivenactions.Bycreatinga
 	*temporarycopyoftheimagebeforemanipulatingit,thisprocessisatomic.
 	*/",
- "/**
-*GraphicsMagickImageDriver.
-*
-*@packageImage
-*@authorKohanaTeam
-*@copyright(c)2007-2009KohanaTeam
-*@licensehttp://kohanaphp.com/license
-*/",
+
  "/**
  * This file contains four arrays of user agent data.  It is used by the
  * User Agent library to help identify browser, platform, robot, and
@@ -7985,114 +7744,6 @@
 	 * @param   array    non-default configurations
 	 * @return  object
 	 */",
- "/**
-	*Createsanewimageeditorinstance.
-	*
-	*@throwsKohana_Exception
-	*@paramstringfilenameofimage
-	*@paramarraynon-defaultconfigurations
-	*@returnvoid
-	*/",
- "/**
-	*Worksoutthecorrectorientationfortheimage
-	*
-	*@returnvoid
-	*/",
- "/**
-	*Handlesretrievalofpre-saveimageproperties
-	*
-	*@paramstringpropertyname
-	*@returnmixed
-	*/",
- "/**
-	*Resizeanimagetoaspecificwidthandheight.Bydefault,Kohanawill
-	*maintaintheaspectratiousingthewidthasthemasterdimension.Ifyou
-	*wishtouseheightasmasterdim,set$image->master_dim=Image::HEIGHT
-	*Thismethodischainable.
-	*
-	*@throwsKohana_Exception
-	*@paramintegerwidth
-	*@paramintegerheight
-	*@paramintegeroneof:Image::NONE,Image::AUTO,Image::WIDTH,Image::HEIGHT
-	*@returnobject
-	*/",
- "/**
-	*Cropanimagetoaspecificwidthandheight.Youmayalsosetthetop
-	*andleftoffset.
-	*Thismethodischainable.
-	*
-	*@throwsKohana_Exception
-	*@paramintegerwidth
-	*@paramintegerheight
-	*@paramintegertopoffset,pixelvalueoroneof:top,center,bottom
-	*@paramintegerleftoffset,pixelvalueoroneof:left,center,right
-	*@returnobject
-	*/",
- "/**
-	*Allowsrotationofanimageby180degreesclockwiseorcounterclockwise.
-	*
-	*@paramintegerdegrees
-	*@returnobject
-	*/",
- "/**
-*Overlayasecondimageontopofthisone.
-*
-*@throwsKohana_Exception
-*@paramstring$overlay_filepathtoanimagefile
-*@paraminteger$xxoffsetfortheoverlay
-*@paraminteger$yyoffsetfortheoverlay
-*@paraminteger$transparencytransparencypercent
-*/",
- "/**
-	*Flipanimagehorizontallyorvertically.
-	*
-	*@throwsKohana_Exception
-	*@paramintegerdirection
-	*@returnobject
-	*/",
- "/**
-	*Changethequalityofanimage.
-	*
-	*@paramintegerqualityasapercentage
-	*@returnobject
-	*/",
- "/**
-	*Sharpenanimage.
-	*
-	*@paramintegeramounttosharpen,usually~20isideal
-	*@returnobject
-	*/",
- "/**
-	*Savetheimagetoanewimageoroverwritethisimage.
-	*
-	*@throwsKohana_Exception
-	*@paramstringnewimagefilename
-	*@paramintegerpermissionsfornewimage
-	*@parambooleankeepordiscardimageprocessactions
-	*@returnobject
-	*/",
- "/**
-	*Outputtheimagetothebrowser.
-	*
-	*@parambooleankeepordiscardimageprocessactions
-	*@return	object
-	*/",
- "/**
-	*Sanitizeagivenvaluetype.
-	*
-	*@paramstringtypeofproperty
-	*@parammixedpropertyvalue
-	*@returnboolean
-	*/",
- "/**
-*Manipulateimagesusingstandardmethodssuchasresize,crop,rotate,etc.
-*Thisclassmustbere-initializedforeveryimageyouwishtomanipulate.
-*
-*@packageKohana
-*@authorKohanaTeam
-*@copyright(c)2007-2009KohanaTeam
-*@licensehttp://kohanaphp.com/license
-*/",
  "/**
  * Gallery - a web based photo album viewer and editor
  * Copyright (C) 2000-2012 Bharat Mediratta
@@ -8638,14 +8289,7 @@
 	*@paramstringoutputfilename,ifdifferentthenanthefilename
 	*@returnintegerThenumberofpiecesthatwerejoined.
 	*/",
- "/**
-*Filehelperclass.
-*
-*@packageKohana
-*@authorKohanaTeam
-*@copyright(c)2007-2009KohanaTeam
-*@licensehttp://kohanaphp.com/license
-*/",
+
  "/**
  * Gallery - a web based photo album viewer and editor
  * Copyright (C) 2000-2012 Bharat Mediratta
@@ -10620,22 +10264,6 @@
  * HTTP-EQUIV type meta tags
  *
  */",
- "/**
-	*Setstheuploaddirectory.
-	*
-	*@paramstringuploaddirectory
-	*@returnvoid
-	*/",
- "/**
-*FORGEuploadinputlibrary.
-*
-*$Id:Form_Upload.php33262008-08-0921:24:30ZShadowhand$
-*
-*@packageForge
-*@authorKohanaTeam
-*@copyright(c)2007-2008KohanaTeam
-*@licensehttp://kohanaphp.com/license.html
-*/",
  "/**
    * @see ORM::delete()
    */",

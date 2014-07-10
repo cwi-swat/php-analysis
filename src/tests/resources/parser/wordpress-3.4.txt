@@ -3505,133 +3505,133 @@
  * @return bool True when finished.
  */",
  "/**
-*Getsthebasenameofaplugin.
+
 *
-*Thismethodextractsthenameofapluginfromitsfilename.
+
 *
-*@packageWordPress
-*@subpackagePlugin
-*@since1.5
+
+
+
 *
-*@accessprivate
+
 *
-*@paramstring$fileThefilenameofplugin.
-*@returnstringThenameofaplugin.
-*@usesWP_PLUGIN_DIR
+
+
+
 */",
  "/**
-*Getsthefilesystemdirectorypath(withtrailingslash)fortheplugin__FILE__passedin
-*@packageWordPress
-*@subpackagePlugin
-*@since2.8
+
+
+
+
 *
-*@paramstring$fileThefilenameoftheplugin(__FILE__)
-*@returnstringthefilesystempathofthedirectorythatcontainstheplugin
+
+
 */",
  "/**
-*GetstheURLdirectorypath(withtrailingslash)fortheplugin__FILE__passedin
-*@packageWordPress
-*@subpackagePlugin
-*@since2.8
+
+
+
+
 *
-*@paramstring$fileThefilenameoftheplugin(__FILE__)
-*@returnstringtheURLpathofthedirectorythatcontainstheplugin
+
+
 */",
  "/**
-*Settheactivationhookforaplugin.
+
 *
-*Whenapluginisactivated,theaction\'activate_PLUGINNAME\'hookis
-*activated.Inthenameofthishook,PLUGINNAMEisreplacedwiththenameof
-*theplugin,includingtheoptionalsubdirectory.Forexample,whentheplugin
-*islocatedinwp-content/plugin/sampleplugin/sample.php,thenthenameof
-*thishookwillbecome\'activate_sampleplugin/sample.php\'.Whentheplugin
-*consistsofonlyonefileandis(asbydefault)locatedat
-*wp-content/plugin/sample.phpthenameofthishookwillbe
-*\'activate_sample.php\'.
+
+
+
+
+
+
+
+
 *
-*@packageWordPress
-*@subpackagePlugin
-*@since2.0
+
+
+
 *
-*@paramstring$fileThefilenameofthepluginincludingthepath.
-*@paramcallback$functionthefunctionhookedtothe\'activate_PLUGIN\'action.
+
+
 */",
  "/**
-*Setthedeactivationhookforaplugin.
+
 *
-*Whenapluginisdeactivated,theaction\'deactivate_PLUGINNAME\'hookis
-*deactivated.Inthenameofthishook,PLUGINNAMEisreplacedwiththename
-*oftheplugin,includingtheoptionalsubdirectory.Forexample,whenthe
-*pluginislocatedinwp-content/plugin/sampleplugin/sample.php,then
-*thenameofthishookwillbecome\'activate_sampleplugin/sample.php\'.
+
+
+
+
+
 *
-*Whenthepluginconsistsofonlyonefileandis(asbydefault)locatedat
-*wp-content/plugin/sample.phpthenameofthishookwillbe
-*\'activate_sample.php\'.
+
+
+
 *
-*@packageWordPress
-*@subpackagePlugin
-*@since2.0
+
+
+
 *
-*@paramstring$fileThefilenameofthepluginincludingthepath.
-*@paramcallback$functionthefunctionhookedtothe\'activate_PLUGIN\'action.
+
+
 */",
  "/**
-*Settheuninstallationhookforaplugin.
+
 *
-*Registerstheuninstallhookthatwillbecalledwhentheuserclicksonthe
-*uninstalllinkthatcallsfortheplugintouninstallitself.Thelinkwon\'t
-*beactiveunlessthepluginhooksintotheaction.
+
+
+
 *
-*Thepluginshouldnotrunarbitrarycodeoutsideoffunctions,when
-*registeringtheuninstallhook.Inordertorunusingthehook,theplugin
-*willhavetobeincluded,whichmeansthatanycodelayingoutsideofa
-*functionwillberunduringtheuninstallprocess.Thepluginshouldnot
-*hindertheuninstallprocess.
+
+
+
+
+
 *
-*Iftheplugincannotbewrittenwithoutrunningcodewithintheplugin,then
-*thepluginshouldcreateafilenamed\'uninstall.php\'inthebaseplugin
-*folder.Thisfilewillbecalled,ifitexists,duringtheuninstallprocess
-*bypassingtheuninstallhook.Theplugin,whenusingthe\'uninstall.php\'
-*shouldalwayscheckforthe\'WP_UNINSTALL_PLUGIN\'constant,before
-*executing.
+
+
+
+
+
+
 *
-*@since2.7
+
 *
-*@paramstring$file
-*@paramcallback$callbackThecallbacktorunwhenthehookiscalled.Mustbeastaticmethodorfunction.
+
+
 */",
  "/**
-*Callsthe\'all\'hook,whichwillprocessthefunctionshookedintoit.
+
 *
-*The\'all\'hookpassesalloftheargumentsorparametersthatwereusedfor
-*thehook,whichthisfunctionwascalledfor.
+
+
 *
-*Thisfunctionisusedinternallyforapply_filters(),do_action(),and
-*do_action_ref_array()andisnotmeanttobeusedfromoutsidethose
-*functions.Thisfunctiondoesnotcheckfortheexistenceoftheallhook,so
-*itwillfailunlesstheallhookexistspriortothisfunctioncall.
+
+
+
+
 *
-*@packageWordPress
-*@subpackagePlugin
-*@since2.5
-*@accessprivate
+
+
+
+
 *
-*@uses$wp_filterUsedtoprocessallofthefunctionsinthe\'all\'hook
+
 *
-*@paramarray$argsThecollectedparametersfromthehookthatwascalled.
-*@paramstring$hookOptional.Thehooknamethatwasusedtocallthe\'all\'hook.
+
+
 */",
  "/**
-*BuildUniqueIDforstorageandretrieval.
+
 *
-*Theoldwaytoserializethecallbackcausedissuesandthisfunctionisthe
-*solution.Itworksbycheckingforobjectsandcreatingananewpropertyin
-*theclasstokeeptrackoftheobjectandnewobjectsofthesameclassthat
-*needtobeadded.
+
+
+
+
 *
-*Italsoallowsfortheremovalofactionsandfiltersforobjectsafterthey
-*changeclassproperties.Itispossibletoincludetheproperty$wp_filter_id
+
+
 *inyourclassandsetitto\"null\" or a number to bypass the workaround.
  * However this will prevent you from adding new classes and any new classes
  * will overwrite the previous hook by the same class.
@@ -4138,133 +4138,133 @@
  * @return bool Whether the path was created. True if path already exists.
  */",
  "/**
-*Testifagivefilesystempathisabsolute(\'/foo/bar\',\'c:\windows\').
+
 *
-*@since2.5.0
+
 *
-*@paramstring$pathFilepath
-*@returnboolTrueifpathisabsolute,falseisnotabsolute.
+
+
 */",
  "/**
-*Jointwofilesystempathstogether(e.g.\'giveme$pathrelativeto$base\').
+
 *
-*Ifthe$pathisabsolute,thenitthefullpathisreturned.
+
 *
-*@since2.5.0
+
 *
-*@paramstring$base
-*@paramstring$path
-*@returnstringThepathwiththebaseorabsolutepath.
+
+
+
 */",
  "/**
-*Determinesawritabledirectoryfortemporaryfiles.
-*Function\'spreferenceistoWP_CONTENT_DIRfollowedbythereturnvalueof<code>sys_get_temp_dir()</code>,beforefinallydefaultingto/tmp/
+
+
 *
-*Intheeventthatthisfunctiondoesnotfindawritablelocation,Itmaybeoverriddenbythe<code>WP_TEMP_DIR</code>constantinyour<code>wp-config.php</code>file.
+
 *
-*@since2.5.0
+
 *
-*@returnstringWritabletemporarydirectory
+
 */",
  "/**
-*Getanarraycontainingthecurrentuploaddirectory\'spathandurl.
+
 *
-*Checksthe\'upload_path\'option,whichshouldbefromthewebrootfolder,
-*andifitisn\'temptyitwillbeused.Ifitisempty,thenthepathwillbe
-*\'WP_CONTENT_DIR/uploads\'.Ifthe\'UPLOADS\'constantisdefined,thenitwill
-*overridethe\'upload_path\'optionand\'WP_CONTENT_DIR/uploads\'path.
+
+
+
+
 *
-*TheuploadURLpathisseteitherbythe\'upload_url_path\'optionorbyusing
-*the\'WP_CONTENT_URL\'constantandappending\'/uploads\'tothepath.
+
+
 *
-*Ifthe\'uploads_use_yearmonth_folders\'issettotrue(checkboxifcheckedin
-*theadministrationsettingspanel),thenthetimewillbeused.Theformat
-*willbeyearfirstandthenmonth.
+
+
+
 *
-*Ifthepathcouldn\'tbecreated,thenanerrorwillbereturnedwiththekey
-*\'error\'containingtheerrormessage.Theerrorsuggeststhattheparent
-*directoryisnotwritablebytheserver.
+
+
+
 *
-*Onsuccess,thereturnedarraywillhavemanyindices:
-*\'path\'-basedirectoryandsubdirectoryorfullpathtouploaddirectory.
-*\'url\'-baseurlandsubdirectoryorabsoluteURLtouploaddirectory.
-*\'subdir\'-subdirectoryifuploadsuseyear/monthfoldersoptionison.
-*\'basedir\'-pathwithoutsubdir.
-*\'baseurl\'-URLpathwithoutsubdir.
-*\'error\'-settofalse.
+
+
+
+
+
+
+
 *
-*@since2.0.0
-*@usesapply_filters()Calls\'upload_dir\'onreturnedarray.
+
+
 *
-*@paramstring$timeOptional.Timeformattedin\'yyyy/mm\'.
-*@returnarraySeeabovefordescription.
+
+
 */",
  "/**
-*Getafilenamethatissanitizedanduniqueforthegivendirectory.
+
 *
-*Ifthefilenameisnotunique,thenanumberwillbeaddedtothefilename
-*beforetheextension,andwillcontinueaddingnumbersuntilthefilenameis
-*unique.
+
+
+
 *
-*Thecallbackispassedthreeparameters,thefirstoneisthedirectory,the
-*secondisthefilename,andthethirdistheextension.
+
+
 *
-*@since2.5.0
+
 *
-*@paramstring$dir
-*@paramstring$filename
-*@parammixed$unique_filename_callbackCallback.
-*@returnstringNewfilename,ifgivenwasn\'tunique.
+
+
+
+
 */",
  "/**
-*Createafileintheuploadfolderwithgivencontent.
+
 *
-*Ifthereisanerror,thenthekey\'error\'willexistwiththeerrormessage.
-*Ifsuccess,thenthekey\'file\'willhavetheuniquefilepath,the\'url\'key
-*willhavethelinktothenewfile.andthe\'error\'keywillbesettofalse.
+
+
+
 *
-*Thisfunctionwillnotmoveanuploadedfiletotheuploadfolder.Itwill
-*createanewfilewiththecontentin$bitsparameter.Ifyoumovetheupload
-*file,readthecontentoftheuploadedfile,andthenyoucangivethe
-*filenameandcontenttothisfunction,whichwilladdittotheupload
-*folder.
+
+
+
+
+
 *
-*Thepermissionswillbesetonthenewfileautomaticallybythisfunction.
+
 *
-*@since2.0.0
+
 *
-*@paramstring$name
-*@paramnull$deprecatedNeverused.Settonull.
-*@parammixed$bitsFilecontent
-*@paramstring$timeOptional.Timeformattedin\'yyyy/mm\'.
-*@returnarray
+
+
+
+
+
 */",
  "/**
-*Retrievethefiletypebasedontheextensionname.
+
 *
-*@packageWordPress
-*@since2.5.0
-*@usesapply_filters()Calls\'ext2type\'hookondefaultsupportedtypes.
+
+
+
 *
-*@paramstring$extTheextensiontosearch.
-*@returnstring|nullThefiletype,example:audio,video,document,spreadsheet,etc.Nullifnotfound.
+
+
 */",
  "/**
-*Retrievethefiletypefromthefilename.
+
 *
-*Youcanoptionallydefinethemimearray,ifneeded.
+
 *
-*@since2.0.4
+
 *
-*@paramstring$filenameFilenameorpath.
-*@paramarray$mimesOptional.Keyisthefileextensionwithvalueasthemimetype.
-*@returnarrayValueswithextensionfirstandmimetype.
+
+
+
 */",
  "/**
-*Attempttodeterminetherealfiletypeofafile.
-*Ifunableto,thefilenameextensionwillbeusedtodeterminetype.
+
+
 *
-*Ifit\'sdeterminedthattheextensiondoesnotmatchthefile\'srealtype,
+
 *thenthe\"proper_filename\" value will be set with a proper filename and extension.
  *
  * Currently this function only supports validating images known to getimagesize().
@@ -9434,46 +9434,46 @@
 	 * @return string The location of the remote path.
 	 */",
  "/**
-	*Locatesafolderontheremotefilesystem.
+
 	*
-	*AssumesthatonWindowssystems,StrippingofftheDriveletterisOK
-	*Sanitizes\\to/inwindowsfilepaths.
+
+
 	*
-	*@since2.7
-	*@accesspublic
+
+
 	*
-	*@paramstring$folderthefoldertolocate
-	*@returnstringThelocationoftheremotepath.
+
+
 	*/",
  "/**
-	*Locatesafolderontheremotefilesystem.
+
 	*
-	*ExpectsWindowssanitizedpath
+
 	*
-	*@since2.7
-	*@accessprivate
+
+
 	*
-	*@paramstring$folderthefoldertolocate
-	*@paramstring$basethefoldertostartsearchingfrom
-	*@parambool$loopifthefunctionhasrecursed,Internaluseonly
-	*@returnstringThelocationoftheremotepath.
+
+
+
+
 	*/",
  "/**
-	*Returnsthe*nixstylefilepermissionsforafile
+
 	*
-	*FromthePHPdocumentationpageforfileperms()
+
 	*
-	*@linkhttp://docs.php.net/fileperms
-	*@since2.5
-	*@accesspublic
+
+
+
 	*
-	*@paramstring$filestringfilename
-	*@returnintoctalrepresentationofpermissions
+
+
 	*/",
  "/**
-	*Converts*nixstylefilepermissionstoaoctalnumber.
+
 	*
-	*Converts\'-rw-r--r--\'to0644
+
 	*From\"info at rvgate dot nl\"\'s comment on the PHP documentation for chmod()
  	 *
 	 * @link http://docs.php.net/manual/en/function.chmod.php#49614
@@ -10183,60 +10183,60 @@
 	 * @access private
 	 */",
  "/**
-	*Seewhatstatetomovetowhilewithinquotedheadervalues
+
 	*
-	*@accessprivate
+
 	*/",
  "/**
-	*Parseaheadervaluewhilewithinquotes
+
 	*
-	*@accessprivate
+
 	*/",
  "/**
-	*Parseanescapedcharacterwithinquotes
+
 	*
-	*@accessprivate
+
 	*/",
  "/**
-	*Parsethebody
+
 	*
-	*@accessprivate
+
 	*/",
  "/**
-*HTTPResponseParser
+
 *
-*@packageSimplePie
+
 */",
  "/**
-	*Don\'tallowanythingtobeset
+
 	*
-	*@accesspublic
+
 	*/",
  "/**
-	*Setthecompressedstringandrelatedproperties
+
 	*
-	*@accesspublic
+
 	*/",
  "/**
-	*DecodetheGZIPstream
+
 	*
-	*@accesspublic
+
 	*/",
  "/**
-*gzdecode
+
 *
-*@packageSimplePie
+
 */",
  "/**
-	*Don\'tcalltheconstructor.Please.
+
 	*
-	*@accessprivate
+
 	*/",
  "/**
-	*CreateanewSimplePie_Cacheobject
+
 	*
-	*@static
-	*@accesspublic
+
+
 	*/",
  "/**
 	 * If a file has been cached, retrieve and display it.
@@ -10306,54 +10306,54 @@
 	 * @return string Output data
 	 */",
  "/**
-	*RemoveRFC822comments
+
 	*
-	*@accesspublic
-	*@paramstring$dataDatatostripcommentsfrom
-	*@returnstringCommentstrippedstring
+
+
+
 	*/",
  "/**
-	*ConvertsaunicodecodepointtoaUTF-8character
+
 	*
-	*@static
-	*@accesspublic
-	*@paramint$codepointUnicodecodepoint
-	*@returnstringUTF-8character
+
+
+
+
 	*/",
  "/**
-	*Re-implementationofPHP5\'sstripos()
+
 	*
-	*Returnsthenumericpositionofthefirstoccurrenceofneedleinthe
-	*haystackstring.
+
+
 	*
-	*@static
-	*@accessstring
-	*@paramobject$haystack
-	*@paramstring$needleNotethattheneedlemaybeastringofoneormore
-	*characters.Ifneedleisnotastring,itisconvertedtoaninteger
-	*andappliedastheordinalvalueofacharacter.
-	*@paramint$offsetTheoptionaloffsetparameterallowsyoutospecifywhich
-	*characterinhaystacktostartsearching.Thepositionreturnedisstill
-	*relativetothebeginningofhaystack.
-	*@returnboolIfneedleisnotfound,stripos()willreturnbooleanfalse.
+
+
+
+
+
+
+
+
+
+
 	*/",
  "/**
-	*Similartoparse_str()
+
 	*
-	*Returnsanassociativearrayofname/valuepairs,wherethevalueisan
-	*arrayofvaluesthathaveusedthesamename
+
+
 	*
-	*@static
-	*@accessstring
-	*@paramstring$strTheinputstring.
-	*@returnarray
+
+
+
+
 	*/",
  "/**
-	*DetectXMLencoding,asperXML1.0AppendixF.1
+
 	*
-	*@todoAddsupportforEBCDIC
-	*@paramstring$dataXMLdata
-	*@returnarrayPossibleencodings
+
+
+
 	*/",
  "/**
 	 * Format debugging information
@@ -10674,104 +10674,104 @@
 	 * @return int Timestamp
 	 */",
  "/**
-	*RemoveRFC822comments
+
 	*
-	*@accessprotected
-	*@paramstring$dataDatatostripcommentsfrom
-	*@returnstringCommentstrippedstring
+
+
+
 	*/",
  "/**
-	*ParseRFC2822\'sdateformat
+
 	*
-	*@accessprotected
-	*@returnintTimestamp
+
+
 	*/",
  "/**
-	*ParseRFC850\'sdateformat
+
 	*
-	*@accessprotected
-	*@returnintTimestamp
+
+
 	*/",
  "/**
-	*ParseC99\'sasctime()\'sdateformat
+
 	*
-	*@accessprotected
-	*@returnintTimestamp
+
+
 	*/",
  "/**
-	*Parsedatesusingstrtotime()
+
 	*
-	*@accessprotected
-	*@returnintTimestamp
+
+
 	*/",
  "/**
-*DateParser
+
 *
-*@packageSimplePie
+
 */",
  "/**
-	*Createaninstanceoftheclasswiththeinputfile
+
 	*
-	*@accesspublic
-	*@paramSimplePie_Content_Type_Sniffer$fileInputfile
+
+
 	*/",
  "/**
-	*GettheContent-Typeofthespecifiedfile
+
 	*
-	*@accesspublic
-	*@returnstringActualContent-Type
+
+
 	*/",
  "/**
-	*Snifftextorbinary
+
 	*
-	*@accessprivate
-	*@returnstringActualContent-Type
+
+
 	*/",
  "/**
-	*Sniffunknown
+
 	*
-	*@accessprivate
-	*@returnstringActualContent-Type
+
+
 	*/",
  "/**
-	*Sniffimages
+
 	*
-	*@accessprivate
-	*@returnstringActualContent-Type
+
+
 	*/",
  "/**
-	*SniffHTML
+
 	*
-	*@accessprivate
-	*@returnstringActualContent-Type
+
+
 	*/",
  "/**
-*Content-typesniffing
+
 *
-*@packageSimplePie
+
 */",
  "/**
-	*Createaninstanceoftheclasswiththeinputdata
+
 	*
-	*@accesspublic
-	*@paramstring$dataInputdata
+
+
 	*/",
  "/**
-	*Parsetheinputdata
+
 	*
-	*@accesspublic
-	*@returnbooltrueonsuccess,falseonfailure
+
+
 	*/",
  "/**
-	*Checkwhetherthereisdatabeyondthepointer
+
 	*
-	*@accessprivate
-	*@returnbooltrueifthereisfurtherdata,falseifnot
+
+
 	*/",
  "/**
-	*Advancepastanywhitespace
+
 	*
-	*@returnintNumberofwhitespacecharacterspassed
+
 	*/",
  "/**
 	 * Read value
@@ -12843,35 +12843,35 @@
 	* @access private
 	*/",
  "/**
-	*decodesaJSONstringintoappropriatevariable
+
 	*
 	*@param	string$str	JSON-formattedstring
 	*
-	*@returnmixednumber,boolean,string,array,orobject
+
 	*				correspondingtogivenJSONinputstring.
 	*				Seeargument1toServices_JSON()aboveforobject-outputbehavior.
 	*				Notethatdecode()alwaysreturnsstrings
 	*				inASCIIorUTF-8format!
-	*@accesspublic
+
 	*/",
  "/**
-	*@todoUltimately,thisshouldjustcallPEAR::isError()
+
 	*/",
  "/**
-*ConvertstoandfromJSONformat.
+
 *
-*Briefexampleofuse:
+
 *
-*<code>
-*//createanewinstanceofServices_JSON
-*$json=newServices_JSON();
+
+
+
 *
-*//convertacomplexevaluetoJSONnotation,andsendittothebrowser
-*$value=array(\'foo\',\'bar\',array(1,2,\'baz\'),array(3,array(4)));
-*$output=$json->encode($value);
+
+
+
 *
-*print($output);
-*//prints:[\"foo\",\"bar\",[1,2,\"baz\"],[3,[4]]]
+
+
  *
  * // accept incoming POST data, assumed to be in JSON notation
  * $input = file_get_contents(\'php://input\', 1000000);
@@ -16069,42 +16069,42 @@
 	 * Doesn\'t need to include # in the beginning of lines, these are added automatically
 	 */",
  "/**
-	*FormatsastringinPO-style
+
 	*
-	*@static
-	*@paramstring$stringthestringtoformat
-	*@returnstringthepoifiedstring
+
+
+
 	*/",
  "/**
-	*GivesbacktheoriginalstringfromaPO-formattedstring
+
 	*
-	*@static
-	*@paramstring$stringPO-formattedstring
-	*@returnstringenascapedstring
+
+
+
 	*/",
  "/**
-	*Inserts$withinthebeginningofeverynewlineof$stringand
-	*returnsthemodifiedstring
+
+
 	*
-	*@static
-	*@paramstring$stringprependlinesinthisstring
-	*@paramstring$withprependlineswiththisstring
+
+
+
 	*/",
  "/**
-	*Prepareatextasacomment--wrapsthelinesandprepends#
-	*andaspecialcharactertoeachline
+
+
 	*
-	*@accessprivate
-	*@paramstring$textthecommenttext
-	*@paramstring$charcharactertodenoteaspecialPOcomment,
+
+
+
 	*	like:,defaultisaspace
 	*/",
  "/**
-	*BuildsastringfromtheentryforinclusioninPOfile
+
 	*
-	*@static
-	*@paramobject&$entrytheentrytoconverttopostring
-	*@returnstring|boolPO-styleformattedstringfortheentryor
+
+
+
 	*	falseiftheentryisempty
 	*/",
  "/**
@@ -17899,12 +17899,12 @@
 	 * @return string Mode of the file (last 4 digits).
 	 */",
  "/**
-*WordPressFilesystemClassfordirectPHPfileandfoldermanipulation.
+
 *
-*@since2.5
-*@packageWordPress
-*@subpackageFilesystem
-*@usesWP_Filesystem_BaseExtendsclass
+
+
+
+
 */",
  "/**
 	 * Constructor for WP_Theme.
@@ -19271,144 +19271,144 @@
  * @return string Content url link with optional path appended.
 */",
  "/**
-*Retrievetheurltothepluginsdirectoryortoaspecificfilewithinthatdirectory.
-*Youcanhardcodethepluginslugin$pathorpass__FILE__asasecondargumenttogetthecorrectfoldername.
+
+
 *
-*@packageWordPress
-*@since2.6.0
+
+
 *
-*@paramstring$pathOptional.Pathrelativetothepluginsurl.
-*@paramstring$pluginOptional.Thepluginfilethatyouwanttoberelativeto-i.e.passin__FILE__
-*@returnstringPluginsurllinkwithoptionalpathappended.
+
+
+
 */",
  "/**
-*Retrievethesiteurlforthecurrentnetwork.
+
 *
-*Returnsthesiteurlwiththeappropriateprotocol,\'https\'if
-*is_ssl()and\'http\'otherwise.If$schemeis\'http\'or\'https\',is_ssl()is
-*overridden.
+
+
+
 *
-*@packageWordPress
-*@since3.0.0
+
+
 *
-*@paramstring$pathOptional.Pathrelativetothesiteurl.
-*@paramstring$schemeOptional.Schemetogivethesiteurlcontext.Currently\'http\',\'https\',\'login\',\'login_post\',\'admin\',or\'relative\'.
-*@returnstringSiteurllinkwithoptionalpathappended.
+
+
+
 */",
  "/**
-*Retrievethehomeurlforthecurrentnetwork.
+
 *
-*Returnsthehomeurlwiththeappropriateprotocol,\'https\'if
-*is_ssl()and\'http\'otherwise.If$schemeis\'http\'or\'https\',is_ssl()is
-*overridden.
+
+
+
 *
-*@packageWordPress
-*@since3.0.0
+
+
 *
-*@paramstring$path(optional)Pathrelativetothehomeurl.
-*@paramstring$scheme(optional)Schemetogivethehomeurlcontext.Currently\'http\',\'https\',or\'relative\'.
-*@returnstringHomeurllinkwithoptionalpathappended.
+
+
+
 */",
  "/**
-*Retrievetheurltotheadminareaforthenetwork.
+
 *
-*@packageWordPress
-*@since3.0.0
+
+
 *
-*@paramstring$pathOptionalpathrelativetotheadminurl.
-*@paramstring$schemeTheschemetouse.Defaultis\'admin\',whichobeysforce_ssl_admin()andis_ssl().\'http\'or\'https\'canbepassedtoforcethoseschemes.
-*@returnstringAdminurllinkwithoptionalpathappended.
+
+
+
 */",
  "/**
-*Retrievetheurltotheadminareaforthecurrentuser.
+
 *
-*@packageWordPress
-*@since3.0.0
+
+
 *
-*@paramstring$pathOptionalpathrelativetotheadminurl.
-*@paramstring$schemeTheschemetouse.Defaultis\'admin\',whichobeysforce_ssl_admin()andis_ssl().\'http\'or\'https\'canbepassedtoforcethoseschemes.
-*@returnstringAdminurllinkwithoptionalpathappended.
+
+
+
 */",
  "/**
-*Retrievetheurltotheadminareaforeitherthecurrentblogorthenetworkdependingoncontext.
+
 *
-*@packageWordPress
-*@since3.1.0
+
+
 *
-*@paramstring$pathOptionalpathrelativetotheadminurl.
-*@paramstring$schemeTheschemetouse.Defaultis\'admin\',whichobeysforce_ssl_admin()andis_ssl().\'http\'or\'https\'canbepassedtoforcethoseschemes.
-*@returnstringAdminurllinkwithoptionalpathappended.
+
+
+
 */",
  "/**
-*SettheschemeforaURL
+
 *
-*@since3.4.0
+
 *
-*@paramstring$urlAbsoluteurlthatincludesascheme
-*@paramstring$schemeOptional.Schemetogive$url.Currently\'http\',\'https\',\'login\',\'login_post\',\'admin\',or\'relative\'.
-*@returnstring$urlURLwithchosenscheme.
+
+
+
 */",
  "/**
-*GettheURLtotheuser\'sdashboard.
+
 *
-*Ifauserdoesnotbelongtoanysite,theglobaluserdashboardisused.Iftheuserbelongstothecurrentsite,
-*thedashboardforthecurrentsiteisreturned.Iftheusercannoteditthecurrentsite,thedashboardtotheuser\'s
-*primaryblogisreturned.
+
+
+
 *
-*@since3.1.0
+
 *
-*@paramint$user_idUserID
-*@paramstring$pathOptionalpathrelativetothedashboard.Useonlypathsknowntobothbloganduseradmins.
-*@paramstring$schemeTheschemetouse.Defaultis\'admin\',whichobeysforce_ssl_admin()andis_ssl().\'http\'or\'https\'canbepassedtoforcethoseschemes.
-*@returnstringDashboardurllinkwithoptionalpathappended.
+
+
+
+
 */",
  "/**
-*GettheURLtotheuser\'sprofileeditor.
+
 *
-*@since3.1.0
+
 *
-*@paramint$userUserID
-*@paramstring$schemeTheschemetouse.Defaultis\'admin\',whichobeysforce_ssl_admin()andis_ssl().\'http\'or\'https\'canbepassedtoforcethoseschemes.
-*@returnstringDashboardurllinkwithoptionalpathappended.
+
+
+
 */",
  "/**
-*Outputrel=canonicalforsingularqueries.
+
 *
-*@packageWordPress
-*@since2.9.0
+
+
 */",
  "/**
-*Returnashortlinkforapost,page,attachment,orblog.
+
 *
-*Thisfunctionexiststoprovideashortlinktagthatallthemesandpluginscantarget.Apluginmusthookinto
-*providetheactualshortlinks.Defaultshortlinksupportislimitedtoproviding?p=stylelinksforposts.
-*Pluginscanshort-circuitthisfunctionviathepre_get_shortlinkfilterorfiltertheoutput
-*viatheget_shortlinkfilter.
+
+
+
+
 *
-*@since3.0.0.
+
 *
-*@paramint$idApostorblogid.Defaultis0,whichmeansthecurrentpostorblog.
-*@paramstring$contextWhethertheidisa\'blog\'id,\'post\'id,or\'media\'id.If\'post\',thepost_typeofthepostisconsulted.If\'query\',thecurrentqueryisconsultedtodeterminetheidandcontext.Defaultis\'post\'.
-*@parambool$allow_slugsWhethertoallowpostslugsintheshortlink.Itisuptothepluginhowandwhethertohonorthis.
-*@returnstringAshortlinkoranemptystringifnoshortlinkexistsfortherequestedresourceorifshortlinksarenotenabled.
+
+
+
+
 */",
  "/**
-*Injectrel=shortlinkintoheadifashortlinkisdefinedforthecurrentpage.
+
 *
-*Attachedtothewp_headaction.
+
 *
-*@since3.0.0
+
 *
-*@useswp_get_shortlink()
+
 */",
  "/**
-*SendaLink:rel=shortlinkheaderifashortlinkisdefinedforthecurrentpage.
+
 *
-*Attachedtothewpaction.
+
 *
-*@since3.0.0
+
 *
-*@useswp_get_shortlink()
+
 */",
  "/**
  * Display the Short Link for a Post
@@ -29095,97 +29095,97 @@
  * @return mixed
  */",
  "/**
-*{@internalMissingShortDescription}}
+
 *
-*{@internalMissingLongDescription}}
+
 *
-*@since1.5.0
+
 *
-*@paramstring$content
-*@returnstring
+
+
 */",
  "/**
-*{@internalMissingShortDescription}}
+
 *
-*{@internalMissingLongDescription}}
+
 *
-*@since1.5.0
+
 *
-*@paramunknown_type$queries
-*@paramunknown_type$execute
-*@returnunknown
+
+
+
 */",
  "/**
-*{@internalMissingShortDescription}}
+
 *
-*{@internalMissingLongDescription}}
+
 *
-*@since1.5.0
+
 */",
  "/**
-*{@internalMissingShortDescription}}
+
 *
-*{@internalMissingLongDescription}}
+
 *
-*@since1.5.0
+
 */",
  "/**
-*{@internalMissingShortDescription}}
+
 *
-*{@internalMissingLongDescription}}
+
 *
-*@since1.5.0
+
 *
-*@paramunknown_type$theme_name
-*@paramunknown_type$template
-*@returnunknown
+
+
+
 */",
  "/**
-*{@internalMissingShortDescription}}
+
 *
-*{@internalMissingLongDescription}}
+
 *
-*@since1.5.0
+
 *
-*@paramunknown_type$theme_name
-*@paramunknown_type$template
-*@returnunknown
+
+
+
 */",
  "/**
-*{@internalMissingShortDescription}}
+
 *
-*{@internalMissingLongDescription}}
+
 *
-*@since1.5.0
+
 *
-*@returnunknown
+
 */",
  "/**
-*Translateuserleveltouserrolename.
+
 *
-*@since2.0.0
+
 *
-*@paramint$levelUserlevel.
-*@returnstringUserrolename.
+
+
 */",
  "/**
-*{@internalMissingShortDescription}}
+
 *
-*{@internalMissingLongDescription}}
+
 *
-*@since2.1.0
+
 */",
  "/**
-*{@internalMissingShortDescription}}
+
 *
-*{@internalMissingLongDescription}}
+
 *
-*@since2.2.0
+
 */",
  "/**
-*Runsbeforetheschemaisupgraded.
+
 *
-*@since2.9.0
+
 */",
  "/**
  * Retrieve list of all cacheable WP files

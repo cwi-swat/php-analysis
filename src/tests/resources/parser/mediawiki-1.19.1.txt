@@ -819,99 +819,6 @@
 	 * @return void
 	 */",
  "/**
-	*Determineifarelativepathisvalid,i.e.notblankorinvolvingdirectorytraveral
-	*
-	*@param$filenamestring
-	*@returnbool
-	*/",
- "/**
-	*Getacallbackfunctiontouseforcleaningerrormessageparameters
-	*
-	*@returnArray
-	*/",
- "/**
-	*Pathdisclosureprotectionfunction
-	*
-	*@param$paramstring
-	*@returnstring
-	*/",
- "/**
-	*Pathdisclosureprotectionfunction
-	*
-	*@param$paramstring
-	*@returnstring
-	*/",
- "/**
-	*Pathdisclosureprotectionfunction
-	*
-	*@param$paramstring
-	*@returnstring
-	*/",
- "/**
-	*Createanewfatalerror
-	*
-	*@returnFileRepoStatus
-	*/",
- "/**
-	*Createanewgoodresult
-	*
-	*@returnFileRepoStatus
-	*/",
- "/**
-	*Deletefilesinthedeleteddirectoryiftheyarenotreferencedinthefilearchivetable
-	*
-	*STUB
-	*/",
- "/**
-	*Checksifthereisaredirectnamedas$title.Ifthereis,returnthe
-	*titleobject.Ifnot,returnfalse.
-	*STUB
-	*
-	*@param$titleTitleofimage
-	*@returnBool
-	*/",
- "/**
-	*Invalidatesimageredirectcacherelatedtothatimage
-	*Doesn\'tdoanythingforrepositoriesthatdon\'tsupportimageredirects.
-	*
-	*STUB
-	*@param$titleTitleofimage
-	*/",
- "/**
-	*Getthehuman-readablenameoftherepo
-	*
-	*@returnstring
-	*/",
- "/**
-	*Returnstrueifthisthelocalfilerepository.
-	*
-	*@returnbool
-	*/",
- "/**
-	*Getakeyontheprimarycacheforthisrepository.
-	*Returnsfalseiftherepository\'scacheisnotaccessibleatthissite.
-	*Theparametersarethepartsofthekey,asforwfMemcKey().
-	*
-	*STUB
-	*/",
- "/**
-	*Getakeyforthisrepointhelocalcachedomain.Thesecachekeysare
-	*notsharedwithremoteinstancesoftherepo.
-	*Theparametersarethepartsofthekey,asforwfMemcKey().
-	*
-	*@returnstring
-	*/",
- "/**
-	*GetanUploadStashassociatedwiththisrepo.
-	*
-	*@returnUploadStash
-	*/",
- "/**
-*Baseclassforfilerepositories
-*
-*@ingroupFileRepo
-*/",
- "/**
 	 * This module uses a custom feed wrapper printer.
 	 *
 	 * @return ApiFormatFeedWrapper
@@ -1125,7 +1032,7 @@
 	 * @return Mixed
 	 */",
  "/**
-	 * Get the underlying client object. This is provided for debugging 
+	 * Get the underlying client object. This is provided for debugging
 	 * purposes.
 	 *
 	 * @return MemCachedClientforWiki
@@ -1133,13 +1040,13 @@
  "/**
 	 * Encode a key for use on the wire inside the memcached protocol.
 	 *
-	 * We encode spaces and line breaks to avoid protocol errors. We encode 
-	 * the other control characters for compatibility with libmemcached 
+	 * We encode spaces and line breaks to avoid protocol errors. We encode
+	 * the other control characters for compatibility with libmemcached
 	 * verify_key. We leave other punctuation alone, to maximise backwards
 	 * compatibility.
 	 */",
  "/**
-	 * Decode a key encoded with encodeKey(). This is provided as a convenience 
+	 * Decode a key encoded with encodeKey(). This is provided as a convenience
 	 * function for debugging.
 	 *
 	 * @param $key string
@@ -1433,7 +1340,7 @@
  * @param $function String
  * @param $version String|false: Added in 1.19.
  * @param $component String|false: Added in 1.19.
- * 
+ *
  * @return null
  */",
  "/**
@@ -3822,103 +3729,103 @@
 	 * @return string
 	 */",
  "/**
-	*@param$sstring
-	*@returnstring
+
+
 	*/",
  "/**
-	*LIKEstatementwrapper,receivesavariable-lengthargumentlistwithpartsofpatterntomatch
-	*containingeitherstringliteralsthatwillbeescapedortokensreturnedbyanyChar()oranyString().
-	*Alternatively,thefunctioncouldbeprovidedwithanarrayofaforementionedparameters.
+
+
+
 	*
-	*Example:$dbr->buildLike(\'My_page_title/\',$dbr->anyString())returnsaLIKEclausethatsearches
-	*forsubpagesof\'Mypagetitle\'.
-	*Alternatively:$pattern=array(\'My_page_title/\',$dbr->anyString());$query.=$dbr->buildLike($pattern);
+
+
+
 	*
-	*@since1.16
-	*@returnString:fullybuiltLIKEstatement
+
+
 	*/",
  "/**
-	*ReturnsatokenforbuildLike()thatdenotesa\'_\'tobeusedinaLIKEquery
+
 	*
-	*@returnLikeMatch
+
 	*/",
  "/**
-	*ReturnsatokenforbuildLike()thatdenotesa\'%\'tobeusedinaLIKEquery
+
 	*
-	*@returnLikeMatch
+
 	*/",
  "/**
-	*Returnsanappropriatelyquotedsequencevalueforinsertinganewrow.
-	*MySQLhasautoincrementfields,sothisisjustNULL.ButthePostgreSQL
-	*subclasswillreturnaninteger,andsavethevalueforinsertId()
+
+
+
 	*
-	*Anyimplementationofthisfunctionshould*not*involvereusing
-	*sequencenumberscreatedforrolled-backtransactions.
-	*Seehttp://bugs.mysql.com/bug.php?id=30767fordetails.
-	*@param$seqNamestring
-	*@returnnull
+
+
+
+
+
 	*/",
  "/**
-	*USEINDEXclause.UnlikelytobeusefulforanythingbutMySQL.This
-	*isonlyneededbecausea)MySQLmustbeasefficientaspossibledueto
-	*itsuseonWikipedia,andb)MySQL4.0iskindofdumbsometimesabout
-	*whichindextopick.Anyway,otherdatabasesmighthavedifferent
-	*indexesonagiventable.Sodon\'tbotheroverridingthisunlessyou\'re
-	*MySQL.
-	*@param$index
-	*@returnstring
+
+
+
+
+
+
+
+
 	*/",
  "/**
-	*REPLACEquerywrapper.
+
 	*
-	*REPLACEisaveryhandyMySQLextension,whichfunctionslikeanINSERT
-	*exceptthatwhenthereisaduplicatekeyerror,theoldrowisdeleted
-	*andthenewrowisinsertedinitsplace.
+
+
+
 	*
-	*WesimulatethiswithstandardSQLwithaDELETEfollowedbyINSERT.To
-	*performthedelete,weneedtoknowwhattheuniqueindexesaresothat
-	*weknowhowtofindtheconflictingrows.
+
+
+
 	*
-	*Itmaybemoreefficienttoleaveoffuniqueindexeswhichareunlikely
-	*tocollide.Howeverifyoudothis,youruntheriskofencountering
-	*errorswhichwouldn\'thaveoccurredinMySQL.
+
+
+
 	*
-	*@param$tableString:Thetabletoreplacetherow(s)in.
-	*@param$rowsarrayCanbeeitherasinglerowtoinsert,ormultiplerows,
-	*inthesameformatasforDatabaseBase::insert()
-	*@param$uniqueIndexesarrayisanarrayofindexes.Eachelementmaybeeither
-	*afieldnameoranarrayoffieldnames
-	*@param$fnameString:Callingfunctionname(use__METHOD__)forlogs/profiling
+
+
+
+
+
+
 	*/",
  "/**
-	*REPLACEquerywrapperforMySQLandSQLite,whichhaveanativeREPLACE
-	*statement.
+
+
 	*
-	*@param$tablestringTablename
-	*@param$rowsarrayRowstoinsert
-	*@param$fnamestringCallerfunctionname
+
+
+
 	*
-	*@returnResultWrapper
+
 	*/",
  "/**
-	*DELETEwheretheconditionisajoin.
+
 	*
-	*MySQLoverridesthistouseamulti-tableDELETEsyntax,inotherdatabases
-	*weusesub-selects
+
+
 	*
-	*Forsafety,anempty$condswillnotdeleteeverything.Ifyouwantto
-	*deleteallrowswherethejoinconditionmatches,set$conds=\'*\'.
+
+
 	*
-	*DONOTputthejoinconditionin$conds.
+
 	*
-	*@param$delTableString:Thetabletodeletefrom.
-	*@param$joinTableString:Theothertable.
-	*@param$delVarString:Thevariabletojoinon,inthefirsttable.
-	*@param$joinVarString:Thevariabletojoinon,inthesecondtable.
-	*@param$condsArray:Conditionarrayoffieldnamesmappedtovariables,
-	*ANDedtogetherintheWHEREclause
-	*@param$fnameString:Callingfunctionname(use__METHOD__)for
-	*logs/profiling
+
+
+
+
+
+
+
+
 	*/",
  "/**
 	 * Returns the size of a text field, or -1 for \"unlimited\"
@@ -5982,7 +5889,7 @@
  * @file
  * @ingroup Testing
  * Copyright (C) 2010 Nadeesha Weerasinghe <nadeesha@calcey.com>
- * http://www.calcey.com/ 
+ * http://www.calcey.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -6154,7 +6061,7 @@
  * @file
  * @ingroup Testing
  * Copyright (C) 2010 Nadeesha Weerasinghe <nadeesha@calcey.com>
- * http://www.calcey.com/ 
+ * http://www.calcey.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -6653,7 +6560,7 @@
 	 * roll back to, e.g. user is the sole contributor. This function
 	 * performs permissions checks on $user, then calls commitRollback()
 	 * to do the dirty work
-	 * 
+	 *
 	 * @todo: seperate the business/permission stuff out from backend code
 	 *
 	 * @param $fromP String: Name of the user whose edits to rollback.
@@ -7034,7 +6941,7 @@
 	 */",
  "/**
 	 * Gets group name
-	 * 
+	 *
 	 * @return String: Name of group
 	 */",
  "/**
@@ -7647,7 +7554,7 @@
 	 */",
  "/**
 	 * Returns true if the title is inside the specified namespace.
-	 * 
+	 *
 	 * Please make use of this instead of comparing to getNamespace()
 	 * This function is much more resistant to changes we may make
 	 * to namespaces than code that makes direct comparisons.
@@ -9191,12 +9098,12 @@
 	 * the date preference they\'re supposed to use, it should be used in
 	 * all children.
 	 *
-	 *<code>
+
 	 * function timeanddate([...], $format = true) {
 	 * 	$datePreference = $this->dateFormat($format);
 	 * [...]
 	 * }
-	 *</code>
+
 	 *
 	 * @param $usePrefs Mixed: if true, the user\'s preference is used
 	 *                         if false, the site/language default is used
@@ -11061,14 +10968,14 @@
 	 */",
  "/**
 	 * Set the visibility restrictions for displaying content.
-	 * If set to public, and an item is deleted, then it will be replaced 
+	 * If set to public, and an item is deleted, then it will be replaced
 	 * with a placeholder even if the context user is allowed to view it.
 	 * @param $audience integer self::FOR_THIS_USER or self::FOR_PUBLIC
 	 */",
  "/**
 	 * Check if a log item can be displayed
 	 * @param $field integer LogPage::DELETED_* constant
-	 * @return bool 
+	 * @return bool
 	 */",
  "/**
 	 * If set to true, will produce user tool links after
@@ -11755,35 +11662,35 @@
 	 * @access private
 	 */",
  "/**
-	*decodesaJSONstringintoappropriatevariable
+
 	*
-	*@param$strString:JSON-formattedstring
+
 	*
-	*@returnmixednumber,boolean,string,array,orobject
+
 	*		correspondingtogivenJSONinputstring.
 	*		Seeargument1toServices_JSON()aboveforobject-outputbehavior.
 	*		Notethatdecode()alwaysreturnsstrings
 	*		inASCIIorUTF-8format!
-	*@accesspublic
+
 	*/",
  "/**
-	*@todoUltimately,thisshouldjustcallPEAR::isError()
+
 	*/",
  "/**
-*ConvertstoandfromJSONformat.
+
 *
-*Briefexampleofuse:
+
 *
-*<code>
-*//createanewinstanceofServices_JSON
-*$json=newServices_JSON();
+
+
+
 *
-*//convertacomplexevaluetoJSONnotation,andsendittothebrowser
-*$value=array(\'foo\',\'bar\',array(1,2,\'baz\'),array(3,array(4)));
-*$output=$json->encode($value);
+
+
+
 *
-*print($output);
-*//prints:[\"foo\",\"bar\",[1,2,\"baz\"],[3,[4]]]
+
+
  *
  * // accept incoming POST data, assumed to be in JSON notation
  * $input = file_get_contents(\'php://input\', 1000000);
@@ -12204,7 +12111,7 @@
  * Like how things were pre 1.17.
  */",
  "/**
-	 * Do a binary search, and return the index of the largest item that sorts 
+	 * Do a binary search, and return the index of the largest item that sorts
 	 * less than or equal to the target value.
 	 *
 	 * @param $valueCallback array A function to call to get the value with
@@ -13900,7 +13807,7 @@
  *
  * To add magic words in an extension, use $magicWords in a file listed in
  * $wgExtensionMessagesFiles[].
- * 
+ *
  * @par Example:
  * @code
  * $magicWords = array();
@@ -14282,7 +14189,7 @@
  * @file
  * @ingroup Testing
  * Copyright (C) 2010 Nadeesha Weerasinghe <nadeesha@calcey.com>
- * http://www.calcey.com/ 
+ * http://www.calcey.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14340,7 +14247,7 @@
  * which can be used with the JasmineBDD framework. This specification can then be used by simply including it into
  * the SpecRunner.html file.
  *
- * This is similar to Michael Dale (mdale@mediawiki.org)\'s parser tests, except that it doesn\'t look up the 
+ * This is similar to Michael Dale (mdale@mediawiki.org)\'s parser tests, except that it doesn\'t look up the
  * API results while doing the test, so the Jasmine run is much faster(at the cost of being out of date in rare
  * circumstances. But mostly the parsing that we are doing in Javascript doesn\'t change much.)
  *
@@ -14449,9 +14356,9 @@
 	 */",
  "/**
 	 * Add a maintenance script to be run after the database updates are complete.
-	 * 
+	 *
 	 * @since 1.19
-	 * 
+	 *
 	 * @param $class string Name of a Maintenance subclass
 	 */",
  "/**
@@ -14461,7 +14368,7 @@
 	 */",
  "/**
 	 * @since 1.17
-	 * 
+	 *
 	 * @return array
 	 */",
  "/**
@@ -14738,7 +14645,7 @@
  * @file
  * @ingroup Testing
  * Copyright (C) 2010 Nadeesha Weerasinghe <nadeesha@calcey.com>
- * http://www.calcey.com/ 
+ * http://www.calcey.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14925,12 +14832,8 @@
  "/**
  ** a test for Special:Import.
  */",
- "/**
-**atestforthumb.php
-*/",
- "/**
-**atestforprofileinfo.php
-*/",
+
+
  "/**
  ** a test for Special:Cite (extension Special page).
  */",
@@ -14984,7 +14887,7 @@
  **        Resulting script requires PHP-Curl be installed in order to work.
  */",
  "/**
-*EscapesavaluesothatitcanbeusedonthecommandlinebyCurl.
+
 *Specifically,\"<\" and \"@\" need to be escaped if they are the first character,
  *        otherwise  curl interprets these as meaning that we want to insert a file.
  * @param $input_params array
@@ -15103,7 +15006,7 @@
 	 *
 	 * @param Title $title
 	 * @param int $namespace
-	 * @param String $dbKey 
+	 * @param String $dbKey
 	 * @return bool: Whether this item is valid
 	 */",
  "/**
@@ -15232,11 +15135,7 @@
  *
  * @ingroup Actions
  */",
- "/**
-*ClassforpagesinNS_FILE
-*
-*@ingroupActions
-*/",
+
  "/**
 	 * Plural forms per
 	 * http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/language_plural_rules.html#mk
@@ -16043,11 +15942,7 @@
 	 *
 	 * @return Integer: revision number as int
 	 */",
- "/**
-*GiveinformationabouttheversionofMediaWiki,PHP,theDBandextensions
-*
-*@ingroupSpecialPage
-*/",
+
  "/**
  * Implements Special:Mostrevisions
  *
@@ -16088,7 +15983,7 @@
  * @file
  * @ingroup Testing
  * Copyright (C) 2010 Nadeesha Weerasinghe <nadeesha@calcey.com>
- * http://www.calcey.com/ 
+ * http://www.calcey.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16249,7 +16144,7 @@
 	 */",
  "/**
 	 * Get a key on the primary cache for this repository.
-	 * Returns false if the repository\'s cache is not accessible at this site. 
+	 * Returns false if the repository\'s cache is not accessible at this site.
 	 * The parameters are the parts of the key, as for wfMemcKey().
 	 *
 	 * @return string
@@ -16421,13 +16316,13 @@
  */",
  "/**
 	 * Setup local pointers to stash, repo and user ( similar to UploadFromStash )
-	 * 
+	 *
 	 * @param $user User
 	 * @param $stash UploadStash
 	 * @param $repo FileRepo
 	 */",
  "/**
-	 * Calls the parent stashFile and updates the uploadsession table to handle \"chunks\" 
+	 * Calls the parent stashFile and updates the uploadsession table to handle \"chunks\"
 	 *
 	 * @return UploadStashFile stashed file
 	 */",
@@ -16447,7 +16342,7 @@
 	 * @return Status
 	 */",
  "/**
-	 * Returns the virtual chunk location: 	
+	 * Returns the virtual chunk location:
 	 * @param unknown_type $index
 	 */",
  "/**
@@ -16455,26 +16350,26 @@
 	 *
 	 * @param $chunkPath path to temporary chunk file
 	 * @param $chunkSize size of the current chunk
-	 * @param $offset offset of current chunk ( mutch match database chunk offset ) 
+	 * @param $offset offset of current chunk ( mutch match database chunk offset )
 	 * @return Status
 	 */",
  "/**
-	 * Update the chunk db table with the current status: 
+	 * Update the chunk db table with the current status:
 	 */",
  "/**
 	 * Get the chunk db state and populate update relevant local values
 	 */",
  "/**
-	 * Get the current Chunk index 
+	 * Get the current Chunk index
 	 * @return Integer index of the current chunk
 	 */",
  "/**
-	 * Gets the current offset in fromt the stashedupload table 
-	 * @return Integer current byte offset of the chunk file set 
+	 * Gets the current offset in fromt the stashedupload table
+	 * @return Integer current byte offset of the chunk file set
 	 */",
  "/**
 	 * Output the chunk to disk
-	 * 
+	 *
 	 * @param $chunkPath string
 	 */",
  "/**
@@ -16796,7 +16691,7 @@
 	 */",
  "/**
 	 * Return either a MediaTransformError or placeholder thumbnail (if $wgIgnoreImageErrors)
-	 * 
+	 *
 	 * @param $thumbPath string Thumbnail storage path
 	 * @param $thumbUrl string Thumbnail URL
 	 * @param $params Array
@@ -17413,7 +17308,7 @@
 	 */",
  "/**
 	 * Register lock managers from the global variables
-	 * 
+	 *
 	 * @return void
 	 */",
  "/**
@@ -17432,7 +17327,7 @@
 	 */",
  "/**
  * Class to handle file lock manager registration
- * 
+ *
  * @ingroup LockManager
  * @author Aaron Schulz
  * @since 1.19
@@ -17454,7 +17349,7 @@
  * @file
  * @ingroup Testing
  * Copyright (C) 2010 Nadeesha Weerasinghe <nadeesha@calcey.com>
- * http://www.calcey.com/ 
+ * http://www.calcey.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18564,21 +18459,21 @@
 	 */",
  "/**
 	 * Sanity check a relative file system path for validity
-	 * 
+	 *
 	 * @param $path string Normalized relative path
 	 * @return bool
 	 */",
  "/**
 	 * Given the short (unresolved) and full (resolved) name of
 	 * a container, return the file system path of the container.
-	 * 
+	 *
 	 * @param $shortCont string
 	 * @param $fullCont string
-	 * @return string|null 
+	 * @return string|null
 	 */",
  "/**
 	 * Get the absolute file system path for a storage path
-	 * 
+	 *
 	 * @param $storagePath string Storage path
 	 * @return string|null
 	 */",
@@ -18642,11 +18537,11 @@
 	 */",
  "/**
  * Class for a file system (FS) based file backend.
- * 
+ *
  * All \"containers\" each map to a directory under the backend\'s base directory.
  * For backwards-compatibility, some container paths can be set to custom paths.
  * The wiki ID will not be used in any custom paths, so this should be avoided.
- * 
+ *
  * Having directories with thousands of files will diminish performance.
  * Sharding can be accomplished by using FileRepo-style hash paths.
  *
@@ -18659,13 +18554,7 @@
  "/**
 	 * @param $dir string file system directory
 	 */",
- "/**
-*WrapperaroundRecursiveDirectoryIteratorthatcatches
-*exceptionordoesanycustombehavoirthatwemaywant.
-*DonotusethisclassfromplacesoutsideFSFileBackend.
-*
-*@ingroupFileBackend
-*/",
+
  "/**
 	 * @expectedException UsageException
 	 */",
@@ -18727,37 +18616,6 @@
 	 * Set headers, titles and other bits
 	 */",
  "/**
-	*Istheprovided`oldimage`valuevalid?
-	*
-	*@returnbool
-	*/",
- "/**
-	*Couldwedeletethefilespecified?Ifan`oldimage`
-	*valuewasprovided,doesitcorrespondtoan
-	*existing,local,oldversionofthisfile?
-	*
-	*@param$fileFile
-	*@param$oldfileFile
-	*@param$oldimageFile
-	*@returnbool
-	*/",
- "/**
-	*Preparetheformaction
-	*
-	*@returnstring
-	*/",
- "/**
-	*Extractthetimestampoftheoldversion
-	*
-	*@returnstring
-	*/",
- "/**
-*Filedeletionuserinterface
-*
-*@ingroupMedia
-*@authorRobChurch<robchur@gmail.com>
-*/",
- "/**
 	 * @return GenderCache
 	 */",
  "/**
@@ -18815,78 +18673,78 @@
 	 * Save the cache to a local file.
 	 */",
  "/**
-	*Setthecacheto$cache,ifitisvalid.Otherwisesetthecachetofalse.
+
 	*
-	*@returnbool
+
 	*/",
  "/**
-	*Loadsmessagesfromcachesorfromdatabaseinthisorder:
-	*(1)localmessagecache(if$wgUseLocalMessageCacheisenabled)
-	*(2)memcached
-	*(3)fromthedatabase.
+
+
+
+
 	*
-	*Whensuccesfullyloadingfrom(2)or(3),allhigherlevelcachesare
-	*updatedforthenewestversion.
+
+
 	*
-	*NothingisloadedifmembervariablemDisableistrue,eithermanually
-	*setbycallingcodeorifmessageloadingfails(isthispossible?).
+
+
 	*
-	*Returnstrueifcacheisalreadypopulatedoritwassuccesfullypopulated,
-	*orfalseifpopulatingemptycachefails.AlsoreturnstrueifMessageCache
-	*isdisabled.
+
+
+
 	*
-	*@param$codeString:languagetowhichloadmessages
+
 	*/",
  "/**
-	*Loadscacheablemessagesfromthedatabase.Messagesbiggerthan
-	*$wgMaxMsgCacheEntrySizeareassignedaspecialvalue,andareloaded
-	*on-demandfromthedatabaselater.
+
+
+
 	*
-	*@param$codeString:languagecode.
-	*@returnArray:loadedmessagesforstoringincaches.
+
+
 	*/",
  "/**
-	*Updatescacheasnecessarywhenmessagepageischanged
+
 	*
-	*@param$titleString:nameofthepagechanged.
-	*@param$textMixed:newcontentsofthepage.
+
+
 	*/",
  "/**
-	*Shortcuttoupdatecaches.
+
 	*
-	*@param$cacheArray:cachedmessageswithaversion.
-	*@param$memcBool:Wethertoupdateornotmemcache.
-	*@param$codeString:Languagecode.
-	*@returnFalseonsomekindoferror.
+
+
+
+
 	*/",
  "/**
-	*Representsawritelockonthemessageskey
+
 	*
-	*@param$keystring
+
 	*
-	*@returnBoolean:success
+
 	*/",
  "/**
-		*Recordeachmessagerequest,butonlyonceperrequest.
-		*Thisinformationisnotusedunless$wgAdaptiveMessageCache
-		*isenabled.
+
+
+
 		*/",
  "/**
-	*Getamessagefromeitherthecontentlanguageortheuserlanguage.
+
 	*
-	*@param$keyString:themessagecachekey
-	*@param$useDBBoolean:getthemessagefromtheDB,falsetouseonly
-	*thelocalisation
-	*@param$langcodeString:codeofthelanguagetogetthemessagefor,if
-	*itisavalidcodecreatealanguageforthatlanguage,
-	*ifitisastringbutnotavalidcodethenmakeabasic
-	*languageobject,ifitisafalsebooleanthenusethe
-	*currentuserslanguage(asafallbackfortheold
-	*parameterfunctionality),orifitisatrueboolean
-	*thenusethewikiscontentlanguage(alsoasa
-	*fallback).
-	*@param$isFullKeyBoolean:specifieswhether$keyisatwopartkey
-	*\"msg/lang\".
+
+
+
+
+
+
+
+
+
+
+
+
+
 	 *
 	 * @return string|false
 	 */",
@@ -20037,7 +19895,7 @@
 	 * @return array
 	 */",
  "/**
-	 * Get a StripState object which is sufficient to unstrip the given text. 
+	 * Get a StripState object which is sufficient to unstrip the given text.
 	 * It will contain the minimum subset of strip items necessary.
 	 *
 	 * @param $text string
@@ -20214,7 +20072,7 @@
  * @file
  * @ingroup Testing
  * Copyright (C) 2010 Nadeesha Weerasinghe <nadeesha@calcey.com>
- * http://www.calcey.com/ 
+ * http://www.calcey.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20762,7 +20620,7 @@
 	 *       array( \'Microsoft-IIS/7\', \'expected\' ),
 	 *    ),
 	 * If you want to add other HTTP server name, you will have to add a new
-	 * testing method much like the testEncodingUrlWith() method above. 
+	 * testing method much like the testEncodingUrlWith() method above.
 	 */",
  "/**
  * Tests for includes/GlobalFunctions.php -> wfUrlencode()
@@ -20983,35 +20841,35 @@
 	 * @return Status:
 	 */",
  "/**
-	*SafewrapperforPHP\'srealpath()thatfailsgracefullyifit\'sunabletocanonicalizethepath.
+
 	*
-	*@param$pathstring
+
 	*
-	*@returnstring
+
 	*/",
  "/**
-	*@returnStatus
+
 	*/",
  "/**
-	*@param$dir
-	*@param$createbool
-	*@returnStatus
+
+
+
 	*/",
  "/**
-	*@returnStatus
+
 	*/",
  "/**
-	*@returnbool
+
 	*/",
  "/**
-	*@returnStatus
+
 	*/",
  "/**
-	*@returnStaus
+
 	*/",
  "/**
-	*@param$statusStatus
-	*@returnStatus
+
+
 	*/",
  "/**
 	 * @return string
@@ -21508,7 +21366,7 @@
 	 *
 	 * @param $data Mixed: value to guess type for
 	 * @exception MWException Unsupported datatype
-	 * @return Type constant 
+	 * @return Type constant
 	 */",
  "/**
 	 * Verify the given option name exist.
@@ -21555,7 +21413,7 @@
 	 */",
  "/**
 	 * Validate and set an option integer value
-	 * The value will be altered to fit in the range. 
+	 * The value will be altered to fit in the range.
 	 *
 	 * @param $name String: option name
 	 * @param $min Int: minimum value
@@ -21589,7 +21447,7 @@
  * Copyright ?? 2011, Antoine Musso
  *
  * @author Niklas Laxstr??m
- * @author Antoine Musso 
+ * @author Antoine Musso
  */",
  "/**
 	 * Returns an HTML element in a string.  The major advantage here over
@@ -22614,7 +22472,7 @@
  * Custom job to perform updates on tables in busier environments
  */",
  "/**
- * Sample test suite. 
+ * Sample test suite.
  * Two ways to configure MW for these tests
  * 1) If you are running multiple test suites, add the following in LocalSettings.php
  * require_once(\"tests/selenium/SimpleSeleniumConfig.php\");
@@ -22679,9 +22537,9 @@
  */",
  "/**
  * Standard output handler for use with ob_start
- * 
+ *
  * @param $s string
- * 
+ *
  * @return string
  */",
  "/**
@@ -22695,7 +22553,7 @@
  "/**
  * Handler that compresses data with gzip if allowed by the Accept header.
  * Unlike ob_gzhandler, it works for HEAD requests too.
- * 
+ *
  * @param $s string
  *
  * @return string
@@ -23607,7 +23465,7 @@
 	 * This will return false if there was an error, the
 	 * thumbnail is to be handled client-side only, or if
 	 * transformation was deferred via TRANSFORM_LATER.
-	 * 
+	 *
 	 * @return Bool
 	 */",
  "/**
@@ -23650,7 +23508,7 @@
 	 * Get a thumbnail object from a file and parameters.
 	 * If $path is set to null, the output file is treated as a source copy.
 	 * If $path is set to false, no output file will be created.
-	 * 
+	 *
 	 * @param $file File object
 	 * @param $url String: URL path to the thumb
 	 * @param $width Integer: file\'s width
@@ -23839,43 +23697,43 @@
 	 * Get an instance of this class
 	 * @return MimeMagic
 	 */",
- "/** 
-	 * Returns a list of file extensions for a given mime type as a space 
+ "/**
+	 * Returns a list of file extensions for a given mime type as a space
 	 * separated string or null if the mime type was unrecognized. Resolves
 	 * mime type aliases.
-	 * 
+	 *
 	 * @param $mime string
 	 * @return string|null
 	 */",
- "/** 
-	 * Returns a list of mime types for a given file extension as a space 
+ "/**
+	 * Returns a list of mime types for a given file extension as a space
 	 * separated string or null if the extension was unrecognized.
-	 * 
+	 *
 	 * @param $ext string
 	 * @return string|null
 	 */",
- "/** 
+ "/**
 	 * Returns a single mime type for a given file extension or null if unknown.
 	 * This is always the first type from the list returned by getTypesForExtension($ext).
-	 * 
+	 *
 	 * @param $ext string
 	 * @return string|null
 	 */",
- "/** 
-	 * Tests if the extension matches the given mime type. Returns true if a 
-	 * match was found, null if the mime type is unknown, and false if the 
+ "/**
+	 * Tests if the extension matches the given mime type. Returns true if a
+	 * match was found, null if the mime type is unknown, and false if the
 	 * mime type is known but no matches where found.
-	 * 
+	 *
 	 * @param $extension string
 	 * @param $mime string
 	 * @return bool|null
 	 */",
- "/** 
-	 * Returns true if the mime type is known to represent an image format 
+ "/**
+	 * Returns true if the mime type is known to represent an image format
 	 * supported by the PHP GD library.
 	 *
 	 * @param $mime string
-	 * 
+	 *
 	 * @return bool
 	 */",
  "/**
@@ -23889,35 +23747,35 @@
 	 *       right now this is the bare minimum getimagesize() list.
 	 * @return bool
 	 */",
- "/** 
+ "/**
 	 * Improves a mime type using the file extension. Some file formats are very generic,
-	 * so their mime type is not very meaningful. A more useful mime type can be derived 
-	 * by looking at the file extension. Typically, this method would be called on the 
+	 * so their mime type is not very meaningful. A more useful mime type can be derived
+	 * by looking at the file extension. Typically, this method would be called on the
 	 * result of guessMimeType().
-	 * 
+	 *
 	 * Currently, this method does the following:
 	 *
 	 * If $mime is \"unknown/unknown\" and isRecognizableExtension( $ext ) returns false,
-	 * return the result of guessTypesForExtension($ext). 
+	 * return the result of guessTypesForExtension($ext).
 	 *
 	 * If $mime is \"application/x-opc+zip\" and isMatchingExtension( $ext, $mime )
-	 * gives true, return the result of guessTypesForExtension($ext). 
+	 * gives true, return the result of guessTypesForExtension($ext).
 	 *
 	 * @param $mime String: the mime type, typically guessed from a file\'s content.
 	 * @param $ext String: the file extension, as taken from the file name
 	 *
 	 * @return string the mime type
 	 */",
- "/** 
-	 * Mime type detection. This uses detectMimeType to detect the mime type 
-	 * of the file, but applies additional checks to determine some well known 
-	 * file formats that may be missed or misinterpreter by the default mime 
-	 * detection (namely XML based formats like XHTML or SVG, as well as ZIP 
+ "/**
+	 * Mime type detection. This uses detectMimeType to detect the mime type
+	 * of the file, but applies additional checks to determine some well known
+	 * file formats that may be missed or misinterpreter by the default mime
+	 * detection (namely XML based formats like XHTML or SVG, as well as ZIP
 	 * based formats like OPC/ODF files).
 	 *
 	 * @param $file String: the file to check
 	 * @param $ext Mixed: the file extension, or true (default) to extract it from the filename.
-	 *             Set it to false to ignore the extension. DEPRECATED! Set to false, use 
+	 *             Set it to false to ignore the extension. DEPRECATED! Set to false, use
 	 *             improveTypeFromExtension($mime, $ext) later to improve mime type.
 	 *
 	 * @return string the mime type of $file
@@ -23942,25 +23800,25 @@
 	 * @param $header String: some reasonably-sized chunk of file header
 	 * @param $tail   String: the tail of the file
 	 * @param $ext Mixed: the file extension, or true to extract it from the filename.
-	 *             Set it to false (default) to ignore the extension. DEPRECATED! Set to false, 
+	 *             Set it to false (default) to ignore the extension. DEPRECATED! Set to false,
 	 *             use improveTypeFromExtension($mime, $ext) later to improve mime type.
 	 *
 	 * @return string
 	 */",
- "/** 
-	 * Internal mime type detection. Detection is done using an external 
-	 * program, if $wgMimeDetectorCommand is set. Otherwise, the fileinfo 
-	 * extension and mime_content_type are tried (in this order), if they 
-	 * are available. If the dections fails and $ext is not false, the mime 
+ "/**
+	 * Internal mime type detection. Detection is done using an external
+	 * program, if $wgMimeDetectorCommand is set. Otherwise, the fileinfo
+	 * extension and mime_content_type are tried (in this order), if they
+	 * are available. If the dections fails and $ext is not false, the mime
 	 * type is guessed from the file extension, using guessTypesForExtension.
-	 * 
-	 * If the mime type is still unknown, getimagesize is used to detect the 
-	 * mime type if the file is an image. If no mime type can be determined, 
+	 *
+	 * If the mime type is still unknown, getimagesize is used to detect the
+	 * mime type if the file is an image. If no mime type can be determined,
 	 * this function returns \'unknown/unknown\'.
 	 *
 	 * @param $file String: the file to check
 	 * @param $ext Mixed: the file extension, or true (default) to extract it from the filename.
-	 *             Set it to false to ignore the extension. DEPRECATED! Set to false, use 
+	 *             Set it to false to ignore the extension. DEPRECATED! Set to false, use
 	 *             improveTypeFromExtension($mime, $ext) later to improve mime type.
 	 *
 	 * @return string the mime type of $file
@@ -23981,7 +23839,7 @@
 	 *
 	 * @return (int?string?) a value to be used with the MEDIATYPE_xxx constants.
 	 */",
- "/** 
+ "/**
 	 * Returns a media code matching the given mime type or file extension.
 	 * File extensions are represented by a string starting with a dot (.) to
 	 * distinguish them from mime types.
@@ -23990,7 +23848,7 @@
 	 * @access private
 	 */",
  "/**
-	 * Get the MIME types that various versions of Internet Explorer would 
+	 * Get the MIME types that various versions of Internet Explorer would
 	 * detect from a chunk of the content.
 	 *
 	 * @param $fileName String: the file name (unused at present)
@@ -24531,7 +24389,7 @@
 	 *    shardViaHashLevels : Map of container names to sharding config with:
 	 *                         \'base\'   : base of hash characters, 16 or 36
 	 *                         \'levels\' : the number of hash levels (and digits)
-	 *                         \'repeat\' : hash subdirectories are prefixed with all the 
+	 *                         \'repeat\' : hash subdirectories are prefixed with all the
 	 *                                    parent hash directory names (e.g. \"a/ab/abc\")
 	 */",
  "/**
@@ -24566,7 +24424,7 @@
 	 */",
  "/**
 	 * Fill in any missing object metadata and save it to Swift
-	 * 
+	 *
 	 * @param $obj CF_Object
 	 * @param $path string Storage path to object
 	 * @return bool Success
@@ -24580,7 +24438,7 @@
 	 */",
  "/**
 	 * Do not call this function outside of SwiftFileBackendFileList
-	 * 
+	 *
 	 * @param $fullCont string Resolved container name
 	 * @param $dir string Resolved storage directory with no trailing slash
 	 * @param $after string Storage path of file to list items after
@@ -24598,11 +24456,11 @@
 	 */",
  "/**
 	 * Get headers to send to Swift when reading a file based
-	 * on a FileBackend params array, e.g. that of getLocalCopy(). 
+	 * on a FileBackend params array, e.g. that of getLocalCopy().
 	 * $params is currently only checked for a \'latest\' flag.
-	 * 
+	 *
 	 * @param $params Array
-	 * @return Array 
+	 * @return Array
 	 */",
  "/**
 	 * Set read/write permissions for a Swift container
@@ -24643,7 +24501,7 @@
 	 */",
  "/**
 	 * Log an unexpected exception for this backend
-	 * 
+	 *
 	 * @param $e Exception
 	 * @param $func string
 	 * @param $params Array
@@ -24811,7 +24669,7 @@
  "/**
 	 * Create a new backend instance from configuration.
 	 * This should only be called from within FileBackendGroup.
-	 * 
+	 *
 	 * $config includes:
 	 *     \'name\'        : The unique name of this backend.
 	 *                     This should consist of alphanumberic, \'-\', and \'_\' characters.
@@ -24821,24 +24679,24 @@
 	 *     \'lockManager\' : Registered name of a file lock manager to use.
 	 *     \'readOnly\'    : Write operations are disallowed if this is a non-empty string.
 	 *                     It should be an explanation for the backend being read-only.
-	 * 
+	 *
 	 * @param $config Array
 	 */",
  "/**
 	 * Get the unique backend name.
 	 * We may have multiple different backends of the same type.
 	 * For example, we can have two Swift backends using different proxies.
-	 * 
+	 *
 	 * @return string
 	 */",
  "/**
 	 * Check if this backend is read-only
-	 * 
+	 *
 	 * @return bool
 	 */",
  "/**
 	 * Get an explanatory message if this backend is read-only
-	 * 
+	 *
 	 * @return string|false Returns falls if the backend is not read-only
 	 */",
  "/**
@@ -24846,10 +24704,10 @@
 	 * Callers supply an ordered list of operations to perform as a transaction.
 	 * Files will be locked, the stat cache cleared, and then the operations attempted.
 	 * If any serious errors occur, all attempted operations will be rolled back.
-	 * 
+	 *
 	 * $ops is an array of arrays. The outer array holds a list of operations.
 	 * Each inner array is a set of key value pairs that specify an operation.
-	 * 
+	 *
 	 * Supported operations and their parameters:
 	 * a) Create a new file in storage with the contents of a string
 	 *     array(
@@ -24893,7 +24751,7 @@
 	 *     array(
 	 *         \'op\'                  => \'null\',
 	 *     )
-	 * 
+	 *
 	 * Boolean flags for operations (operation-specific):
 	 * \'ignoreMissingSource\' : The operation will simply succeed and do
 	 *                         nothing if the source file does not exist.
@@ -24901,7 +24759,7 @@
 	 * \'overwriteSame\'       : An error will not be given if a file already
 	 *                         exists at the destination that has the same
 	 *                         contents as the new contents to be written there.
-	 * 
+	 *
 	 * $opts is an associative of boolean flags, including:
 	 * \'force\'               : Errors that would normally cause a rollback do not.
 	 *                         The remaining operations are still attempted if any fail.
@@ -24911,19 +24769,19 @@
 	 * \'allowStale\'          : Don\'t require the latest available data.
 	 *                         This can increase performance for non-critical writes.
 	 *                         This has no effect unless the \'force\' flag is set.
-	 * 
+	 *
 	 * Remarks on locking:
 	 * File system paths given to operations should refer to files that are
 	 * already locked or otherwise safe from modification from other processes.
 	 * Normally these files will be new temp files, which should be adequate.
-	 * 
+	 *
 	 * Return value:
 	 * This returns a Status, which contains all warnings and fatals that occured
 	 * during the operation. The \'failCount\', \'successCount\', and \'success\' members
 	 * will reflect each operation attempted. The status will be \"OK\" unless:
 	 *     a) unexpected operation errors occurred (network partitions, disk full...)
 	 *     b) significant operation errors occured and \'force\' was not set
-	 * 
+	 *
 	 * @param $ops Array List of operations to execute in order
 	 * @param $opts Array Batch operation options
 	 * @return Status
@@ -25008,10 +24866,10 @@
 	 * Prepare a storage directory for usage.
 	 * This will create any required containers and parent directories.
 	 * Backends using key/value stores only need to create the container.
-	 * 
+	 *
 	 * $params include:
 	 *     dir : storage directory
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Status
 	 */",
@@ -25024,12 +24882,12 @@
 	 * files whereas key/value store backends might restrict container
 	 * access to the auth user that represents end-users in web request.
 	 * This is not guaranteed to actually do anything.
-	 * 
+	 *
 	 * $params include:
 	 *     dir       : storage directory
 	 *     noAccess  : try to deny file access
 	 *     noListing : try to deny file listing
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Status
 	 */",
@@ -25040,10 +24898,10 @@
 	 * Delete a storage directory if it is empty.
 	 * Backends using key/value stores may do nothing unless the directory
 	 * is that of an empty container, in which case it should be deleted.
-	 * 
+	 *
 	 * $params include:
 	 *     dir : storage directory
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Status
 	 */",
@@ -25053,42 +24911,42 @@
  "/**
 	 * Check if a file exists at a storage path in the backend.
 	 * This returns false if only a directory exists at the path.
-	 * 
+	 *
 	 * $params include:
 	 *     src    : source storage path
 	 *     latest : use the latest available data
-	 * 
+	 *
 	 * @param $params Array
 	 * @return bool|null Returns null on failure
 	 */",
  "/**
 	 * Get the last-modified timestamp of the file at a storage path.
-	 * 
+	 *
 	 * $params include:
 	 *     src    : source storage path
 	 *     latest : use the latest available data
-	 * 
+	 *
 	 * @param $params Array
 	 * @return string|false TS_MW timestamp or false on failure
 	 */",
  "/**
 	 * Get the contents of a file at a storage path in the backend.
 	 * This should be avoided for potentially large files.
-	 * 
+	 *
 	 * $params include:
 	 *     src    : source storage path
 	 *     latest : use the latest available data
-	 * 
+	 *
 	 * @param $params Array
 	 * @return string|false Returns false on failure
 	 */",
  "/**
 	 * Get the size (bytes) of a file at a storage path in the backend.
-	 * 
+	 *
 	 * $params include:
 	 *     src    : source storage path
 	 *     latest : use the latest available data
-	 * 
+	 *
 	 * @param $params Array
 	 * @return integer|false Returns false on failure
 	 */",
@@ -25099,32 +24957,32 @@
 	 *     mtime  : the last-modified timestamp (TS_MW)
 	 *     size   : the file size (bytes)
 	 * Additional values may be included for internal use only.
-	 * 
+	 *
 	 * $params include:
 	 *     src    : source storage path
 	 *     latest : use the latest available data
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Array|false|null Returns null on failure
 	 */",
  "/**
 	 * Get a SHA-1 hash of the file at a storage path in the backend.
-	 * 
+	 *
 	 * $params include:
 	 *     src    : source storage path
 	 *     latest : use the latest available data
-	 * 
+	 *
 	 * @param $params Array
 	 * @return string|false Hash string or false on failure
 	 */",
  "/**
 	 * Get the properties of the file at a storage path in the backend.
 	 * Returns FSFile::placeholderProps() on failure.
-	 * 
+	 *
 	 * $params include:
 	 *     src    : source storage path
 	 *     latest : use the latest available data
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Array
 	 */",
@@ -25134,12 +24992,12 @@
 	 * Appropriate HTTP headers (Status, Content-Type, Content-Length)
 	 * must be sent if streaming began, while none should be sent otherwise.
 	 * Implementations should flush the output buffer before sending data.
-	 * 
+	 *
 	 * $params include:
 	 *     src     : source storage path
 	 *     headers : additional HTTP headers to send on success
 	 *     latest  : use the latest available data
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Status
 	 */",
@@ -25150,16 +25008,16 @@
 	 *    The temporary copy will have the same extension as the source.
 	 * b) An original of the file at a storage path in the backend.
 	 * Temporary files may be purged when the file object falls out of scope.
-	 * 
+	 *
 	 * Write operations should *never* be done on this file as some backends
 	 * may do internal tracking or may be instances of FileBackendMultiWrite.
 	 * In that later case, there are copies of the file that must stay in sync.
 	 * Additionally, further calls to this function may return the same file.
-	 * 
+	 *
 	 * $params include:
 	 *     src    : source storage path
 	 *     latest : use the latest available data
-	 * 
+	 *
 	 * @param $params Array
 	 * @return FSFile|null Returns null on failure
 	 */",
@@ -25167,24 +25025,24 @@
 	 * Get a local copy on disk of the file at a storage path in the backend.
 	 * The temporary copy will have the same file extension as the source.
 	 * Temporary files may be purged when the file object falls out of scope.
-	 * 
+	 *
 	 * $params include:
 	 *     src    : source storage path
 	 *     latest : use the latest available data
-	 * 
+	 *
 	 * @param $params Array
 	 * @return TempFSFile|null Returns null on failure
 	 */",
  "/**
 	 * Get an iterator to list out all stored files under a storage directory.
-	 * If the directory is of the form \"mwstore://backend/container\", 
+	 * If the directory is of the form \"mwstore://backend/container\",
 	 * then all files in the container should be listed.
 	 * If the directory is of form \"mwstore://backend/container/dir\",
 	 * then all files under that container directory should be listed.
 	 * Results should be storage paths relative to the given directory.
-	 * 
+	 *
 	 * Storage backends with eventual consistency might return stale data.
-	 * 
+	 *
 	 * $params include:
 	 *     dir : storage path directory
 	 *
@@ -25200,16 +25058,16 @@
  "/**
 	 * Lock the files at the given storage paths in the backend.
 	 * This will either lock all the files or none (on failure).
-	 * 
+	 *
 	 * Callers should consider using getScopedFileLocks() instead.
-	 * 
+	 *
 	 * @param $paths Array Storage paths
 	 * @param $type integer LockManager::LOCK_* constant
 	 * @return Status
 	 */",
  "/**
 	 * Unlock the files at the given storage paths in the backend.
-	 * 
+	 *
 	 * @param $paths Array Storage paths
 	 * @param $type integer LockManager::LOCK_* constant
 	 * @return Status
@@ -25218,10 +25076,10 @@
 	 * Lock the files at the given storage paths in the backend.
 	 * This will either lock all the files or none (on failure).
 	 * On failure, the status object will be updated with errors.
-	 * 
+	 *
 	 * Once the return value goes out scope, the locks will be released and
 	 * the status updated. Unlock fatals will not change the status \"OK\" value.
-	 * 
+	 *
 	 * @param $paths Array Storage paths
 	 * @param $type integer LockManager::LOCK_* constant
 	 * @param $status Status Status to update on lock/unlock
@@ -25230,12 +25088,12 @@
  "/**
 	 * Check if a given path is a \"mwstore://\" path.
 	 * This does not do any further validation or any existence checks.
-	 * 
+	 *
 	 * @param $path string
 	 * @return bool
 	 */",
  "/**
-	 * Split a storage path into a backend name, a container name, 
+	 * Split a storage path into a backend name, a container name,
 	 * and a relative file path. The relative path may be the empty string.
 	 * This does not do any path normalization or traversal checks.
 	 *
@@ -25245,29 +25103,13 @@
  "/**
 	 * Normalize a storage path by cleaning up directory separators.
 	 * Returns null if the path is not of the format of a valid storage path.
-	 * 
-	 * @param $storagePath string
-	 * @return string|null 
-	 */",
- "/**
-	*Validateandnormalizearelativestoragepath.
-	*Nullisreturnedifthepathinvolvesdirectorytraversal.
-	*TraversalisinsecureforFSbackendsandbrokenforothers.
-	*
-	*@param$pathstringStoragepathrelativetoacontainer
-	*@returnstring|null
-	*/",
- "/**
-	*Gettheparentstoragedirectoryofastoragepath.
-	*Thisreturnsapathlike\"mwstore://backend/container\",
-	 * \"mwstore://backend/container/...\", or null if there is no parent.
-	 * 
+	 *
 	 * @param $storagePath string
 	 * @return string|null
 	 */",
  "/**
 	 * Get the final extension from a storage or FS path
-	 * 
+	 *
 	 * @param $path string
 	 * @return string
 	 */",
@@ -25276,23 +25118,23 @@
  *
  * This class defines the methods as abstract that subclasses must implement.
  * Outside callers can assume that all backends will have these functions.
- * 
+ *
  * All \"storage paths\" are of the format \"mwstore://backend/container/path\".
  * The paths use UNIX file system (FS) notation, though any particular backend may
  * not actually be using a local filesystem. Therefore, the paths are only virtual.
- * 
+ *
  * Backend contents are stored under wiki-specific container names by default.
  * For legacy reasons, this has no effect for the FS backend class, and per-wiki
  * segregation must be done by setting the container paths appropriately.
- * 
+ *
  * FS-based backends are somewhat more restrictive due to the existence of real
  * directory files; a regular file cannot have the same name as a directory. Other
  * backends with virtual directories may not have this limitation. Callers should
  * store files in such a way that no files and directories are under the same path.
- * 
+ *
  * Methods should avoid throwing exceptions at all costs.
  * As a corollary, external dependencies should be kept to a minimum.
- * 
+ *
  * @ingroup FileBackend
  * @since 1.19
  */",
@@ -25300,8 +25142,8 @@
 	 * Get the maximum allowable file size given backend
 	 * medium restrictions and basic performance constraints.
 	 * Do not call this function from places outside FileBackend and FileOp.
-	 * 
-	 * @return integer Bytes 
+	 *
+	 * @return integer Bytes
 	 */",
  "/**
 	 * Check if a file can be created at a given storage path.
@@ -25314,12 +25156,12 @@
  "/**
 	 * Create a file in the backend with the given contents.
 	 * Do not call this function from places outside FileBackend and FileOp.
-	 * 
+	 *
 	 * $params include:
 	 *     content       : the raw file contents
 	 *     dst           : destination storage path
 	 *     overwrite     : overwrite any file that exists at the destination
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Status
 	 */",
@@ -25329,12 +25171,12 @@
  "/**
 	 * Store a file into the backend from a file on disk.
 	 * Do not call this function from places outside FileBackend and FileOp.
-	 * 
+	 *
 	 * $params include:
 	 *     src           : source path on disk
 	 *     dst           : destination storage path
 	 *     overwrite     : overwrite any file that exists at the destination
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Status
 	 */",
@@ -25344,12 +25186,12 @@
  "/**
 	 * Copy a file from one storage path to another in the backend.
 	 * Do not call this function from places outside FileBackend and FileOp.
-	 * 
+	 *
 	 * $params include:
 	 *     src           : source storage path
 	 *     dst           : destination storage path
 	 *     overwrite     : overwrite any file that exists at the destination
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Status
 	 */",
@@ -25359,11 +25201,11 @@
  "/**
 	 * Delete a file at the storage path.
 	 * Do not call this function from places outside FileBackend and FileOp.
-	 * 
+	 *
 	 * $params include:
 	 *     src                 : source storage path
 	 *     ignoreMissingSource : do nothing if the source file does not exist
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Status
 	 */",
@@ -25373,12 +25215,12 @@
  "/**
 	 * Move a file from one storage path to another in the backend.
 	 * Do not call this function from places outside FileBackend and FileOp.
-	 * 
+	 *
 	 * $params include:
 	 *     src           : source storage path
 	 *     dst           : destination storage path
 	 *     overwrite     : overwrite any file that exists at the destination
-	 * 
+	 *
 	 * @param $params Array
 	 * @return Status
 	 */",
@@ -25446,13 +25288,13 @@
 	 * @see FileBackendStore::streamFile()
 	 */",
  "/**
-	 * @copydoc FileBackend::getFileList() 
+	 * @copydoc FileBackend::getFileList()
 	 */",
  "/**
 	 * Do not call this function from places outside FileBackend
 	 *
 	 * @see FileBackendStore::getFileList()
-	 * 
+	 *
 	 * @param $container string Resolved container name
 	 * @param $dir string Resolved path relative to container
 	 * @param $params Array
@@ -25460,7 +25302,7 @@
 	 */",
  "/**
 	 * Get the list of supported operations and their corresponding FileOp classes.
-	 * 
+	 *
 	 * @return Array
 	 */",
  "/**
@@ -25469,7 +25311,7 @@
 	 *
 	 * The result must have the same number of items as the input.
 	 * An exception is thrown if an unsupported operation is requested.
-	 * 
+	 *
 	 * @param $ops Array Same format as doOperations()
 	 * @return Array List of FileOp objects
 	 * @throws MWException
@@ -25482,26 +25324,26 @@
 	 */",
  "/**
 	 * Clears any additional stat caches for storage paths
-	 * 
+	 *
 	 * @see FileBackend::clearCache()
-	 * 
+	 *
 	 * @param $paths Array Storage paths (optional)
 	 * @return void
 	 */",
  "/**
 	 * Prune the inexpensive cache if it is too big to add an item
-	 * 
+	 *
 	 * @return void
 	 */",
  "/**
 	 * Prune the expensive cache if it is too big to add an item
-	 * 
+	 *
 	 * @return void
 	 */",
  "/**
 	 * Check if a container name is valid.
 	 * This checks for for length and illegal characters.
-	 * 
+	 *
 	 * @param $container string
 	 * @return bool
 	 */",
@@ -25545,23 +25387,23 @@
 	 */",
  "/**
 	 * Get a list of full container shard suffixes for a container
-	 * 
+	 *
 	 * @param $container string
-	 * @return Array 
+	 * @return Array
 	 */",
  "/**
 	 * Get the full container name, including the wiki ID prefix
-	 * 
+	 *
 	 * @param $container string
-	 * @return string 
+	 * @return string
 	 */",
  "/**
 	 * Resolve a container name, checking if it\'s allowed by the backend.
 	 * This is intended for internal use, such as encoding illegal chars.
 	 * Subclasses can override this to be more restrictive.
-	 * 
+	 *
 	 * @param $container string
-	 * @return string|null 
+	 * @return string|null
 	 */",
  "/**
 	 * Resolve a relative storage path, checking if it\'s allowed by the backend.
@@ -25578,11 +25420,11 @@
  *
  * This class defines the methods as abstract that subclasses must implement.
  * Outside callers should *not* use functions with \"Internal\" in the name.
- * 
+ *
  * The FileBackend operations are implemented using basic functions
  * such as storeInternal(), copyInternal(), deleteInternal() and the like.
  * This class is also responsible for path resolution and sanitization.
- * 
+ *
  * @ingroup FileBackend
  * @since 1.19
  */",
@@ -26016,14 +25858,14 @@
  "/**
 	 * Make a new temporary file on the file system.
 	 * Temporary files may be purged when the file object falls out of scope.
-	 * 
+	 *
 	 * @param $prefix string
 	 * @param $extension string
-	 * @return TempFSFile|null 
+	 * @return TempFSFile|null
 	 */",
  "/**
 	 * Purge this file off the file system
-	 * 
+	 *
 	 * @return bool Success
 	 */",
  "/**
@@ -26763,7 +26605,7 @@
  * @file
  * @ingroup Testing
  * Copyright (C) 2010 Nadeesha Weerasinghe <nadeesha@calcey.com>
- * http://www.calcey.com/ 
+ * http://www.calcey.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26941,13 +26783,7 @@ and the various metadata extractors.
 	 * @dataProvider provideDottedAndDotlessI
 	 */",
  "/** Tests for MediaWiki languages/LanguageTr.php */",
- "/**
-*Amodulethatallowsforeditingandcreatingpages.
-*
-*Currently,thiswrapsaroundtheEditPageclassinanuglyway,
-*EditPage.phpshouldberewrittentoprovideacleanerinterface
-*@ingroupAPI
-*/",
+
  "/**
 	 * ResourceLoaderRegisterModules hook
 	 */",
@@ -27527,14 +27363,14 @@ and the various metadata extractors.
 	* This turns an array of (for example) authors into a bulleted list.
 	*
 	* This is public on the basis it might be useful outside of this class.
-	* 
+	*
 	* @param $vals Array array of values
 	* @param $type String Type of array (either lang, ul, ol).
 	* lang = language assoc array with keys being the lang code
 	* ul = unordered list, ol = ordered list
 	* type can also come from the \'_type\' member of $vals.
 	* @param $noHtml Boolean If to avoid returning anything resembling
-	* html. (Ugly hack for backwards compatibility with old mediawiki). 
+	* html. (Ugly hack for backwards compatibility with old mediawiki).
 	* @return String single value (in wiki-syntax).
 	*/",
  "/** Helper function for creating lists of translations.
@@ -27584,7 +27420,7 @@ and the various metadata extractors.
 	 * @private
 	 */",
  "/** Fetch the human readable version of a news code.
-	 * A news code is an 8 digit code. The first two 
+	 * A news code is an 8 digit code. The first two
 	 * digits are a general classification, so we just
 	 * translate that.
 	 *
@@ -28128,7 +27964,7 @@ and the various metadata extractors.
 	 * Get the expiry time for a given action, by combining the relevant inputs.
 	 *
 	 * @param $action string
-	 * 
+	 *
 	 * @return string 14-char timestamp or \"infinity\", or false if the input was invalid
 	 */",
  "/**
@@ -28214,7 +28050,7 @@ and the various metadata extractors.
  * @author Shijualex
  * @author ??var Arnfj??r?? Bjarmason <avarab@gmail.com>
  */",
- "/** namespace translations from translatewiki.net 
+ "/** namespace translations from translatewiki.net
  * @author Shijualex
  * @author Psubhashish
  */",
@@ -29773,25 +29609,25 @@ and the various metadata extractors.
 	 * @return array
 	 */",
  "/**
-	*PickapartsomeCSSandcheckitforforbiddenorunsafestructures.
-	*Returnsasanitizedstring.Thissanitizedstringwillhave
-	*characterreferencesandescapesequencesdecoded,andcomments
-	*stripped.Iftheinputisjusttooevil,onlyacommentcomplaining
-	*aboutevilnesswillbereturned.
+
+
+
+
+
 	*
-	*CurrentlyURLreferences,\'expression\',\'tps\'areforbidden.
+
 	*
-	*NOTE:Despitethefactthatcharacterreferencesaredecoded,the
-	*returnedstringmaycontaincharacterreferencesgivencertain
-	*cleverinputstrings.Thesecharacterreferencesmust
-	*beescapedbeforethereturnvalueisembeddedinHTML.
+
+
+
+
 	*
-	*@param$valueString
-	*@returnString
+
+
 	*/",
  "/**
-	*@param$matchesarray
-	*@returnString
+
+
 	*/",
  "/**
 	 * Take a tag soup fragment listing an HTML element\'s attributes
@@ -30389,9 +30225,9 @@ and the various metadata extractors.
  "/** assertion helper expecting a magic output which is unpadded */",
  "/**
 	 * Main assertion helper for magic variables padding
-	 * @param $magic string Magic variable name 
+	 * @param $magic string Magic variable name
 	 * @param $value mixed Month or day
-	 * @param $format string sprintf format for $value 
+	 * @param $format string sprintf format for $value
 	 */",
  "/** helper to set the parser timestamp and revision timestamp */",
  "/**
@@ -30772,30 +30608,28 @@ and the various metadata extractors.
 	 * Make sure the router decodes urlencoding properly
 	 */",
  "/**
-	*Makesuretherouterdoesn\'tbreakonspecialcharacterslike$usedinregexpreplacements
-	*@dataProviderdataRegexpChars
+
+
 	*/",
  "/**
-	*Makesuretherouterhandlescharacterslike+&()properly
+
 	*/",
  "/**
-	*Makesuretherouterhandlesunicodecharacterscorrectly
-	*@dependstestSpecial
-	*@dependstestUrlencoding
-	*@dependstestCharacters
+
+
+
+
 	*/",
  "/**
-	*Ensuretherouterdoesn\'tchokeonlongpaths.
+
 	*/",
  "/**
-	*Ensurethatthephppassedsiteofparametervaluesarenoturldecoded
+
 	*/",
  "/**
-	*Ensurethatrawparametervaluesdonothaveanyvariablereplacementsorurldecoding
+
 	*/",
- "/**
-*TestsforthePathRouterparsing
-*/",
+
  "/**
 	 * Convert from the nominative form of a noun to some other case
 	 * Invoked with {{grammar:case|word}}
@@ -30850,7 +30684,7 @@ and the various metadata extractors.
 	 * request, without actually requesting a \"real\" edit token
 	 * @param $params: key-value API params
 	 * @param $session: session array
-	 * @param $user String|null A User object for the context 
+	 * @param $user String|null A User object for the context
 	 */",
  "/**
 	 * Returns a DerivativeContext with the request variables in place
@@ -31044,9 +30878,7 @@ and the various metadata extractors.
 	 * Validate the user parameters and set $this->archiveName and $this->file.
 	 * Throws an error if validation fails
 	 */",
- "/**
-*@ingroupAPI
-*/",
+
  "/** Inupiaq (I??upiak)
  *
  * See MessagesQqq.php for message documentation incl. usage of parameters
@@ -31108,23 +30940,23 @@ and the various metadata extractors.
  */",
  "/**
 	 * BeforePageDisplay hook
-	 * 
+	 *
 	 * Adds the modules to the page
-	 * 
+	 *
 	 * @param $out OutputPage output page
 	 * @param $skin Skin current skin
 	 */",
  "/**
 	 * GetPreferences hook
-	 * 
+	 *
 	 * Adds Vector-releated items to the preferences
-	 * 
+	 *
 	 * @param $user User current user
 	 * @param $defaultPreferences array list of default user preference controls
 	 */",
  "/**
 	 * ResourceLoaderGetConfigVars hook
-	 * 
+	 *
 	 * Adds enabled/disabled switches for Vector modules
 	 */",
  "/**
@@ -31133,7 +30965,7 @@ and the various metadata extractors.
 	 */",
  "/**
  * Hooks for Vector extension
- * 
+ *
  * @file
  * @ingroup Extensions
  */",
@@ -32819,7 +32651,7 @@ and the various metadata extractors.
  * @since 1.17
  */",
  "/**
-	 * Instanciates a FormOptions object to play with.	 
+	 * Instanciates a FormOptions object to play with.
 	 * FormOptions::add() is tested by the class FormOptionsInitializationTest
 	 * so we assume the function is well tested already an use it to create
 	 * the fixture.
@@ -32829,10 +32661,10 @@ and the various metadata extractors.
 	 * Reuse helpers above assertGuessBoolean assertGuessInt assertGuessString
 	 */",
  "/**
-	 * @expectedException MWException 
+	 * @expectedException MWException
 	 */",
  "/**
-	 * @expectedException MWException 
+	 * @expectedException MWException
 	 */",
  "/**
  * Test class for FormOptions methods.
@@ -32888,7 +32720,7 @@ and the various metadata extractors.
  */",
  "/**
 	 * Construct a new instance from configuration.
-	 * 
+	 *
 	 * $config paramaters include:
 	 *     \'dbServers\'   : Associative array of DB names to server configuration.
 	 *                     Configuration is an associative array that includes:
@@ -32907,7 +32739,7 @@ and the various metadata extractors.
 	 *                     This tells the DB server how long to wait before assuming
 	 *                     connection failure and releasing all the locks for a session.
 	 *
-	 * @param Array $config 
+	 * @param Array $config
 	 */",
  "/**
 	 * @see LockManager::doLock()
@@ -32959,14 +32791,14 @@ and the various metadata extractors.
 	 * Check if the last DB error for $lockDb indicates
 	 * that a requested resource was locked by another process.
 	 * This should avoid throwing any exceptions.
-	 * 
+	 *
 	 * @param $lockDb string
 	 * @return bool
 	 */",
  "/**
 	 * Checks if the DB has not recently had connection/query errors.
 	 * This just avoids wasting time on doomed connection attempts.
-	 * 
+	 *
 	 * @param $lockDb string
 	 * @return bool
 	 */",
@@ -33439,7 +33271,7 @@ and the various metadata extractors.
  */",
  "/**
 	 * Construct a new instance from configuration.
-	 * 
+	 *
 	 * $config includes:
 	 *     \'lockDirectory\' : Directory containing the lock files
 	 *
@@ -33450,14 +33282,14 @@ and the various metadata extractors.
 	 *
 	 * @param $path string
 	 * @param $type integer
-	 * @return Status 
+	 * @return Status
 	 */",
  "/**
 	 * Unlock a single resource key
-	 * 
+	 *
 	 * @param $path string
 	 * @param $type integer
-	 * @return Status 
+	 * @return Status
 	 */",
  "/**
 	 * Get the path to the lock file for a key
@@ -33556,7 +33388,7 @@ and the various metadata extractors.
 		 */",
  "/**
 	 * Construct a language selector appropriate for use in a form or preferences
-	 * 
+	 *
 	 * @param string $selected The language code of the selected language
 	 * @param boolean $customisedOnly If true only languages which have some content are listed
 	 * @param string $language The ISO code of the language to display the select list in (optional)
@@ -39546,8 +39378,8 @@ and the various metadata extractors.
 	 * @return Language
 	 */",
  "/**
-	 * Get the target language for the content being parsed. This is usually the 
-	 * language that the content is in. 
+	 * Get the target language for the content being parsed. This is usually the
+	 * language that the content is in.
 	 */",
  "/**
 	 * Get the language object for language conversion
@@ -40761,9 +40593,9 @@ and the various metadata extractors.
  */",
  "/**
 	 * Constructor.
-	 * 
+	 *
 	 * @since 1.19
-	 * 
+	 *
 	 * @param string $type
 	 * @param string $subtype
 	 */",
@@ -40778,44 +40610,44 @@ and the various metadata extractors.
 	 *   \'4:color\' => \'blue\',
 	 *   \'animal\' => \'dog\'
 	 * );
-	 * 
+	 *
 	 * @since 1.19
-	 * 
+	 *
 	 * @param $parameters Associative array
 	 */",
  "/**
 	 * Set the user that performed the action being logged.
-	 * 
+	 *
 	 * @since 1.19
-	 * 
+	 *
 	 * @param User $performer
 	 */",
  "/**
 	 * Set the title of the object changed.
-	 * 
+	 *
 	 * @since 1.19
-	 * 
+	 *
 	 * @param Title $target
 	 */",
  "/**
 	 * Set the timestamp of when the logged action took place.
-	 * 
+	 *
 	 * @since 1.19
-	 * 
+	 *
 	 * @param string $timestamp
 	 */",
  "/**
 	 * Set a comment associated with the action being logged.
-	 * 
+	 *
 	 * @since 1.19
-	 * 
+	 *
 	 * @param string $comment
 	 */",
  "/**
 	 * TODO: document
-	 * 
+	 *
 	 * @since 1.19
-	 * 
+	 *
 	 * @param integer $deleted
 	 */",
  "/**
@@ -41444,34 +41276,34 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Lock the resources at the given abstract paths
-	 * 
+	 *
 	 * @param $paths Array List of resource names
 	 * @param $type integer LockManager::LOCK_* constant
-	 * @return Status 
+	 * @return Status
 	 */",
  "/**
 	 * Unlock the resources at the given abstract paths
-	 * 
+	 *
 	 * @param $paths Array List of storage paths
 	 * @param $type integer LockManager::LOCK_* constant
-	 * @return Status 
+	 * @return Status
 	 */",
  "/**
 	 * Get the base 36 SHA-1 of a string, padded to 31 digits
-	 * 
+	 *
 	 * @param $path string
 	 * @return string
 	 */",
  "/**
 	 * Lock resources with the given keys and lock type
-	 * 
+	 *
 	 * @param $paths Array List of storage paths
 	 * @param $type integer LockManager::LOCK_* constant
 	 * @return string
 	 */",
  "/**
 	 * Unlock resources with the given keys and lock type
-	 * 
+	 *
 	 * @param $paths Array List of storage paths
 	 * @param $type integer LockManager::LOCK_* constant
 	 * @return string
@@ -41501,7 +41333,7 @@ and the various metadata extractors.
 	 * Get a ScopedLock object representing a lock on resource paths.
 	 * Any locks are released once this object goes out of scope.
 	 * The status object is updated with any errors or warnings.
-	 * 
+	 *
 	 * @param $manager LockManager
 	 * @param $paths Array List of storage paths
 	 * @param $type integer LockManager::LOCK_* constant
@@ -42312,7 +42144,7 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Remove files from the purge list
-	 * 
+	 *
 	 * @param array $files
 	 * @param array $options
 	 */",
@@ -42368,7 +42200,7 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Auth-less test of Title::isValidMoveOperation
-	 * 
+	 *
 	 * @group Database
 	 * @param string $source
 	 * @param string $target
@@ -42792,7 +42624,7 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Gets group name
-	 * 
+	 *
 	 * @return String: Name of group
 	 */",
  "/**
@@ -43229,7 +43061,7 @@ and the various metadata extractors.
  * @author Urhixidur
  */",
  "/**
-	 * Tests zTXt tag (compressed textual metadata) 
+	 * Tests zTXt tag (compressed textual metadata)
 	 */",
  "/**
 	 * Test tEXt tag (Uncompressed textual metadata)
@@ -44099,7 +43931,7 @@ and the various metadata extractors.
  */",
  "/**
 	 * Get a key on the primary cache for this repository.
-	 * Returns false if the repository\'s cache is not accessible at this site. 
+	 * Returns false if the repository\'s cache is not accessible at this site.
 	 * The parameters are the parts of the key, as for wfMemcKey().
 	 */",
  "/**
@@ -44508,8 +44340,8 @@ and the various metadata extractors.
 	 * @param $context IContextSource object
 	 * @return ParserOptions object
 	 */",
- "/** 
-	 * Get user options 
+ "/**
+	 * Get user options
 	 *
 	 * @param $user User object
 	 * @param $lang Language object
@@ -44701,8 +44533,8 @@ and the various metadata extractors.
 	 * @return String
 	 */",
  "/**
- * Base class for general text storage via the \"object\" flag in old_flags, or 
- * two-part external storage URLs. Used for represent efficient concatenated 
+ * Base class for general text storage via the \"object\" flag in old_flags, or
+ * two-part external storage URLs. Used for represent efficient concatenated
  * storage, and migration-related pointer objects.
  */",
  "/** Constructor */",
@@ -46189,14 +46021,14 @@ and the various metadata extractors.
 	 * Get an uplaod result based on upload context
 	 */",
  "/**
-	 * Get Stash Result, throws an expetion if the file could not be stashed. 
+	 * Get Stash Result, throws an expetion if the file could not be stashed.
 	 */",
  "/**
 	 * Get Warnings Result
 	 * @param $warnings Array of Api upload warnings
 	 */",
  "/**
-	 * Get the result of a chunk upload. 
+	 * Get the result of a chunk upload.
 	 */",
  "/**
 	 * Stash the file and return the file key
@@ -46260,7 +46092,7 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Warning:
-	 * 
+	 *
 	 * These tests are for code that makes use of an artifact of how CURL
 	 * handles header reporting on redirect pages, and will need to be
 	 * rewritten when bug 29232 is taken care of (high-level handling of
@@ -46504,7 +46336,7 @@ and the various metadata extractors.
 	 *
 	 * @param $rc RecentChange
 	 */",
- "/** 
+ "/**
 	 * Insert a formatted comment
 	 * @param $rc RecentChange
 	 */",
@@ -48006,9 +47838,7 @@ and the various metadata extractors.
  "/**
 	 * @dataProvider providePaths
 	 */",
- "/**
-*TestsforwfBaseName()
-*/",
+
  "/** @dataProvider providerPlural */",
  "/** Tests for MediaWiki languages/classes/LanguageSk.php */",
  "/** Tagalog (Tagalog)
@@ -48378,12 +48208,12 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Destroy the singleton instance
-	 * 
+	 *
 	 * @return void
 	 */",
  "/**
 	 * Register file backends from the global variables
-	 * 
+	 *
 	 * @return void
 	 */",
  "/**
@@ -48505,42 +48335,42 @@ and the various metadata extractors.
 	 * Build the list of files we\'ll check for syntax errors
 	 */",
  "/**
-	*Returnstrueif$fileisofatypewecancheck
-	*@param$filestring
-	*@returnbool
+
+
+
 	*/",
  "/**
-	*Addgivenpathtofilelist,searchingitinincludepathifneeded
-	*@param$pathstring
-	*@returnbool
+
+
+
 	*/",
  "/**
-	*Addgivenfiletofilelist,or,ifit\'sadirectory,additscontent
-	*@param$pathstring
-	*@returnbool
+
+
+
 	*/",
  "/**
-	*Addallsuitablefilesingivendirectoryoritssubdirectoriestothefilelist
+
 	*
-	*@param$dirString:directorytoprocess
+
 	*/",
  "/**
-	*CheckafileforsyntaxerrorsusingParsekit.Shamelesslystolen
-	*fromtools/lint.phpbyTimStarling
-	*@param$fileStringPathtoafiletocheckforsyntaxerrors
-	*@returnboolean
+
+
+
+
 	*/",
  "/**
-	*Checkafileforsyntaxerrorsusingphp-l
-	*@param$fileStringPathtoafiletocheckforsyntaxerrors
-	*@returnboolean
+
+
+
 	*/",
  "/**
-	*Checkafilefornon-fatalcodingerrors,suchasbyte-ordermarksinthebeginning
-	*orpointless?>closingtagsattheend.
+
+
 	*
-	*@param$fileStringStringPathtoafiletocheckforerrors
-	*@returnboolean
+
+
 	*/",
  "/**
 	 * Output a HTTP header, wrapper for PHP\'s
@@ -48627,13 +48457,7 @@ and the various metadata extractors.
  * @return Integer
  * @public
  */",
- "/**
-*EscapeastringforinclusioninaPHPsingle-quotedstringliteral.
-*
-*@param$stringString:stringtobeescaped.
-*@returnString:escapedstring.
-*@public
-*/",
+
  "/**
  * Implements Special:Unlockdb
  *
@@ -49554,7 +49378,7 @@ and the various metadata extractors.
 	 */",
  "/**
  * @group Database
- * @todo This test suite is severly broken and need a full review 
+ * @todo This test suite is severly broken and need a full review
  */",
  "/** Min Nan Chinese (B??n-l??m-g??)
  *
@@ -54124,80 +53948,76 @@ and the various metadata extractors.
 	 * @return MediaTransformError Error object if error occured, false (=no error) otherwise
 	 */",
  "/**
-	*EscapeastringforImageMagick\'spropertyinput(e.g.-set-comment)
-	*SeeInterpretImageProperties()inmagick/property.c
+
+
 	*/",
  "/**
-	*EscapeastringforImageMagick\'sinputfilenames.SeeExpandFilenames()
-	*andGetPathComponent()inmagick/utility.c.
+
+
 	*
-	*Thiswon\'tworkwithaninitial~or@,soinputfilesshouldbeprefixed
-	*withthedirectoryname.
+
+
 	*
-	*GlobcharacterunescapingisbrokeninImageMagickbefore6.6.1-5,but
-	*it\'sbrokeninawaythatdoesn\'tinvolvetryingtoconverteveryfile
-	*inadirectory,sowe\'rebetteroffescapingandwaitingforthebugfix
-	*tofilterdowntousers.
+
+
+
+
 	*
-	*@param$pathstringThefilepath
-	*@param$scenestringThescenespecification,orfalseifthereisnone
+
+
 	*/",
  "/**
-	*EscapeastringforImageMagick\'soutputfilename.See
-	*InterpretImageFilename()inmagick/image.c.
+
+
 	*/",
  "/**
-	*ArmourastringagainstImageMagick\'sGetPathComponent().Thisisa
-	*helperfunctionforescapeMagickInput()andescapeMagickOutput().
+
+
 	*
-	*@param$pathstringThefilepath
-	*@param$scenestringThescenespecification,orfalseifthereisnone
+
+
 	*/",
  "/**
-	*RetrievetheversionoftheinstalledImageMagick
-	*YoucanusePHPsversion_compare()tousethisvalue
-	*Valueiscachedforonehour.
-	*@returnStringrepresentingtheIMversion.
+
+
+
+
 	*/",
  "/**
-	*Onsupportingimageformats,trytoreadoutthelow-levelorientation
-	*ofthefileandreturntheanglethatthefileneedstoberotatedto
-	*beviewed.
+
+
+
 	*
-	*Thisinformationisonlyusefulwhenmanipulatingtheoriginalfile;
-	*thewidthandheightwenormallyworkwithislogical,andwillmatch
-	*anyproducedoutputviews.
+
+
+
 	*
-	*ThebaseBitmapHandlerdoesn\'tunderstandanymetadataformats,sothis
-	*isleftuptochildclassestoimplement.
+
+
 	*
-	*@param$fileFile
-	*@returnint0,90,180or270
+
+
 	*/",
  "/**
-	*Returnswhetherthecurrentscalersupportsrotation(imandgddo)
+
 	*
-	*@returnbool
+
 	*/",
  "/**
-	*Rerurnswhetherthefileneedstoberendered.Returnstrueifthe
-	*filerequiresrotationandweareabletorotateit.
+
+
 	*
-	*@param$fileFile
-	*@returnbool
+
+
 	*/",
- "/**
-*Generichandlerforbitmapimages
-*
-*@ingroupMedia
-*/",
+
  "/**
  * Selenium server manager
  *
  * @file
  * @ingroup Testing
  * Copyright (C) 2010 Nadeesha Weerasinghe <nadeesha@calcey.com>
- * http://www.calcey.com/ 
+ * http://www.calcey.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54784,7 +54604,7 @@ and the various metadata extractors.
 	 * Stream a file to the browser, adding all the headings and fun stuff.
 	 * Headers sent include: Content-type, Content-Length, Last-Modified,
 	 * and Content-Disposition.
-	 * 
+	 *
 	 * @param $fname string Full name and path of the file to stream
 	 * @param $headers array Any additional headers to send
 	 * @param $sendErrors bool Send error messages if errors occur (like 404)
@@ -54805,7 +54625,7 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Determine the file type of a file based on the path
-	 * 
+	 *
 	 * @param $filename string Storage path or file system path
 	 * @param $safe bool Whether to do retroactive upload blacklist checks
 	 * @return null|string
@@ -55207,7 +55027,7 @@ and the various metadata extractors.
  "/**
 	 * Work out the IP address based on various globals
 	 * For trusted proxies, use the XFF client IP (first of the chain)
-	 * 
+	 *
 	 * @since 1.19
 	 *
 	 * @return string
@@ -55455,7 +55275,7 @@ and the various metadata extractors.
 	 */",
  "/**
  * Some functions to help implement an external link filter for spam control.
- * 
+ *
  * @todo implement the filter. Currently these are just some functions to help
  * maintenance/cleanupSpam.php remove links to a single specified domain. The
  * next thing is to implement functions for checking a given page against a big
@@ -55672,7 +55492,7 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Don\'t serialize the parent object, it is big, and not needed when it is
-	 * a parameter to mergeForeign(), which is the only application of 
+	 * a parameter to mergeForeign(), which is the only application of
 	 * serializing at present.
 	 *
 	 * Compact the titles, only serialize the text form.
@@ -55685,9 +55505,9 @@ and the various metadata extractors.
 	 * @param $other LinkHolderArray
 	 */",
  "/**
-	 * Merge a LinkHolderArray from another parser instance into this one. The 
-	 * keys will not be preserved. Any text which went with the old 
-	 * LinkHolderArray and needs to work with the new one should be passed in 
+	 * Merge a LinkHolderArray from another parser instance into this one. The
+	 * keys will not be preserved. Any text which went with the old
+	 * LinkHolderArray and needs to work with the new one should be passed in
 	 * the $texts array. The strings in this array will have their link holders
 	 * converted for use in the destination link holder. The resulting array of
 	 * strings will be returned.
@@ -55926,7 +55746,7 @@ and the various metadata extractors.
  "/**
 	 * Delete all objects expiring before a certain date.
 	 * @param $date The reference date in MW format
-	 * @param $progressCallback Optional, a function which will be called 
+	 * @param $progressCallback Optional, a function which will be called
 	 *     regularly during long-running operations with the percentage progress
 	 *     as the first parameter.
 	 *
@@ -56635,28 +56455,28 @@ and the various metadata extractors.
  "/**
 	 * Substitute the backend name in storage path parameters
 	 * for a set of operations with that of a given internal backend.
-	 * 
+	 *
 	 * @param $ops Array List of file operation arrays
 	 * @param $backend FileBackendStore
 	 * @return Array
 	 */",
  "/**
 	 * Same as substOpBatchPaths() but for a single operation
-	 * 
+	 *
 	 * @param $op File operation array
 	 * @param $backend FileBackendStore
 	 * @return Array
 	 */",
  "/**
 	 * Substitute the backend of storage paths with an internal backend\'s name
-	 * 
+	 *
 	 * @param $paths Array|string List of paths or single string path
 	 * @param $backend FileBackendStore
 	 * @return Array|string
 	 */",
  "/**
 	 * Substitute the backend of internal storage paths with the proxy backend\'s name
-	 * 
+	 *
 	 * @param $paths Array|string List of paths or single string path
 	 * @return Array|string
 	 */",
@@ -57050,27 +56870,27 @@ and the various metadata extractors.
 	 * @return Boolean
 	 */",
  "/**
-	*Rungivenstringsthroughadiffandreturnthe(colorized)output.
-	*Requireswritable/tmpdirectoryanda\'diff\'commandinthePATH.
+
+
 	*
-	*@param$inputString
-	*@param$outputString
-	*@param$inFileTailString:tailingfortheinputfilename
-	*@param$outFileTailString:tailingfortheoutputfilename
-	*@returnString
+
+
+
+
+
 	*/",
  "/**
-	*Writethegivenstringtoafile,addingafinalnewline.
+
 	*
-	*@param$dataString
-	*@param$filenameString
+
+
 	*/",
  "/**
-	*ColorizeunifieddiffoutputifsetforANSIcoloroutput.
-	*Subtractionsarecoloredblue,additionsred.
+
+
 	*
-	*@param$textString
-	*@returnString
+
+
 	*/",
  "/**
 	 * Show \"Reading tests from ...\"
@@ -57182,7 +57002,7 @@ and the various metadata extractors.
  "/**
 	 * Create an UnregisteredLocalFile based on a path or a (title,repo) pair.
 	 * A FileRepo object is not required here, unlike most other File classes.
-	 * 
+	 *
 	 * @throws MWException
 	 * @param $title Title|false
 	 * @param $repo FileRepo
@@ -57250,10 +57070,7 @@ and the various metadata extractors.
  * @author Xxglennxx
  * @author ???????? ????????????????
  */",
- "/**
-*ThrownbyUser::setPassword()onerror.
-*@ingroupException
-*/",
+
  "/**
 	 * Lightweight constructor for an anonymous user.
 	 * Use the User::newFrom* factory functions for other kinds of users.
@@ -58437,7 +58254,7 @@ and the various metadata extractors.
  */",
  "/**
 	 * Get a key on the primary cache for this repository.
-	 * Returns false if the repository\'s cache is not accessible at this site. 
+	 * Returns false if the repository\'s cache is not accessible at this site.
 	 * The parameters are the parts of the key, as for wfMemcKey().
 	 */",
  "/**
@@ -59354,7 +59171,7 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Clean up the temp file and throw an exception
-	 * 
+	 *
 	 * @param $msg string
 	 * @throws MWException
 	 */",
@@ -61222,7 +61039,7 @@ and the various metadata extractors.
 	 * NOTE: The mtime of the module\'s messages is NOT automatically included.
 	 * If you want this to happen, you\'ll need to call getMsgBlobMtime()
 	 * yourself and take its result into consideration.
-	 * 
+	 *
 	 * @param $context ResourceLoaderContext: Context object
 	 * @return Integer: UNIX timestamp
 	 */",
@@ -61324,15 +61141,15 @@ and the various metadata extractors.
  *       \'DBprefix\' => \'\',
  *   );
  *
- * All fields must be present.  These mean the same things as $wgDBtype, 
- * $wgDBserver, etc.  This implementation is quite crude; it could easily 
- * support multiple database servers, for instance, and memcached, and it 
- * probably has bugs.  Kind of hard to reuse code when things might rely on who 
+ * All fields must be present.  These mean the same things as $wgDBtype,
+ * $wgDBserver, etc.  This implementation is quite crude; it could easily
+ * support multiple database servers, for instance, and memcached, and it
+ * probably has bugs.  Kind of hard to reuse code when things might rely on who
  * knows what configuration globals.
  *
- * If either wiki uses the UserComparePasswords hook, password authentication 
- * might fail unexpectedly unless they both do the exact same validation.  
- * There may be other corner cases like this where this will fail, but it 
+ * If either wiki uses the UserComparePasswords hook, password authentication
+ * might fail unexpectedly unless they both do the exact same validation.
+ * There may be other corner cases like this where this will fail, but it
  * should be unlikely.
  *
  * @ingroup ExternalUser
@@ -61343,7 +61160,7 @@ and the various metadata extractors.
  * @file
  * @ingroup Testing
  * Copyright (C) 2010 Nadeesha Weerasinghe <nadeesha@calcey.com>
- * http://www.calcey.com/ 
+ * http://www.calcey.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61510,7 +61327,7 @@ and the various metadata extractors.
  "/**
 	 * First checks the return code
 	 * of UploadBase::getTitle() and then the actual returned title
-	 * 
+	 *
 	 * @dataProvider dataTestTitleValidation
 	 */",
  "/**
@@ -61640,7 +61457,7 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * @param $res ResultWrapper
-	 * @param $n 
+	 * @param $n
 	 * @return bool
 	 */",
  "/**
@@ -63111,12 +62928,7 @@ and the various metadata extractors.
  * @author Murma174
  * @author Pyt
  */",
- "/**
-*TestCaseID:18-27(http://www.mediawiki.org/wiki/New_installer/Test_plan)
-*TestCaseName:UIofMediaWikiinitial/Language/WelcometoMediaWiki!/Connecttodatabase/
-*Databasesettings/Name/Options/Install/Complete/RestartInslationpages
-*Version:MediaWiki1.18alpha
-*/",
+
  "/**
 	 * Log the job message
 	 * @param $msg String The message to log
@@ -63288,8 +63100,8 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Guess the MIME type from the file contents alone
-	 * 
-	 * @return string 
+	 *
+	 * @return string
 	 */",
  "/**
 	 * Get an associative array containing information about
@@ -63321,7 +63133,7 @@ and the various metadata extractors.
 	 */",
  "/**
 	 * Get the final file extension from a file system path
-	 * 
+	 *
 	 * @param $path string
 	 * @return string
 	 */",
@@ -63545,7 +63357,7 @@ and the various metadata extractors.
 	 * Partition a DB result with backlinks in it into batches
 	 * @param $res ResultWrapper database result
 	 * @param $batchSize integer
-	 * @return array @see 
+	 * @return array @see
 	 */",
  "/**
  * Class for fetching backlink lists, approximate backlink counts and
@@ -63999,14 +63811,7 @@ and the various metadata extractors.
  *
  * @ingroup SpecialPage
  */",
- "/**
-*TheUnitTestmustbeeitheraclassthatinheritsfromMediaWikiTestCase
-*oraclassthatprovidesapublicstaticsuite()methodwhichreturns
-*anPHPUnit_Framework_Testobject
-*
-*@groupParser
-*@groupDatabase
-*/",
+
  "/**
  * This class supports the proprietary vBulletin forum system
  * <http://www.vbulletin.com>, versions 3.5 and up.  It calls no functions or
@@ -65116,9 +64921,9 @@ and the various metadata extractors.
  "/**
  * A repository for files accessible via the local filesystem.
  * Does not support database access or registration.
- * 
+ *
  * This is a mostly a legacy class. New uses should not be added.
- * 
+ *
  * @ingroup FileRepo
  * @deprecated since 1.19
  */",
@@ -65892,22 +65697,20 @@ and the various metadata extractors.
 	 * @return array
 	 */",
  "/**
-	*Escapeastringtomakeitsuitableforinclusioninapreg_replace()
-	*replacementparameter.
+
+
 	*
-	*@param$stringString
-	*@returnString
+
+
 	*/",
  "/**
-	*Workalikeforexplode()withlimitedmemoryusage.
-	*ReturnsanIterator
-	*@param$separator
-	*@param$subject
-	*@return\ArrayIterator|\ExplodeIterator
+
+
+
+
+
 	*/",
- "/**
-*Acollectionofstaticmethodstoplaywithstrings.
-*/",
+
  "/**
 *Baseclassfor\"replacers\", objects used in preg_replace_callback() and
  * StringUtils::delimiterReplaceCallback()

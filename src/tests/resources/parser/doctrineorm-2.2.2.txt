@@ -1,4 +1,5 @@
 ["/**
+     * Some random description
      * @param array $fieldDeclaration
      * @param AbstractPlatform $platform
      * @return string
@@ -12,10 +13,10 @@
      * @return mixed The PHP representation of the value.
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to clear the metadata cache of the various cache drivers.
@@ -56,15 +57,7 @@
      * @param ClassMetadataInfo $metadata
      * @return string $exported
      */",
- "/**
-*ClassMetadataexporterforPHPclasseswithannotations
-*
-*@licensehttp://www.opensource.org/licenses/lgpl-license.phpLGPL
-*@linkwww.doctrine-project.org
-*@since2.0
-*@version$Revision$
-*@authorJonathanWage<jonwage@gmail.com>
-*/",
+
  "/**
      * Constructor.
      *
@@ -128,7 +121,7 @@
      * Initializes a new SchemaTool instance that uses the connection of the
      * provided EntityManager.
      *
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param \\Doctrine\\ORM\\EntityManager $em
      */",
  "/**
      * Creates the database schema for the given array of ClassMetadata instances.
@@ -186,8 +179,8 @@
      * This includes the SQL for foreign key constraints and join tables.
      *
      * @param ClassMetadata $class
-     * @param \Doctrine\DBAL\Schema\Table $table
-     * @param \Doctrine\DBAL\Schema\Schema $schema
+     * @param \\Doctrine\\DBAL\\Schema\\Table $table
+     * @param \\Doctrine\\DBAL\\Schema\\Schema $schema
      * @return void
      */",
  "/**
@@ -201,13 +194,13 @@
      *
      * @param ClassMetadata $class
      * @param string $referencedColumnName
-     * @return array(ClassMetadata, referencedFieldName)
+     * @return array (ClassMetadata, referencedFieldName)
      */",
  "/**
      * Gather columns and fk constraints that are required for one part of relationship.
      *
      * @param array $joinColumns
-     * @param \Doctrine\DBAL\Schema\Table $theJoinTable
+     * @param \\Doctrine\\DBAL\\Schema\\Table $theJoinTable
      * @param ClassMetadata $class
      * @param array $mapping
      * @param array $primaryKeyColumns
@@ -309,7 +302,7 @@
  "/**
      * Initializes a new UnitOfWork instance, bound to the given EntityManager.
      *
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param \\Doctrine\\ORM\\EntityManager $em
      */",
  "/**
      * Commits the UnitOfWork, executing all operations that have been postponed
@@ -409,17 +402,17 @@
  "/**
      * Executes all entity insertions for entities of the specified type.
      *
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @param \\Doctrine\\ORM\\Mapping\\ClassMetadata $class
      */",
  "/**
      * Executes all entity updates for entities of the specified type.
      *
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @param \\Doctrine\\ORM\\Mapping\\ClassMetadata $class
      */",
  "/**
      * Executes all entity deletions for entities of the specified type.
      *
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @param \\Doctrine\\ORM\\Mapping\\ClassMetadata $class
      */",
  "/**
      * Gets the commit order.
@@ -669,7 +662,7 @@
  "/**
      * Gets the CommitOrderCalculator used by the UnitOfWork to order commits.
      *
-     * @return \Doctrine\ORM\Internal\CommitOrderCalculator
+     * @return \\Doctrine\\ORM\\Internal\\CommitOrderCalculator
      */",
  "/**
      * Clears the UnitOfWork.
@@ -780,7 +773,7 @@
      *
      * @param string $entityName  The name of the Entity.
      *
-     * @return \Doctrine\ORM\Persisters\BasicEntityPersister
+     * @return \\Doctrine\\ORM\\Persisters\\BasicEntityPersister
      */",
  "/**
      * Gets a collection persister for a collection-valued association.
@@ -854,14 +847,14 @@
      * This operation cannot be undone as some parts of the UnitOfWork now keep gathering information
      * on this object that might be necessary to perform a correct udpate.
      *
-     * @throws \InvalidArgumentException
+     * @throws \\InvalidArgumentException
      * @param $object
      * @return void
      */",
  "/**
      * Is this entity read only?
      *
-     * @throws \InvalidArgumentException
+     * @throws \\InvalidArgumentException
      * @param $object
      * @return void
      */",
@@ -884,7 +877,7 @@
      * @param string $username
      * @param string $password
      * @param array $driverOptions
-     * @return Doctrine\DBAL\Driver\Connection
+     * @return Doctrine\\DBAL\\Driver\\Connection
      */",
  "/**
      * Constructs the MySql PDO DSN.
@@ -928,13 +921,7 @@
  * @since       2.0
  * @version     $Revision$
  */",
- "/**
-*DeterminesifaPHPvaluewouldrequiredoublequotinginYAML.
-*
-*@paramstring$valueAPHPvalue
-*
-*@returnBooleanTrueifthevaluewouldrequiredoublequotes.
-*/",
+
  "/**
      * Escapes and surrounds a PHP value with double quotes.
      *
@@ -987,10 +974,10 @@
  "/**
      * Executes all sql statements.
      *
-     * @param \Doctrine\DBAL\Connection $conn The database connection that is used to execute the queries.
+     * @param \\Doctrine\\DBAL\\Connection $conn The database connection that is used to execute the queries.
      * @param array $params  The parameters.
      * @param array $types The parameter types.
-     * @return \Doctrine\DBAL\Driver\Statement
+     * @return \\Doctrine\\DBAL\\Driver\\Statement
      */",
  "/**
  * Base class for SQL statement executors.
@@ -1029,7 +1016,7 @@
      *
      * @return array The YAML converted to a PHP array
      *
-     * @throws \InvalidArgumentException If the YAML is not valid
+     * @throws \\InvalidArgumentException If the YAML is not valid
      *
      * @api
      */",
@@ -1267,43 +1254,12 @@
      * @param string $class
      * @return array
      */",
- "/**
-*Returntheshortnameofaclass.
-*
-*@paramstring$className
-*@returnstring
-*/",
- "/**
-*Returnthenamespaceofaclass.
-*
-*@paramstring$className
-*@returnstring
-*/",
- "/**
-*Returnareflectionclassinstanceornull
-*
-*@paramstring$class
-*@returnReflectionClass|null
-*/",
- "/**
-*Returnanaccessibleproperty(setAccessible(true))ornull.
-*
-*@paramstring$class
-*@paramstring$property
-*@returnReflectionProperty|null
-*/",
- "/**
-*Checkiftheclasshaveapublicmethodwiththegivenname.
-*
-*@parammixed$class
-*@parammixed$method
-*@returnbool
-*/",
- "/**
-*PHPRuntimeReflectionService
-*
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*/",
+
+
+
+
+
+
  "/**
      * @param string $seqName The name of the sequence to pass to lastInsertId()
      *                        to obtain the last generated identifier within the current
@@ -1347,12 +1303,12 @@
  "/**
      * Constructor. Accepts the Connection instance to manage the schema for
      *
-     * @param \Doctrine\DBAL\Connection $conn
+     * @param \\Doctrine\\DBAL\\Connection $conn
      */",
  "/**
      * Return associated platform.
      *
-     * @return \Doctrine\DBAL\Platform\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platform\\AbstractPlatform
      */",
  "/**
      * Try any method on the schema manager. Normally a method throws an
@@ -1493,7 +1449,7 @@
      * Create a new sequence
      *
      * @param Sequence $sequence
-     * @throws Doctrine\DBAL\ConnectionException     if something fails at database level
+     * @throws Doctrine\\DBAL\\ConnectionException     if something fails at database level
      */",
  "/**
      * Create a constraint on a table
@@ -1542,7 +1498,7 @@
      * Drop and create a new sequence
      *
      * @param Sequence $sequence
-     * @throws Doctrine\DBAL\ConnectionException     if something fails at database level
+     * @throws Doctrine\\DBAL\\ConnectionException     if something fails at database level
      */",
  "/**
      * Drop and create a new table.
@@ -1714,19 +1670,19 @@
      * @param ClassMetadataExporter $metadataExporter
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param \\Doctrine\\ORM\\EntityManager $em
      * @param array $fromPaths
      * @param string $destPath
      * @param string $toType
      * @param int $numSpaces
      * @param string|null $extend
-     * @param Console\Output\OutputInterface $output
+     * @param Console\\Output\\OutputInterface $output
      */",
  "/**
  * Command to convert a Doctrine 1 schema to a Doctrine 2 mapping file.
@@ -1745,10 +1701,10 @@
  * @Target(\"PROPERTY\")
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to convert your mapping information between the various formats.
@@ -1897,34 +1853,10 @@
  * @author  Jonathan Wage <jonwage@gmail.com>
  * @author  Roman Borschel <roman@code-factory.org>
  */",
- "/**
-*Getsaclassannotation.
-*
-*@paramReflectionClass$classTheReflectionClassoftheclassfromwhich
-*theclassannotationsshouldberead.
-*@paramstring$annotationNameThenameoftheannotation.
-*@returnTheAnnotationorNULL,iftherequestedannotationdoesnotexist.
-*/",
- "/**
-*Getsamethodannotation.
-*
-*@paramReflectionMethod$method
-*@paramstring$annotationNameThenameoftheannotation.
-*@returnTheAnnotationorNULL,iftherequestedannotationdoesnotexist.
-*/",
- "/**
-*Getsapropertyannotation.
-*
-*@paramReflectionProperty$property
-*@paramstring$annotationNameThenameoftheannotation.
-*@returnTheAnnotationorNULL,iftherequestedannotationdoesnotexist.
-*/",
- "/**
-*Filecachereaderforannotations.
-*
-*@authorJohannesM.Schmitt<schmittjoh@gmail.com>
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*/",
+
+
+
+
  "/**
  * Expression class for building DQL and parts
  *
@@ -2123,7 +2055,7 @@
      * @return EntityManager
      */",
  "/**
-     * @return Mapping\ClassMetadata
+     * @return Mapping\\ClassMetadata
      */",
  "/**
  * An EntityRepository serves as a repository for entities with generic as well as
@@ -2253,12 +2185,12 @@
  "/**
      * Sets the cache driver used by the factory to cache ClassMetadata instances.
      *
-     * @param \Doctrine\Common\Cache\Cache $cacheDriver
+     * @param \\Doctrine\\Common\\Cache\\Cache $cacheDriver
      */",
  "/**
      * Gets the cache driver used by the factory to cache ClassMetadata instances.
      *
-     * @return \Doctrine\Common\Cache\Cache
+     * @return \\Doctrine\\Common\\Cache\\Cache
      */",
  "/**
      * Forces the factory to load the metadata of all classes known to the underlying
@@ -2270,122 +2202,33 @@
      * Lazy initialization of this stuff, especially the metadata driver,
      * since these are not needed at all when a metadata cache is active.
      */",
- "/**
-*Getstheclassmetadatadescriptorforaclass.
-*
-*@paramstring$classNameThenameoftheclass.
-*@return\Doctrine\ORM\Mapping\ClassMetadata
-*/",
- "/**
-*Checkswhetherthefactoryhasthemetadataforaclassloadedalready.
-*
-*@paramstring$className
-*@returnbooleanTRUEifthemetadataoftheclassinquestionisalreadyloaded,FALSEotherwise.
-*/",
- "/**
-*Setsthemetadatadescriptorforaspecificclass.
-*
-*NOTE:Thisisonlyusefulinveryspecialcases,likewhengeneratingproxyclasses.
-*
-*@paramstring$className
-*@paramClassMetadata$class
-*/",
- "/**
-*Getarrayofparentclassesforthegivenentityclass
-*
-*@paramstring$name
-*@returnarray$parentClasses
-*/",
- "/**
-*Loadsthemetadataoftheclassinquestionandallit'sancestorswhosemetadata
-*isstillnotloaded.
-*
-*@paramstring$nameThenameoftheclassforwhichthemetadatashouldgetloaded.
-*@paramarray$tablesThemetadatacollectiontowhichtheloadedmetadataisadded.
-*/",
- "/**
-*Validateruntimemetadataiscorrectlydefined.
-*
-*@paramClassMetadata$class
-*@paramClassMetadata$parent
-*/",
- "/**
-*CreatesanewClassMetadatainstanceforthegivenclassname.
-*
-*@paramstring$className
-*@return\Doctrine\ORM\Mapping\ClassMetadata
-*/",
- "/**
-*Addsinheritedfieldstothesubclassmapping.
-*
-*@param\Doctrine\ORM\Mapping\ClassMetadata$subClass
-*@param\Doctrine\ORM\Mapping\ClassMetadata$parentClass
-*/",
- "/**
-*Addsinheritedassociationmappingstothesubclassmapping.
-*
-*@param\Doctrine\ORM\Mapping\ClassMetadata$subClass
-*@param\Doctrine\ORM\Mapping\ClassMetadata$parentClass
-*/",
- "/**
-*Addsinheritednamedqueriestothesubclassmapping.
-*
-*@since2.2
-*@param\Doctrine\ORM\Mapping\ClassMetadata$subClass
-*@param\Doctrine\ORM\Mapping\ClassMetadata$parentClass
-*/",
+
+
+
+
+
+
+
+
+
+
  "/**
 *CompletestheIDgeneratormapping.If\"auto\" is specified we choose the generator
      * most appropriate for the targeted database platform.
      *
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @param \\Doctrine\\ORM\\Mapping\\ClassMetadata $class
+     */",
+
+
+
+
+
+
+ "/**
+     * @see Console\\Command\\Command
      */",
  "/**
-*CheckifthisclassismappedbythisEntityManager+ClassMetadataconfiguration
-*
-*@param$class
-*@returnbool
-*/",
- "/**
-*GetreflectionService.
-*
-*@return\Doctrine\Common\Persistence\Mapping\ReflectionService
-*/",
- "/**
-*SetreflectionService.
-*
-*@paramreflectionServicethevaluetoset.
-*/",
- "/**
-*WakeupreflectionafterClassMetadatagetsunserializedfromcache.
-*
-*@paramClassMetadataInfo$class
-*@paramReflectionService$reflService
-*@returnvoid
-*/",
- "/**
-*InitializeReflectionafterClassMetadatawasconstructed.
-*
-*@paramClassMetadataInfo$class
-*@paramReflectionService$reflService
-*@returnvoid
-*/",
- "/**
-*TheClassMetadataFactoryisusedtocreateClassMetadataobjectsthatcontainallthe
-*metadatamappinginformationsofaclasswhichdescribeshowaclassshouldbemapped
-*toarelationaldatabase.
-*
-*@since2.0
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@authorGuilhermeBlanco<guilhermeblanco@hotmail.com>
-*@authorJonathanWage<jonwage@gmail.com>
-*@authorRomanBorschel<roman@code-factory.org>
-*/",
- "/**
-     * @see Console\Command\Command
-     */",
- "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to (re)generate the proxy classes used by doctrine.
@@ -2468,7 +2311,7 @@
      *
      * @param   string  $string
      *
-     * @return  Symfony\Component\Console\Format\FormatterStyle|Boolean false if string is not format string
+     * @return  Symfony\\Component\\Console\\Format\\FormatterStyle|Boolean false if string is not format string
      */",
  "/**
  * Formatter class for console output.
@@ -2481,7 +2324,7 @@
      * Constructor
      *
      * @param object $entity
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param \\Doctrine\\ORM\\EntityManager $em
      */",
  "/**
      * Retireve associated Entity.
@@ -2491,7 +2334,7 @@
  "/**
      * Retrieve associated EntityManager.
      *
-     * @return \Doctrine\ORM\EntityManager
+     * @return \\Doctrine\\ORM\\EntityManager
      */",
  "/**
  * Lifecycle Events are triggered by the UnitOfWork during lifecycle transitions
@@ -2575,27 +2418,27 @@
  "/**
      * Gets the DBAL driver instance.
      *
-     * @return \Doctrine\DBAL\Driver
+     * @return \\Doctrine\\DBAL\\Driver
      */",
  "/**
      * Gets the Configuration used by the Connection.
      *
-     * @return \Doctrine\DBAL\Configuration
+     * @return \\Doctrine\\DBAL\\Configuration
      */",
  "/**
      * Gets the EventManager used by the Connection.
      *
-     * @return \Doctrine\Common\EventManager
+     * @return \\Doctrine\\Common\\EventManager
      */",
  "/**
      * Gets the DatabasePlatform for the connection.
      *
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
      * Gets the ExpressionBuilder for the connection.
      *
-     * @return \Doctrine\DBAL\Query\ExpressionBuilder
+     * @return \\Doctrine\\DBAL\\Query\\ExpressionBuilder
      */",
  "/**
      * Establishes the connection with the database.
@@ -2712,7 +2555,7 @@
      * Prepares an SQL statement.
      *
      * @param string $statement The SQL statement to prepare.
-     * @return Doctrine\DBAL\Driver\Statement The prepared statement.
+     * @return Doctrine\\DBAL\\Driver\\Statement The prepared statement.
      */",
  "/**
      * Executes an, optionally parameterized, SQL query.
@@ -2724,7 +2567,7 @@
      * @param array $params The parameters to bind to the query, if any.
      * @param array $types The types the previous parameters are in.
      * @param QueryCacheProfile $qcp
-     * @return Doctrine\DBAL\Driver\Statement The executed statement.
+     * @return Doctrine\\DBAL\\Driver\\Statement The executed statement.
      * @internal PERF: Directly prepares a driver statement, not a wrapper.
      */",
  "/**
@@ -2734,7 +2577,7 @@
      * @param array $params
      * @param array $types
      * @param QueryCacheProfile $qcp
-     * @return \Doctrine\DBAL\Driver\ResultStatement
+     * @return \\Doctrine\\DBAL\\Driver\\ResultStatement
      */",
  "/**
      * Executes an, optionally parameterized, SQL query and returns the result,
@@ -2752,7 +2595,7 @@
      *
      * @param string $statement
      * @param integer $fetchType
-     * @return Doctrine\DBAL\Driver\Statement
+     * @return Doctrine\\DBAL\\Driver\\Statement
      */",
  "/**
      * Executes an SQL INSERT/UPDATE/DELETE query with the given parameters
@@ -2869,13 +2712,13 @@
  "/**
      * Gets the wrapped driver connection.
      *
-     * @return Doctrine\DBAL\Driver\Connection
+     * @return Doctrine\\DBAL\\Driver\\Connection
      */",
  "/**
      * Gets the SchemaManager that can be used to inspect or change the
      * database schema through the connection.
      *
-     * @return Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @return Doctrine\\DBAL\\Schema\\AbstractSchemaManager
      */",
  "/**
      * Marks the current transaction so that the only possible
@@ -2925,10 +2768,10 @@
  "/**
      * Create a new instance of a SQL query builder.
      *
-     * @return Query\QueryBuilder
+     * @return Query\\QueryBuilder
      */",
  "/**
- * A wrapper around a Doctrine\DBAL\Driver\Connection that adds features like
+ * A wrapper around a Doctrine\\DBAL\\Driver\\Connection that adds features like
  * events, transaction isolation levels, configuration, emulated transaction nesting,
  * lazy connecting and more.
  *
@@ -2945,7 +2788,7 @@
  "/**
      * Initializes a new sequence generator.
      *
-     * @param \Doctrine\ORM\EntityManager $em The EntityManager to use.
+     * @param \\Doctrine\\ORM\\EntityManager $em The EntityManager to use.
      * @param string $sequenceName The name of the sequence.
      * @param integer $allocationSize The allocation size of the sequence.
      */",
@@ -3114,10 +2957,10 @@
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to generate repository classes for mapping information.
@@ -3240,7 +3083,7 @@
      * Gets the repository for a class.
      *
      * @param string $className
-     * @return \Doctrine\Common\Persistence\ObjectRepository
+     * @return \\Doctrine\\Common\\Persistence\\ObjectRepository
      */",
  "/**
      * Returns the ClassMetadata descriptor for a class.
@@ -3249,12 +3092,12 @@
      * (as it is returned by get_class($obj)).
      *
      * @param string $className
-     * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     * @return \\Doctrine\\Common\\Persistence\\Mapping\\ClassMetadata
      */",
  "/**
      * Gets the metadata factory used to gather the metadata of classes.
      *
-     * @return Doctrine\Common\Persistence\Mapping\ClassMetadataFactory
+     * @return Doctrine\\Common\\Persistence\\Mapping\\ClassMetadataFactory
      */",
  "/**
      * Helper method to initialize a lazy loading proxy or persistent collection.
@@ -3348,7 +3191,7 @@
      * @param string $shortcut The short option key
      * @param mixed  $value    The value for the option
      *
-     * @throws \RuntimeException When option given doesn't exist
+     * @throws \\RuntimeException When option given doesn't exist
      */",
  "/**
      * Adds a long option value.
@@ -3356,8 +3199,8 @@
      * @param string $name  The long option key
      * @param mixed  $value The value for the option
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
-     * @throws \InvalidArgumentException When a required value is missing
+     * @throws \\InvalidArgumentException When option given doesn't exist
+     * @throws \\InvalidArgumentException When a required value is missing
      */",
  "/**
      * Adds an argument value.
@@ -3365,7 +3208,7 @@
      * @param string $name  The argument name
      * @param mixed  $value The value for the argument
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws \\InvalidArgumentException When argument given doesn't exist
      */",
  "/**
  * ArrayInput represents an input provided as an array.
@@ -3421,241 +3264,41 @@
      * @todo Force parameter to be a Closure to ensure lazy evaluation
      *       (as soon as a metadata cache is in effect, the driver never needs to initialize).
      */",
- "/**
-*Addanewdefaultannotationdriverwithacorrectlyconfiguredannotationreader.
-*
-*@paramarray$paths
-*@returnMapping\Driver\AnnotationDriver
-*/",
- "/**
-*Addsanamespaceunderacertainalias.
-*
-*@paramstring$alias
-*@paramstring$namespace
-*/",
- "/**
-*Resolvesaregisterednamespacealiastothefullnamespace.
-*
-*@paramstring$entityNamespaceAlias
-*@returnstring
-*@throwsMappingException
-*/",
- "/**
-*Settheentityaliasmap
-*
-*@paramarray$entityAliasMap
-*@returnvoid
-*/",
- "/**
-*Retrievesthelistofregisteredentitynamespacealiases.
-*
-*@returnarray
-*/",
- "/**
-*Getsthecachedriverimplementationthatisusedforthemappingmetadata.
-*
-*@throwsORMException
-*@returnMapping\Driver\Driver
-*/",
- "/**
-*Getsthecachedriverimplementationthatisusedforthequerycache(SQLcache).
-*
-*@return\Doctrine\Common\Cache\Cache
-*/",
- "/**
-*Setsthecachedriverimplementationthatisusedforthequerycache(SQLcache).
-*
-*@param\Doctrine\Common\Cache\Cache$cacheImpl
-*/",
- "/**
-*Getsthecachedriverimplementationthatisusedforthehydrationcache(SQLcache).
-*
-*@return\Doctrine\Common\Cache\Cache
-*/",
- "/**
-*Setsthecachedriverimplementationthatisusedforthehydrationcache(SQLcache).
-*
-*@param\Doctrine\Common\Cache\Cache$cacheImpl
-*/",
- "/**
-*Getsthecachedriverimplementationthatisusedformetadatacaching.
-*
-*@return\Doctrine\Common\Cache\Cache
-*/",
- "/**
-*Setsthecachedriverimplementationthatisusedformetadatacaching.
-*
-*@param\Doctrine\Common\Cache\Cache$cacheImpl
-*/",
- "/**
-*AddsanamedDQLquerytotheconfiguration.
-*
-*@paramstring$nameThenameofthequery.
-*@paramstring$dqlTheDQLquerystring.
-*/",
- "/**
-*GetsapreviouslyregisterednamedDQLquery.
-*
-*@paramstring$nameThenameofthequery.
-*@returnstringTheDQLquery.
-*/",
- "/**
-*Addsanamednativequerytotheconfiguration.
-*
-*@paramstring$nameThenameofthequery.
-*@paramstring$sqlThenativeSQLquerystring.
-*@paramResultSetMapping$rsmTheResultSetMappingusedfortheresultsoftheSQLquery.
-*/",
- "/**
-*Getsthecomponentsofapreviouslyregisterednamednativequery.
-*
-*@paramstring$nameThenameofthequery.
-*@returnarrayAtuplewiththefirstelementbeingtheSQLstringandthesecond
-*elementbeingtheResultSetMapping.
-*/",
- "/**
-*EnsuresthatthisConfigurationinstancecontainssettingsthatare
-*suitableforaproductionenvironment.
-*
-*@throwsORMExceptionIfaconfigurationsettinghasavaluethatisnot
-*suitableforaproductionenvironment.
-*/",
- "/**
-*RegistersacustomDQLfunctionthatproducesastringvalue.
-*SuchafunctioncanthenbeusedinanyDQLstatementinanyplacewherestring
-*functionsareallowed.
-*
-*DQLfunctionnamesarecase-insensitive.
-*
-*@paramstring$name
-*@paramstring$className
-*/",
- "/**
-*GetstheimplementationclassnameofaregisteredcustomstringDQLfunction.
-*
-*@paramstring$name
-*@returnstring
-*/",
- "/**
-*SetsamapofcustomDQLstringfunctions.
-*
-*KeysmustbefunctionnamesandvaluestheFQCNoftheimplementingclass.
-*Thefunctionnameswillbecase-insensitiveinDQL.
-*
-*Anypreviouslyaddedstringfunctionsarediscarded.
-*
-*@paramarray$functionsThemapofcustomDQLstringfunctions.
-*/",
- "/**
-*RegistersacustomDQLfunctionthatproducesanumericvalue.
-*SuchafunctioncanthenbeusedinanyDQLstatementinanyplacewherenumeric
-*functionsareallowed.
-*
-*DQLfunctionnamesarecase-insensitive.
-*
-*@paramstring$name
-*@paramstring$className
-*/",
- "/**
-*GetstheimplementationclassnameofaregisteredcustomnumericDQLfunction.
-*
-*@paramstring$name
-*@returnstring
-*/",
- "/**
-*SetsamapofcustomDQLnumericfunctions.
-*
-*KeysmustbefunctionnamesandvaluestheFQCNoftheimplementingclass.
-*Thefunctionnameswillbecase-insensitiveinDQL.
-*
-*Anypreviouslyaddednumericfunctionsarediscarded.
-*
-*@paramarray$functionsThemapofcustomDQLnumericfunctions.
-*/",
- "/**
-*RegistersacustomDQLfunctionthatproducesadate/timevalue.
-*SuchafunctioncanthenbeusedinanyDQLstatementinanyplacewheredate/time
-*functionsareallowed.
-*
-*DQLfunctionnamesarecase-insensitive.
-*
-*@paramstring$name
-*@paramstring$className
-*/",
- "/**
-*Getstheimplementationclassnameofaregisteredcustomdate/timeDQLfunction.
-*
-*@paramstring$name
-*@returnstring
-*/",
- "/**
-*SetsamapofcustomDQLdate/timefunctions.
-*
-*KeysmustbefunctionnamesandvaluestheFQCNoftheimplementingclass.
-*Thefunctionnameswillbecase-insensitiveinDQL.
-*
-*Anypreviouslyaddeddate/timefunctionsarediscarded.
-*
-*@paramarray$functionsThemapofcustomDQLdate/timefunctions.
-*/",
- "/**
-*Getthehydratorclassforthegivenhydrationmodename.
-*
-*@paramstring$modeNameThehydrationmodename.
-*@returnstring$hydratorThehydratorclassname.
-*/",
- "/**
-*Addacustomhydrationmode.
-*
-*@paramstring$modeNameThehydrationmodename.
-*@paramstring$hydratorThehydratorclassname.
-*/",
- "/**
-*Setaclassmetadatafactory.
-*
-*@paramstring$cmf
-*/",
- "/**
-*@returnstring
-*/",
- "/**
-*Addafiltertothelistofpossiblefilters.
-*
-*@paramstring$nameThenameofthefilter.
-*@paramstring$classNameTheclassnameofthefilter.
-*/",
- "/**
-*Getstheclassnameforagivenfiltername.
-*
-*@paramstring$nameThenameofthefilter.
-*
-*@returnstringTheclassnameofthefilter,ornullofitisnot
-*defined.
-*/",
- "/**
-*Setdefaultrepositoryclass.
-*
-*@since2.2
-*@paramstring$className
-*@throwsORMExceptionIfnotisa\Doctrine\ORM\EntityRepository
-*/",
- "/**
-*Getdefaultrepositoryclass.
-*
-*@since2.2
-*@returnstring
-*/",
- "/**
-*ConfigurationcontainerforallconfigurationoptionsofDoctrine.
-*ItcombinesallconfigurationoptionsfromDBAL&ORM.
-*
-*@since2.0
-*@internalWhenaddinganewconfigurationoptionjustwriteagetter/setterpair.
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@authorGuilhermeBlanco<guilhermeblanco@hotmail.com>
-*@authorJonathanWage<jonwage@gmail.com>
-*@authorRomanBorschel<roman@code-factory.org>
-*/",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  "/**
      * Create Master Slave Connection
      *
@@ -3751,7 +3394,7 @@
  * @example
  *
  * $conn = DriverManager::getConnection(array(
- *    'wrapperClass' => 'Doctrine\DBAL\Connections\MasterSlaveConnection',
+ *    'wrapperClass' => 'Doctrine\\DBAL\\Connections\\MasterSlaveConnection',
  *    'driver' => 'pdo_mysql',
  *    'master' => array('user' => '', 'password' => '', 'host' => '', 'dbname' => ''),
  *    'slaves' => array(
@@ -3865,28 +3508,28 @@
  * @Annotation
  */",
  "/**
-     * @param \Doctrine\DBAL\Schema\Column $column
-     * @param \Doctrine\DBAL\Schema\Table $table
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param \\Doctrine\\DBAL\\Schema\\Column $column
+     * @param \\Doctrine\\DBAL\\Schema\\Table $table
+     * @param \\Doctrine\\DBAL\\Platforms\\AbstractPlatform $platform
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\Column
+     * @return \\Doctrine\\DBAL\\Schema\\Column
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\Table
+     * @return \\Doctrine\\DBAL\\Schema\\Table
      */",
  "/**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
      * @param string|array $sql
-     * @return \Doctrine\DBAL\Event\SchemaCreateTableColumnEventArgs
+     * @return \\Doctrine\\DBAL\\Event\\SchemaCreateTableColumnEventArgs
      */",
  "/**
      * @return array
      */",
  "/**
- * Event Arguments used when SQL queries for creating table columns are generated inside Doctrine\DBAL\Platform\AbstractPlatform.
+ * Event Arguments used when SQL queries for creating table columns are generated inside Doctrine\\DBAL\\Platform\\AbstractPlatform.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -3997,32 +3640,32 @@
  * @Target(\"METHOD\")
  */",
  "/**
-     * @param \Doctrine\DBAL\Schema\Table $table
+     * @param \\Doctrine\\DBAL\\Schema\\Table $table
      * @param array $columns
      * @param array $options
-     * @param Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param Doctrine\\DBAL\\Platforms\\AbstractPlatform $platform
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\Table
-     */",
- "/**
-     * @return array
+     * @return \\Doctrine\\DBAL\\Schema\\Table
      */",
  "/**
      * @return array
      */",
  "/**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return array
+     */",
+ "/**
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
      * @param string|array $sql
-     * @return \Doctrine\DBAL\Event\SchemaCreateTableEventArgs
+     * @return \\Doctrine\\DBAL\\Event\\SchemaCreateTableEventArgs
      */",
  "/**
      * @return array
      */",
  "/**
- * Event Arguments used when SQL queries for creating tables are generated inside Doctrine\DBAL\Platform\AbstractPlatform.
+ * Event Arguments used when SQL queries for creating tables are generated inside Doctrine\\DBAL\\Platform\\AbstractPlatform.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -4032,7 +3675,7 @@
  "/**
      * Initializes a new <tt>QueryBuilder</tt>.
      *
-     * @param Doctrine\DBAL\Connection $connection DBAL Connection
+     * @param Doctrine\\DBAL\\Connection $connection DBAL Connection
      */",
  "/**
      * Gets an ExpressionBuilder used for object-oriented construction of query expressions.
@@ -4048,7 +3691,7 @@
      * For more complex expression construction, consider storing the expression
      * builder object in a local variable.
      *
-     * @return Doctrine\DBAL\Query\ExpressionBuilder
+     * @return Doctrine\\DBAL\\Query\\ExpressionBuilder
      */",
  "/**
      * Get the type of the currently built query.
@@ -4058,7 +3701,7 @@
  "/**
      * Get the associated DBAL Connection for this query builder.
      *
-     * @return Doctrine\DBAL\Connection
+     * @return Doctrine\\DBAL\\Connection
      */",
  "/**
      * Get the state of this query builder instance.
@@ -4133,7 +3776,7 @@
      * Sets the position of the first result to retrieve (the \"offset\").
      *
      * @param integer $firstResult The first result to return.
-     * @return Doctrine\DBAL\Query\QueryBuilder This QueryBuilder instance.
+     * @return Doctrine\\DBAL\\Query\\QueryBuilder This QueryBuilder instance.
      */",
  "/**
      * Gets the position of the first result the query object was set to retrieve (the \"offset\").
@@ -4145,7 +3788,7 @@
      * Sets the maximum number of results to retrieve (the \"limit\").
      *
      * @param integer $maxResults The maximum number of results to retrieve.
-     * @return Doctrine\DBAL\Query\QueryBuilder This QueryBuilder instance.
+     * @return Doctrine\\DBAL\\Query\\QueryBuilder This QueryBuilder instance.
      */",
  "/**
      * Gets the maximum number of results the query object was set to retrieve (the \"limit\").
@@ -4162,7 +3805,7 @@
      * @param string $sqlPartName
      * @param string $sqlPart
      * @param string $append
-     * @return Doctrine\DBAL\Query\QueryBuilder This QueryBuilder instance.
+     * @return Doctrine\\DBAL\\Query\\QueryBuilder This QueryBuilder instance.
      */",
  "/**
      * Specifies an item that is to be returned in the query result.
@@ -4555,10 +4198,10 @@
  * @author  Roman Borschel <roman@code-factory.org>
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Validate that the current mapping is valid
@@ -4603,7 +4246,7 @@
  * @Target(\"PROPERTY\")
  */",
  "/**
-     * @return \Doctrine\DBAL\Event\SchemaEventArgs
+     * @return \\Doctrine\\DBAL\\Event\\SchemaEventArgs
      */",
  "/**
      * @return boolean
@@ -4654,93 +4297,27 @@
  * @author      Jonathan Wage <jonwage@gmail.com>
  * @author      Roman Borschel <roman@code-factory.org>
  */",
- "/**
-*GenerateandwriteentityclassesforthegivenarrayofClassMetadataInfoinstances
-*
-*@paramarray$metadatas
-*@paramstring$outputDirectory
-*@returnvoid
-*/",
- "/**
-*GeneratedandwriteentityclasstodiskforthegivenClassMetadataInfoinstance
-*
-*@paramClassMetadataInfo$metadata
-*@paramstring$outputDirectory
-*@returnvoid
-*/",
- "/**
-*GenerateaPHP5Doctrine2entityclassfromthegivenClassMetadataInfoinstance
-*
-*@paramClassMetadataInfo$metadata
-*@returnstring$code
-*/",
- "/**
-*GeneratetheupdatedcodeforthegivenClassMetadataInfoandentityatpath
-*
-*@paramClassMetadataInfo$metadata
-*@paramstring$path
-*@returnstring$code;
-*/",
- "/**
-*Setthenumberofspacestheexportedclassshouldhave
-*
-*@paraminteger$numSpaces
-*@returnvoid
-*/",
- "/**
-*Settheextensiontousewhenwritingphpfilestodisk
-*
-*@paramstring$extension
-*@returnvoid
-*/",
- "/**
-*Setthenameoftheclassthegeneratedclassesshouldextendfrom
-*
-*@returnvoid
-*/",
- "/**
-*Setwhetherornottogenerateannotationsfortheentity
-*
-*@parambool$bool
-*@returnvoid
-*/",
- "/**
-*Setanannotationprefix.
-*
-*@paramstring$prefix
-*/",
- "/**
-*Setwhetherornottotryandupdatetheentityifitalreadyexists
-*
-*@parambool$bool
-*@returnvoid
-*/",
- "/**
-*Setwhetherornottoregeneratetheentityifitexists
-*
-*@parambool$bool
-*@returnvoid
-*/",
- "/**
-*Setwhetherornottogeneratestubmethodsfortheentity
-*
-*@parambool$bool
-*@returnvoid
-*/",
- "/**
-*Shouldanexistingentitybebackedupifitalreadyexists?
-*/",
- "/**
-*@todothiswon'tworkifthereisanamespaceinbracketsandaclassoutsideofit.
-*@paramstring$src
-*/",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  "/**
  * Generic class used to generate PHP5 entity classes from ClassMetadataInfo instances
  *
  *     [php]
  *     $classes = $em->getClassMetadataFactory()->getAllMetadata();
  *
- *     $generator = new \Doctrine\ORM\Tools\EntityGenerator();
+ *     $generator = new \\Doctrine\\ORM\\Tools\\EntityGenerator();
  *     $generator->setGenerateAnnotations(true);
  *     $generator->setGenerateStubMethods(true);
  *     $generator->setRegenerateEntityIfExists(false);
@@ -4916,8 +4493,8 @@
  "/**
      * Gets the schema manager that is relevant for this driver.
      *
-     * @param Doctrine\DBAL\Connection $conn
-     * @return Doctrine\DBAL\Schema\SqliteSchemaManager
+     * @param Doctrine\\DBAL\\Connection $conn
+     * @return Doctrine\\DBAL\\Schema\\SqliteSchemaManager
      */",
  "/**
  * The PDO Sqlite driver.
@@ -4951,20 +4528,20 @@
      * @param string $username The username to use when connecting.
      * @param string $password The password to use when connecting.
      * @param array $driverOptions The driver options to use when connecting.
-     * @return Doctrine\DBAL\Driver\Connection The database connection.
+     * @return Doctrine\\DBAL\\Driver\\Connection The database connection.
      */",
  "/**
      * Gets the DatabasePlatform instance that provides all the metadata about
      * the platform this driver connects to.
      *
-     * @return Doctrine\DBAL\Platforms\AbstractPlatform The database platform.
+     * @return Doctrine\\DBAL\\Platforms\\AbstractPlatform The database platform.
      */",
  "/**
      * Gets the SchemaManager that can be used to inspect and change the underlying
      * database schema of the platform this driver connects to.
      *
-     * @param  Doctrine\DBAL\Connection $conn
-     * @return Doctrine\DBAL\SchemaManager
+     * @param  Doctrine\\DBAL\\Connection $conn
+     * @return Doctrine\\DBAL\\SchemaManager
      */",
  "/**
      * Gets the name of the driver.
@@ -4974,7 +4551,7 @@
  "/**
      * Get the name of the database connected to for this driver.
      *
-     * @param  Doctrine\DBAL\Connection $conn
+     * @param  Doctrine\\DBAL\\Connection $conn
      * @return string $database
      */",
  "/**
@@ -5146,40 +4723,11 @@
      * @param string $fileExtension The file extension to set
      * @return void
      */",
- "/**
-*Gettheelementofschemametadatafortheclassfromthemappingfile.
-*Thiswilllazilyloadthemappingfileifitisnotloadedyet
-*
-*@returnarray$elementTheelementofschemametadata
-*/",
- "/**
-*Whethertheclasswiththespecifiednameshouldhaveitsmetadataloaded.
-*ThisisonlythecaseifitiseithermappedasanEntityora
-*MappedSuperclass.
-*
-*@paramstring$className
-*@returnboolean
-*/",
- "/**
-*Getsthenamesofallmappedclassesknowntothisdriver.
-*
-*@returnarrayThenamesofallmappedclassesknowntothisdriver.
-*/",
- "/**
-*Findsthemappingfilefortheclasswiththegivennamebysearching
-*throughtheconfiguredpaths.
-*
-*@param$className
-*@returnstringThe(absolute)filename.
-*@throwsMappingException
-*/",
- "/**
-*Loadsamappingfilewiththegivennameandreturnsamap
-*fromclass/entitynamestotheircorrespondingelements.
-*
-*@paramstring$fileThemappingfiletoload.
-*@returnarray
-*/",
+
+
+
+
+
  "/**
 *Basedriverforfile-basedmetadatadrivers.
 *
@@ -5222,7 +4770,7 @@
      * @param Boolean      $newline  Whether to add a newline or not
      * @param integer      $type     The type of output
      *
-     * @throws \InvalidArgumentException When unknown output type is given
+     * @throws \\InvalidArgumentException When unknown output type is given
      *
      * @api
      */",
@@ -5304,8 +4852,8 @@
  "/**
      * Wraps <tt>Statement</tt> and applies portability measures
      *
-     * @param Doctrine\DBAL\Driver\Statement $stmt
-     * @param Doctrine\DBAL\Connection $conn
+     * @param Doctrine\\DBAL\\Driver\\Statement $stmt
+     * @param Doctrine\\DBAL\\Connection $conn
      */",
  "/**
  * Portability Wrapper for a Statement
@@ -5377,7 +4925,7 @@
      * @param string $username
      * @param string $password
      * @param array $driverOptions
-     * @return Doctrine\DBAL\Driver\Connection
+     * @return Doctrine\\DBAL\\Driver\\Connection
      */",
  "/**
      * Constructs the MySql PDO DSN.
@@ -5388,14 +4936,14 @@
      * Gets the DatabasePlatform instance that provides all the metadata about
      * the platform this driver connects to.
      *
-     * @return Doctrine\DBAL\Platforms\AbstractPlatform The database platform.
+     * @return Doctrine\\DBAL\\Platforms\\AbstractPlatform The database platform.
      */",
  "/**
      * Gets the SchemaManager that can be used to inspect and change the underlying
      * database schema of the platform this driver connects to.
      *
-     * @param  Doctrine\DBAL\Connection $conn
-     * @return Doctrine\DBAL\SchemaManager
+     * @param  Doctrine\\DBAL\\Connection $conn
+     * @return Doctrine\\DBAL\\SchemaManager
      */",
  "/**
      * Gets the name of the driver.
@@ -5405,7 +4953,7 @@
  "/**
      * Get the name of the database connected to for this driver.
      *
-     * @param  Doctrine\DBAL\Connection $conn
+     * @param  Doctrine\\DBAL\\Connection $conn
      * @return string $database
      */",
  "/**
@@ -5421,19 +4969,19 @@
  * @author      Roman Borschel <roman@code-factory.org>
  */",
  "/**
-     * @return Doctrine\DBAL\Connection
+     * @return Doctrine\\DBAL\\Connection
      */",
  "/**
-     * @return Doctrine\DBAL\Driver
+     * @return Doctrine\\DBAL\\Driver
      */",
  "/**
-     * @return Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
-     * @return Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @return Doctrine\\DBAL\\Schema\\AbstractSchemaManager
      */",
  "/**
- * Event Arguments used when a Driver connection is established inside Doctrine\DBAL\Connection.
+ * Event Arguments used when a Driver connection is established inside Doctrine\\DBAL\\Connection.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -5444,7 +4992,7 @@
  "/**
      * Initializes a new <tt>ExpressionBuilder</tt>.
      *
-     * @param Doctrine\DBAL\Connection $connection DBAL Connection
+     * @param Doctrine\\DBAL\\Connection $connection DBAL Connection
      */",
  "/**
      * Creates a conjunction of the given boolean expressions.
@@ -5705,7 +5253,7 @@
      * Adds an EventSubscriber. The subscriber is asked for all the events he is
      * interested in and added as a listener for these events.
      *
-     * @param Doctrine\Common\EventSubscriber $subscriber The subscriber.
+     * @param Doctrine\\Common\\EventSubscriber $subscriber The subscriber.
      */",
  "/**
  * The EventManager is the central point of Doctrine's event listener system.
@@ -5740,7 +5288,7 @@
  * @author      Roman Borschel <roman@code-factory.org>
  */",
  "/**
-     * @param \Doctrine\ORM\Internal\Hydration\AbstractHydrator $hydrator
+     * @param \\Doctrine\\ORM\\Internal\\Hydration\\AbstractHydrator $hydrator
      */",
  "/**
      * Gets the next set of results.
@@ -5843,24 +5391,10 @@
      * @param string $fileExtension The file extension to set
      * @return void
      */",
- "/**
-*{@inheritDoc}
-*/",
- "/**
-*{@inheritDoc}
-*/",
- "/**
-*{@inheritDoc}
-*/",
- "/**
-*TheSymfonyFileLocatormakesasimplifyingassumptionscompared
-*totheDefaultFileLocator.Byassumingpathsonlycontainentitiesofacertain
-*namespacethemappingfilesconsistsoftheshortclassnameonly.
-*
-*@authorFabienPotencier<fabien@symfony.com>
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@licenseMIT
-*/",
+
+
+
+
  "/**
      * {@inheritdoc}
      */",
@@ -5967,12 +5501,12 @@
  "/**
      * Sets the SQL executor that should be used for this ParserResult.
      *
-     * @param \Doctrine\ORM\Query\Exec\AbstractSqlExecutor $executor
+     * @param \\Doctrine\\ORM\\Query\\Exec\\AbstractSqlExecutor $executor
      */",
  "/**
      * Gets the SQL executor used by this ParserResult.
      *
-     * @return \Doctrine\ORM\Query\Exec\AbstractSqlExecutor
+     * @return \\Doctrine\\ORM\\Query\\Exec\\AbstractSqlExecutor
      */",
  "/**
      * Adds a DQL to SQL parameter mapping. One DQL parameter name/position can map to
@@ -6039,33 +5573,9 @@
      *
      * @return void
      */",
- "/**
-*GeneratethepathtowritetheclassforthegivenClassMetadataInfoinstance
-*
-*@paramClassMetadataInfo$metadata
-*@returnstring$path
-*/",
- "/**
-*Setthedirectorytooutputthemappingfilesto
-*
-*[php]
-*$exporter=newYamlExporter($metadata,__DIR__.'/yaml');
-*$exporter->setExtension('.yml');
-*$exporter->export();
-*
-*@paramstring$extension
-*@returnvoid
-*/",
- "/**
-*AbstractbaseclasswhichistobeusedfortheExporterdrivers
-*whichcanbefoundin\Doctrine\ORM\Tools\Export\Driver
-*
-*@licensehttp://www.opensource.org/licenses/lgpl-license.phpLGPL
-*@linkwww.doctrine-project.org
-*@since2.0
-*@version$Revision$
-*@authorJonathanWage<jonwage@gmail.com>
-*/",
+
+
+
  "/**
      * Logs a SQL statement somewhere.
      *
@@ -6163,7 +5673,7 @@
      * Therefore we can use MINVALUE to be able to get a hint what START WITH was for later introspection
      * in {@see listSequences()}
      *
-     * @param \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param \\Doctrine\\DBAL\\Schema\\Sequence $sequence
      * @return string
      */",
  "/**
@@ -6227,7 +5737,7 @@
      */",
  "/**
      *
-     * @param  \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param  \\Doctrine\\DBAL\\Schema\\Sequence $sequence
      * @return string
      */",
  "/**
@@ -6370,7 +5880,7 @@
  "/**
      * Moves the lookahead token forward.
      *
-     * @return array | null The next token or NULL if there are no more tokens ahead.
+     * @return array|null The next token or NULL if there are no more tokens ahead.
      */",
  "/**
      * Peeks at the next token, returns it and immediately resets the peek.
@@ -6498,13 +6008,7 @@
  * @author  Roman Borschel <roman@code-factory.org>
  * @author  Benjamin Eberlei <kontakt@beberlei.de>
  */",
- "/**
-*XmlDriverthatadditionallylooksformappinginformationinaglobalfile.
-*
-*@authorFabienPotencier<fabien@symfony.com>
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@licenseMIT
-*/",
+
  "/**
  * Subselect ::= SimpleSelectClause SubselectFromClause [WhereClause] [GroupByClause] [HavingClause] [OrderByClause]
  *
@@ -6517,24 +6021,24 @@
  * @author  Roman Borschel <roman@code-factory.org>
  */",
  "/**
-     * @param \Doctrine\DBAL\Schema\TableDiff $tableDiff
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param \\Doctrine\\DBAL\\Schema\\TableDiff $tableDiff
+     * @param \\Doctrine\\DBAL\\Platforms\\AbstractPlatform $platform
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\TableDiff
+     * @return \\Doctrine\\DBAL\\Schema\\TableDiff
      */",
  "/**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
      * @param string|array $sql
-     * @return \Doctrine\DBAL\Event\SchemaAlterTableEventArgs
+     * @return \\Doctrine\\DBAL\\Event\\SchemaAlterTableEventArgs
      */",
  "/**
      * @return array
      */",
  "/**
- * Event Arguments used when SQL queries for creating tables are generated inside Doctrine\DBAL\Platform\*Platform.
+ * Event Arguments used when SQL queries for creating tables are generated inside Doctrine\\DBAL\\Platform\*Platform.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -6607,28 +6111,28 @@
  * @author      Benjamin Eberlei <kontakt@beberlei.de>
  */",
  "/**
-     * @param \Doctrine\DBAL\Schema\ColumnDiff $columnDiff
-     * @param \Doctrine\DBAL\Schema\TableDiff $tableDiff
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param \\Doctrine\\DBAL\\Schema\\ColumnDiff $columnDiff
+     * @param \\Doctrine\\DBAL\\Schema\\TableDiff $tableDiff
+     * @param \\Doctrine\\DBAL\\Platforms\\AbstractPlatform $platform
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\ColumnDiff
+     * @return \\Doctrine\\DBAL\\Schema\\ColumnDiff
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\TableDiff
+     * @return \\Doctrine\\DBAL\\Schema\\TableDiff
      */",
  "/**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
      * @param string|array $sql
-     * @return \Doctrine\DBAL\Event\SchemaAlterTableChangeColumnEventArgs
+     * @return \\Doctrine\\DBAL\\Event\\SchemaAlterTableChangeColumnEventArgs
      */",
  "/**
      * @return array
      */",
  "/**
- * Event Arguments used when SQL queries for changing table columns are generated inside Doctrine\DBAL\Platform\*Platform.
+ * Event Arguments used when SQL queries for changing table columns are generated inside Doctrine\\DBAL\\Platform\*Platform.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -6862,7 +6366,7 @@
      * @param Boolean      $newline  Whether to add a newline or not
      * @param integer      $type     The type of output
      *
-     * @throws \InvalidArgumentException When unknown output type is given
+     * @throws \\InvalidArgumentException When unknown output type is given
      *
      * @api
      */",
@@ -6921,7 +6425,7 @@
      *
      * Throws an exception when not enough arguments are given.
      *
-     * @throws \RuntimeException
+     * @throws \\RuntimeException
      */",
  "/**
      * Returns all the given arguments merged with the default values.
@@ -6976,7 +6480,7 @@
      *
      * @return HelperInterface The helper instance
      *
-     * @throws \InvalidArgumentException if the helper is not defined
+     * @throws \\InvalidArgumentException if the helper is not defined
      */",
  "/**
      * Sets the command associated with this helper set.
@@ -7077,10 +6581,10 @@
  * @since 2.0
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to clear the query cache of the various cache drivers.
@@ -7209,10 +6713,10 @@
  * @author  Johannes M. Schmitt <schmittjoh@gmail.com>
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to generate entity classes and method stubs from your mapping information.
@@ -7227,7 +6731,7 @@
  * @author  Roman Borschel <roman@code-factory.org>
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to generate the SQL needed to update the database schema to match
@@ -7265,7 +6769,7 @@
  * @author      Roman Borschel <roman@code-factory.org>
  */",
  "/**
- * Base exception class for package Doctrine\Common
+ * Base exception class for package Doctrine\\Common
  * @author heinrich
  *
  */",
@@ -7372,22 +6876,8 @@
      * @return integer The fetch mode as defined in ClassMetadata
      * @throws MappingException If the fetch mode is not valid
      */",
- "/**
-*FactorymethodfortheAnnotationDriver
-*
-*@paramarray|string$paths
-*@paramAnnotationReader$reader
-*@returnAnnotationDriver
-*/",
- "/**
-*TheAnnotationDriverreadsthemappingmetadatafromdocblockannotations.
-*
-*@since2.0
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@authorGuilhermeBlanco<guilhermeblanco@hotmail.com>
-*@authorJonathanH.Wage<jonwage@gmail.com>
-*@authorRomanBorschel<roman@code-factory.org>
-*/",
+
+
  "/**
      * @param string $from      The class name.
      * @param string $alias     The alias of the class.
@@ -8043,7 +7533,7 @@
  * @since 2.0
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to create the database schema for a set of classes based on their mappings.
@@ -8081,12 +7571,12 @@
  "/**
      * Constructor.
      *
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param \\Doctrine\\ORM\\EntityManager $em
      */",
  "/**
      * Retrieve associated EntityManager.
      *
-     * @return \Doctrine\ORM\EntityManager
+     * @return \\Doctrine\\ORM\\EntityManager
      */",
  "/**
  * Provides event arguments for the postFlush event.
@@ -8167,12 +7657,12 @@
  "/**
      * Gets the lexer used by the parser.
      *
-     * @return \Doctrine\ORM\Query\Lexer
+     * @return \\Doctrine\\ORM\\Query\\Lexer
      */",
  "/**
      * Gets the ParserResult that is being filled with information during parsing.
      *
-     * @return \Doctrine\ORM\Query\ParserResult
+     * @return \\Doctrine\\ORM\\Query\\ParserResult
      */",
  "/**
      * Gets the EntityManager used by the parser.
@@ -8182,9 +7672,9 @@
  "/**
      * Parse and build AST for the given Query.
      *
-     * @return \Doctrine\ORM\Query\AST\SelectStatement |
-     *         \Doctrine\ORM\Query\AST\\UpdateStatement |
-     *         \Doctrine\ORM\Query\AST\DeleteStatement
+     * @return \\Doctrine\\ORM\\Query\\AST\\SelectStatement |
+     *         \\Doctrine\\ORM\\Query\\AST\\UpdateStatement |
+     *         \\Doctrine\\ORM\\Query\\AST\\DeleteStatement
      */",
  "/**
      * Attempts to match the given token with the current lookahead token.
@@ -8214,7 +7704,7 @@
      * declarations (from ... x join ... y join ... z ...) appear in the query
      * as the hydration process relies on that order for proper operation.
      *
-     * @param AST\SelectStatement|AST\DeleteStatement|AST\\UpdateStatement $AST
+     * @param AST\\SelectStatement|AST\\DeleteStatement|AST\\UpdateStatement $AST
      * @return void
      */",
  "/**
@@ -8223,7 +7713,7 @@
      * @param string $expected Expected string.
      * @param array $token Got token.
      *
-     * @throws \Doctrine\ORM\Query\QueryException
+     * @throws \\Doctrine\\ORM\\Query\\QueryException
      */",
  "/**
      * Generates a new semantical error.
@@ -8231,7 +7721,7 @@
      * @param string $message Optional message.
      * @param array $token Optional token.
      *
-     * @throws \Doctrine\ORM\Query\QueryException
+     * @throws \\Doctrine\\ORM\\Query\\QueryException
      */",
  "/**
      * Peeks beyond the specified token and returns the first token after that one.
@@ -8297,24 +7787,24 @@
  "/**
      * QueryLanguage ::= SelectStatement | UpdateStatement | DeleteStatement
      *
-     * @return \Doctrine\ORM\Query\AST\SelectStatement |
-     *         \Doctrine\ORM\Query\AST\\UpdateStatement |
-     *         \Doctrine\ORM\Query\AST\DeleteStatement
+     * @return \\Doctrine\\ORM\\Query\\AST\\SelectStatement |
+     *         \\Doctrine\\ORM\\Query\\AST\\UpdateStatement |
+     *         \\Doctrine\\ORM\\Query\\AST\\DeleteStatement
      */",
  "/**
      * SelectStatement ::= SelectClause FromClause [WhereClause] [GroupByClause] [HavingClause] [OrderByClause]
      *
-     * @return \Doctrine\ORM\Query\AST\SelectStatement
+     * @return \\Doctrine\\ORM\\Query\\AST\\SelectStatement
      */",
  "/**
      * UpdateStatement ::= UpdateClause [WhereClause]
      *
-     * @return \Doctrine\ORM\Query\AST\\UpdateStatement
+     * @return \\Doctrine\\ORM\\Query\\AST\\UpdateStatement
      */",
  "/**
      * DeleteStatement ::= DeleteClause [WhereClause]
      *
-     * @return \Doctrine\ORM\Query\AST\DeleteStatement
+     * @return \\Doctrine\\ORM\\Query\\AST\\DeleteStatement
      */",
  "/**
      * IdentificationVariable ::= identifier
@@ -8326,25 +7816,13 @@
      *
      * @return string
      */",
- "/**
-*AbstractSchemaName::=identifier
-*
-*@returnstring
-*/",
- "/**
-*AliasResultVariable::=identifier
-*
-*@returnstring
-*/",
- "/**
-*ResultVariable::=identifier
-*
-*@returnstring
-*/",
+
+
+
  "/**
 *JoinAssociationPathExpression::=IdentificationVariable\".\" (CollectionValuedAssociationField | SingleValuedAssociationField)
      *
-     * @return \Doctrine\ORM\Query\AST\JoinAssociationPathExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\JoinAssociationPathExpression
      */",
  "/**
      * Parses an arbitrary path expression and defers semantical validation
@@ -8353,102 +7831,102 @@
      * PathExpression ::= IdentificationVariable \".\" identifier
      *
      * @param integer $expectedTypes
-     * @return \Doctrine\ORM\Query\AST\PathExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\PathExpression
      */",
  "/**
      * AssociationPathExpression ::= CollectionValuedPathExpression | SingleValuedAssociationPathExpression
      *
-     * @return \Doctrine\ORM\Query\AST\PathExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\PathExpression
      */",
  "/**
      * SingleValuedPathExpression ::= StateFieldPathExpression | SingleValuedAssociationPathExpression
      *
-     * @return \Doctrine\ORM\Query\AST\PathExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\PathExpression
      */",
  "/**
      * StateFieldPathExpression ::= IdentificationVariable \".\" StateField
      *
-     * @return \Doctrine\ORM\Query\AST\PathExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\PathExpression
      */",
  "/**
      * SingleValuedAssociationPathExpression ::= IdentificationVariable \".\" SingleValuedAssociationField
      *
-     * @return \Doctrine\ORM\Query\AST\PathExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\PathExpression
      */",
  "/**
      * CollectionValuedPathExpression ::= IdentificationVariable \".\" CollectionValuedAssociationField
      *
-     * @return \Doctrine\ORM\Query\AST\PathExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\PathExpression
      */",
  "/**
      * SelectClause ::= \"SELECT\" [\"DISTINCT\"] SelectExpression {\",\" SelectExpression}
      *
-     * @return \Doctrine\ORM\Query\AST\SelectClause
+     * @return \\Doctrine\\ORM\\Query\\AST\\SelectClause
      */",
  "/**
      * SimpleSelectClause ::= \"SELECT\" [\"DISTINCT\"] SimpleSelectExpression
      *
-     * @return \Doctrine\ORM\Query\AST\SimpleSelectClause
+     * @return \\Doctrine\\ORM\\Query\\AST\\SimpleSelectClause
      */",
  "/**
      * UpdateClause ::= \"UPDATE\" AbstractSchemaName [\"AS\"] AliasIdentificationVariable \"SET\" UpdateItem {\",\" UpdateItem}*
      *
-     * @return \Doctrine\ORM\Query\AST\\UpdateClause
+     * @return \\Doctrine\\ORM\\Query\\AST\\UpdateClause
      */",
  "/**
      * DeleteClause ::= \"DELETE\" [\"FROM\"] AbstractSchemaName [\"AS\"] AliasIdentificationVariable
      *
-     * @return \Doctrine\ORM\Query\AST\DeleteClause
+     * @return \\Doctrine\\ORM\\Query\\AST\\DeleteClause
      */",
  "/**
      * FromClause ::= \"FROM\" IdentificationVariableDeclaration {\",\" IdentificationVariableDeclaration}*
      *
-     * @return \Doctrine\ORM\Query\AST\FromClause
+     * @return \\Doctrine\\ORM\\Query\\AST\\FromClause
      */",
  "/**
      * SubselectFromClause ::= \"FROM\" SubselectIdentificationVariableDeclaration {\",\" SubselectIdentificationVariableDeclaration}*
      *
-     * @return \Doctrine\ORM\Query\AST\SubselectFromClause
+     * @return \\Doctrine\\ORM\\Query\\AST\\SubselectFromClause
      */",
  "/**
      * WhereClause ::= \"WHERE\" ConditionalExpression
      *
-     * @return \Doctrine\ORM\Query\AST\WhereClause
+     * @return \\Doctrine\\ORM\\Query\\AST\\WhereClause
      */",
  "/**
      * HavingClause ::= \"HAVING\" ConditionalExpression
      *
-     * @return \Doctrine\ORM\Query\AST\HavingClause
+     * @return \\Doctrine\\ORM\\Query\\AST\\HavingClause
      */",
  "/**
      * GroupByClause ::= \"GROUP\" \"BY\" GroupByItem {\",\" GroupByItem}*
      *
-     * @return \Doctrine\ORM\Query\AST\GroupByClause
+     * @return \\Doctrine\\ORM\\Query\\AST\\GroupByClause
      */",
  "/**
      * OrderByClause ::= \"ORDER\" \"BY\" OrderByItem {\",\" OrderByItem}*
      *
-     * @return \Doctrine\ORM\Query\AST\OrderByClause
+     * @return \\Doctrine\\ORM\\Query\\AST\\OrderByClause
      */",
  "/**
      * Subselect ::= SimpleSelectClause SubselectFromClause [WhereClause] [GroupByClause] [HavingClause] [OrderByClause]
      *
-     * @return \Doctrine\ORM\Query\AST\Subselect
+     * @return \\Doctrine\\ORM\\Query\\AST\\Subselect
      */",
  "/**
      * UpdateItem ::= SingleValuedPathExpression \"=\" NewValue
      *
-     * @return \Doctrine\ORM\Query\AST\\UpdateItem
+     * @return \\Doctrine\\ORM\\Query\\AST\\UpdateItem
      */",
  "/**
      * GroupByItem ::= IdentificationVariable | ResultVariable | SingleValuedPathExpression
      *
-     * @return string | \Doctrine\ORM\Query\AST\PathExpression
+     * @return string | \\Doctrine\\ORM\\Query\\AST\\PathExpression
      */",
  "/**
      * OrderByItem ::= (ResultVariable | SingleValuedPathExpression) [\"ASC\" | \"DESC\"]
      *
-     * @return \Doctrine\ORM\Query\AST\OrderByItem
+     * @return \\Doctrine\\ORM\\Query\\AST\\OrderByItem
      */",
  "/**
      * NewValue ::= SimpleArithmeticExpression | StringPrimary | DatetimePrimary | BooleanPrimary |
@@ -8464,23 +7942,23 @@
  "/**
      * IdentificationVariableDeclaration ::= RangeVariableDeclaration [IndexBy] {JoinVariableDeclaration}*
      *
-     * @return \Doctrine\ORM\Query\AST\IdentificationVariableDeclaration
+     * @return \\Doctrine\\ORM\\Query\\AST\\IdentificationVariableDeclaration
      */",
  "/**
      * SubselectIdentificationVariableDeclaration ::= IdentificationVariableDeclaration | (AssociationPathExpression [\"AS\"] AliasIdentificationVariable)
      *
-     * @return \Doctrine\ORM\Query\AST\SubselectIdentificationVariableDeclaration |
-     *         \Doctrine\ORM\Query\AST\IdentificationVariableDeclaration
+     * @return \\Doctrine\\ORM\\Query\\AST\\SubselectIdentificationVariableDeclaration |
+     *         \\Doctrine\\ORM\\Query\\AST\\IdentificationVariableDeclaration
      */",
  "/**
      * JoinVariableDeclaration ::= Join [IndexBy]
      *
-     * @return \Doctrine\ORM\Query\AST\JoinVariableDeclaration
+     * @return \\Doctrine\\ORM\\Query\\AST\\JoinVariableDeclaration
      */",
  "/**
      * RangeVariableDeclaration ::= AbstractSchemaName [\"AS\"] AliasIdentificationVariable
      *
-     * @return \Doctrine\ORM\Query\AST\RangeVariableDeclaration
+     * @return \\Doctrine\\ORM\\Query\\AST\\RangeVariableDeclaration
      */",
  "/**
      * PartialObjectExpression ::= \"PARTIAL\" IdentificationVariable \".\" PartialFieldSet
@@ -8492,12 +7970,12 @@
      * Join ::= [\"LEFT\" [\"OUTER\"] | \"INNER\"] \"JOIN\" JoinAssociationPathExpression
      *          [\"AS\"] AliasIdentificationVariable [\"WITH\" ConditionalExpression]
      *
-     * @return \Doctrine\ORM\Query\AST\Join
+     * @return \\Doctrine\\ORM\\Query\\AST\\Join
      */",
  "/**
      * IndexBy ::= \"INDEX\" \"BY\" StateFieldPathExpression
      *
-     * @return \Doctrine\ORM\Query\AST\IndexBy
+     * @return \\Doctrine\\ORM\\Query\\AST\\IndexBy
      */",
  "/**
      * ScalarExpression ::= SimpleArithmeticExpression | StringPrimary | DateTimePrimary |
@@ -8521,17 +7999,17 @@
  "/**
      * CoalesceExpression ::= \"COALESCE\" \"(\" ScalarExpression {\",\" ScalarExpression}* \")\"
      *
-     * @return \Doctrine\ORM\Query\AST\CoalesceExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\CoalesceExpression
      */",
  "/**
      * NullIfExpression ::= \"NULLIF\" \"(\" ScalarExpression \",\" ScalarExpression \")\"
      *
-     * @return \Doctrine\ORM\Query\AST\NullIfExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\NullIfExpression
      */",
  "/**
      * GeneralCaseExpression ::= \"CASE\" WhenClause {WhenClause}* \"ELSE\" ScalarExpression \"END\"
      *
-     * @return \Doctrine\ORM\Query\AST\GeneralExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\GeneralExpression
      */",
  "/**
      * SimpleCaseExpression ::= \"CASE\" CaseOperand SimpleWhenClause {SimpleWhenClause}* \"ELSE\" ScalarExpression \"END\"
@@ -8540,12 +8018,12 @@
  "/**
      * WhenClause ::= \"WHEN\" ConditionalExpression \"THEN\" ScalarExpression
      *
-     * @return \Doctrine\ORM\Query\AST\WhenExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\WhenExpression
      */",
  "/**
      * SimpleWhenClause ::= \"WHEN\" ScalarExpression \"THEN\" ScalarExpression
      *
-     * @return \Doctrine\ORM\Query\AST\SimpleWhenExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\SimpleWhenExpression
      */",
  "/**
      * SelectExpression ::= (
@@ -8553,34 +8031,34 @@
      *     PartialObjectExpression | \"(\" Subselect \")\" | CaseExpression
      * ) [[\"AS\"] [\"HIDDEN\"] AliasResultVariable]
      *
-     * @return \Doctrine\ORM\Query\AST\SelectExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\SelectExpression
      */",
  "/**
      * SimpleSelectExpression ::=
      *      StateFieldPathExpression | IdentificationVariable |
      *      ((AggregateExpression | \"(\" Subselect \")\" | ScalarExpression) [[\"AS\"] AliasResultVariable])
      *
-     * @return \Doctrine\ORM\Query\AST\SimpleSelectExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\SimpleSelectExpression
      */",
  "/**
      * ConditionalExpression ::= ConditionalTerm {\"OR\" ConditionalTerm}*
      *
-     * @return \Doctrine\ORM\Query\AST\ConditionalExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\ConditionalExpression
      */",
  "/**
      * ConditionalTerm ::= ConditionalFactor {\"AND\" ConditionalFactor}*
      *
-     * @return \Doctrine\ORM\Query\AST\ConditionalTerm
+     * @return \\Doctrine\\ORM\\Query\\AST\\ConditionalTerm
      */",
  "/**
      * ConditionalFactor ::= [\"NOT\"] ConditionalPrimary
      *
-     * @return \Doctrine\ORM\Query\AST\ConditionalFactor
+     * @return \\Doctrine\\ORM\\Query\\AST\\ConditionalFactor
      */",
  "/**
      * ConditionalPrimary ::= SimpleConditionalExpression | \"(\" ConditionalExpression \")\"
      *
-     * @return \Doctrine\ORM\Query\AST\ConditionalPrimary
+     * @return \\Doctrine\\ORM\\Query\\AST\\ConditionalPrimary
      */",
  "/**
      * SimpleConditionalExpression ::=
@@ -8592,7 +8070,7 @@
  "/**
      * EmptyCollectionComparisonExpression ::= CollectionValuedPathExpression \"IS\" [\"NOT\"] \"EMPTY\"
      *
-     * @return \Doctrine\ORM\Query\AST\EmptyCollectionComparisonExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\EmptyCollectionComparisonExpression
      */",
  "/**
      * CollectionMemberExpression ::= EntityExpression [\"NOT\"] \"MEMBER\" [\"OF\"] CollectionValuedPathExpression
@@ -8600,7 +8078,7 @@
      * EntityExpression ::= SingleValuedAssociationPathExpression | SimpleEntityExpression
      * SimpleEntityExpression ::= IdentificationVariable | InputParameter
      *
-     * @return \Doctrine\ORM\Query\AST\CollectionMemberExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\CollectionMemberExpression
      */",
  "/**
      * Literal ::= string | char | integer | float | boolean
@@ -8610,32 +8088,32 @@
  "/**
      * InParameter ::= Literal | InputParameter
      *
-     * @return string | \Doctrine\ORM\Query\AST\InputParameter
+     * @return string | \\Doctrine\\ORM\\Query\\AST\\InputParameter
      */",
  "/**
      * InputParameter ::= PositionalParameter | NamedParameter
      *
-     * @return \Doctrine\ORM\Query\AST\InputParameter
+     * @return \\Doctrine\\ORM\\Query\\AST\\InputParameter
      */",
  "/**
      * ArithmeticExpression ::= SimpleArithmeticExpression | \"(\" Subselect \")\"
      *
-     * @return \Doctrine\ORM\Query\AST\ArithmeticExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\ArithmeticExpression
      */",
  "/**
      * SimpleArithmeticExpression ::= ArithmeticTerm {(\"+\" | \"-\") ArithmeticTerm}*
      *
-     * @return \Doctrine\ORM\Query\AST\SimpleArithmeticExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\SimpleArithmeticExpression
      */",
  "/**
      * ArithmeticTerm ::= ArithmeticFactor {(\"*\" | \"/\") ArithmeticFactor}*
      *
-     * @return \Doctrine\ORM\Query\AST\ArithmeticTerm
+     * @return \\Doctrine\\ORM\\Query\\AST\\ArithmeticTerm
      */",
  "/**
      * ArithmeticFactor ::= [(\"+\" | \"-\")] ArithmeticPrimary
      *
-     * @return \Doctrine\ORM\Query\AST\ArithmeticFactor
+     * @return \\Doctrine\\ORM\\Query\\AST\\ArithmeticFactor
      */",
  "/**
      * ArithmeticPrimary ::= SingleValuedPathExpression | Literal | \"(\" SimpleArithmeticExpression \")\"
@@ -8645,8 +8123,8 @@
  "/**
      * StringExpression ::= StringPrimary | \"(\" Subselect \")\"
      *
-     * @return \Doctrine\ORM\Query\AST\StringPrimary |
-     *         \Doctrine]ORM\Query\AST\Subselect
+     * @return \\Doctrine\\ORM\\Query\\AST\\StringPrimary |
+     *         \\Doctrine]ORM\\Query\\AST\\Subselect
      */",
  "/**
      * StringPrimary ::= StateFieldPathExpression | string | InputParameter | FunctionsReturningStrings | AggregateExpression | CaseExpression
@@ -8654,45 +8132,45 @@
  "/**
      * EntityExpression ::= SingleValuedAssociationPathExpression | SimpleEntityExpression
      *
-     * @return \Doctrine\ORM\Query\AST\SingleValuedAssociationPathExpression |
-     *         \Doctrine\ORM\Query\AST\SimpleEntityExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\SingleValuedAssociationPathExpression |
+     *         \\Doctrine\\ORM\\Query\\AST\\SimpleEntityExpression
      */",
  "/**
      * SimpleEntityExpression ::= IdentificationVariable | InputParameter
      *
-     * @return string | \Doctrine\ORM\Query\AST\InputParameter
+     * @return string | \\Doctrine\\ORM\\Query\\AST\\InputParameter
      */",
  "/**
      * AggregateExpression ::=
      *  (\"AVG\" | \"MAX\" | \"MIN\" | \"SUM\") \"(\" [\"DISTINCT\"] StateFieldPathExpression \")\" |
      *  \"COUNT\" \"(\" [\"DISTINCT\"] (IdentificationVariable | SingleValuedPathExpression) \")\"
      *
-     * @return \Doctrine\ORM\Query\AST\AggregateExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\AggregateExpression
      */",
  "/**
      * QuantifiedExpression ::= (\"ALL\" | \"ANY\" | \"SOME\") \"(\" Subselect \")\"
      *
-     * @return \Doctrine\ORM\Query\AST\QuantifiedExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\QuantifiedExpression
      */",
  "/**
      * BetweenExpression ::= ArithmeticExpression [\"NOT\"] \"BETWEEN\" ArithmeticExpression \"AND\" ArithmeticExpression
      *
-     * @return \Doctrine\ORM\Query\AST\BetweenExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\BetweenExpression
      */",
  "/**
      * ComparisonExpression ::= ArithmeticExpression ComparisonOperator ( QuantifiedExpression | ArithmeticExpression )
      *
-     * @return \Doctrine\ORM\Query\AST\ComparisonExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\ComparisonExpression
      */",
  "/**
      * InExpression ::= SingleValuedPathExpression [\"NOT\"] \"IN\" \"(\" (InParameter {\",\" InParameter}* | Subselect) \")\"
      *
-     * @return \Doctrine\ORM\Query\AST\InExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\InExpression
      */",
  "/**
      * InstanceOfExpression ::= IdentificationVariable [\"NOT\"] \"INSTANCE\" [\"OF\"] (InstanceOfParameter | \"(\" InstanceOfParameter {\",\" InstanceOfParameter}* \")\")
      *
-     * @return \Doctrine\ORM\Query\AST\InstanceOfExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\InstanceOfExpression
      */",
  "/**
      * InstanceOfParameter ::= AbstractSchemaName | InputParameter
@@ -8702,17 +8180,17 @@
  "/**
      * LikeExpression ::= StringExpression [\"NOT\"] \"LIKE\" (string | input_parameter) [\"ESCAPE\" char]
      *
-     * @return \Doctrine\ORM\Query\AST\LikeExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\LikeExpression
      */",
  "/**
      * NullComparisonExpression ::= (SingleValuedPathExpression | InputParameter) \"IS\" [\"NOT\"] \"NULL\"
      *
-     * @return \Doctrine\ORM\Query\AST\NullComparisonExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\NullComparisonExpression
      */",
  "/**
      * ExistsExpression ::= [\"NOT\"] \"EXISTS\" \"(\" Subselect \")\"
      *
-     * @return \Doctrine\ORM\Query\AST\ExistsExpression
+     * @return \\Doctrine\\ORM\\Query\\AST\\ExistsExpression
      */",
  "/**
      * ComparisonOperator ::= \"=\" | \"<\" | \"<=\" | \"<>\" | \">\" | \">=\" | \"!=\"
@@ -8755,17 +8233,11 @@
  * @author  Roman Borschel <roman@code-factory.org>
  * @author  Janne Vanhala <jpvanhal@cc.hut.fi>
  */",
- "/**
-*YamlDriverthatadditionallylooksformappinginformationinaglobalfile.
-*
-*@authorFabienPotencier<fabien@symfony.com>
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@licenseMIT
-*/",
+
  "/**
      * Initializes a new instance of a class derived from AbstractCollectionPersister.
      *
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param \\Doctrine\\ORM\\EntityManager $em
      */",
  "/**
      * Deletes the persistent state represented by the given collection.
@@ -8828,7 +8300,7 @@
      * Creates a new <tt>Statement</tt> for the given SQL and <tt>Connection</tt>.
      *
      * @param string $sql The SQL of the statement.
-     * @param Doctrine\DBAL\Connection The connection on which the statement should be executed.
+     * @param Doctrine\\DBAL\\Connection The connection on which the statement should be executed.
      */",
  "/**
      * Binds a parameter value to the statement.
@@ -8906,10 +8378,10 @@
  "/**
      * Gets the wrapped driver statement.
      *
-     * @return Doctrine\DBAL\Driver\Statement
+     * @return Doctrine\\DBAL\\Driver\\Statement
      */",
  "/**
- * A thin wrapper around a Doctrine\DBAL\Driver\Statement that adds support
+ * A thin wrapper around a Doctrine\\DBAL\\Driver\\Statement that adds support
  * for logging, DBAL mapping types, etc.
  *
  * @author Roman Borschel <roman@code-factory.org>
@@ -8958,10 +8430,10 @@
  "/**
      * @throws SchemaException
      * @param  string $sequenceName
-     * @return Doctrine\DBAL\Schema\Sequence
+     * @return Doctrine\\DBAL\\Schema\\Sequence
      */",
  "/**
-     * @return Doctrine\DBAL\Schema\Sequence[]
+     * @return Doctrine\\DBAL\\Schema\\Sequence[]
      */",
  "/**
      * Create a new table
@@ -9128,7 +8600,7 @@
      * Constructor.
      *
      * @param object $entity
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param \\Doctrine\\ORM\\EntityManager $em
      * @param array $changeSet
      */",
  "/**
@@ -9335,7 +8807,7 @@
      * Return the FOREIGN KEY query section dealing with non-standard options
      * as MATCH, INITIALLY DEFERRED, ON UPDATE, ...
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey         foreign key definition
+     * @param \\Doctrine\\DBAL\\Schema\\ForeignKeyConstraint $foreignKey         foreign key definition
      * @return string
      * @override
      */",
@@ -9354,12 +8826,12 @@
  "/**
      * Gets the SQL to create a sequence on this platform.
      *
-     * @param \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param \\Doctrine\\DBAL\\Schema\\Sequence $sequence
      * @return string
      */",
  "/**
      * Drop existing sequence
-     * @param  \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param  \\Doctrine\\DBAL\\Schema\\Sequence $sequence
      * @return string
      */",
  "/**
@@ -9490,29 +8962,9 @@
  * @author  Roman Borschel <roman@code-factory.org>
  * @author  David Abdemoulaie <dave@hobodave.com>
  */",
- "/**
-*Addatarget-entityclassnametoresolvetoanewclassname.
-*
-*@paramstring$originalEntity
-*@paramstring$newEntity
-*@paramarray$mapping
-*@returnvoid
-*/",
- "/**
-*Processeventandresolvenewtargetentitynames.
-*
-*@paramLoadClassMetadataEventArgs$args
-*@returnvoid
-*/",
- "/**
-*ResolveTargetEntityListener
-*
-*Mechanismtooverwriteinterfacesorclassesspecifiedasassociation
-*targets.
-*
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@since2.2
-*/",
+
+
+
  "/**
      * @param array $oracleSessionVars
      */",
@@ -9570,7 +9022,7 @@
      *
      * @return mixed
      *
-     * @throws \Exception When any of the validator returns an error
+     * @throws \\Exception When any of the validator returns an error
      */",
  "/**
      * Returns the helper's canonical name
@@ -9631,7 +9083,7 @@
      * @static
      * @throws DBALException
      * @param string $name The name of the type (as returned by getName()).
-     * @return Doctrine\DBAL\Types\Type
+     * @return Doctrine\\DBAL\\Types\\Type
      */",
  "/**
      * Adds a custom type to the type map.
@@ -9676,62 +9128,33 @@
      *
      * @return array $typesMap
      */",
+
+
+
+
  "/**
-*DoesworkingwiththiscolumnrequireSQLconversionfunctions?
-*
-*ThisisametadatafunctionthatisrequiredforexampleintheORM.
-*Usageof{@linkconvertToDatabaseValueSQL}and
-*{@linkconvertToPHPValueSQL}worksforanytypeandmostly
-*doesnothing.Thismethodcanadditionallybeusedforoptimizationpurposes.
-*
-*@returnbool
-*/",
- "/**
-*ModifiestheSQLexpression(identifier,parameter)toconverttoadatabasevalue.
-*
-*@paramstring$sqlExpr
-*@paramAbstractPlatform$platform
-*@returnstring
-*/",
- "/**
-*ModifiestheSQLexpression(identifier,parameter)toconverttoaPHPvalue.
-*
-*@paramstring$sqlExpr
-*@paramAbstractPlatform$platform
-*@returnstring
-*/",
- "/**
-*Thebaseclassforso-calledDoctrinemappingtypes.
-*
-*ATypeobjectisobtainedbycallingthestatic{@linkgetType()}method.
-*
-*@authorRomanBorschel<roman@code-factory.org>
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@since2.0
-*/",
- "/**
-     * @param \Doctrine\DBAL\Schema\Column $column
-     * @param \Doctrine\DBAL\Schema\TableDiff $tableDiff
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param \\Doctrine\\DBAL\\Schema\\Column $column
+     * @param \\Doctrine\\DBAL\\Schema\\TableDiff $tableDiff
+     * @param \\Doctrine\\DBAL\\Platforms\\AbstractPlatform $platform
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\Column
+     * @return \\Doctrine\\DBAL\\Schema\\Column
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\TableDiff
+     * @return \\Doctrine\\DBAL\\Schema\\TableDiff
      */",
  "/**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
      * @param string|array $sql
-     * @return \Doctrine\DBAL\Event\SchemaAlterTableAddColumnEventArgs
+     * @return \\Doctrine\\DBAL\\Event\\SchemaAlterTableAddColumnEventArgs
      */",
  "/**
      * @return array
      */",
  "/**
- * Event Arguments used when SQL queries for adding table columns are generated inside Doctrine\DBAL\Platform\*Platform.
+ * Event Arguments used when SQL queries for adding table columns are generated inside Doctrine\\DBAL\\Platform\*Platform.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -9744,31 +9167,31 @@
  */",
  "/**
      * @param string $oldColumnName
-     * @param \Doctrine\DBAL\Schema\Column $column
-     * @param \Doctrine\DBAL\Schema\TableDiff $tableDiff
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param \\Doctrine\\DBAL\\Schema\\Column $column
+     * @param \\Doctrine\\DBAL\\Schema\\TableDiff $tableDiff
+     * @param \\Doctrine\\DBAL\\Platforms\\AbstractPlatform $platform
      */",
  "/**
      * @return string
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\Column
+     * @return \\Doctrine\\DBAL\\Schema\\Column
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\TableDiff
+     * @return \\Doctrine\\DBAL\\Schema\\TableDiff
      */",
  "/**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
      * @param string|array $sql
-     * @return \Doctrine\DBAL\Event\SchemaAlterTableRenameColumnEventArgs
+     * @return \\Doctrine\\DBAL\\Event\\SchemaAlterTableRenameColumnEventArgs
      */",
  "/**
      * @return array
      */",
  "/**
- * Event Arguments used when SQL queries for renaming table columns are generated inside Doctrine\DBAL\Platform\*Platform.
+ * Event Arguments used when SQL queries for renaming table columns are generated inside Doctrine\\DBAL\\Platform\*Platform.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -9829,7 +9252,7 @@
      *
      * @param string $name The name of the command
      *
-     * @throws \LogicException When the command name is empty
+     * @throws \\LogicException When the command name is empty
      *
      * @api
      */",
@@ -9863,7 +9286,7 @@
      *
      * @return integer 0 if everything went fine, or an error code
      *
-     * @throws \LogicException When this abstract method is not implemented
+     * @throws \\LogicException When this abstract method is not implemented
      * @see    setCode()
      */",
  "/**
@@ -9902,7 +9325,7 @@
      * If this method is used, it overrides the code defined
      * in the execute() method.
      *
-     * @param \Closure $code A \Closure
+     * @param \\Closure $code A \\Closure
      *
      * @return Command The current instance
      *
@@ -9966,7 +9389,7 @@
      *
      * @return Command The current instance
      *
-     * @throws \InvalidArgumentException When command name given is empty
+     * @throws \\InvalidArgumentException When command name given is empty
      *
      * @api
      */",
@@ -10043,7 +9466,7 @@
      *
      * @return mixed The helper value
      *
-     * @throws \InvalidArgumentException if the helper is not defined
+     * @throws \\InvalidArgumentException if the helper is not defined
      *
      * @api
      */",
@@ -10144,7 +9567,7 @@
      *
      * @param string $className
      *
-     * @return \Doctrine\ORM\Mapping\ClassMetadata
+     * @return \\Doctrine\\ORM\\Mapping\\ClassMetadata
      */",
  "/**
  * The ArrayHydrator produces a nested array \"graph\" that is often (not always)
@@ -10161,7 +9584,7 @@
      * This function finds the ClassMetadata instance in an inheritance hierarchy
      * that is responsible for enabling versioning.
      *
-     * @return \Doctrine\ORM\Mapping\ClassMetadata
+     * @return \\Doctrine\\ORM\\Mapping\\ClassMetadata
      */",
  "/**
      * Gets the name of the table that owns the column the given field is mapped to.
@@ -10288,19 +9711,19 @@
      * Creates a new EntityManager that operates on the given database connection
      * and uses the given Configuration and EventManager implementations.
      *
-     * @param \Doctrine\DBAL\Connection $conn
-     * @param \Doctrine\ORM\Configuration $config
-     * @param \Doctrine\Common\EventManager $eventManager
+     * @param \\Doctrine\\DBAL\\Connection $conn
+     * @param \\Doctrine\\ORM\\Configuration $config
+     * @param \\Doctrine\\Common\\EventManager $eventManager
      */",
  "/**
      * Gets the database connection object used by the EntityManager.
      *
-     * @return \Doctrine\DBAL\Connection
+     * @return \\Doctrine\\DBAL\\Connection
      */",
  "/**
      * Gets the metadata factory used to gather the metadata of classes.
      *
-     * @return \Doctrine\ORM\Mapping\ClassMetadataFactory
+     * @return \\Doctrine\\ORM\\Mapping\\ClassMetadataFactory
      */",
  "/**
      * Gets an ExpressionBuilder used for object-oriented construction of query expressions.
@@ -10314,7 +9737,7 @@
      *         ->where($expr->orX($expr->eq('u.id', 1), $expr->eq('u.id', 2)));
      * </code>
      *
-     * @return \Doctrine\ORM\Query\Expr
+     * @return \\Doctrine\\ORM\\Query\\Expr
      */",
  "/**
      * Starts a transaction on the underlying database connection.
@@ -10351,23 +9774,23 @@
      * (as it is returned by get_class($obj)) or an aliased class name.
      *
      * Examples:
-     * MyProject\Domain\\User
+     * MyProject\\Domain\\User
      * sales:PriceRequest
      *
-     * @return \Doctrine\ORM\Mapping\ClassMetadata
+     * @return \\Doctrine\\ORM\\Mapping\\ClassMetadata
      * @internal Performance-sensitive method.
      */",
  "/**
      * Creates a new Query object.
      *
      * @param string  The DQL string.
-     * @return \Doctrine\ORM\Query
+     * @return \\Doctrine\\ORM\\Query
      */",
  "/**
      * Creates a Query from a named query.
      *
      * @param string $name
-     * @return \Doctrine\ORM\Query
+     * @return \\Doctrine\\ORM\\Query
      */",
  "/**
      * Creates a native SQL query.
@@ -10380,7 +9803,7 @@
      * Creates a NativeQuery from a named native query.
      *
      * @param string $name
-     * @return \Doctrine\ORM\NativeQuery
+     * @return \\Doctrine\\ORM\\NativeQuery
      */",
  "/**
      * Create a QueryBuilder instance
@@ -10396,7 +9819,7 @@
      * the cascade-persist semantics + scheduled inserts/removals are synchronized.
      *
      * @param object $entity
-     * @throws \Doctrine\ORM\OptimisticLockException If a version check on an entity that
+     * @throws \\Doctrine\\ORM\\OptimisticLockException If a version check on an entity that
      *         makes use of optimistic locking fails.
      */",
  "/**
@@ -10409,201 +9832,34 @@
      * @param int $lockMode
      * @param int $lockVersion
      * @return object
-     */",
- "/**
-*Getsareferencetotheentityidentifiedbythegiventypeandidentifier
-*withoutactuallyloadingit,iftheentityisnotyetloaded.
-*
-*@paramstring$entityNameThenameoftheentitytype.
-*@parammixed$idTheentityidentifier.
-*@returnobjectTheentityreference.
-*/",
- "/**
-*Getsapartialreferencetotheentityidentifiedbythegiventypeandidentifier
-*withoutactuallyloadingit,iftheentityisnotyetloaded.
-*
-*Thereturnedreferencemaybeapartialobjectiftheentityisnotyetloaded/managed.
-*Ifitisapartialobjectitwillnotinitializetherestoftheentitystateonaccess.
-*Thusyoucanonlyeversafelyaccesstheidentifierofanentityobtainedthrough
-*thismethod.
-*
-*Theuse-casesforpartialreferencesinvolvemaintainingbidirectionalassociations
-*withoutloadingonesideoftheassociationortoupdateanentitywithoutloadingit.
-*Note,however,thatinthelattercasetheoriginal(persistent)entitydatawill
-*neverbevisibletotheapplication(especiallynoteventlisteners)asitwill
-*neverbeloadedinthefirstplace.
-*
-*@paramstring$entityNameThenameoftheentitytype.
-*@parammixed$identifierTheentityidentifier.
-*@returnobjectThe(partial)entityreference.
-*/",
- "/**
-*ClearstheEntityManager.Allentitiesthatarecurrentlymanaged
-*bythisEntityManagerbecomedetached.
-*
-*@paramstring$entityNameifgiven,onlyentitiesofthistypewillgetdetached
-*/",
- "/**
-*ClosestheEntityManager.Allentitiesthatarecurrentlymanaged
-*bythisEntityManagerbecomedetached.TheEntityManagermaynolonger
-*beusedafteritisclosed.
-*/",
- "/**
-*TellstheEntityManagertomakeaninstancemanagedandpersistent.
-*
-*Theentitywillbeenteredintothedatabaseatorbeforetransaction
-*commitorasaresultoftheflushoperation.
-*
-*NOTE:Thepersistoperationalwaysconsidersentitiesthatarenotyetknownto
-*thisEntityManagerasNEW.Donotpassdetachedentitiestothepersistoperation.
-*
-*@paramobject$objectTheinstancetomakemanagedandpersistent.
-*/",
- "/**
-*Removesanentityinstance.
-*
-*Aremovedentitywillberemovedfromthedatabaseatorbeforetransactioncommit
-*orasaresultoftheflushoperation.
-*
-*@paramobject$entityTheentityinstancetoremove.
-*/",
- "/**
-*Refreshesthepersistentstateofanentityfromthedatabase,
-*overridinganylocalchangesthathavenotyetbeenpersisted.
-*
-*@paramobject$entityTheentitytorefresh.
-*/",
- "/**
-*DetachesanentityfromtheEntityManager,causingamanagedentityto
-*becomedetached.Unflushedchangesmadetotheentityifany
-*(includingremovaloftheentity),willnotbesynchronizedtothedatabase.
-*Entitieswhichpreviouslyreferencedthedetachedentitywillcontinueto
-*referenceit.
-*
-*@paramobject$entityTheentitytodetach.
-*/",
- "/**
-*Mergesthestateofadetachedentityintothepersistencecontext
-*ofthisEntityManagerandreturnsthemanagedcopyoftheentity.
-*Theentitypassedtomergewillnotbecomeassociated/managedwiththisEntityManager.
-*
-*@paramobject$entityThedetachedentitytomergeintothepersistencecontext.
-*@returnobjectThemanagedcopyoftheentity.
-*/",
- "/**
-*Createsacopyofthegivenentity.Cancreateashalloworadeepcopy.
-*
-*@paramobject$entityTheentitytocopy.
-*@returnobjectThenewentity.
-*@todoImplementationneed.Thisisnecessarysince$e2=clone$e1;throwsanE_FATALwhenaccessanythingon$e:
-*Fatalerror:Maximumfunctionnestinglevelof'100'reached,aborting!
-*/",
- "/**
-*Acquirealockonthegivenentity.
-*
-*@paramobject$entity
-*@paramint$lockMode
-*@paramint$lockVersion
-*@throwsOptimisticLockException
-*@throwsPessimisticLockException
-*/",
- "/**
-*Getstherepositoryforanentityclass.
-*
-*@paramstring$entityNameThenameoftheentity.
-*@returnEntityRepositoryTherepositoryclass.
-*/",
- "/**
-*DetermineswhetheranentityinstanceismanagedinthisEntityManager.
-*
-*@paramobject$entity
-*@returnbooleanTRUEifthisEntityManagercurrentlymanagesthegivenentity,FALSEotherwise.
-*/",
- "/**
-*GetstheEventManagerusedbytheEntityManager.
-*
-*@return\Doctrine\Common\EventManager
-*/",
- "/**
-*GetstheConfigurationusedbytheEntityManager.
-*
-*@return\Doctrine\ORM\Configuration
-*/",
- "/**
-*ThrowsanexceptioniftheEntityManagerisclosedorcurrentlynotactive.
-*
-*@throwsORMExceptionIftheEntityManagerisclosed.
-*/",
- "/**
-*CheckiftheEntitymanagerisopenorclosed.
-*
-*@returnbool
-*/",
- "/**
-*GetstheUnitOfWorkusedbytheEntityManagertocoordinateoperations.
-*
-*@return\Doctrine\ORM\\UnitOfWork
-*/",
- "/**
-*Getsahydratorforthegivenhydrationmode.
-*
-*Thismethodcachesthehydratorinstanceswhichisusedforallqueriesthatdon't
-*selectivelyiterateovertheresult.
-*
-*@paramint$hydrationMode
-*@return\Doctrine\ORM\Internal\Hydration\AbstractHydrator
-*/",
- "/**
-*Createanewinstanceforthegivenhydrationmode.
-*
-*@paramint$hydrationMode
-*@return\Doctrine\ORM\Internal\Hydration\AbstractHydrator
-*/",
- "/**
-*GetstheproxyfactoryusedbytheEntityManagertocreateentityproxies.
-*
-*@returnProxyFactory
-*/",
- "/**
-*Helpermethodtoinitializealazyloadingproxyorpersistentcollection.
-*
-*Thismethodisano-opforotherobjects
-*
-*@paramobject$obj
-*/",
- "/**
-*FactorymethodtocreateEntityManagerinstances.
-*
-*@parammixed$connAnarraywiththeconnectionparametersoranexisting
-*Connectioninstance.
-*@paramConfiguration$configTheConfigurationinstancetouse.
-*@paramEventManager$eventManagerTheEventManagerinstancetouse.
-*@returnEntityManagerThecreatedEntityManager.
-*/",
- "/**
-*Getstheenabledfilters.
-*
-*@returnFilterCollectionTheactivefiltercollection.
-*/",
- "/**
-*Checkswhetherthestateofthefiltercollectionisclean.
-*
-*@returnbooleanTrue,ifthefiltercollectionisclean.
-*/",
- "/**
-*CheckswhethertheEntityManagerhasfilters.
-*
-*@returnTrue,iftheEMhasafiltercollection.
-*/",
- "/**
-*TheEntityManageristhecentralaccesspointtoORMfunctionality.
-*
-*@since2.0
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@authorGuilhermeBlanco<guilhermeblanco@hotmail.com>
-*@authorJonathanWage<jonwage@gmail.com>
-*@authorRomanBorschel<roman@code-factory.org>
-*/",
+     */"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  "/**
      * @param Schema $schema
      */",
@@ -10722,7 +9978,7 @@
  * Replaces the whereClause of the AST with a WHERE id IN (:foo_1, :foo_2) equivalent
  *
  * @category    DoctrineExtensions
- * @package     DoctrineExtensions\Paginate
+ * @package     DoctrineExtensions\\Paginate
  * @author      David Abdemoulaie <dave@hobodave.com>
  * @copyright   Copyright (c) 2010 David Abdemoulaie (http://hobodave.com/)
  * @license     http://hobodave.com/license.txt New BSD License
@@ -11143,7 +10399,7 @@
  * Replaces the selectClause of the AST with a SELECT DISTINCT root.id equivalent
  *
  * @category    DoctrineExtensions
- * @package     DoctrineExtensions\Paginate
+ * @package     DoctrineExtensions\\Paginate
  * @author      David Abdemoulaie <dave@hobodave.com>
  * @copyright   Copyright (c) 2010 David Abdemoulaie (http://hobodave.com/)
  * @license     http://hobodave.com/license.txt New BSD License
@@ -11151,7 +10407,7 @@
  "/**
      * Attempts to connect to the database and returns a driver connection on success.
      *
-     * @return Doctrine\DBAL\Driver\Connection
+     * @return Doctrine\\DBAL\\Driver\\Connection
      */",
  "/**
      * Constructs the Postgres PDO DSN.
@@ -11212,7 +10468,7 @@
      * For more complex expression construction, consider storing the expression
      * builder object in a local variable.
      *
-     * @return Query\Expr
+     * @return Query\\Expr
      */",
  "/**
      * Get the type of the currently built query.
@@ -11310,7 +10566,7 @@
      *
      * @param string|integer $key The parameter position or name.
      * @param mixed $value The parameter value.
-     * @param string|null $type PDO::PARAM_* or \Doctrine\DBAL\Types\Type::* constant
+     * @param string|null $type PDO::PARAM_* or \\Doctrine\\DBAL\\Types\\Type::* constant
      * @return QueryBuilder This QueryBuilder instance.
      */",
  "/**
@@ -11473,7 +10729,7 @@
      *     $qb = $em->createQueryBuilder()
      *         ->select('u')
      *         ->from('User', 'u')
-     *         ->join('u.Phonenumbers', 'p', Expr\Join::WITH, 'p.is_primary = 1');
+     *         ->join('u.Phonenumbers', 'p', Expr\\Join::WITH, 'p.is_primary = 1');
      * </code>
      *
      * @param string $join The relationship to join
@@ -11494,7 +10750,7 @@
      *     $qb = $em->createQueryBuilder()
      *         ->select('u')
      *         ->from('User', 'u')
-     *         ->innerJoin('u.Phonenumbers', 'p', Expr\Join::WITH, 'p.is_primary = 1');
+     *         ->innerJoin('u.Phonenumbers', 'p', Expr\\Join::WITH, 'p.is_primary = 1');
      *
      * @param string $join The relationship to join
      * @param string $alias The alias of the join
@@ -11514,7 +10770,7 @@
      *     $qb = $em->createQueryBuilder()
      *         ->select('u')
      *         ->from('User', 'u')
-     *         ->leftJoin('u.Phonenumbers', 'p', Expr\Join::WITH, 'p.is_primary = 1');
+     *         ->leftJoin('u.Phonenumbers', 'p', Expr\\Join::WITH, 'p.is_primary = 1');
      * </code>
      *
      * @param string $join The relationship to join
@@ -11950,7 +11206,7 @@
      *
      * @return integer 0 if everything went fine, or an error code
      *
-     * @throws \Exception When doRun returns Exception
+     * @throws \\Exception When doRun returns Exception
      *
      * @api
      */",
@@ -12069,7 +11325,7 @@
      *
      * @return Command A Command object
      *
-     * @throws \InvalidArgumentException When command name given does not exist
+     * @throws \\InvalidArgumentException When command name given does not exist
      *
      * @api
      */",
@@ -12096,7 +11352,7 @@
      *
      * @return string A registered namespace
      *
-     * @throws \InvalidArgumentException When namespace is incorrect or ambiguous
+     * @throws \\InvalidArgumentException When namespace is incorrect or ambiguous
      */",
  "/**
      * Finds a command by name or alias.
@@ -12108,7 +11364,7 @@
      *
      * @return Command A Command instance
      *
-     * @throws \InvalidArgumentException When command name is incorrect or ambiguous
+     * @throws \\InvalidArgumentException When command name is incorrect or ambiguous
      *
      * @api
      */",
@@ -12238,7 +11494,7 @@
      * @return string|null
      */",
  "/**
-     * @param \Doctrine\ORM\Mapping\ClassMetadataInfo $cm
+     * @param \\Doctrine\\ORM\\Mapping\\ClassMetadataInfo $cm
      */",
  "/**
      * @return ClassMetadata
@@ -12441,12 +11697,12 @@
  "/**
      * Constructor.
      *
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param \\Doctrine\\ORM\\EntityManager $em
      */",
  "/**
      * Retrieve associated EntityManager.
      *
-     * @return \Doctrine\ORM\EntityManager
+     * @return \\Doctrine\\ORM\\EntityManager
      */",
  "/**
  * Provides event arguments for the preFlush event.
@@ -12595,10 +11851,10 @@
  * @author  Roman Borschel <roman@code-factory.org>
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to execute DQL queries in a given EntityManager.
@@ -12694,7 +11950,7 @@
      * @return ConversionException
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to drop the database schema for a set of classes based on their mappings.
@@ -12745,7 +12001,7 @@
      * @param PersistentCollection $coll
      * @param int $offset
      * @param int $length
-     * @return \Doctrine\Common\Collections\ArrayCollection
+     * @return \\Doctrine\\Common\\Collections\\ArrayCollection
      */",
  "/**
      * @param PersistentCollection $coll
@@ -12829,7 +12085,7 @@
  "/**
      * INTERNAL: Gets the association mapping of the collection.
      *
-     * @return \Doctrine\ORM\Mapping\AssociationMapping
+     * @return \\Doctrine\\ORM\\Mapping\\AssociationMapping
      */",
  "/**
      * Marks this collection as changed/dirty.
@@ -12946,7 +12202,7 @@
  "/**
      * Retrieves the wrapped Collection instance.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \\Doctrine\\Common\\Collections\\Collection
      */",
  "/**
      * Extract a slice of $length elements starting at position $offset from the Collection.
@@ -13289,7 +12545,7 @@
      * @return mixed $exported
      */",
  "/**
-     * @param \SimpleXMLElement $simpleXml
+     * @param \\SimpleXMLElement $simpleXml
      * @return string $xml
      */",
  "/**
@@ -13363,17 +12619,17 @@
      * @param array  $tableColumn
      * @param string $table
      * @param string $database
-     * @param \Doctrine\DBAL\Connection $conn
+     * @param \\Doctrine\\DBAL\\Connection $conn
      */",
  "/**
      * Allows to clear the column which means the column will be excluded from
      * tables column list.
      *
-     * @param null|\Doctrine\DBAL\Schema\Column $column
+     * @param null|\Doctrine\\DBAL\\Schema\\Column $column
      * @return SchemaColumnDefinitionEventArgs
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\Column
+     * @return \\Doctrine\\DBAL\\Schema\\Column
      */",
  "/**
      * @return array
@@ -13385,13 +12641,13 @@
      * @return string
      */",
  "/**
-     * @return \Doctrine\DBAL\Connection
+     * @return \\Doctrine\\DBAL\\Connection
      */",
  "/**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
- * Event Arguments used when the portable column definition is generated inside Doctrine\DBAL\Schema\AbstractSchemaManager.
+ * Event Arguments used when the portable column definition is generated inside Doctrine\\DBAL\\Schema\\AbstractSchemaManager.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -13486,10 +12742,10 @@
  * @since       2.0
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Task for executing arbitrary SQL that can come from a file or directly from
@@ -13564,10 +12820,10 @@
  * @since 2.0
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to clear the result cache of the various cache drivers.
@@ -13587,48 +12843,15 @@
      * @param array $metadatas
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
- "/**
-*Parsesaclass.
-*
-*@param\ReflectionClass$classA<code>ReflectionClass</code>object.
-*@returnarrayAlistwithusestatementsintheform(Alias=>FQN).
-*/",
- "/**
-*Getthecontentofthefilerightuptothegivenlinenumber.
-*
-*@paramstring$filenameThenameofthefiletoload.
-*@paramint$lineNumberThenumberoflinestoreadfromfile.
-*@returnstringThecontentofthefile.
-*/",
- "/**
-*Getsthenextnonwhitespaceandnoncommenttoken.
-*
-*@returnarrayThetokenifexists,nullotherwise.
-*/",
- "/**
-*Getallusestatements.
-*
-*@paramstring$namespaceNameThenamespacenameofthereflectedclass.
-*@returnarrayAlistwithallfoundusestatements.
-*/",
- "/**
-*Getthenamespacename.
-*
-*@returnstringThefoundnamespacename.
-*/",
- "/**
-*Parseasingleusestatement.
-*
-*@returnarrayAlistwithallfoundclassnamesforausestatement.
-*/",
- "/**
-*Parsesafilefornamespaces/use/classdeclarations.
-*
-*@authorFabienPotencier<fabien@symfony.com>
-*@authorChristianKaps<christian.kaps@mohiva.com>
-*/",
+
+
+
+
+
+
+
  "/**
      * {@inheritdoc}
      */",
@@ -13647,7 +12870,7 @@
  "/**
      * Checks that xcache.admin.enable_auth is Off
      *
-     * @throws \BadMethodCallException When xcache.admin.enable_auth is On
+     * @throws \\BadMethodCallException When xcache.admin.enable_auth is On
      * @return void
      */",
  "/**
@@ -13667,8 +12890,8 @@
  */",
  "/**
      * Infer type of a given value, returning a compatible constant:
-     * - Type (\Doctrine\DBAL\Types\Type::*)
-     * - Connection (\Doctrine\DBAL\Connection::PARAM_*)
+     * - Type (\Doctrine\\DBAL\\Types\\Type::*)
+     * - Connection (\Doctrine\\DBAL\\Connection::PARAM_*)
      *
      * @param mixed $value Parameter value
      *
@@ -13712,11 +12935,11 @@
      *     // (u.type = ?1) AND (u.role = ?2)
      *     $expr->andX($expr->eq('u.type', ':1'), $expr->eq('u.role', ':2'));
      *
-     * @param \Doctrine\ORM\Query\Expr\Comparison |
-     *          \Doctrine\ORM\Query\Expr\Func |
-     *          \Doctrine\ORM\Query\Expr\Orx
+     * @param \\Doctrine\\ORM\\Query\\Expr\\Comparison |
+     *          \\Doctrine\\ORM\\Query\\Expr\\Func |
+     *          \\Doctrine\\ORM\\Query\\Expr\\Orx
     *               $x Optional clause. Defaults = null, but requires at least one defined when converting to string.
-     * @return Expr\Andx
+     * @return Expr\\Andx
      */",
  "/**
      * Creates a disjunction of the given boolean expressions.
@@ -13729,19 +12952,19 @@
      *
      * @param mixed $x Optional clause. Defaults = null, but requires
      *                 at least one defined when converting to string.
-     * @return Expr\Orx
+     * @return Expr\\Orx
      */",
  "/**
      * Creates an ASCending order expression.
      *
      * @param $sort
-     * @return Expr\OrderBy
+     * @return Expr\\OrderBy
      */",
  "/**
      * Creates a DESCending order expression.
      *
      * @param $sort
-     * @return Expr\OrderBy
+     * @return Expr\\OrderBy
      */",
  "/**
      * Creates an equality comparison expression with the given arguments.
@@ -13755,10 +12978,10 @@
      *
      * @param mixed $x Left expression
      * @param mixed $y Right expression
-     * @return Expr\Comparison
+     * @return Expr\\Comparison
      */",
  "/**
-     * Creates an instance of Expr\Comparison, with the given arguments.
+     * Creates an instance of Expr\\Comparison, with the given arguments.
      * First argument is considered the left expression and the second is the right expression.
      * When converted to string, it will generated a <left expr> <> <right expr>. Example:
      *
@@ -13768,10 +12991,10 @@
      *
      * @param mixed $x Left expression
      * @param mixed $y Right expression
-     * @return Expr\Comparison
+     * @return Expr\\Comparison
      */",
  "/**
-     * Creates an instance of Expr\Comparison, with the given arguments.
+     * Creates an instance of Expr\\Comparison, with the given arguments.
      * First argument is considered the left expression and the second is the right expression.
      * When converted to string, it will generated a <left expr> < <right expr>. Example:
      *
@@ -13781,10 +13004,10 @@
      *
      * @param mixed $x Left expression
      * @param mixed $y Right expression
-     * @return Expr\Comparison
+     * @return Expr\\Comparison
      */",
  "/**
-     * Creates an instance of Expr\Comparison, with the given arguments.
+     * Creates an instance of Expr\\Comparison, with the given arguments.
      * First argument is considered the left expression and the second is the right expression.
      * When converted to string, it will generated a <left expr> <= <right expr>. Example:
      *
@@ -13794,10 +13017,10 @@
      *
      * @param mixed $x Left expression
      * @param mixed $y Right expression
-     * @return Expr\Comparison
+     * @return Expr\\Comparison
      */",
  "/**
-     * Creates an instance of Expr\Comparison, with the given arguments.
+     * Creates an instance of Expr\\Comparison, with the given arguments.
      * First argument is considered the left expression and the second is the right expression.
      * When converted to string, it will generated a <left expr> > <right expr>. Example:
      *
@@ -13807,10 +13030,10 @@
      *
      * @param mixed $x Left expression
      * @param mixed $y Right expression
-     * @return Expr\Comparison
+     * @return Expr\\Comparison
      */",
  "/**
-     * Creates an instance of Expr\Comparison, with the given arguments.
+     * Creates an instance of Expr\\Comparison, with the given arguments.
      * First argument is considered the left expression and the second is the right expression.
      * When converted to string, it will generated a <left expr> >= <right expr>. Example:
      *
@@ -13820,31 +13043,31 @@
      *
      * @param mixed $x Left expression
      * @param mixed $y Right expression
-     * @return Expr\Comparison
+     * @return Expr\\Comparison
      */",
  "/**
      * Creates an instance of AVG() function, with the given argument.
      *
      * @param mixed $x Argument to be used in AVG() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates an instance of MAX() function, with the given argument.
      *
      * @param mixed $x Argument to be used in MAX() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates an instance of MIN() function, with the given argument.
      *
      * @param mixed $x Argument to be used in MIN() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates an instance of COUNT() function, with the given argument.
      *
      * @param mixed $x Argument to be used in COUNT() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates an instance of COUNT(DISTINCT) function, with the given argument.
@@ -13856,37 +13079,37 @@
      * Creates an instance of EXISTS() function, with the given DQL Subquery.
      *
      * @param mixed $subquery DQL Subquery to be used in EXISTS() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates an instance of ALL() function, with the given DQL Subquery.
      *
      * @param mixed $subquery DQL Subquery to be used in ALL() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates a SOME() function expression with the given DQL subquery.
      *
      * @param mixed $subquery DQL Subquery to be used in SOME() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates an ANY() function expression with the given DQL subquery.
      *
      * @param mixed $subquery DQL Subquery to be used in ANY() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates a negation expression of the given restriction.
      *
      * @param mixed $restriction Restriction to be used in NOT() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates an ABS() function expression with the given argument.
      *
      * @param mixed $x Argument to be used in ABS() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates a product mathematical expression with the given arguments.
@@ -13900,7 +13123,7 @@
      *
      * @param mixed $x Left expression
      * @param mixed $y Right expression
-     * @return Expr\Math
+     * @return Expr\\Math
      */",
  "/**
      * Creates a difference mathematical expression with the given arguments.
@@ -13913,7 +13136,7 @@
      *
      * @param mixed $x Left expression
      * @param mixed $y Right expression
-     * @return Expr\Math
+     * @return Expr\\Math
      */",
  "/**
      * Creates a sum mathematical expression with the given arguments.
@@ -13926,7 +13149,7 @@
      *
      * @param mixed $x Left expression
      * @param mixed $y Right expression
-     * @return Expr\Math
+     * @return Expr\\Math
      */",
  "/**
      * Creates a quotient mathematical expression with the given arguments.
@@ -13939,27 +13162,27 @@
      *
      * @param mixed $x Left expression
      * @param mixed $y Right expression
-     * @return Expr\Math
+     * @return Expr\\Math
      */",
  "/**
      * Creates a SQRT() function expression with the given argument.
      *
      * @param mixed $x Argument to be used in SQRT() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates an IN() expression with the given arguments.
      *
      * @param string $x Field in string format to be restricted by IN() function
      * @param mixed $y Argument to be used in IN() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates a NOT IN() expression with the given arguments.
      *
      * @param string $x Field in string format to be restricted by NOT IN() function
      * @param mixed $y Argument to be used in NOT IN() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates an IS NULL expression with the given arguments.
@@ -13978,14 +13201,14 @@
      *
      * @param string $x Field in string format to be inspected by LIKE() comparison.
      * @param mixed $y Argument to be used in LIKE() comparison.
-     * @return Expr\Comparison
+     * @return Expr\\Comparison
      */",
  "/**
      * Creates a CONCAT() function expression with the given arguments.
      *
      * @param mixed $x First argument to be used in CONCAT() function.
      * @param mixed $x Second argument to be used in CONCAT() function.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates a SUBSTRING() function expression with the given arguments.
@@ -13993,31 +13216,31 @@
      * @param mixed $x Argument to be used as string to be cropped by SUBSTRING() function.
      * @param integer $from Initial offset to start cropping string. May accept negative values.
      * @param integer $len Length of crop. May accept negative values.
-     * @return Expr\Func
+     * @return Expr\\Func
      */",
  "/**
      * Creates a LOWER() function expression with the given argument.
      *
      * @param mixed $x Argument to be used in LOWER() function.
-     * @return Expr\Func A LOWER function expression.
+     * @return Expr\\Func A LOWER function expression.
      */",
  "/**
      * Creates an UPPER() function expression with the given argument.
      *
      * @param mixed $x Argument to be used in UPPER() function.
-     * @return Expr\Func An UPPER function expression.
+     * @return Expr\\Func An UPPER function expression.
      */",
  "/**
      * Creates a LENGTH() function expression with the given argument.
      *
      * @param mixed $x Argument to be used as argument of LENGTH() function.
-     * @return Expr\Func A LENGTH function expression.
+     * @return Expr\\Func A LENGTH function expression.
      */",
  "/**
      * Creates a literal expression of the given argument.
      *
      * @param mixed $literal Argument to be converted to literal.
-     * @return Expr\Literal
+     * @return Expr\\Literal
      */",
  "/**
      * Quotes a literal value, if necessary, according to the DQL syntax.
@@ -14031,13 +13254,13 @@
      * @param mixed $val Valued to be inspected by range values.
      * @param integer $x Starting range value to be used in BETWEEN() function.
      * @param integer $y End point value to be used in BETWEEN() function.
-     * @return Expr\Func A BETWEEN expression.
+     * @return Expr\\Func A BETWEEN expression.
      */",
  "/**
      * Creates an instance of TRIM() function, with the given argument.
      *
      * @param mixed $x Argument to be used as argument of TRIM() function.
-     * @return Expr\Func a TRIM expression.
+     * @return Expr\\Func a TRIM expression.
      */",
  "/**
  * This class is used to generate DQL expressions via a set of PHP static functions
@@ -14099,7 +13322,7 @@
      * Tokenizes a string.
      *
      * @param string $input The input to tokenize
-     * @throws \InvalidArgumentException When unable to parse input (should never happen)
+     * @throws \\InvalidArgumentException When unable to parse input (should never happen)
      */",
  "/**
  * StringInput represents an input provided as a string.
@@ -14417,471 +13640,82 @@
      * @param array $mapping  The field mapping to validated & complete.
      * @return array  The validated and completed field mapping.
      */",
- "/**
-*Validates&completesthebasicmappinginformationthatiscommontoall
-*associationmappings(one-to-one,many-ot-one,one-to-many,many-to-many).
-*
-*@paramarray$mappingThemapping.
-*@returnarrayTheupdatedmapping.
-*@throwsMappingExceptionIfsomethingiswrongwiththemapping.
-*/",
- "/**
-*Validates&completesaone-to-oneassociationmapping.
-*
-*@paramarray$mappingThemappingtovalidate&complete.
-*@returnarrayThevalidated&completedmapping.
-*@override
-*/",
- "/**
-*Validatesandcompletesthemapping.
-*
-*@paramarray$mappingThemappingtovalidateandcomplete.
-*@returnarrayThevalidatedandcompletedmapping.
-*@override
-*/",
- "/**
-*Getstheidentifier(primarykey)fieldnamesoftheclass.
-*
-*@returnmixed
-*/",
- "/**
-*Getsthenameofthesingleidfield.Notethatthisonlyworkson
-*entityclassesthathaveasingle-fieldpk.
-*
-*@returnstring
-*@throwsMappingExceptionIftheclasshasacompositeprimarykey.
-*/",
- "/**
-*Getsthecolumnnameofthesingleidcolumn.Notethatthisonlyworkson
-*entityclassesthathaveasingle-fieldpk.
-*
-*@returnstring
-*@throwsMappingExceptionIftheclasshasacompositeprimarykey.
-*/",
- "/**
-*INTERNAL:
-*Setsthemappedidentifier/primarykeyfieldsofthisclass.
-*MainlyusedbytheClassMetadataFactorytoassigninheritedidentifiers.
-*
-*@paramarray$identifier
-*/",
- "/**
-*Getsthemappedidentifierfieldofthisclass.
-*
-*@returnstring$identifier
-*/",
- "/**
-*Checkswhethertheclasshasa(mapped)fieldwithacertainname.
-*
-*@returnboolean
-*/",
- "/**
-*Getsanarraycontainingallthecolumnnames.
-*
-*@returnarray
-*/",
- "/**
-*Returnsanarraywithalltheidentifiercolumnnames.
-*
-*@returnarray
-*/",
- "/**
-*SetsthetypeofIdgeneratortouseforthemappedclass.
-*/",
- "/**
-*CheckswhetherthemappedclassusesanIdgenerator.
-*
-*@returnbooleanTRUEifthemappedclassusesanIdgenerator,FALSEotherwise.
-*/",
- "/**
-*@returnboolean
-*/",
- "/**
-*CheckswhetherthemappedclassusestheJOINEDinheritancemappingstrategy.
-*
-*@returnbooleanTRUEiftheclassparticipatesinaJOINEDinheritancemapping,
-*FALSEotherwise.
-*/",
- "/**
-*CheckswhetherthemappedclassusestheSINGLE_TABLEinheritancemappingstrategy.
-*
-*@returnbooleanTRUEiftheclassparticipatesinaSINGLE_TABLEinheritancemapping,
-*FALSEotherwise.
-*/",
- "/**
-*CheckswhetherthemappedclassusestheTABLE_PER_CLASSinheritancemappingstrategy.
-*
-*@returnbooleanTRUEiftheclassparticipatesinaTABLE_PER_CLASSinheritancemapping,
-*FALSEotherwise.
-*/",
- "/**
-*CheckswhethertheclassusesanidentitycolumnfortheIdgeneration.
-*
-*@returnbooleanTRUEiftheclassusestheIDENTITYgenerator,FALSEotherwise.
-*/",
- "/**
-*Checkswhethertheclassusesasequenceforidgeneration.
-*
-*@returnbooleanTRUEiftheclassusestheSEQUENCEgenerator,FALSEotherwise.
-*/",
- "/**
-*Checkswhethertheclassusesatableforidgeneration.
-*
-*@returnbooleanTRUEiftheclassusestheTABLEgenerator,FALSEotherwise.
-*/",
- "/**
-*Checkswhethertheclasshasanaturalidentifier/pk(whichmeansitdoes
-*notuseanyIdgenerator.
-*
-*@returnboolean
-*/",
- "/**
-*Getsthetypeofafield.
-*
-*@paramstring$fieldName
-*@return\Doctrine\DBAL\Types\Type
-*/",
- "/**
-*Getsthetypeofacolumn.
-*
-*@return\Doctrine\DBAL\Types\Type
-*/",
- "/**
-*Getsthenameoftheprimarytable.
-*
-*@returnstring
-*/",
- "/**
-*Getsthetablenametousefortemporaryidentifiertablesofthisclass.
-*
-*@returnstring
-*/",
- "/**
-*Setsthemappedsubclassesofthisclass.
-*
-*@paramarray$subclassesThenamesofallmappedsubclasses.
-*/",
- "/**
-*Setstheparentclassnames.
-*Assumesthattheclassnamesinthepassedarrayareintheorder:
-*directParent->directParentParent->directParentParentParent...->root.
-*/",
- "/**
-*Setstheinheritancetypeusedbytheclassandit'ssubclasses.
-*
-*@paraminteger$type
-*/",
- "/**
-*Checkswhetheramappedfieldisinheritedfromanentitysuperclass.
-*
-*@returnbooleanTRUEifthefieldisinherited,FALSEotherwise.
-*/",
- "/**
-*Checkswhetheramappedassociationfieldisinheritedfromasuperclass.
-*
-*@paramstring$fieldName
-*@returnbooleanTRUEifthefieldisinherited,FALSEotherwise.
-*/",
- "/**
-*Setsthenameoftheprimarytabletheclassismappedto.
-*
-*@paramstring$tableNameThetablename.
-*@deprecatedUse{@linksetPrimaryTable}.
-*/",
- "/**
-*Setstheprimarytabledefinition.Theprovidedarraysupportsthe
-*followingstructure:
-*
-*name=><tableName>(optional,defaultstoclassname)
-*indexes=>arrayofindexes(optional)
-*uniqueConstraints=>arrayofconstraints(optional)
-*
-*Ifakeyisomitted,thecurrentvalueiskept.
-*
-*@paramarray$tableThetabledescription.
-*/",
- "/**
-*Checkswhetherthegiventypeidentifiesaninheritancetype.
-*
-*@paraminteger$type
-*@returnbooleanTRUEifthegiventypeidentifiesaninheritancetype,FALSeotherwise.
-*/",
- "/**
-*Addsamappedfieldtotheclass.
-*
-*@paramarray$mappingThefieldmapping.
-*/",
- "/**
-*INTERNAL:
-*Addsanassociationmappingwithoutcompleting/validatingit.
-*Thisismainlyusedtoaddinheritedassociationmappingstoderivedclasses.
-*
-*@paramarray$mapping
-*/",
- "/**
-*INTERNAL:
-*Addsafieldmappingwithoutcompleting/validatingit.
-*Thisismainlyusedtoaddinheritedfieldmappingstoderivedclasses.
-*
-*@paramarray$mapping
-*/",
- "/**
-*INTERNAL:
-*Addsanamedquerytothisclass.
-*
-*@throwsMappingException
-*@paramarray$queryMapping
-*/",
- "/**
-*Addsaone-to-onemapping.
-*
-*@paramarray$mappingThemapping.
-*/",
- "/**
-*Addsaone-to-manymapping.
-*
-*@paramarray$mappingThemapping.
-*/",
- "/**
-*Addsamany-to-onemapping.
-*
-*@paramarray$mappingThemapping.
-*/",
- "/**
-*Addsamany-to-manymapping.
-*
-*@paramarray$mappingThemapping.
-*/",
- "/**
-*Storestheassociationmapping.
-*
-*@paramarray$assocMapping
-*/",
- "/**
-*Registersacustomrepositoryclassfortheentityclass.
-*
-*@paramstring$mapperClassNameTheclassnameofthecustommapper.
-*/",
- "/**
-*Dispatchesthelifecycleeventofthegivenentitytotheregistered
-*lifecyclecallbacksandlifecyclelisteners.
-*
-*@paramstring$eventThelifecycleevent.
-*@paramEntity$entityTheEntityonwhichtheeventoccured.
-*/",
- "/**
-*Whethertheclasshasanyattachedlifecyclelistenersorcallbacksforalifecycleevent.
-*
-*@paramstring$lifecycleEvent
-*@returnboolean
-*/",
- "/**
-*Getstheregisteredlifecyclecallbacksforanevent.
-*
-*@paramstring$event
-*@returnarray
-*/",
- "/**
-*Addsalifecyclecallbackforentitiesofthisclass.
-*
-*@paramstring$callback
-*@paramstring$event
-*/",
- "/**
-*Setsthelifecyclecallbacksforentitiesofthisclass.
-*Anypreviouslyregisteredcallbacksareoverwritten.
-*
-*@paramarray$callbacks
-*/",
- "/**
-*Setsthediscriminatorcolumndefinition.
-*
-*@paramarray$columnDef
-*@seegetDiscriminatorColumn()
-*/",
- "/**
-*Setsthediscriminatorvaluesusedbythisclass.
-*UsedforJOINEDandSINGLE_TABLEinheritancemappingstrategies.
-*
-*@paramarray$map
-*/",
- "/**
-*Addoneentryofthediscriminatormapwithanewclassandcorrespondingname.
-*
-*@paramstring$name
-*@paramstring$className
-*/",
- "/**
-*Checkswhethertheclasshasanamedquerywiththegivenqueryname.
-*
-*@paramstring$fieldName
-*@returnboolean
-*/",
- "/**
-*Checkswhethertheclasshasamappedassociationwiththegivenfieldname.
-*
-*@paramstring$fieldName
-*@returnboolean
-*/",
- "/**
-*Checkswhethertheclasshasamappedassociationforthespecifiedfield
-*andifyes,checkswhetheritisasingle-valuedassociation(to-one).
-*
-*@paramstring$fieldName
-*@returnbooleanTRUEiftheassociationexistsandissingle-valued,FALSEotherwise.
-*/",
- "/**
-*Checkswhethertheclasshasamappedassociationforthespecifiedfield
-*andifyes,checkswhetheritisacollection-valuedassociation(to-many).
-*
-*@paramstring$fieldName
-*@returnbooleanTRUEiftheassociationexistsandiscollection-valued,FALSEotherwise.
-*/",
- "/**
-*Isthisanassociationthatonlyhasasinglejoincolumn?
-*
-*@paramstring$fieldName
-*@returnbool
-*/",
- "/**
-*Returnthesingleassociationjoincolumn(ifany).
-*
-*@paramstring$fieldName
-*@returnstring
-*/",
- "/**
-*Returnthesingleassociationreferencedjoincolumnname(ifany).
-*
-*@paramstring$fieldName
-*@returnstring
-*/",
- "/**
-*Usedtoretrieveafieldnameforeitherfieldorassociationfromagivencolumn,
-*
-*Thismethodisusedinforeign-keyasprimary-keycontexts.
-*
-*@paramstring$columnName
-*@returnstring
-*/",
- "/**
-*SetstheIDgeneratorusedtogenerateIDsforinstancesofthisclass.
-*
-*@paramAbstractIdGenerator$generator
-*/",
- "/**
-*SetsthedefinitionofthesequenceIDgeneratorforthisclass.
-*
-*Thedefinitionmusthavethefollowingstructure:
-*<code>
-*array(
-*'sequenceName'=>'name',
-*'allocationSize'=>20,
-*'initialValue'=>1
-*)
-*</code>
-*
-*@paramarray$definition
-*/",
- "/**
-*Setstheversionfieldmappingusedforversioning.Setsthedefault
-*valuetousedependingonthecolumntype.
-*
-*@paramarray$mappingTheversionfieldmappingarray
-*/",
- "/**
-*Setswhetherthisclassistobeversionedforoptimisticlocking.
-*
-*@paramboolean$bool
-*/",
- "/**
-*Setsthenameofthefieldthatistobeusedforversioningifthisclassis
-*versionedforoptimisticlocking.
-*
-*@paramstring$versionField
-*/",
- "/**
-*Markthisclassasreadonly,nochangetrackingisappliedtoit.
-*
-*@returnvoid
-*/",
- "/**
-*Anumericallyindexedlistoffieldnamesofthispersistentclass.
-*
-*Thisarrayincludesidentifierfieldsifpresentonthisclass.
-*
-*@returnarray
-*/",
- "/**
-*Anumericallyindexedlistofassociationnamesofthispersistentclass.
-*
-*Thisarrayincludesidentifierassociationsifpresentonthisclass.
-*
-*@returnarray
-*/",
- "/**
-*Returnsthetargetclassnameofthegivenassociation.
-*
-*@paramstring$assocName
-*@returnstring
-*/",
- "/**
-*Getfully-qualifiedclassnameofthispersistentclass.
-*
-*@returnstring
-*/",
- "/**
-*Getsthe(possiblyquoted)identifiercolumnnamesforsafeuseinanSQLstatement.
-*
-*@paramAbstractPlatform$platform
-*@returnarray
-*/",
- "/**
-*Getsthe(possiblyquoted)columnnameofamappedfieldforsafeuse
-*inanSQLstatement.
-*
-*@paramstring$field
-*@paramAbstractPlatform$platform
-*@returnstring
-*/",
- "/**
-*Getsthe(possiblyquoted)primarytablenameofthisclassforsafeuse
-*inanSQLstatement.
-*
-*@paramAbstractPlatform$platform
-*@returnstring
-*/",
- "/**
-*Getsthe(possiblyquoted)nameofthejointable.
-*
-*@paramAbstractPlatform$platform
-*@returnstring
-*/",
- "/**
-*@paramstring$fieldName
-*@returnbool
-*/",
- "/**
-*@paramstring$fieldName
-*@returnstring
-*/",
- "/**
-*A<tt>ClassMetadata</tt>instanceholdsalltheobject-relationalmappingmetadata
-*ofanentityandit'sassociations.
-*
-*Oncepopulated,ClassMetadatainstancesareusuallycachedinaserializedform.
-*
-*<b>IMPORTANTNOTE:</b>
-*
-*Thefieldsofthisclassareonlypublicfor2reasons:
-*1)ToallowfastREADaccess.
-*2)Todrasticallyreducethesizeofaserializedinstance(private/protectedmembers
-*getthewholeclassname,namespaceinclusive,prependedtoeverypropertyin
-*theserializedrepresentation).
-*
-*@authorRomanBorschel<roman@code-factory.org>
-*@authorJonathanH.Wage<jonwage@gmail.com>
-*@since2.0
-*/",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  "/**
      * Sets the SQL logger to use. Defaults to NULL which means SQL logging is disabled.
      *
@@ -14895,12 +13729,12 @@
  "/**
      * Gets the cache driver implementation that is used for query result caching.
      *
-     * @return \Doctrine\Common\Cache\Cache
+     * @return \\Doctrine\\Common\\Cache\\Cache
      */",
  "/**
      * Sets the cache driver implementation that is used for query result caching.
      *
-     * @param \Doctrine\Common\Cache\Cache $cacheImpl
+     * @param \\Doctrine\\Common\\Cache\\Cache $cacheImpl
      */",
  "/**
      * Filter schema assets expression.
@@ -15170,7 +14004,7 @@
      * Prepares an SQL statement.
      *
      * @param string $statement The SQL statement to prepare.
-     * @return Doctrine\DBAL\Driver\Statement The prepared statement.
+     * @return Doctrine\\DBAL\\Driver\\Statement The prepared statement.
      */",
  "/**
      * Walks down a SelectStatement AST node, modifying it to retrieve a COUNT
@@ -15182,7 +14016,7 @@
  * Replaces the selectClause of the AST with a COUNT statement
  *
  * @category    DoctrineExtensions
- * @package     DoctrineExtensions\Paginate
+ * @package     DoctrineExtensions\\Paginate
  * @author      David Abdemoulaie <dave@hobodave.com>
  * @copyright   Copyright (c) 2010 David Abdemoulaie (http://hobodave.com/)
  * @license     http://hobodave.com/license.txt New BSD License
@@ -15236,7 +14070,7 @@
      * @param string  $description A description text
      * @param mixed   $default     The default value (for self::OPTIONAL mode only)
      *
-     * @throws \InvalidArgumentException When argument mode is not valid
+     * @throws \\InvalidArgumentException When argument mode is not valid
      *
      * @api
      */",
@@ -15260,7 +14094,7 @@
      *
      * @param mixed $default The default value
      *
-     * @throws \LogicException When incorrect default value is given
+     * @throws \\LogicException When incorrect default value is given
      */",
  "/**
      * Returns the default value.
@@ -15396,10 +14230,10 @@
      * @param string $class
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
      * Annotation construct
@@ -15436,7 +14270,7 @@
      * Question marks inside literal strings are therefore handled correctly by this method.
      * This comes at a cost, the whole sql statement has to be looped over.
      *
-     * @todo extract into utility class in Doctrine\DBAL\\Util namespace
+     * @todo extract into utility class in Doctrine\\DBAL\\Util namespace
      * @todo review and test for lost spaces. we experienced missing spaces with oci8 in some sql statements.
      * @param string $statement The SQL statement to convert.
      * @return string
@@ -15491,7 +14325,7 @@
  "/** Private constructor. This class cannot be instantiated. */",
  "/**
      * Creates a connection object based on the specified parameters.
-     * This method returns a Doctrine\DBAL\Connection which wraps the underlying
+     * This method returns a Doctrine\\DBAL\\Connection which wraps the underlying
      * driver connection.
      *
      * $params must contain at least one of the following.
@@ -15520,19 +14354,19 @@
      *
      * <b>pdo</b>:
      * You can pass an existing PDO instance through this parameter. The PDO
-     * instance will be wrapped in a Doctrine\DBAL\Connection.
+     * instance will be wrapped in a Doctrine\\DBAL\\Connection.
      *
      * <b>wrapperClass</b>:
      * You may specify a custom wrapper class through the 'wrapperClass'
-     * parameter but this class MUST inherit from Doctrine\DBAL\Connection.
+     * parameter but this class MUST inherit from Doctrine\\DBAL\\Connection.
      *
      * <b>driverClass</b>:
      * The driver class to use.
      *
      * @param array $params The parameters.
-     * @param Doctrine\DBAL\Configuration The configuration to use.
-     * @param Doctrine\Common\EventManager The event manager to use.
-     * @return Doctrine\DBAL\Connection
+     * @param Doctrine\\DBAL\\Configuration The configuration to use.
+     * @param Doctrine\\Common\\EventManager The event manager to use.
+     * @return Doctrine\\DBAL\\Connection
      */",
  "/**
      * Checks the list of parameters.
@@ -15540,7 +14374,7 @@
      * @param array $params
      */",
  "/**
- * Factory for creating Doctrine\DBAL\Connection instances.
+ * Factory for creating Doctrine\\DBAL\\Connection instances.
  *
  * @author Roman Borschel <roman@code-factory.org>
  * @since 2.0
@@ -15566,12 +14400,12 @@
  "/**
      * Sets the cache driver used by the factory to cache ClassMetadata instances.
      *
-     * @param Doctrine\Common\Cache\Cache $cacheDriver
+     * @param Doctrine\\Common\\Cache\\Cache $cacheDriver
      */",
  "/**
      * Gets the cache driver used by the factory to cache ClassMetadata instances.
      *
-     * @return Doctrine\Common\Cache\Cache
+     * @return Doctrine\\Common\\Cache\\Cache
      */",
  "/**
      * Return an array of all the loaded metadata currently in memory.
@@ -15620,7 +14454,7 @@
      * Gets the class metadata descriptor for a class.
      *
      * @param string $className The name of the class.
-     * @return Doctrine\Common\Persistence\Mapping\ClassMetadata
+     * @return Doctrine\\Common\\Persistence\\Mapping\\ClassMetadata
      */",
  "/**
      * Checks whether the factory has the metadata for a class loaded already.
@@ -15739,7 +14573,7 @@
      *
      * @param string $name The object manager name (null for the default one)
      *
-     * @return \Doctrine\Common\Persistence\ObjectManager
+     * @return \\Doctrine\\Common\\Persistence\\ObjectManager
      */",
  "/**
      * Gets an array of all registered object managers
@@ -15761,7 +14595,7 @@
      *
      * @param string $name The object manager name (null for the default one)
      *
-     * @return \Doctrine\Common\Persistence\ObjectManager
+     * @return \\Doctrine\\Common\\Persistence\\ObjectManager
      */",
  "/**
      * Resolves a registered namespace alias to the full namespace.
@@ -15783,14 +14617,14 @@
      * @param string $persistentObject        The name of the persistent object.
      * @param string $persistentManagerName The object manager name (null for the default one)
      *
-     * @return \Doctrine\Common\Persistence\ObjectRepository
+     * @return \\Doctrine\\Common\\Persistence\\ObjectRepository
      */",
  "/**
      * Gets the object manager associated with a given class.
      *
      * @param string $class A persistent object class name
      *
-     * @return \Doctrine\Common\Persistence\ObjectManager|null
+     * @return \\Doctrine\\Common\\Persistence\\ObjectManager|null
      */",
  "/**
  * Contract covering object managers for a Doctrine persistence layer ManagerRegistry class to implement.
@@ -16021,20 +14855,20 @@
      * @param string $username The username to use when connecting.
      * @param string $password The password to use when connecting.
      * @param array $driverOptions The driver options to use when connecting.
-     * @return Doctrine\DBAL\Driver\Connection The database connection.
+     * @return Doctrine\\DBAL\\Driver\\Connection The database connection.
      */",
  "/**
      * Gets the DatabasePlatform instance that provides all the metadata about
      * the platform this driver connects to.
      *
-     * @return Doctrine\DBAL\Platforms\AbstractPlatform The database platform.
+     * @return Doctrine\\DBAL\\Platforms\\AbstractPlatform The database platform.
      */",
  "/**
      * Gets the SchemaManager that can be used to inspect and change the underlying
      * database schema of the platform this driver connects to.
      *
-     * @param  Doctrine\DBAL\Connection $conn
-     * @return Doctrine\DBAL\SchemaManager
+     * @param  Doctrine\\DBAL\\Connection $conn
+     * @return Doctrine\\DBAL\\SchemaManager
      */",
  "/**
      * Gets the name of the driver.
@@ -16044,7 +14878,7 @@
  "/**
      * Get the name of the database connected to for this driver.
      *
-     * @param  Doctrine\DBAL\Connection $conn
+     * @param  Doctrine\\DBAL\\Connection $conn
      * @return string $database
      */",
  "/**
@@ -16093,12 +14927,12 @@
  "/**
      * Sets the EventManager used by the Platform.
      *
-     * @param \Doctrine\Common\EventManager
+     * @param \\Doctrine\\Common\\EventManager
      */",
  "/**
      * Gets the EventManager used by the Platform.
      *
-     * @return \Doctrine\Common\EventManager
+     * @return \\Doctrine\\Common\\EventManager
      */",
  "/**
      * Gets the SQL snippet that declares a boolean column.
@@ -16503,7 +15337,7 @@
  "/**
      * Drop a Table
      *
-     * @throws \InvalidArgumentException
+     * @throws \\InvalidArgumentException
      * @param  Table|string $table
      * @return string
      */",
@@ -16523,7 +15357,7 @@
  "/**
      * Get drop constraint sql
      *
-     * @param  \Doctrine\DBAL\Schema\Constraint $constraint
+     * @param  \\Doctrine\\DBAL\\Schema\\Constraint $constraint
      * @param  string|Table $table
      * @return string
      */",
@@ -16549,13 +15383,13 @@
  "/**
      * Gets the SQL to create a sequence on this platform.
      *
-     * @param \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param \\Doctrine\\DBAL\\Schema\\Sequence $sequence
      * @throws DBALException
      */",
  "/**
      * Gets the SQL statement to change a sequence on this platform.
      *
-     * @param \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param \\Doctrine\\DBAL\\Schema\\Sequence $sequence
      * @return string
      */",
  "/**
@@ -16891,7 +15725,7 @@
      * Gets the SQL statement specific for the platform to set the charset.
      *
      * This function is MySQL specific and required by
-     * {@see \Doctrine\DBAL\Connection::setCharset($charset)}
+     * {@see \\Doctrine\\DBAL\\Connection::setCharset($charset)}
      *
      * @param string $charset
      * @return string
@@ -16970,7 +15804,7 @@
      * Gets the default transaction isolation level of the platform.
      *
      * @return integer The default isolation level.
-     * @see Doctrine\DBAL\Connection\TRANSACTION_* constants.
+     * @see Doctrine\\DBAL\\Connection\\TRANSACTION_* constants.
      */",
  "/**
      * Whether the platform supports sequences.
@@ -17272,7 +16106,7 @@
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */",
  "/**
- * Doctrine\DBAL\ConnectionException
+ * Doctrine\\DBAL\\ConnectionException
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
@@ -17505,16 +16339,16 @@
  "/**
      * Returns the corresponding AST for this DQL query.
      *
-     * @return \Doctrine\ORM\Query\AST\SelectStatement |
-     *         \Doctrine\ORM\Query\AST\\UpdateStatement |
-     *         \Doctrine\ORM\Query\AST\DeleteStatement
+     * @return \\Doctrine\\ORM\\Query\\AST\\SelectStatement |
+     *         \\Doctrine\\ORM\\Query\\AST\\UpdateStatement |
+     *         \\Doctrine\\ORM\\Query\\AST\\DeleteStatement
      */",
  "/**
      * Parses the DQL query, if necessary, and stores the parser result.
      *
      * Note: Populates $this->_parserResult as a side-effect.
      *
-     * @return \Doctrine\ORM\Query\ParserResult
+     * @return \\Doctrine\\ORM\\Query\\ParserResult
      */",
  "/**
      * {@inheritdoc}
@@ -17572,7 +16406,7 @@
      * Sets a DQL query string.
      *
      * @param string $dqlQuery DQL Query
-     * @return \Doctrine\ORM\AbstractQuery
+     * @return \\Doctrine\\ORM\\AbstractQuery
      */",
  "/**
      * Returns the DQL query that is represented by this query object.
@@ -17625,7 +16459,7 @@
      *
      * @param array $params The query parameters.
      * @param integer $hydrationMode The hydration mode to use.
-     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
+     * @return \\Doctrine\\ORM\\Internal\\Hydration\\IterableResult
      */",
  "/**
      * {@inheritdoc}
@@ -17636,7 +16470,7 @@
  "/**
      * Set the lock mode for this Query.
      *
-     * @see \Doctrine\DBAL\LockMode
+     * @see \\Doctrine\\DBAL\\LockMode
      * @param  int $lockMode
      * @return Query
      */",
@@ -17682,12 +16516,12 @@
  "/**
      * Initializes a new instance of a class derived from <tt>AbstractQuery</tt>.
      *
-     * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param \\Doctrine\\ORM\\EntityManager $entityManager
      */",
  "/**
      * Retrieves the associated EntityManager of this Query instance.
      *
-     * @return \Doctrine\ORM\EntityManager
+     * @return \\Doctrine\\ORM\\EntityManager
      */",
  "/**
      * Frees the resources used by the query object.
@@ -17733,7 +16567,7 @@
      * @param string $type The parameter type. If specified, the given value will be run through
      *                     the type conversion of this type. This is usually not needed for
      *                     strings and numeric types.
-     * @return \Doctrine\ORM\AbstractQuery This query instance.
+     * @return \\Doctrine\\ORM\\AbstractQuery This query instance.
      */",
  "/**
      * Process an individual parameter value
@@ -17746,13 +16580,13 @@
      *
      * @param array $params
      * @param array $types
-     * @return \Doctrine\ORM\AbstractQuery This query instance.
+     * @return \\Doctrine\\ORM\\AbstractQuery This query instance.
      */",
  "/**
      * Sets the ResultSetMapping that should be used for hydration.
      *
      * @param ResultSetMapping $rsm
-     * @return \Doctrine\ORM\AbstractQuery
+     * @return \\Doctrine\\ORM\\AbstractQuery
      */",
  "/**
      * Set a cache profile for hydration caching.
@@ -17772,11 +16606,11 @@
      * $query->setHydrationCacheProfile(new QueryCacheProfile());
      * $query->setHydrationCacheProfile(new QueryCacheProfile($lifetime, $resultKey));
      *
-     * @param \Doctrine\DBAL\Cache\QueryCacheProfile $profile
-     * @return \Doctrine\ORM\AbstractQuery
+     * @param \\Doctrine\\DBAL\\Cache\\QueryCacheProfile $profile
+     * @return \\Doctrine\\ORM\\AbstractQuery
      */",
  "/**
-     * @return \Doctrine\DBAL\Cache\QueryCacheProfile
+     * @return \\Doctrine\\DBAL\\Cache\\QueryCacheProfile
      */",
  "/**
      * Set a cache profile for the result cache.
@@ -17784,20 +16618,20 @@
      * If no result cache driver is set in the QueryCacheProfile, the default
      * result cache driver is used from the configuration.
      *
-     * @param \Doctrine\DBAL\Cache\QueryCacheProfile $profile
-     * @return \Doctrine\ORM\AbstractQuery
+     * @param \\Doctrine\\DBAL\\Cache\\QueryCacheProfile $profile
+     * @return \\Doctrine\\ORM\\AbstractQuery
      */",
  "/**
      * Defines a cache driver to be used for caching result sets and implictly enables caching.
      *
-     * @param \Doctrine\Common\Cache\Cache $driver Cache driver
-     * @return \Doctrine\ORM\AbstractQuery
+     * @param \\Doctrine\\Common\\Cache\\Cache $driver Cache driver
+     * @return \\Doctrine\\ORM\\AbstractQuery
      */",
  "/**
      * Returns the cache driver used for caching result sets.
      *
      * @deprecated
-     * @return \Doctrine\Common\Cache\Cache Cache driver
+     * @return \\Doctrine\\Common\\Cache\\Cache Cache driver
      */",
  "/**
      * Set whether or not to cache the results of this query and if so, for
@@ -17806,13 +16640,13 @@
      * @param boolean $bool
      * @param integer $lifetime
      * @param string $resultCacheId
-     * @return \Doctrine\ORM\AbstractQuery This query instance.
+     * @return \\Doctrine\\ORM\\AbstractQuery This query instance.
      */",
  "/**
      * Defines how long the result cache will be active before expire.
      *
      * @param integer $lifetime How long the cache entry is valid.
-     * @return \Doctrine\ORM\AbstractQuery This query instance.
+     * @return \\Doctrine\\ORM\\AbstractQuery This query instance.
      */",
  "/**
      * Retrieves the lifetime of resultset cache.
@@ -17824,7 +16658,7 @@
      * Defines if the result cache is active or not.
      *
      * @param boolean $expire Whether or not to force resultset cache expiration.
-     * @return \Doctrine\ORM\AbstractQuery This query instance.
+     * @return \\Doctrine\\ORM\\AbstractQuery This query instance.
      */",
  "/**
      * Retrieves if the resultset cache is active or not.
@@ -17849,7 +16683,7 @@
      *
      * @param integer $hydrationMode Doctrine processing mode to be used during hydration process.
      *                               One of the Query::HYDRATE_* constants.
-     * @return \Doctrine\ORM\AbstractQuery This query instance.
+     * @return \\Doctrine\\ORM\\AbstractQuery This query instance.
      */",
  "/**
      * Gets the hydration mode currently used by the query.
@@ -17910,7 +16744,7 @@
      *
      * @param string $name The name of the hint.
      * @param mixed $value The value of the hint.
-     * @return \Doctrine\ORM\AbstractQuery
+     * @return \\Doctrine\\ORM\\AbstractQuery
      */",
  "/**
      * Gets the value of a query hint. If the hint name is not recognized, FALSE is returned.
@@ -17929,7 +16763,7 @@
      *
      * @param array $params The query parameters.
      * @param integer $hydrationMode The hydration mode to use.
-     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
+     * @return \\Doctrine\\ORM\\Internal\\Hydration\\IterableResult
      */",
  "/**
      * Executes the query.
@@ -17951,7 +16785,7 @@
      * generated for you.
      *
      * @param string $id
-     * @return \Doctrine\ORM\AbstractQuery This query instance.
+     * @return \\Doctrine\\ORM\\AbstractQuery This query instance.
      */",
  "/**
      * Get the result cache id to use to store the result set cache entry if set.
@@ -17962,7 +16796,7 @@
  "/**
      * Executes the query and returns a the resulting Statement object.
      *
-     * @return \Doctrine\DBAL\Driver\Statement The executed database statement that holds the results.
+     * @return \\Doctrine\\DBAL\\Driver\\Statement The executed database statement that holds the results.
      */",
  "/**
      * Cleanup Query resource when clone is called.
@@ -18598,7 +17432,7 @@
  "/**
      * Run console with the given helperset.
      *
-     * @param \Symfony\Component\Console\Helper\HelperSet $helperSet
+     * @param \\Symfony\\Component\\Console\\Helper\\HelperSet $helperSet
      * @return void
      */",
  "/**
@@ -18622,30 +17456,9 @@
      *
      * @return string The unescaped string.
      */",
- "/**
-*Unescapesacharacterthatwasfoundinadouble-quotedstring
-*
-*@paramstring$valueAnescapedcharacter
-*
-*@returnstringTheunescapedcharacter
-*/",
- "/**
-*Convertastringfromoneencodingtoanother.
-*
-*@paramstring$valueThestringtoconvert
-*@paramstring$toTheinputencoding
-*@paramstring$fromTheoutputencoding
-*
-*@returnstringThestringwiththenewencoding
-*
-*@throws\RuntimeExceptionifnosuitableencodingfunctionisfound(iconvormbstring)
-*/",
- "/**
-*Unescaperencapsulatesunescapingrulesforsingleanddouble-quoted
-*YAMLstrings.
-*
-*@authorMatthewLewinski<matthew@lewinski.org>
-*/",
+
+
+
  "/**
      * Compares a Doctrine version with the current one.
      *
@@ -18666,7 +17479,7 @@
  * @author  Roman Borschel <roman@code-factory.org>
  */",
  "/**
-     * @param \Doctrine\ORM\Mapping\AssociationMapping $assoc
+     * @param \\Doctrine\\ORM\\Mapping\\AssociationMapping $assoc
      */",
  "/**
  * Description of QueryException
@@ -18709,10 +17522,10 @@
  * @author  Roman Borschel <roman@code-factory.org>
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Task for executing arbitrary SQL that can come from a file or directly from
@@ -18972,7 +17785,7 @@
      * @return boolean
      */",
  "/**
-     * @param \Doctrine\ORM\PersistentCollection $coll
+     * @param \\Doctrine\\ORM\\PersistentCollection $coll
      * @param object $element
      * @param boolean $addFilters Whether the filter SQL should be included or not.
      * @return array
@@ -19009,17 +17822,17 @@
  "/**
      * @param array  $tableIndex
      * @param string $table
-     * @param \Doctrine\DBAL\Connection $conn
+     * @param \\Doctrine\\DBAL\\Connection $conn
      */",
  "/**
      * Allows to clear the index which means the index will be excluded from
      * tables index list.
      *
-     * @param null|\Doctrine\DBAL\Schema\Index $index
+     * @param null|\Doctrine\\DBAL\\Schema\\Index $index
      * @return SchemaIndexDefinitionEventArgs
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\Index
+     * @return \\Doctrine\\DBAL\\Schema\\Index
      */",
  "/**
      * @return array
@@ -19028,13 +17841,13 @@
      * @return string
      */",
  "/**
-     * @return \Doctrine\DBAL\Connection
+     * @return \\Doctrine\\DBAL\\Connection
      */",
  "/**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
- * Event Arguments used when the portable index definition is generated inside Doctrine\DBAL\Schema\AbstractSchemaManager.
+ * Event Arguments used when the portable index definition is generated inside Doctrine\\DBAL\\Schema\\AbstractSchemaManager.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -19226,7 +18039,7 @@
      * @param string  $description A description text
      * @param mixed   $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
      *
-     * @throws \InvalidArgumentException If option mode is invalid or incompatible
+     * @throws \\InvalidArgumentException If option mode is invalid or incompatible
      *
      * @api
      */",
@@ -19294,7 +18107,7 @@
      * Create a new Column
      *
      * @param string $columnName
-     * @param Doctrine\DBAL\Types\Type $type
+     * @param Doctrine\\DBAL\\Types\\Type $type
      * @param int $length
      * @param bool $notNull
      * @param mixed $default
@@ -19855,12 +18668,12 @@
  "/**
      * Retrieve Query Instance reponsible for the current walkers execution.
      *
-     * @return \Doctrine\ORM\Query
+     * @return \\Doctrine\\ORM\\Query
      */",
  "/**
      * Retrieve ParserResult
      *
-     * @return \Doctrine\ORM\Query\ParserResult
+     * @return \\Doctrine\\ORM\\Query\\ParserResult
      */",
  "/**
      * Walks down a SelectStatement AST node, thereby generating the appropriate SQL.
@@ -20197,7 +19010,7 @@
  "/**
      * Validates the input.
      *
-     * @throws \RuntimeException When not enough arguments are given
+     * @throws \\RuntimeException When not enough arguments are given
      */",
  "/**
      * Checks if the input is interactive.
@@ -20221,7 +19034,7 @@
      *
      * @return mixed The argument value
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws \\InvalidArgumentException When argument given doesn't exist
      */",
  "/**
      * Sets an argument value by name.
@@ -20229,7 +19042,7 @@
      * @param string $name  The argument name
      * @param string $value The argument value
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws \\InvalidArgumentException When argument given doesn't exist
      */",
  "/**
      * Returns true if an InputArgument object exists by name or position.
@@ -20250,7 +19063,7 @@
      *
      * @return mixed The option value
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
+     * @throws \\InvalidArgumentException When option given doesn't exist
      */",
  "/**
      * Sets an option value by name.
@@ -20258,7 +19071,7 @@
      * @param string $name  The option name
      * @param string $value The option value
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
+     * @throws \\InvalidArgumentException When option given doesn't exist
      */",
  "/**
      * Returns true if an InputOption object exists by name.
@@ -20299,7 +19112,7 @@
      *
      * @param string $name The current token
      *
-     * @throws \RuntimeException When option given doesn't exist
+     * @throws \\RuntimeException When option given doesn't exist
      */",
  "/**
      * Parses a long option.
@@ -20311,7 +19124,7 @@
      *
      * @param string $token The current token
      *
-     * @throws \RuntimeException When too many arguments are given
+     * @throws \\RuntimeException When too many arguments are given
      */",
  "/**
      * Adds a short option value.
@@ -20319,7 +19132,7 @@
      * @param string $shortcut The short option key
      * @param mixed  $value    The value for the option
      *
-     * @throws \RuntimeException When option given doesn't exist
+     * @throws \\RuntimeException When option given doesn't exist
      */",
  "/**
      * Adds a long option value.
@@ -20327,7 +19140,7 @@
      * @param string $name  The long option key
      * @param mixed  $value The value for the option
      *
-     * @throws \RuntimeException When option given doesn't exist
+     * @throws \\RuntimeException When option given doesn't exist
      */",
  "/**
      * Returns the first argument from the raw parameters (not parsed).
@@ -20398,66 +19211,17 @@
  * @version     $Revision$
  * @since       2.0
  */",
- "/**
-*Createsanew<tt>ClassLoader</tt>thatloadsclassesofthe
-*specifiednamespacefromthespecifiedincludepath.
-*
-*Ifnoincludepathisgiven,theClassLoaderreliesonthePHPinclude_path.
-*Ifneitheranamespacenoranincludepathisgiven,theClassLoaderwill
-*beresponsibleforloadingallclasses,therebyrelyingonthePHPinclude_path.
-*
-*@paramstring$nsThenamespaceoftheclassestoload.
-*@paramstring$includePathThebaseincludepathtouse.
-*/",
- "/**
-*SetsthenamespaceseparatorusedbyclassesinthenamespaceofthisClassLoader.
-*
-*@paramstring$sepTheseparatortouse.
-*/",
- "/**
-*GetsthenamespaceseparatorusedbyclassesinthenamespaceofthisClassLoader.
-*
-*@returnstring
-*/",
- "/**
-*SetsthebaseincludepathforallclassfilesinthenamespaceofthisClassLoader.
-*
-*@paramstring$includePath
-*/",
- "/**
-*GetsthebaseincludepathforallclassfilesinthenamespaceofthisClassLoader.
-*
-*@returnstring
-*/",
- "/**
-*SetsthefileextensionofclassfilesinthenamespaceofthisClassLoader.
-*
-*@paramstring$fileExtension
-*/",
- "/**
-*GetsthefileextensionofclassfilesinthenamespaceofthisClassLoader.
-*
-*@returnstring
-*/",
- "/**
-*RegistersthisClassLoaderontheSPLautoloadstack.
-*/",
- "/**
-*RemovesthisClassLoaderfromtheSPLautoloadstack.
-*/",
- "/**
-*Loadsthegivenclassorinterface.
-*
-*@paramstring$classnameThenameoftheclasstoload.
-*@returnbooleanTRUEiftheclasshasbeensuccessfullyloaded,FALSEotherwise.
-*/",
- "/**
-*AsksthisClassLoaderwhetheritcanpotentiallyloadtheclass(file)with
-*thegivenname.
-*
-*@paramstring$classNameThefully-qualifiednameoftheclass.
-*@returnbooleanTRUEifthisClassLoadercanloadtheclass,FALSEotherwise.
-*/",
+
+
+
+
+
+
+
+
+
+
+
  "/**
 *Checkswhetheraclasswithagivennameexists.Aclass\"exists\" if it is either
      * already defined in the current request or if there is an autoloader on the SPL
@@ -20501,13 +19265,13 @@
  "/**
      * Constructor.
      *
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param \\Doctrine\\ORM\\EntityManager $em
      * @param string $entityClass Optional entity class
      */",
  "/**
      * Retrieve associated EntityManager.
      *
-     * @return \Doctrine\ORM\EntityManager
+     * @return \\Doctrine\\ORM\\EntityManager
      */",
  "/**
      * Name of the entity class that is cleared, or empty if all are cleared.
@@ -20597,10 +19361,10 @@
  * @author  Jonathan Wage <jonwage@gmail.com>
  */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
-     * @see Console\Command\Command
+     * @see Console\\Command\\Command
      */",
  "/**
  * Command to ensure that Doctrine is properly configured for a production environment.
@@ -20676,7 +19440,7 @@
      *
      * @param InputArgument $argument An InputArgument object
      *
-     * @throws \LogicException When incorrect argument is given
+     * @throws \\LogicException When incorrect argument is given
      *
      * @api
      */",
@@ -20687,7 +19451,7 @@
      *
      * @return InputArgument An InputArgument object
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws \\InvalidArgumentException When argument given doesn't exist
      *
      * @api
      */",
@@ -20741,7 +19505,7 @@
      *
      * @param InputOption $option An InputOption object
      *
-     * @throws \LogicException When option given already exist
+     * @throws \\LogicException When option given already exist
      *
      * @api
      */",
@@ -20796,7 +19560,7 @@
      *
      * @return string The InputOption name
      *
-     * @throws \InvalidArgumentException When option given does not exist
+     * @throws \\InvalidArgumentException When option given does not exist
      */",
  "/**
      * Gets the synopsis.
@@ -20959,7 +19723,7 @@
      * @param Boolean         $decorated Whether to decorate messages or not (null for auto-guessing)
      * @param OutputFormatter $formatter Output formatter instance
      *
-     * @throws \InvalidArgumentException When first argument is not a real stream
+     * @throws \\InvalidArgumentException When first argument is not a real stream
      *
      * @api
      */",
@@ -20974,33 +19738,10 @@
      * @param string  $message A message to write to the output
      * @param Boolean $newline Whether to add a newline or not
      *
-     * @throws \RuntimeException When unable to write output (should never happen)
+     * @throws \\RuntimeException When unable to write output (should never happen)
      */",
- "/**
-*Returnstrueifthestreamsupportscolorization.
-*
-*Colorizationisdisabledifnotsupportedbythestream:
-*
-*-windowswithoutansicon
-*-nonttyconsoles
-*
-*@returnBooleantrueifthestreamsupportscolorization,falseotherwise
-*/",
- "/**
-*StreamOutputwritestheoutputtoagivenstream.
-*
-*Usage:
-*
-*$output=newStreamOutput(fopen('php://stdout','w'));
-*
-*As`StreamOutput`canuseanystream,youcanalsouseafile:
-*
-*$output=newStreamOutput(fopen('/path/to/output.log','a',false));
-*
-*@authorFabienPotencier<fabien@symfony.com>
-*
-*@api
-*/",
+
+
  "/**
      * {@inheritdoc}
      */",
@@ -21147,18 +19888,7 @@
  *
  * @api
  */",
- "/**
-*Classtogenerateentityrepositoryclasses
-*
-*@licensehttp://www.opensource.org/licenses/lgpl-license.phpLGPL
-*@linkwww.doctrine-project.org
-*@since2.0
-*@version$Revision$
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@authorGuilhermeBlanco<guilhermeblanco@hotmail.com>
-*@authorJonathanWage<jonwage@gmail.com>
-*@authorRomanBorschel<roman@code-factory.org>
-*/",
+
  "/**
      * @override
      */",
@@ -21223,36 +19953,13 @@
  *
  * @api
  */",
- "/**
-*Resolveproxyclassnametoafilenamebasedonthefollowingpattern.
-*
-*1.RemoveProxynamespacefromclassname
-*2.Removenamespaceseperatorsfromremainingclassname.
-*3.ReturnPHPfilenamefromproxy-dirwiththeresultfrom2.
-*
-*@paramstring$proxyDir
-*@paramstring$proxyNamespace
-*@paramstring$className
-*@returnstring
-*/",
- "/**
-*Registerandreturnautoloadercallbackforthegivenproxydirand
-*namespace.
-*
-*@paramstring$proxyDir
-*@paramstring$proxyNamespace
-*@paramClosure$notFoundCallbackInvokedwhentheproxyfileisnotfound.
-*@returnClosure
-*/",
- "/**
-*SpecialAutoloaderforProxyclassesbecausethemnotbeingPSR-0compatible.
-*
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*/",
+
+
+
  "/**
      * Generates an identifier for an entity.
      *
-     * @param \Doctrine\ORM\Entity $entity
+     * @param \\Doctrine\\ORM\\Entity $entity
      * @return mixed
      */",
  "/**
@@ -21289,7 +19996,7 @@
      * within the stacktrace
      *
      * @param string $entity The entity's name
-     * @param \ReflectionException $previousException
+     * @param \\ReflectionException $previousException
      */",
  "/**
      *
@@ -21379,18 +20086,8 @@
  "/**
      * @inheritdoc
      */",
- "/**
-*@inheritdoc
-*/",
- "/**
-*Simplelexerfordocblockannotations.
-*
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@authorGuilhermeBlanco<guilhermeblanco@hotmail.com>
-*@authorJonathanWage<jonwage@gmail.com>
-*@authorRomanBorschel<roman@code-factory.org>
-*@authorJohannesM.Schmitt<schmittjoh@gmail.com>
-*/",
+
+
  "/**
      * @override
      */",
@@ -21454,31 +20151,9 @@
      * @param mixed $identifier
      * @return object
      */",
- "/**
-*GeneratetheProxyfilename
-*
-*@paramstring$className
-*@paramstring$baseDirOptionalbasedirectoryforproxyfilenamegeneration.
-*Ifnotspecified,thedirectoryconfiguredontheConfigurationofthe
-*EntityManagerwillbeusedbythisfactory.
-*@returnstring
-*/",
- "/**
-*Generatesproxyclassesforallgivenclasses.
-*
-*@paramarray$classesTheclasses(ClassMetadatainstances)forwhichtogenerateproxies.
-*@paramstring$toDirThetargetdirectoryoftheproxyclasses.Ifnotspecified,the
-*directoryconfiguredontheConfigurationoftheEntityManagerused
-*bythisfactoryisused.
-*@returnintNumberofgeneratedproxies.
-*/",
- "/**
-*Generatesaproxyclassfile.
-*
-*@param$class
-*@param$proxyClassName
-*@param$fileThepathofthefiletowriteto.
-*/",
+
+
+
  "/**
      * Generates the methods of a proxy class.
      *
@@ -21678,24 +20353,24 @@
  * @since 2.0
  */",
  "/**
-     * @param string|\Doctrine\DBAL\Schema\Table $table
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param string|\Doctrine\\DBAL\\Schema\\Table $table
+     * @param \\Doctrine\\DBAL\\Platforms\\AbstractPlatform $platform
      */",
  "/**
-     * @return string|\Doctrine\DBAL\Schema\Table
+     * @return string|\Doctrine\\DBAL\\Schema\\Table
      */",
  "/**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
      * @param string $sql
-     * @return \Doctrine\DBAL\Event\SchemaDropTableEventArgs
+     * @return \\Doctrine\\DBAL\\Event\\SchemaDropTableEventArgs
      */",
  "/**
      * @return string
      */",
  "/**
- * Event Arguments used when the SQL query for dropping tables are generated inside Doctrine\DBAL\Platform\AbstractPlatform.
+ * Event Arguments used when the SQL query for dropping tables are generated inside Doctrine\\DBAL\\Platform\\AbstractPlatform.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -21790,11 +20465,11 @@
      * Constructor.
      *
      * If there is no readline support for the current PHP executable
-     * a \RuntimeException exception is thrown.
+     * a \\RuntimeException exception is thrown.
      *
      * @param Application $application An application instance
      *
-     * @throws \RuntimeException When Readline extension is not enabled
+     * @throws \\RuntimeException When Readline extension is not enabled
      */",
  "/**
      * Runs the shell.
@@ -21916,18 +20591,18 @@
  "/**
      * Constructor.
      *
-     * @param \Doctrine\ORM\Mapping\ClassMetadataInfo $classMetadata
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param \\Doctrine\\ORM\\Mapping\\ClassMetadataInfo $classMetadata
+     * @param \\Doctrine\\ORM\\EntityManager $em
      */",
  "/**
      * Retrieve associated ClassMetadata.
      *
-     * @return \Doctrine\ORM\Mapping\ClassMetadataInfo
+     * @return \\Doctrine\\ORM\\Mapping\\ClassMetadataInfo
      */",
  "/**
      * Retrieve associated EntityManager.
      *
-     * @return \Doctrine\ORM\EntityManager
+     * @return \\Doctrine\\ORM\\EntityManager
      */",
  "/**
  * Class that holds event arguments for a loadMetadata event.
@@ -22051,33 +20726,19 @@
      * @param string $fileExtension The file extension to set
      * @return void
      */",
- "/**
-*{@inheritDoc}
-*/",
- "/**
-*{@inheritDoc}
-*/",
- "/**
-*{@inheritDoc}
-*/",
- "/**
-*Locatethefilethatcontainsthemetadatainformationforagivenclassname.
-*
-*Thisbehaviorisinpependentoftheactualcontentofthefile.Itjustdetects
-*thefilewhichisresponsibleforthegivenclassname.
-*
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@authorJohannesM.Schmitt<schmittjoh@gmail.com>
-*/",
+
+
+
+
  "/**
      * Initializes a new <tt>BasicEntityPersister</tt> that uses the given EntityManager
      * and persists instances of the class described by the given ClassMetadata descriptor.
      *
-     * @param \Doctrine\ORM\EntityManager $em
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @param \\Doctrine\\ORM\\EntityManager $em
+     * @param \\Doctrine\\ORM\\Mapping\\ClassMetadata $class
      */",
  "/**
-     * @return \Doctrine\ORM\Mapping\ClassMetadata
+     * @return \\Doctrine\\ORM\\Mapping\\ClassMetadata
      */",
  "/**
      * Adds an entity to the queued insertions.
@@ -22105,7 +20766,7 @@
  "/**
      * Fetch the current version value of a versioned entity.
      *
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $versionedClass
+     * @param \\Doctrine\\ORM\\Mapping\\ClassMetadata $versionedClass
      * @param mixed $id
      * @return mixed
      */",
@@ -22240,7 +20901,7 @@
      * Load an array of entities from a given dbal statement.
      *
      * @param array $assoc
-     * @param \Doctrine\DBAL\Statement $stmt
+     * @param \\Doctrine\\DBAL\\Statement $stmt
      *
      * @return array
      */",
@@ -22248,7 +20909,7 @@
      * Hydrate a collection from a given dbal statement.
      *
      * @param array $assoc
-     * @param \Doctrine\DBAL\Statement $stmt
+     * @param \\Doctrine\\DBAL\\Statement $stmt
      * @param PersistentCollection $coll
      *
      * @return array
@@ -22388,7 +21049,7 @@
      * @param object $sourceEntity
      * @param int|null $offset
      * @param int|null $limit
-     * @return \Doctrine\DBAL\Statement
+     * @return \\Doctrine\\DBAL\\Statement
      */",
  "/**
      * Expand the parameters from the given criteria and use the correct binding types if found.
@@ -22483,28 +21144,28 @@
  * @since 2.0
  */",
  "/**
-     * @param \Doctrine\DBAL\Schema\Column $column
-     * @param \Doctrine\DBAL\Schema\TableDiff $tableDiff
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param \\Doctrine\\DBAL\\Schema\\Column $column
+     * @param \\Doctrine\\DBAL\\Schema\\TableDiff $tableDiff
+     * @param \\Doctrine\\DBAL\\Platforms\\AbstractPlatform $platform
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\Column
+     * @return \\Doctrine\\DBAL\\Schema\\Column
      */",
  "/**
-     * @return \Doctrine\DBAL\Schema\TableDiff
+     * @return \\Doctrine\\DBAL\\Schema\\TableDiff
      */",
  "/**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return \\Doctrine\\DBAL\\Platforms\\AbstractPlatform
      */",
  "/**
      * @param string|array $sql
-     * @return \Doctrine\DBAL\Event\SchemaAlterTableRemoveColumnEventArgs
+     * @return \\Doctrine\\DBAL\\Event\\SchemaAlterTableRemoveColumnEventArgs
      */",
  "/**
      * @return array
      */",
  "/**
- * Event Arguments used when SQL queries for removing table columns are generated inside Doctrine\DBAL\Platform\*Platform.
+ * Event Arguments used when SQL queries for removing table columns are generated inside Doctrine\\DBAL\\Platform\*Platform.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.com
@@ -22571,7 +21232,7 @@
      *
      * @param string $name Name of the filter.
      *
-     * @throws \InvalidArgumentException If the filter does not exist.
+     * @throws \\InvalidArgumentException If the filter does not exist.
      *
      * @return SQLFilter The enabled filter.
      */",
@@ -22582,7 +21243,7 @@
      *
      * @return SQLFilter The disabled filter.
      *
-     * @throws \InvalidArgumentException If the filter does not exist.
+     * @throws \\InvalidArgumentException If the filter does not exist.
      */",
  "/**
      * Get an enabled filter from the collection.
@@ -22591,7 +21252,7 @@
      *
      * @return SQLFilter The filter.
      *
-     * @throws \InvalidArgumentException If the filter is not enabled.
+     * @throws \\InvalidArgumentException If the filter is not enabled.
      */",
  "/**
      * @return boolean True, if the filter collection is clean.
@@ -22609,50 +21270,13 @@
  *
  * @author Alexander <iam.asm89@gmail.com>
  */",
- "/**
-*Gettherealclassnameofaclassnamethatcouldbeaproxy.
-*
-*@paramstring
-*@returnstring
-*/",
- "/**
-*Gettherealclassnameofanobject(evenifitsaproxy)
-*
-*@paramobject
-*@returnstring
-*/",
- "/**
-*Gettherealparentclassnameofaclassorobject
-*
-*@paramstring
-*@returnstring
-*/",
- "/**
-*Createanewreflectionclass
-*
-*@paramstring
-*@returnReflectionClass
-*/",
- "/**
-*Createanewreflectionobject
-*
-*@paramobject
-*@returnReflectionObject
-*/",
- "/**
-*Givenaclassnameandaproxynamespacereturntheproxyname.
-*
-*@paramstring$className
-*@paramstring$proxyNamespace
-*@returnstring
-*/",
- "/**
-*Classandreflectionrelatedfunctionalityforobjectsthat
-*mightornotbeproxyobjectsatthemoment.
-*
-*@authorBenjaminEberlei<kontakt@beberlei.de>
-*@authorJohannesSchmitt<schmittjoh@gmail.com>
-*/",
+
+
+
+
+
+
+
  "/**
  * Container for all DBAL events.
  *
@@ -22919,7 +21543,7 @@
      * MySQL commits a transaction implicitly when DROP TABLE is executed, however not
      * if DROP TEMPORARY TABLE is executed.
      *
-     * @throws \InvalidArgumentException
+     * @throws \\InvalidArgumentException
      * @param $table
      * @return string
      */",
@@ -22939,7 +21563,7 @@
  "/**
      * Initializes a new instance of a class derived from <tt>AbstractHydrator</tt>.
      *
-     * @param \Doctrine\ORM\EntityManager $em The EntityManager to use.
+     * @param \\Doctrine\\ORM\\EntityManager $em The EntityManager to use.
      */",
  "/**
      * Initiates a row-by-row hydration.
@@ -23015,7 +21639,7 @@
  "/**
      * Register entity as managed in UnitOfWork.
      *
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @param \\Doctrine\\ORM\\Mapping\\ClassMetadata $class
      * @param object $entity
      * @param array $data
      *
@@ -23063,11 +21687,5 @@
      * IMPORTANT: Loaders have to return true if they loaded a class that could contain the searched annotation class.
      *
      * @param callabale $callabale
-     */",
- "/**
-*Autoloadanannotationclasssilently.
-*
-*@paramstring$class
-*@returnvoid
-*/"
+     */"
 ]
