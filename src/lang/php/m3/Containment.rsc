@@ -280,6 +280,7 @@ public M3 addVarDecl(M3 m3, node n, node parent) {
 	containment = invert(containment);
 	solve(decl) {
 		if (!isClass(decl) && !isInterface(decl)) {
+			assert size(containment[decl]) == 1 : "getClassOrInterface failed for decl: <decl>";
 			decl = getOneFrom(containment[decl]);	
 		}
 	}

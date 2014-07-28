@@ -8,7 +8,6 @@ module lang::php::m3::Core
 extend analysis::m3::Core;
 
 import lang::php::m3::AST;
-
 import analysis::graphs::Graph;
 import analysis::m3::Registry;
 
@@ -20,13 +19,23 @@ import lang::php::util::Utils;
 
 import Prelude;
 
+/* todo move to different file. This didnt work beacuse of an import loop */
+data Annotation = 
+	returnType(set[TypeSymbol]) | 
+	parameterType(loc var, set[TypeSymbol]) | 
+	varType(loc var, set[TypeSymbol]);
+	
+
+alias PhpParams = lrel[loc decl, set[loc] typeHints, bool isRequired, bool byRef];
 alias M3Collection = map[loc fileloc, M3 model];
 
 anno rel[loc from, loc to] M3@extends;      // classes extending classes and interfaces extending interfaces
 anno rel[loc from, loc to] M3@implements;   // classes implementing interfaces
 anno rel[loc from, loc to] M3@traitUses;    // classes using traits and traits using traits
+anno rel[loc decl, PhpParams params] M3@parameters;   // formal parameters of functions and methods
+anno rel[loc decl, loc to] M3@constructors; // a list of classes that have a constructor
 anno rel[loc from, loc to] M3@aliases;      // class name aliases (new name -> old name)
-anno rel[loc pos, str phpDoc] M3@phpDoc;    // Multiline php comments /** ... */
+anno rel[loc pos, Annotation annotation] M3@annotations;    // result of parsed php docs
 
 public loc globalNamespace = |php+namespace:///|;
 public loc unknownLocation = |php+unknown:///|;
@@ -36,15 +45,32 @@ public data Language(str version="")
 
 public M3 createEmptyM3(loc file)
 {
-	m = emptyM3(file);
+	m = composeM3(file, {});
 	
 	m@extends = {};
 	m@implements = {};
 	m@traitUses = {};
 	m@aliases = {};
-	m@phpDoc = {};
+	m@parameters = {};
+	m@constructors = {};
+	m@annotations = {};
 
 	return m;
+}
+
+public M3 composePhpM3(loc id, set[M3] models)
+{
+    m = composeM3(id, models);
+    
+    m@extends = {*model@extends | model <- models};
+    m@implements = {*model@implements | model <- models};
+    m@traitUses = {*model@traitUses | model <- models};
+    m@aliases = {*model@aliases | model <- models};
+    m@parameters = {*model@parameters | model <- models};
+    m@constructors = {*model@constructors | model <- models};
+    m@annotations = {*model@annotations | model <- models};
+    
+    return m;
 }
 
 public bool isNamespace(loc entity) = entity.scheme == "php+namespace";

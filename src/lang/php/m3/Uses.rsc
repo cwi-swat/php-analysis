@@ -1,5 +1,4 @@
 module lang::php::m3::Uses
-
 extend lang::php::m3::Core;
 
 import lang::php::m3::Containment;
@@ -105,8 +104,12 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
         // $this is a reserved keyword, referring to the current class
         case v:var(name(name(/this/i))):
         {
-			loc currentClassDecl = getClassOrInterface(m3@containment, v@scope);
-        	m3@uses += { <v@at, currentClassDecl> };
+        	if (v@scope == globalNamespace) {
+        		m3@uses += { <v@at, v@scope> };
+        	} else {
+				loc currentClassDecl = getClassOrInterface(m3@containment, v@scope);
+        		m3@uses += { <v@at, currentClassDecl> };
+        	}
         }
         
         case v:var(varNode):

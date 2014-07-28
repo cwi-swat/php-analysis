@@ -15,7 +15,7 @@ public &T <: node annotateWithDeclScopes(&T <: node t, loc scope, set[str] allow
 {
 	t@scope = scope;
 	
-	if (t@decl? && !isEmpty(toSet(split("+", t@decl.scheme)) & allowedScopeTypes))
+	if (t@decl? && isAllowedScope(t@decl.scheme, allowedScopeTypes))
 	{
 		scope = t@decl;
 	}
@@ -31,3 +31,6 @@ public &T <: node annotateWithDeclScopes(&T <: node t, loc scope, set[str] allow
 	
 	return t;
 }
+
+@memo private bool isAllowedScope(str scheme, set[str] allowedScopeTypes) = !isEmpty(schemeToSet(scheme) & allowedScopeTypes);
+@memo private set[str] schemeToSet(str scheme) = toSet(split("+", scheme));
