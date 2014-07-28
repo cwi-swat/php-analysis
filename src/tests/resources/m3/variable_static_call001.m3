@@ -1,0 +1,34 @@
+m3(|file:///|)[
+  @declarations={
+    <|php+class:///x|,|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(8,156,<3,0>,<3,0>)>,
+    <|php+method:///x/tostring|,|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(22,65,<5,0>,<5,0>)>,
+    <|php+method:///x/getclass|,|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(93,69,<9,0>,<9,0>)>,
+    <|php+globalVar:///a|,|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(236,2,<21,0>,<21,0>)>,
+    <|php+globalVar:///ts|,|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(266,3,<24,0>,<24,0>)>,
+    <|php+globalVar:///x|,|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(226,2,<20,0>,<20,0>)>,
+    <|php+globalVar:///b|,|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(284,2,<25,0>,<25,0>)>
+  },
+  @uses={
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(166,11,<14,0>,<14,0>),|php+function:///class_alias|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(192,3,<16,0>,<16,0>),|php+interface:///x|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(192,3,<16,0>,<16,0>),|php+class:///x|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(197,8,<16,0>,<16,0>),|php+method:///x/toString|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(210,1,<18,0>,<18,0>),|php+class:///x|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(210,1,<18,0>,<18,0>),|php+interface:///x|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(213,8,<18,0>,<18,0>),|php+method:///x/toString|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(245,2,<21,0>,<21,0>),|php+globalVar:///x|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(249,2,<22,0>,<22,0>),|php+globalVar:///a|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(253,8,<22,0>,<22,0>),|php+method:///a/toString|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(289,2,<25,0>,<25,0>),|php+globalVar:///a|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(293,8,<25,0>,<25,0>),|php+method:///a/getClass|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(305,9,<26,0>,<26,0>),|php+globalVar:///ts|>,
+    <|file:///Users/ruud/git/php-analysis/src/tests/resources/m3/variable_static_call001.php|(305,2,<26,0>,<26,0>),|php+globalVar:///b|>
+  },
+  @modifiers={
+    <|php+method:///x/tostring|,public()>,
+    <|php+method:///x/tostring|,static()>,
+    <|php+method:///x/getclass|,public()>,
+    <|php+method:///x/getclass|,static()>
+  }
+]
+

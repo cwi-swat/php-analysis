@@ -6,6 +6,7 @@ import lang::php::m3::Containment;
 import lang::php::m3::Uses;
 import lang::php::util::Config;
 import lang::php::ast::AbstractSyntax;
+import lang::php::ast::System;
 
 import IO;
 import List;
@@ -16,7 +17,7 @@ import Set;
 
 import ValueIO;
 
-// test PHP Schemes
+// test PHP Schemes -- incomplete list
 public test bool testIsNamespace() = isNamespace(|php+namespace:///|);
 public test bool testIsClass()     = isClass(|php+class:///|);
 public test bool testIsMethod()    = isMethod(|php+method:///|);
@@ -27,77 +28,120 @@ public test bool testIsVariable()  = isVariable(|php+globalVar:///|) && isVariab
 public test bool testIsField()     = isField(|php+field:///|);
 public test bool testIsInterface() = isInterface(|php+interface:///|);
 
-// helpers
-public loc emptyId = |file:///|;
-public M3 m3 = m3(emptyId);
-
-public M3Collection getM3s() {
-	m3@names = { <"Class_1",|php+class:///Class_1|>, <"Class_2",|php+class:///Class_2|> };
-	return (emptyId:m3);
-}
-
-// helpers 
-public loc classTestFolder = analysisLoc + "src/tests/resources/class/";
-public M3Collection classM3s = createM3sFromDirectory(classTestFolder);
-
-// test createM3sFromDirectory
-public test bool testFilesInModel() = size(classM3s) == size(classTestFolder.ls); 
-public test bool testFileInModelPerFile() = classTestFolder+"Class.php" in classM3s;
-public test bool testFileInModel2() = classTestFolder+"ClassAbstract.php" in classM3s;
-public test bool testFileInModel3() = classTestFolder+"ClassFinal.php" in classM3s;
-
-public test bool testModifierInModel1() = isEmpty(classM3s[classTestFolder+"Class.php"]@modifiers);
-public test bool testModifierInModel2() = {abstract()}== range(classM3s[classTestFolder+"ClassAbstract.php"]@modifiers);
-public test bool testModifierInModel3() = {final()} == range(classM3s[classTestFolder+"ClassFinal.php"]@modifiers);
-
-public rel[str,Modifier] actualClassModifiers = (classM3s[classTestFolder+"ClassPopulated.php"]@names o classM3s[classTestFolder+"ClassPopulated.php"]@modifiers);
-public rel[str,Modifier] expectedClassModifiers = { 
-    <"publicFieldC", \public()>,
-    <"publicFieldB", \public()>,
-	<"protectedField", protected()>, 
-	<"privateField", \private()>, 
-	<"publicfunction", \public()>, 
-	<"publicstaticfunction", \public()>, 
-	<"publicstaticfunction", static()>, 
-	<"publicfinalfunction", \public()>, 
-	<"publicfinalfunction", final()>, 
-	<"protectedfunction", protected()>,
-	<"privatefunction", \private()>
-	};
-	
-public test bool testClassModifiers() =  actualClassModifiers == expectedClassModifiers;
 
 public loc testFolder = analysisLoc + "src/tests/resources/m3";
 
-public test bool testContainment() {
-	M3Collection m3s = createM3sFromDirectory(testFolder);
+// test the creation of m3s
+public test bool testFillM3() {
+	throw ("method should not be used");
+	M3Collection m3s = getM3s();
+	map[str,int] counter = ();
 	for (f <- testFolder.ls) {
-		if (f.extension == "containment") {
-			rel[loc from, loc to] expected = readTextValueFile(#rel[loc,loc], f);
-			loc phpFile = getPhpFileNameFromContainmentFile(f);
-			if (m3s[phpFile]@containment != expected) {
-				printFailedTest(phpFile, f, expected, m3s[phpFile]@containment);
-				return false;
+		if (f.extension == "m3") {
+			loc phpFile = getPhpFileNameFromM3File(f);
+			M3 actual = m3s[phpFile];
+			M3 expected = readTextValueFile(#M3, f);
+			
+			actualAnnos = getAnnotations(actual);
+			expectedAnnos = getAnnotations(expected);
+			
+			// check all annotations set in expected
+			for(key <- expectedAnnos) {
+				counter[key] = key in counter ? counter[key] + 1 : 1; // count the number of tests
+				if (expectedAnnos[key] != actualAnnos[key]) {
+					printFailedTest(phpFile, key, "<expectedAnnos[key]>", "<actualAnnos[key]>");
+					return false;
+				}
 			}
 		}
-		if (f.extension == "uses") {
-			rel[loc from, loc to] expected = readTextValueFile(#rel[loc,loc], f);
-			loc phpFile = getPhpFileNameFromUsesFile(f);
-			if (m3s[phpFile]@uses != expected) {
-				printFailedTest(phpFile, f, expected, m3s[phpFile]@uses);
-				return false;
+	}
+	println("Total number of tests executed: <counter>");
+	return true;
+}
+
+public test bool testGetM3ForDirectory() 
+{
+	M3 m3 =	getM3ForDirectory(testFolder);
+	
+	return m3ContainsExpectedResults(m3);
+}
+
+public bool m3ContainsExpectedResults(M3 m3) 
+{
+	map[str,int] counter = ();
+	for (f <- testFolder.ls) {
+		if (f.extension == "m3") {
+			M3 expected = readTextValueFile(#M3, f);
+			
+			expectedAnnos = getAnnotations(expected);
+			
+			// check all annotations set in expected
+			for(key <- expectedAnnos) {
+				counter[key] = key in counter ? counter[key] + 1 : 1; // count the number of tests
+				if (!assertAnnotation(key, m3, "<expectedAnnos[key]>")) {
+					return false;
+				}	
 			}
 		}
+	}
+	println("Total number of tests executed: <counter>");
+	return true;
+}
+
+private bool assertAnnotation(str key, M3 m3, str expected)
+{
+	actualAnnos = getAnnotations(m3);
+    if (key in ["uses", "declarations"]) {
+   		if (!assertAnnotationLocLoc(expected, actualAnnos[key])) return false;
+	} else if (key in ["modifiers"]) {
+   		if (!assertAnnotationLocModifier(expected, actualAnnos[key])) return false;
+	} else {
+		throw("Unsupported type of annotations. Please implement: \'<key>\'");	
+	}
+	
+	return true;
+}
+
+private bool assertAnnotationLocLoc(str expectedRaw, rel[loc,loc] actual)
+{
+	rel[loc,loc] expected = readTextValueString(#rel[loc,loc], "<expectedRaw>");
+	unImplemented = expected - actual;
+	if (!isEmpty(unImplemented)) {
+		iprintln(unImplemented);	
+		return false;	
 	}
 	return true;
 }
 
-private loc getPhpFileNameFromContainmentFile(loc f) = testFolder+"<f.file[0..-12]>.php";
-private loc getPhpFileNameFromUsesFile(loc f) = testFolder+"<f.file[0..-5]>.php";
+private bool assertAnnotationLocModifier(str expectedRaw, rel[loc,Modifier] actual)
+{
+   	rel[loc,Modifier] expected = readTextValueString(#rel[loc,Modifier], "<expectedRaw>");
+	unImplemented = expected - actual;
+	if (!isEmpty(unImplemented)) {
+		iprintln(unImplemented);	
+		return false;	
+	}
+	return true;
+}
 
-private void printFailedTest(loc phpFile, loc testFile, rel[loc,loc] expected, rel[loc,loc] actual) {
-    println("Test failed for file: `<phpFile.file>`, `<testFile.file>` (test stopped)");
-    println("Not in expected/actual:");
-    println(actual - expected);
-    println(expected - actual);
+private M3Collection getM3s() = getM3CollectionForSystem(getSystem(testFolder), testFolder);
+
+private loc getPhpFileNameFromM3File(loc f) = testFolder+"<f.file[0..-3]>.php";
+
+private void printFailedTest(loc phpFile, str annotation, str expected, str actual) {
+    println("Test failed for file: `<phpFile.file>`, on `<annotation>` (test stopped)");
+    println("Not in Expected/actual:");
+    if (annotation in ["uses", "declarations"]) {
+        rel[loc,loc] e = readTextValueString(#rel[loc,loc], expected);
+        rel[loc,loc] a = readTextValueString(#rel[loc,loc], actual);
+        println(sort(e-a));
+        println(sort(a-e));
+    } else if (annotation in ["modifiers"]) {
+        rel[loc,Modifier] e = readTextValueString(#rel[loc,Modifier], expected);
+        rel[loc,Modifier] a = readTextValueString(#rel[loc,Modifier], actual);
+        println(sort(e-a));
+        println(sort(a-e));
+    } else {
+        throw ("implement node <annotation>");
+    }
 }

@@ -1,12 +1,13 @@
-@note{Please make sure to run tests::lang::php::parser::DocBlockParser when you modify this grammar file}
+@note{Please make sure to run tests::lang::php::parser::DocBlockParser when you modify this grammar}
 module lang::php::parser::DocBlockParser
 
 // added \u002A == * to the layout, the rest is the same as lang::std::Whitespace;
 layout Standard 
-  = Whitespace* !>> [\u0009-\u000D \u0020 \u002A \u0085 \u00A0 \u1680 \u180E \u2000-\u200A \u2028 \u2029 \u202F \u205F \u3000] !>> "//";
+  = Whitespace* !>> [\u0009-\u000D \u0020 \u002A \u0085 \u00A0 \u1680 \u180E \u2000-\u200A \u2028 \u2029 \u202F \u205F \u3000 \r \n] !>> "//";
+  //= Whitespace !<< Whitespace* !>> Whitespace;
   
 lexical Whitespace 
-  = [\u0009-\u000D \u0020 \u002A \u0085 \u00A0 \u1680 \u180E \u2000-\u200A \u2028 \u2029 \u202F \u205F \u3000]
+  = [\u0009-\u000D \u0020 \u002A \u0085 \u00A0 \u1680 \u180E \u2000-\u200A \u2028 \u2029 \u202F \u205F \u3000 \r \n]
   ;
 
 // Class names should start with a letter or a backslash like \Object
@@ -35,6 +36,7 @@ lexical Var
 // Description is everything that does not start with @ (annotation).
 // used !<< and !>> for longest match
 lexical Description 
+	//= description: ![@]+ 
 	= description: 
 			[a-z A-Z 0-9 $ { } ( ) \[ \] \< \> & @ # ^ + % = : ; ? ! ~ ` \' \" / \\ _ \- | . , \u007f-\u00ff] 
 		!<<  
@@ -74,7 +76,7 @@ keyword PhpTypes
 // for instance: * // comment
 // not found a solution for this yet.
 syntax DocBlock 
-	= docBlock: "/" Description* Annotation* "/"
+	= docBlock: "/" Description? Annotation* "/"
 	;
 	
 syntax Annotation
@@ -82,8 +84,8 @@ syntax Annotation
 	;
 
 syntax AnnotationType
-	= param: ("@param" Types Var)
-	| \return: ("@return" Types)
+	= param: ("@param" Types Var) 
+	| \return: ("@return" Types) 
 	| var: ("@var" Types Var)
 	> other: AnnotationTag \ SupportedAnnotationTags
 	;

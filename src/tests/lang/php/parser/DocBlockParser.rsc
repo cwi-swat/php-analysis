@@ -7,6 +7,8 @@ import Node;
 import List;
 import ValueIO;
 
+import Ambiguity;
+
 // hardcoded test inputs:
 private list[str] phpTypes = ["array", "mixed", "bool", "boolean", "int", "integer", "float", "string", "resource", "unset"];
 private list[str] variables = [ "$var", "$object", "$OBJ", "$_OBJ", "$_OBJ_o", "$_OBJ_ÿ", "$_{$O_ÿ}", "$a_b_c", "$randomName" ];
@@ -27,7 +29,9 @@ public void main()
     print("Testing <numberOfTests> random multiple types ..."); if (testMultipleTypes(numberOfTests)) println("Done.");
 
     print("Testing docblocks...");      if (testDocBlocks())     println("Done.");
-    print("Testing real docblocks..."); testFullDocBlocks();
+    
+    str filterFileNames = "";
+    print("Testing real docblocks...\n"); testFullDocBlocks(filterFileNames);
 }
 
 // test the parser with some inputs
@@ -177,11 +181,15 @@ public test bool testDocBlocks()
     return testParser(#DocBlock, inputs);	
 }
 
-public void testFullDocBlocks()
+public void testFullDocBlocks(str filtr)
 {
+	// helper method, apply filter when a filter is applied
+	private bool filterFile(loc l) = filtr != "" ==> /<filtr>/ := l.file;
+	
     loc baseDir = |project://PHPAnalysis/src/tests/resources/parser|;
-   
-    for (l <- baseDir.ls, l.extension == "txt") {
+
+  	set[loc] files = { f | f <- baseDir.ls, f.extension == "txt", filterFile(f) };
+    for (l <- files) {
         int success = 0, total = 0;
     
         list[str] phpdocs = readTextValueFile(#list[str],l);
@@ -214,6 +222,7 @@ public bool canParse(type[&T<:Tree] t, str input)
     } catch: {
     	//println("Unknown error... ambigious grammar??");
         //println(input);
+        //iprintln(diagnose(parse(t, input)));
         //println(implode(#node, parse(t, input)));
     	//exit;
     	return false;

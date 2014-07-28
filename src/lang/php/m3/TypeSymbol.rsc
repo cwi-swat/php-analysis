@@ -1,34 +1,20 @@
 module lang::php::m3::TypeSymbol
-
 extend analysis::m3::TypeSymbol;
 
-data Bound 
-  = \super(list[TypeSymbol] bound)
-  | \extends(list[TypeSymbol] bound)
-  | \unbounded()
-  ;
-  
-data TypeSymbol 
-  = \class(loc decl, list[TypeSymbol] typeParameters)
-  | \interface(loc decl, list[TypeSymbol] typeParameters)
-  | \trait(loc decl, list[TypeSymbol] typeParameters)
-  | \method(loc decl, list[TypeSymbol] typeParameters, TypeSymbol returnType, list[TypeSymbol] parameters)
-  | \typeParameter(loc decl, Bound upperbound) 
-  //| \callback(loc decl, list[TypeSymbol] typeParameters)
-  | array()
+// type `mixed()` is omitted, `\any()` will be used
+
+data TypeSymbol
+  = array(set[TypeSymbol] itemTypes)
   | \bool()
+  | class(loc decl)
   | float()
   | \int()
-  | mixed()
+  | \null()
   | object()
-  //| resouce()
-  //| \null()
+  | resource()
   | string()
-  | unset()
-  ;  
-  
-  
+  ; 
   
 default bool subtype(TypeSymbol s, TypeSymbol t) = s == t;
 
-default TypeSymbol lub(TypeSymbol s, TypeSymbol t) = s == t ? s : object();  
+default TypeSymbol lub(TypeSymbol s, TypeSymbol t) = s == t ? s : \any();
