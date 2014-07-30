@@ -48,7 +48,7 @@ private M3 createM3forScript(loc filename, Script script)
 	
 	try
 	{
-		script = setEmptyModifiersToPublic(script); // set Modifiers when they are not provided, like function => public function
+		script = addPublicModifierWhenNotProvided(script); // set Modifiers when they are not provided, like function => public function
    		m3 = fillDeclarations(m3, script); // fill @declarations and @names	
 	   	script = propagateDeclToScope(script); // propagate @decl to @scope
    	

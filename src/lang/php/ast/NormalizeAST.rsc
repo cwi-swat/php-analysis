@@ -11,6 +11,7 @@ module lang::php::ast::NormalizeAST
 import lang::php::ast::AbstractSyntax;
 import List;
 import IO;
+import Node;
 import String;
 
 data Expr = blockedVar(NameOrExpr varName);
@@ -243,16 +244,19 @@ public Script discardModifiers(Script s) {
 	return s;
 }
 
-public Script setEmptyModifiersToPublic(Script s) {
+// dirty setAnnotations and getAnnotations to keep the annotations of the origional node on the new node.
+public Script addPublicModifierWhenNotProvided(Script s) {
 	set[Modifier] publicModifier = { \public() };
 	
 	solve(s) {
 		s = visit(s) {
-			case property({}, prop) => 
-				property(publicModifier, prop)
+			case origNode:property(set[Modifier] mfs, prop) => 
+				setAnnotations( property(mfs + publicModifier, prop), getAnnotations(origNode))
+			when \public() notin mfs && \private() notin mfs && \protected() notin mfs
 				
-			case method(name, {}, byRef, params, body) =>
-				method(name, publicModifier, byRef, params, body)
+			case origNode:method(name, set[Modifier] mfs, byRef, params, body) =>
+				setAnnotations( method(name, mfs + publicModifier, byRef, params, body), getAnnotations(origNode))
+			when \public() notin mfs && \private() notin mfs && \protected() notin mfs
 		}
 	}
 	return s;
