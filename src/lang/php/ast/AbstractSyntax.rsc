@@ -328,3 +328,5 @@ public anno loc node@at;
 public anno loc node@decl;
 public anno str node@phpdoc;
 public anno loc node@scope;
+
+alias PhpParams = lrel[loc decl, set[loc] typeHints, bool isRequired, bool byRef];

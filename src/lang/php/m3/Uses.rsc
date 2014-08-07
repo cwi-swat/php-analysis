@@ -2,7 +2,7 @@ module lang::php::m3::Uses
 extend lang::php::m3::Core;
 
 import lang::php::m3::Containment;
-import lang::php::m3::TypeSymbol;
+import lang::php::types::TypeSymbol;
 import lang::php::ast::AbstractSyntax;
 import lang::php::pp::PrettyPrinter;
 import lang::php::\syntax::Names;
@@ -119,9 +119,11 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
                 parentNode = getTraversalContextNodes()[1];
                 /* if parent is $i++; or $i += 1; */
                 if (unaryOperation(_,_) := parentNode || assignWOp(_,_,_) := parentNode) {
+        			println("2");
                     m3 = addVarUse(m3, varNode, v@at, varNode@scope);
             	}
             } else { // add all vars uses that have no declarations
+       			println("3");
                 m3 = addVarUse(m3, varNode, v@at, varNode@scope);
         	}
         }

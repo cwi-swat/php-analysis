@@ -25,8 +25,6 @@ data Annotation =
 	parameterType(loc var, set[TypeSymbol]) | 
 	varType(loc var, set[TypeSymbol]);
 	
-
-alias PhpParams = lrel[loc decl, set[loc] typeHints, bool isRequired, bool byRef];
 alias M3Collection = map[loc fileloc, M3 model];
 
 anno rel[loc from, loc to] M3@extends;      // classes extending classes and interfaces extending interfaces

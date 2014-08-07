@@ -1,8 +1,8 @@
 module lang::php::m3::Types
 extend lang::php::m3::Core;
 
-import lang::php::m3::TypeSymbol;
-import lang::php::m3::TypeConstraints;
+import lang::php::types::TypeSymbol;
+import lang::php::types::TypeConstraints;
 
 public M3 resolveTypes(M3 m3, System system) 
 {

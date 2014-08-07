@@ -7,7 +7,7 @@ import Set;
 import List;
 import Relation;
 
-import lang::php::m3::TypeSymbol;
+import lang::php::types::TypeSymbol;
 import lang::php::parser::DocBlockParser;
 
 public M3 fillPhpDocAnnotations(M3 m3, Script script) {
@@ -16,8 +16,9 @@ public M3 fillPhpDocAnnotations(M3 m3, Script script) {
 			if ( n@phpdoc? && n@decl? )
 			{
 				try {
-					set[Annotation] annotations = parseAnnotation(n);
-					m3@annotations += { <n@decl, a> | a <- annotations };
+					; // todo: add option to use annotations or not.
+					//set[Annotation] annotations = parseAnnotation(n);
+					//m3@annotations += { <n@decl, a> | a <- annotations };
 				} catch ParseError(loc l): {
 					m3@messages += error("Parse error while parsing annotation: <n@phpdoc>", n@at);
 				} catch: {
