@@ -17,27 +17,29 @@ public void main()
 	assert true == testVariable();
 	assert true == testNormalAssign();
 	assert true == testScalars();
+	assert true == testOpAssign();
 }
 
 public test bool testVariable() {
 	str name = "variable";
-	set[str] expected = {
+	list[str] expected = [
 		"[$a] \<: any()"
-	};
+	];
 	return run(name, expected);
 }
 public test bool testNormalAssign() {
-	set[str] expected = {
+	list[str] expected = [
 		"[2] \<: [$a]",
 		"[2] = int()",
 		"[$a] \<: [$b]",
-		"[$a] \<: any()", // twice
+		"[$a] \<: any()", // twice because the variable occurs at two different places
+		"[$a] \<: any()", 
 		"[$b] \<: any()"
-	};
+	];
 	return run("normalAssign", expected);
 }
 public test bool testScalars() {
-	set[str] expected = {
+	list[str] expected = [
 		"[__CLASS__] = string()",
 		"[__DIR__] = string()",
 		"[__FILE__] = string()",
@@ -58,11 +60,11 @@ public test bool testScalars() {
 		"[\'also a string\'] = string()",
 		"[\"$encaped string\"] = string()",
 		"[\"{$encaped} string\"] = string()"
-	};
+	];
 	return run("scalar", expected);
 }
 public test bool testOpAssign() {
-	set[str] expected = {
+	list[str] expected = [
 		"[$a] \<: any()", "[$b] \<: any()", "[$a] = int()",
 		"[$c] \<: any()", "[$d] \<: any()", "[$c] = int()",
 		"[$e] \<: any()", "[$f] \<: any()", "[$e] = int()", 
@@ -74,11 +76,11 @@ public test bool testOpAssign() {
 		
 		"[$o] \<: any()", "[$p] \<: any()", "[$o] = int()",
 		"[$q] \<: any()", "[$r] \<: any()", "[$q] = int()"
-	};
+	];
 	return run("opAssign", expected);
 }
 
-public bool run(str fileName, set[str] expected)
+public bool run(str fileName, list[str] expected)
 {
 	loc l = getFileLocation(fileName);
 	
@@ -88,7 +90,7 @@ public bool run(str fileName, set[str] expected)
 	set[Constraint] actual = getConstraints(system, m3);
 
 	// for debugging purposes
-	printResult(fileName, expected, actual);
+	//printResult(fileName, expected, actual);
 	
 	// assert that expectedConstraints is a subset of ActualConstraints
 	return assertPrettyPrinted(expected, actual);
@@ -97,19 +99,25 @@ public bool run(str fileName, set[str] expected)
 //
 // Assert pretty printed
 //
-private bool assertPrettyPrinted(set[str] expected, set[Constraint] actual) 
+private bool assertPrettyPrinted(list[str] expected, set[Constraint] actual) 
 {
-	set[str] actualPP = { toStr(a) | a <- actual };
+	list[str] actualPP = [ toStr(a) | a <- actual ];
 
-	a = sort(toList(actualPP));
-	e = sort(toList(expected));
+	a = sort(actualPP);
+	e = sort(expected);
 	
-	iprintln("Actual: <a>");
-	iprintln("Expected: <e>");
-	iprintln("Not in actual: <a-e>");
-	iprintln("Not in expected: <e-a>");
+	notInActual = a - e;
+	notInExpected = e - a;	
 	
-	return expected == actualPP;
+	if (!isEmpty(notInActual) || !isEmpty(notInExpected))	
+	{
+		iprintln("Actual: <a>");
+		iprintln("Expected: <e>");
+		iprintln("Not in actual: <a-e>");
+		iprintln("Not in expected: <e-a>");
+	}
+	
+	return a == e;
 }
 
 
@@ -117,7 +125,7 @@ private bool assertPrettyPrinted(set[str] expected, set[Constraint] actual)
 // Printer functions:
 //
 
-private void printResult(str fileName, set[str] expected, set[Constraint] actual)
+private void printResult(str fileName, list[str] expected, set[Constraint] actual)
 {
 	println();
 	println("----------File Content: <fileName>----------");
@@ -137,6 +145,7 @@ private str toStr(eq(TypeOf a, TypeOf b)) 		= "<toStr(a)> = <toStr(b)>";
 private str toStr(eq(TypeOf a, TypeSymbol ts)) 	= "<toStr(a)> = <toStr(ts)>";
 private str toStr(subtyp(TypeOf a, TypeOf b)) 	= "<toStr(a)> \<: <toStr(b)>";
 private str toStr(subtyp(TypeOf a, TypeSymbol ts)) 	= "<toStr(a)> \<: <toStr(ts)>";
+default str toStr(Constraint c) { throw "Please implement toStr for node :: <c>"; }
 
 private str toStr(typeOf(loc i)) 	= isFile(i) ? "["+readFile(i)+"]" : "[<i>]";
 private str toStr(TypeSymbol t) 	= "<t>";

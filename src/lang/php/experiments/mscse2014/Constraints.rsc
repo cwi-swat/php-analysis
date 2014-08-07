@@ -113,10 +113,9 @@ private void addConstraints(Expr e, M3 m3)
 				case rightShift():	constraints += { eq(typeOf(assignTo@at), \int()) }; 
 				case \mod():		constraints += { eq(typeOf(assignTo@at), \int()) };
 				
-				case div():	{		
+				case div():	{		// LHS is int, RHS is not of type array
 									constraints += { eq(typeOf(assignTo@at), \int()) };
-									constraints += { eq(typeOf(assignExpr@at), 
-										disjunction({ t | t <- allTypes, \array(_) := t })) };
+									constraints += { negation(eq(typeOf(assignExpr@at), \array(\any()))) };
 				}
 				case minus():		constraints += { eq(typeOf(assignTo@at), \int()) };
 				
