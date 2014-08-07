@@ -113,13 +113,20 @@ private void addConstraints(Expr e, M3 m3)
 				case rightShift():	constraints += { eq(typeOf(assignTo@at), \int()) }; 
 				case \mod():		constraints += { eq(typeOf(assignTo@at), \int()) };
 				
-				case div():	{		// LHS is int, RHS is not of type array
-									constraints += { eq(typeOf(assignTo@at), \int()) };
-									constraints += { negation(eq(typeOf(assignExpr@at), \array(\any()))) };
-				}
-				case minus():		constraints += { eq(typeOf(assignTo@at), \int()) };
+				case div(): 		constraints += { 
+										eq(typeOf(assignTo@at), \int()), // LHS is int
+										negation(eq(typeOf(assignExpr@at), \array(\any()))) // RHS is not an array
+									};
+				
+				case minus(): 		constraints += { 
+										eq(typeOf(assignTo@at), \int()), // LHS is int
+										negation(eq(typeOf(assignExpr@at), \array(\any()))) // RHS is not an array
+									};
 				
 				case concat():		constraints += { eq(typeOf(assignTo@at), string()) };
+				
+				case mul(): 		constraints += { subtyp(typeOf(assignTo@at), float()) };
+				case plus(): 		constraints += { subtyp(typeOf(assignTo@at), float()) };
 				
 				
 			//	default: 	constraints += { subtyp(typeOf(assignExpr@at), typeOf(assignTo@at)) }; 
@@ -134,6 +141,188 @@ private void addConstraints(Expr e, M3 m3)
 		//unaryOperation(Expr operand, Op operation)
 		// not final!!!!!!
 		case u:unaryOperation(Expr operand, Op operation): {
+			addConstraints(operand, m3);	
+			switch (operation) {
+				case unaryPlus():		constraints += { 
+											subtyp(typeOf(u@at), float()), // type of whole expression is int or float
+											negation(eq(typeOf(operand@at), array(\any()))) // type of the expression is not an array
+											// todo
+											// in: float -> out: float
+											// in: str 	 -> out: int|float
+											// in: _	 -> out: int
+										};
+										
+				case unaryMinus():		constraints += { 
+											subtyp(typeOf(u@at), float()), // type of whole expression is int or float
+											negation(eq(typeOf(operand@at), array(\any()))) // type of the expression is not an array
+											// todo
+											// in: float -> out: float
+											// in: str 	 -> out: int|float
+											// in: _	 -> out: int
+										};
+				
+				case booleanNot():		constraints += { eq(typeOf(u@at), \bool()) }; // type of whole expression is bool
+				
+				case bitwiseNot():		constraints += { 
+											disjunction({ // the sub expression is int, float or string (rest results in fatal error)
+												eq(typeOf(operand@at), \int()),  
+												eq(typeOf(operand@at), float()),
+												eq(typeOf(operand@at), string()) 
+											}),
+											disjunction({ // the whole expression is always a int or string
+												eq(typeOf(u@at), \int()),  
+												eq(typeOf(u@at), string()) 
+											})
+											// todo:
+											// in: int 	  -> out: int
+											// in: float  -> out: int
+											// in: string -> out: string
+										}; 
+				
+				case postInc():			constraints += {
+											conditional( //"if([E] = array(any())) then ([E++] = array(any()))",
+												eq(typeOf(operand@at), \array(\any())),
+												eq(typeOf(u@at), \array(\any()))
+											),
+											conditional( //"if([E] = bool()) then ([E++] = bool())",
+												eq(typeOf(operand@at), \bool()),
+												eq(typeOf(u@at), \bool())
+											),
+											conditional( //"if([E] = float()) then ([E++] = float())",
+												eq(typeOf(operand@at), float()),
+												eq(typeOf(u@at), float())
+											),
+											conditional( //"if([E] = int()) then ([E++] = int())",
+												eq(typeOf(operand@at), \int()),
+												eq(typeOf(u@at), \int())
+											),
+											conditional( //"if([E] = null()) then (or([E++] = null(), [E++] = int()))",
+												eq(typeOf(operand@at), \null()),
+												disjunction({eq(typeOf(u@at), \null()), eq(typeOf(u@at), \int())})
+											),
+											conditional( //"if([E] = object()) then ([E++] = object())",
+												subtyp(typeOf(operand@at), \object()),
+												subtyp(typeOf(u@at), \object())
+											),
+											conditional( //"if([E] = resource()) then ([E++] = resource())",
+												eq(typeOf(operand@at), resource()),
+												eq(typeOf(u@at), resource())
+											),
+											conditional( //"if([E] = string()) then (or([E++] = float(), [E++] = int(), [E++] = string())",
+												eq(typeOf(operand@at), \string()),
+												disjunction({eq(typeOf(u@at), \float()), eq(typeOf(u@at), \int()), eq(typeOf(u@at), \string())})
+											)
+										};
+										
+				case postDec():			constraints += {
+											conditional( //"if([E] = array(any())) then ([E--] = array(any()))",
+												eq(typeOf(operand@at), \array(\any())),
+												eq(typeOf(u@at), \array(\any()))
+											),
+											conditional( //"if([E] = bool()) then ([E--] = bool())",
+												eq(typeOf(operand@at), \bool()),
+												eq(typeOf(u@at), \bool())
+											),
+											conditional( //"if([E] = float()) then ([E--] = float())",
+												eq(typeOf(operand@at), float()),
+												eq(typeOf(u@at), float())
+											),
+											conditional( //"if([E] = int()) then ([E--] = int())",
+												eq(typeOf(operand@at), \int()),
+												eq(typeOf(u@at), \int())
+											),
+											conditional( //"if([E] = null()) then (or([E--] = null(), [E++] = int()))",
+												eq(typeOf(operand@at), \null()),
+												disjunction({eq(typeOf(u@at), \null()), eq(typeOf(u@at), \int())})
+											),
+											conditional( //"if([E] = object()) then ([E--] = object())",
+												subtyp(typeOf(operand@at), \object()),
+												subtyp(typeOf(u@at), \object())
+											),
+											conditional( //"if([E] = resource()) then ([E--] = resource())",
+												eq(typeOf(operand@at), resource()),
+												eq(typeOf(u@at), resource())
+											),
+											conditional( //"if([E] = string()) then (or([E--] = float(), [E--] = int(), [E--] = string())",
+												eq(typeOf(operand@at), \string()),
+												disjunction({eq(typeOf(u@at), \float()), eq(typeOf(u@at), \int()), eq(typeOf(u@at), \string())})
+											)
+										};
+										
+				case preInc():			constraints += {
+											conditional( //"if([E] = array(any())) then ([E++] = array(any()))",
+												eq(typeOf(operand@at), \array(\any())),
+												eq(typeOf(u@at), \array(\any()))
+											),
+											conditional( //"if([E] = bool()) then ([E++] = bool())",
+												eq(typeOf(operand@at), \bool()),
+												eq(typeOf(u@at), \bool())
+											),
+											conditional( //"if([E] = float()) then ([E++] = float())",
+												eq(typeOf(operand@at), float()),
+												eq(typeOf(u@at), float())
+											),
+											conditional( //"if([E] = int()) then ([E++] = int())",
+												eq(typeOf(operand@at), \int()),
+												eq(typeOf(u@at), \int())
+											),
+											conditional( //"if([E] = null()) then (or([E++] = null(), [E++] = int()))",
+												eq(typeOf(operand@at), \null()),
+												eq(typeOf(u@at), \int())
+											),
+											conditional( //"if([E] = object()) then ([E++] = object())",
+												subtyp(typeOf(operand@at), \object()),
+												subtyp(typeOf(u@at), \object())
+											),
+											conditional( //"if([E] = resource()) then ([E++] = resource())",
+												eq(typeOf(operand@at), resource()),
+												eq(typeOf(u@at), resource())
+											),
+											conditional( //"if([E] = string()) then (or([E++] = float(), [E++] = int(), [E++] = string())",
+												eq(typeOf(operand@at), \string()),
+												disjunction({eq(typeOf(u@at), \float()), eq(typeOf(u@at), \int()), eq(typeOf(u@at), \string())})
+											)
+										};
+										
+				case preDec():			constraints += {
+											conditional( //"if([E] = array(any())) then ([E--] = array(any()))",
+												eq(typeOf(operand@at), \array(\any())),
+												eq(typeOf(u@at), \array(\any()))
+											),
+											conditional( //"if([E] = bool()) then ([E--] = bool())",
+												eq(typeOf(operand@at), \bool()),
+												eq(typeOf(u@at), \bool())
+											),
+											conditional( //"if([E] = float()) then ([E--] = float())",
+												eq(typeOf(operand@at), float()),
+												eq(typeOf(u@at), float())
+											),
+											conditional( //"if([E] = int()) then ([E--] = int())",
+												eq(typeOf(operand@at), \int()),
+												eq(typeOf(u@at), \int())
+											),
+											conditional( //"if([E] = null()) then (or([E--] = null(), [E++] = int()))",
+												eq(typeOf(operand@at), \null()),
+												eq(typeOf(u@at), \int())
+											),
+											conditional( //"if([E] = object()) then ([E--] = object())",
+												subtyp(typeOf(operand@at), \object()),
+												subtyp(typeOf(u@at), \object())
+											),
+											conditional( //"if([E] = resource()) then ([E--] = resource())",
+												eq(typeOf(operand@at), resource()),
+												eq(typeOf(u@at), resource())
+											),
+											conditional( //"if([E] = string()) then (or([E--] = float(), [E--] = int(), [E--] = string())",
+												eq(typeOf(operand@at), \string()),
+												disjunction({eq(typeOf(u@at), \float()), eq(typeOf(u@at), \int()), eq(typeOf(u@at), \string())})
+											)
+										};
+			}
+		
+		}
+		case u:unaryOperation(Expr operand, Op operation): {
+			// delete this!!
 			switch (operation) {
 				case preInc(): {
 					// if operand == string -> result = string/integer/float

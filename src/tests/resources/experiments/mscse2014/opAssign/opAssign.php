@@ -1,15 +1,15 @@
 <?php
-$a &= $b; // $a = integer()
-$c |= $d; // $c = integer()
-$e ^= $f; // $e = integer()
-$g %= $h; // $g = integer()
-$i <<= $j; // $i = integer()
-$k >>= $l; // $k = integer()
+$a &= $b; // $a = int()
+$c |= $d; // $c = int()
+$e ^= $f; // $e = int()
+$g %= $h; // $g = int()
+$i <<= $j; // $i = int()
+$k >>= $l; // $k = int()
 
 $m .= $n; // $m = string()
 
-$o /= $p; // $i = integer(), $j != array()
-$q -= $r; // $a = integer(), $l != array()
+$o /= $p; // $o = int(), $p != array()
+$q -= $r; // $q = int(), $r != array()
 
-//$o *= $p;
-//$q += $r;
+$s *= $t; // $s = int() || float()
+$u += $v; // $u = int() || float()

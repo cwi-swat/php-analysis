@@ -18,6 +18,8 @@ public void main()
 	assert true == testNormalAssign();
 	assert true == testScalars();
 	assert true == testOpAssign();
+	assert true == testUnaryOp();
+	assert true == testBinaryOp();
 }
 
 public test bool testVariable() {
@@ -40,44 +42,107 @@ public test bool testNormalAssign() {
 }
 public test bool testScalars() {
 	list[str] expected = [
-		"[__CLASS__] = string()",
-		"[__DIR__] = string()",
-		"[__FILE__] = string()",
-		"[__FUNCTION__] = string()",
-		"[__LINE__] = string()",
-		"[__METHOD__] = string()",
-		"[__NAMESPACE__] = string()",
-		"[__TRAIT__] = string()",
-		"[0.0] = float()",
-		"[0.5] = float()",
-		"[1000.0382] = float()",
-		"[0] = int()",
-		"[1] = int()",
-		"[2] = int()",
-		"[10] = int()",
-		"[100] = int()",
-		"[\"string\"] = string()",
-		"[\'also a string\'] = string()",
-		"[\"$encaped string\"] = string()",
-		"[\"{$encaped} string\"] = string()"
+		// magic constants -> string()
+		"[__CLASS__] = string()", "[__DIR__] = string()", "[__FILE__] = string()", "[__FUNCTION__] = string()", 
+		"[__LINE__] = string()", "[__METHOD__] = string()", "[__NAMESPACE__] = string()", "[__TRAIT__] = string()",
+		// floats -> float()
+		"[0.0] = float()", "[0.5] = float()", "[1000.0382] = float()",
+		// int -> int()
+		"[0] = int()", "[1] = int()", "[2] = int()", "[10] = int()", "[100] = int()",
+		// strings -> string()
+		"[\"string\"] = string()", "[\'also a string\'] = string()", "[\"$encaped string\"] = string()", "[\"{$encaped} string\"] = string()"
 	];
 	return run("scalar", expected);
 }
+
 public test bool testOpAssign() {
 	list[str] expected = [
-		"[$a] \<: any()", "[$b] \<: any()", "[$a] = int()",
-		"[$c] \<: any()", "[$d] \<: any()", "[$c] = int()",
-		"[$e] \<: any()", "[$f] \<: any()", "[$e] = int()", 
-		"[$g] \<: any()", "[$h] \<: any()", "[$g] = int()", 
-		"[$i] \<: any()", "[$j] \<: any()", "[$i] = int()", 
-		"[$k] \<: any()", "[$l] \<: any()", "[$k] = int()",
-		
-		"[$m] \<: any()", "[$n] \<: any()", "[$m] = string()",
-		
-		"[$o] \<: any()", "[$p] \<: any()", "[$o] = int()",
-		"[$q] \<: any()", "[$r] \<: any()", "[$q] = int()"
+		// LHS = int()
+		"[$a] \<: any()", "[$b] \<: any()", "[$a] = int()", // $a  &= $b
+		"[$c] \<: any()", "[$d] \<: any()", "[$c] = int()", // $c  |= $d
+		"[$e] \<: any()", "[$f] \<: any()", "[$e] = int()", // $e  ^= $f
+		"[$g] \<: any()", "[$h] \<: any()", "[$g] = int()", // $g  %= $h
+		"[$i] \<: any()", "[$j] \<: any()", "[$i] = int()", // $i <<= $j
+		"[$k] \<: any()", "[$l] \<: any()", "[$k] = int()", // $k >>= $l
+	
+		// LHS = string()	
+		"[$m] \<: any()", "[$n] \<: any()", "[$m] = string()", // $m .= $n
+	
+		// LHS = int, RHS != array()	
+		"[$o] \<: any()", "[$p] \<: any()", "[$o] = int()", "neg([$p] = array(any()))", // $o /= $p
+		"[$q] \<: any()", "[$r] \<: any()", "[$q] = int()", "neg([$r] = array(any()))", // $q -= $r
+	
+		// LHS = int || float => LHS <: float()	
+		"[$s] \<: any()", "[$t] \<: any()", "[$s] \<: float()", // $s *= $t
+		"[$u] \<: any()", "[$v] \<: any()", "[$u] \<: float()"  // $u += $v
 	];
 	return run("opAssign", expected);
+}
+
+public test bool testUnaryOp() {
+	list[str] expected = [
+		"[$a] \<: any()",
+		"[+$a] \<: float()", // expression is float or int
+		"neg([$a] = array(any()))", // $a is not an array
+		
+		"[$b] \<: any()",
+		"[-$b] \<: float()", // expression is float or int
+		"neg([$b] = array(any()))", // $b is not an array
+		
+		"[$c] \<: any()", 
+		"[!$c] = bool()", 
+		
+		"[$d] \<: any()", 
+		"or([$d] = float(), [$d] = int(), [$d] = string())", 
+		"or([~$d] = int(), [~$d] = string())", 
+		
+		"[$e] \<: any()",
+		"if([$e] = array(any())) then ([$e++] = array(any()))",
+		"if([$e] = bool()) then ([$e++] = bool())",
+		"if([$e] = float()) then ([$e++] = float())",
+		"if([$e] = int()) then ([$e++] = int())",
+		"if([$e] = null()) then (or([$e++] = int(), [$e++] = null()))",
+		"if([$e] \<: object()) then ([$e++] \<: object())",
+		"if([$e] = resource()) then ([$e++] = resource())",
+		"if([$e] = string()) then (or([$e++] = float(), [$e++] = int(), [$e++] = string()))",
+		
+		"[$f] \<: any()",
+		"if([$f] = array(any())) then ([$f--] = array(any()))",
+		"if([$f] = bool()) then ([$f--] = bool())",
+		"if([$f] = float()) then ([$f--] = float())",
+		"if([$f] = int()) then ([$f--] = int())",
+		"if([$f] = null()) then (or([$f--] = int(), [$f--] = null()))",
+		"if([$f] \<: object()) then ([$f--] \<: object())",
+		"if([$f] = resource()) then ([$f--] = resource())",
+		"if([$f] = string()) then (or([$f--] = float(), [$f--] = int(), [$f--] = string()))",
+		
+		"[$g] \<: any()",
+		"if([$g] = array(any())) then ([++$g] = array(any()))",
+		"if([$g] = bool()) then ([++$g] = bool())",
+		"if([$g] = float()) then ([++$g] = float())",
+		"if([$g] = int()) then ([++$g] = int())",
+		"if([$g] = null()) then ([++$g] = int())",
+		"if([$g] \<: object()) then ([++$g] \<: object())",
+		"if([$g] = resource()) then ([++$g] = resource())",
+		"if([$g] = string()) then (or([++$g] = float(), [++$g] = int(), [++$g] = string()))",
+		
+		"[$h] \<: any()",
+		"if([$h] = array(any())) then ([--$h] = array(any()))",
+		"if([$h] = bool()) then ([--$h] = bool())",
+		"if([$h] = float()) then ([--$h] = float())",
+		"if([$h] = int()) then ([--$h] = int())",
+		"if([$h] = null()) then ([--$h] = int())",
+		"if([$h] \<: object()) then ([--$h] \<: object())",
+		"if([$h] = resource()) then ([--$h] = resource())",
+		"if([$h] = string()) then (or([--$h] = float(), [--$h] = int(), [--$h] = string()))"
+	];
+	return run("unaryOp", expected);
+}
+
+
+public test bool testBinaryOp() {
+	return true;
+	throw "implement binaryOp";
 }
 
 public bool run(str fileName, list[str] expected)
@@ -141,11 +206,17 @@ private void printResult(str fileName, list[str] expected, set[Constraint] actua
 	println();
 }
 
-private str toStr(eq(TypeOf a, TypeOf b)) 		= "<toStr(a)> = <toStr(b)>";
-private str toStr(eq(TypeOf a, TypeSymbol ts)) 	= "<toStr(a)> = <toStr(ts)>";
-private str toStr(subtyp(TypeOf a, TypeOf b)) 	= "<toStr(a)> \<: <toStr(b)>";
+// Pretty Print the constraints
+private str toStr(eq(TypeOf a, TypeOf b)) 			= "<toStr(a)> = <toStr(b)>";
+private str toStr(eq(TypeOf a, TypeSymbol ts)) 		= "<toStr(a)> = <toStr(ts)>";
+private str toStr(subtyp(TypeOf a, TypeOf b)) 		= "<toStr(a)> \<: <toStr(b)>";
 private str toStr(subtyp(TypeOf a, TypeSymbol ts)) 	= "<toStr(a)> \<: <toStr(ts)>";
+private str toStr(disjunction(set[Constraint] cs))	= "or(<intercalate(", ", [ toStr(c) | c <- sort(toList(cs))])>)";
+private str toStr(conjunction(set[Constraint] cs))	= "and(<intercalate(", ", [ toStr(c) | c <- sort(toList(cs))])>)";
+private str toStr(negation(Constraint c)) 			= "neg(<toStr(c)>)";
+private str toStr(conditional(Constraint c, Constraint res)) = "if(<toStr(c)>) then (<toStr(res)>)";
 default str toStr(Constraint c) { throw "Please implement toStr for node :: <c>"; }
 
 private str toStr(typeOf(loc i)) 	= isFile(i) ? "["+readFile(i)+"]" : "[<i>]";
 private str toStr(TypeSymbol t) 	= "<t>";
+default str toStr(TypeOf to) { throw "Please implement toStr for node :: <to>"; }
