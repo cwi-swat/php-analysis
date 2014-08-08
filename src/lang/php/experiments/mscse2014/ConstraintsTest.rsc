@@ -141,8 +141,14 @@ public test bool testUnaryOp() {
 
 
 public test bool testBinaryOp() {
-	return true;
-	throw "implement binaryOp";
+	list[str] expected = [
+		"[$a] \<: any()", "[$b] \<: any()",
+		"or([$a + $b] \<: float(), [$a + $b] = array(any()))", // always array, or subtype of float()
+		"if(and([$a] = array(any()), [$b] = array(any()))) then ([$a + $b] = array(any()))", // ($a = array && $b = array) => [E] = array
+		"if(or(neg([$a] = array(any())), neg([$b] = array(any())))) then ([$a + $b] \<: float())", // ($a != array || $b = array) => [E] <: float 
+		""
+	];
+	return run("binaryOp", expected);
 }
 
 public bool run(str fileName, list[str] expected)
@@ -158,13 +164,13 @@ public bool run(str fileName, list[str] expected)
 	//printResult(fileName, expected, actual);
 	
 	// assert that expectedConstraints is a subset of ActualConstraints
-	return assertPrettyPrinted(expected, actual);
+	return comparePrettyPrinted(expected, actual);
 }
 
 //
 // Assert pretty printed
 //
-private bool assertPrettyPrinted(list[str] expected, set[Constraint] actual) 
+private bool comparePrettyPrinted(list[str] expected, set[Constraint] actual) 
 {
 	list[str] actualPP = [ toStr(a) | a <- actual ];
 
@@ -178,8 +184,10 @@ private bool assertPrettyPrinted(list[str] expected, set[Constraint] actual)
 	{
 		iprintln("Actual: <a>");
 		iprintln("Expected: <e>");
-		iprintln("Not in actual: <a-e>");
-		iprintln("Not in expected: <e-a>");
+		iprintln("Not in actual:");
+		for (nia <- notInActual) println(nia);
+		iprintln("Not in expected:");
+		for (nie <- notInExpected) println(nie);
 	}
 	
 	return a == e;
@@ -211,8 +219,9 @@ private str toStr(eq(TypeOf a, TypeOf b)) 			= "<toStr(a)> = <toStr(b)>";
 private str toStr(eq(TypeOf a, TypeSymbol ts)) 		= "<toStr(a)> = <toStr(ts)>";
 private str toStr(subtyp(TypeOf a, TypeOf b)) 		= "<toStr(a)> \<: <toStr(b)>";
 private str toStr(subtyp(TypeOf a, TypeSymbol ts)) 	= "<toStr(a)> \<: <toStr(ts)>";
-private str toStr(disjunction(set[Constraint] cs))	= "or(<intercalate(", ", [ toStr(c) | c <- sort(toList(cs))])>)";
-private str toStr(conjunction(set[Constraint] cs))	= "and(<intercalate(", ", [ toStr(c) | c <- sort(toList(cs))])>)";
+private str toStr(disjunction(set[Constraint] cs))	= "or(<intercalate(", ", sort([ toStr(c) | c <- sort(toList(cs))]))>)";
+private str toStr(exclusiveDisjunction(set[Constraint] cs))	= "xor(<intercalate(", ", sort([ toStr(c) | c <- sort(toList(cs))]))>)";
+private str toStr(conjunction(set[Constraint] cs))	= "and(<intercalate(", ", sort([ toStr(c) | c <- sort(toList(cs))]))>)";
 private str toStr(negation(Constraint c)) 			= "neg(<toStr(c)>)";
 private str toStr(conditional(Constraint c, Constraint res)) = "if(<toStr(c)>) then (<toStr(res)>)";
 default str toStr(Constraint c) { throw "Please implement toStr for node :: <c>"; }

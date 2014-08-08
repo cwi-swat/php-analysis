@@ -115,12 +115,12 @@ private void addConstraints(Expr e, M3 m3)
 				
 				case div(): 		constraints += { 
 										eq(typeOf(assignTo@at), \int()), // LHS is int
-										negation(eq(typeOf(assignExpr@at), \array(\any()))) // RHS is not an array
+										negation(eq(typeOf(assignExpr@at), array(\any()))) // RHS is not an array
 									};
 				
 				case minus(): 		constraints += { 
 										eq(typeOf(assignTo@at), \int()), // LHS is int
-										negation(eq(typeOf(assignExpr@at), \array(\any()))) // RHS is not an array
+										negation(eq(typeOf(assignExpr@at), array(\any()))) // RHS is not an array
 									};
 				
 				case concat():		constraints += { eq(typeOf(assignTo@at), string()) };
@@ -136,7 +136,40 @@ private void addConstraints(Expr e, M3 m3)
 		}
 	//| listAssign(list[OptionExpr] assignsTo, Expr assignExpr)
 	//| refAssign(Expr assignTo, Expr assignExpr)
-	//| binaryOperation(Expr left, Expr right, Op operation)
+		case op:binaryOperation(Expr left, Expr right, Op operation): {
+			addConstraints(left, m3);	
+			addConstraints(right, m3);	
+			switch (operation) {
+				case plus():			constraints += {
+											// if left AND right are array: results is array
+											conditional(
+												conjunction({
+													eq(typeOf(left@at), array(\any())),
+													eq(typeOf(right@at), array(\any()))
+												}),
+												eq(typeOf(op@at), array(\any()))
+											),
+											
+											// if left or right is NOT array: result is subytpe of float 
+											conditional(
+												disjunction({
+													negation(eq(typeOf(left@at), array(\any()))),
+													negation(eq(typeOf(right@at), array(\any())))
+												}),
+												subtyp(typeOf(op@at), float())
+											),
+											// unconditional: result = array | double | int
+											disjunction({
+												eq(typeOf(op@at), array(\any())),
+												subtyp(typeOf(op@at), float()) 
+											})
+											
+											// todo ?
+											// if (left XOR right = double) -> double
+											// in all other cases: int
+										};
+			}
+		}
 	
 		//unaryOperation(Expr operand, Op operation)
 		// not final!!!!!!
@@ -181,8 +214,8 @@ private void addConstraints(Expr e, M3 m3)
 				
 				case postInc():			constraints += {
 											conditional( //"if([E] = array(any())) then ([E++] = array(any()))",
-												eq(typeOf(operand@at), \array(\any())),
-												eq(typeOf(u@at), \array(\any()))
+												eq(typeOf(operand@at), array(\any())),
+												eq(typeOf(u@at), array(\any()))
 											),
 											conditional( //"if([E] = bool()) then ([E++] = bool())",
 												eq(typeOf(operand@at), \bool()),
@@ -216,8 +249,8 @@ private void addConstraints(Expr e, M3 m3)
 										
 				case postDec():			constraints += {
 											conditional( //"if([E] = array(any())) then ([E--] = array(any()))",
-												eq(typeOf(operand@at), \array(\any())),
-												eq(typeOf(u@at), \array(\any()))
+												eq(typeOf(operand@at), array(\any())),
+												eq(typeOf(u@at), array(\any()))
 											),
 											conditional( //"if([E] = bool()) then ([E--] = bool())",
 												eq(typeOf(operand@at), \bool()),
@@ -251,8 +284,8 @@ private void addConstraints(Expr e, M3 m3)
 										
 				case preInc():			constraints += {
 											conditional( //"if([E] = array(any())) then ([E++] = array(any()))",
-												eq(typeOf(operand@at), \array(\any())),
-												eq(typeOf(u@at), \array(\any()))
+												eq(typeOf(operand@at), array(\any())),
+												eq(typeOf(u@at), array(\any()))
 											),
 											conditional( //"if([E] = bool()) then ([E++] = bool())",
 												eq(typeOf(operand@at), \bool()),
@@ -286,8 +319,8 @@ private void addConstraints(Expr e, M3 m3)
 										
 				case preDec():			constraints += {
 											conditional( //"if([E] = array(any())) then ([E--] = array(any()))",
-												eq(typeOf(operand@at), \array(\any())),
-												eq(typeOf(u@at), \array(\any()))
+												eq(typeOf(operand@at), array(\any())),
+												eq(typeOf(u@at), array(\any()))
 											),
 											conditional( //"if([E] = bool()) then ([E--] = bool())",
 												eq(typeOf(operand@at), \bool()),
