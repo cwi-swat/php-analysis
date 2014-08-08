@@ -133,11 +133,11 @@ _ | _ | integer
 
 ---
 
-** Rules for Subtraction operator: ** `l - r` -> (array | double | int)
+** Rules for Subtraction operator: ** `l - r` -> (double | int)
 
-** Rules for Multiplication operator: ** `l * r` -> (array | double | int)
+** Rules for Multiplication operator: ** `l * r` -> ( double | int)
 
-** Rules for Division operator: ** `l / r` -> (array | double | int)
+** Rules for Division operator: ** `l / r` -> (double | int)
 
 `l` | `r` | result
 --- | --- | ---

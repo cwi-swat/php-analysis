@@ -168,17 +168,46 @@ private void addConstraints(Expr e, M3 m3)
 						// if (left XOR right = double) -> double
 						// in all other cases: int
 					};
+				case minus():
+					constraints += {
+						negation(eq(typeOf(left@at),  array(\any()))), // LHS != array
+						negation(eq(typeOf(right@at), array(\any()))), // RHS != array
+						subtyp(typeOf(op@at), float()) // result is subtype of float
+						// todo ?
+						// if (left XOR right = double) -> double
+						// in all other cases: int
+					};
+				case mul(): // refactor: same as minus()
+					constraints += {
+						negation(eq(typeOf(left@at),  array(\any()))), // LHS != array
+						negation(eq(typeOf(right@at), array(\any()))), // RHS != array
+						subtyp(typeOf(op@at), float()) // result is subtype of float
+						// todo ?
+						// if (left XOR right = double) -> double
+						// in all other cases: int
+					};
+				case div(): // refactor: same as minus()
+					constraints += {
+						negation(eq(typeOf(left@at),  array(\any()))), // LHS != array
+						negation(eq(typeOf(right@at), array(\any()))), // RHS != array
+						subtyp(typeOf(op@at), float()) // result is subtype of float
+						// todo ?
+						// if (left XOR right = double) -> double
+						// in all other cases: int
+					};
+				
+				case \mod(): constraints += { eq(typeOf(op@at), \int()) }; // [E] = int
 			}
 		}
 	
 		//unaryOperation(Expr operand, Op operation)
 		// not final!!!!!!
-		case u:unaryOperation(Expr operand, Op operation): {
+		case expr:unaryOperation(Expr operand, Op operation): {
 			addConstraints(operand, m3);	
 			switch (operation) {
 				case unaryPlus():
 					constraints += { 
-						subtyp(typeOf(u@at), float()), // type of whole expression is int or float
+						subtyp(typeOf(expr@at), float()), // type of whole expression is int or float
 						negation(eq(typeOf(operand@at), array(\any()))) // type of the expression is not an array
 						// todo
 						// in: float -> out: float
@@ -188,7 +217,7 @@ private void addConstraints(Expr e, M3 m3)
 										
 				case unaryMinus():		
 					constraints += { 
-							subtyp(typeOf(u@at), float()), // type of whole expression is int or float
+							subtyp(typeOf(expr@at), float()), // type of whole expression is int or float
 							negation(eq(typeOf(operand@at), array(\any()))) // type of the expression is not an array
 							// todo
 							// in: float -> out: float
@@ -196,7 +225,7 @@ private void addConstraints(Expr e, M3 m3)
 							// in: _	 -> out: int
 						};
 				
-				case booleanNot():		constraints += { eq(typeOf(u@at), \bool()) }; // type of whole expression is bool
+				case booleanNot():		constraints += { eq(typeOf(expr@at), \bool()) }; // type of whole expression is bool
 				
 				case bitwiseNot():		
 					constraints += { 
@@ -206,8 +235,8 @@ private void addConstraints(Expr e, M3 m3)
 							eq(typeOf(operand@at), string()) 
 						}),
 						disjunction({ // the whole expression is always a int or string
-							eq(typeOf(u@at), \int()),  
-							eq(typeOf(u@at), string()) 
+							eq(typeOf(expr@at), \int()),  
+							eq(typeOf(expr@at), string()) 
 						})
 						// todo:
 						// in: int 	  -> out: int
@@ -219,35 +248,35 @@ private void addConstraints(Expr e, M3 m3)
 					constraints += {
 						conditional( //"if([E] = array(any())) then ([E++] = array(any()))",
 							eq(typeOf(operand@at), array(\any())),
-							eq(typeOf(u@at), array(\any()))
+							eq(typeOf(expr@at), array(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E++] = bool())",
 							eq(typeOf(operand@at), \bool()),
-							eq(typeOf(u@at), \bool())
+							eq(typeOf(expr@at), \bool())
 						),
 						conditional( //"if([E] = float()) then ([E++] = float())",
 							eq(typeOf(operand@at), float()),
-							eq(typeOf(u@at), float())
+							eq(typeOf(expr@at), float())
 						),
 						conditional( //"if([E] = int()) then ([E++] = int())",
 							eq(typeOf(operand@at), \int()),
-							eq(typeOf(u@at), \int())
+							eq(typeOf(expr@at), \int())
 						),
 						conditional( //"if([E] = null()) then (or([E++] = null(), [E++] = int()))",
 							eq(typeOf(operand@at), \null()),
-							disjunction({eq(typeOf(u@at), \null()), eq(typeOf(u@at), \int())})
+							disjunction({eq(typeOf(expr@at), \null()), eq(typeOf(expr@at), \int())})
 						),
 						conditional( //"if([E] = object()) then ([E++] = object())",
 							subtyp(typeOf(operand@at), \object()),
-							subtyp(typeOf(u@at), \object())
+							subtyp(typeOf(expr@at), \object())
 						),
 						conditional( //"if([E] = resource()) then ([E++] = resource())",
 							eq(typeOf(operand@at), resource()),
-							eq(typeOf(u@at), resource())
+							eq(typeOf(expr@at), resource())
 						),
 						conditional( //"if([E] = string()) then (or([E++] = float(), [E++] = int(), [E++] = string())",
 							eq(typeOf(operand@at), \string()),
-							disjunction({eq(typeOf(u@at), \float()), eq(typeOf(u@at), \int()), eq(typeOf(u@at), \string())})
+							disjunction({eq(typeOf(expr@at), \float()), eq(typeOf(expr@at), \int()), eq(typeOf(expr@at), \string())})
 						)
 					};
 										
@@ -255,35 +284,35 @@ private void addConstraints(Expr e, M3 m3)
 					constraints += {
 						conditional( //"if([E] = array(any())) then ([E--] = array(any()))",
 							eq(typeOf(operand@at), array(\any())),
-							eq(typeOf(u@at), array(\any()))
+							eq(typeOf(expr@at), array(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E--] = bool())",
 							eq(typeOf(operand@at), \bool()),
-							eq(typeOf(u@at), \bool())
+							eq(typeOf(expr@at), \bool())
 						),
 						conditional( //"if([E] = float()) then ([E--] = float())",
 							eq(typeOf(operand@at), float()),
-							eq(typeOf(u@at), float())
+							eq(typeOf(expr@at), float())
 						),
 						conditional( //"if([E] = int()) then ([E--] = int())",
 							eq(typeOf(operand@at), \int()),
-							eq(typeOf(u@at), \int())
+							eq(typeOf(expr@at), \int())
 						),
 						conditional( //"if([E] = null()) then (or([E--] = null(), [E++] = int()))",
 							eq(typeOf(operand@at), \null()),
-							disjunction({eq(typeOf(u@at), \null()), eq(typeOf(u@at), \int())})
+							disjunction({eq(typeOf(expr@at), \null()), eq(typeOf(expr@at), \int())})
 						),
 						conditional( //"if([E] = object()) then ([E--] = object())",
 							subtyp(typeOf(operand@at), \object()),
-							subtyp(typeOf(u@at), \object())
+							subtyp(typeOf(expr@at), \object())
 						),
 						conditional( //"if([E] = resource()) then ([E--] = resource())",
 							eq(typeOf(operand@at), resource()),
-							eq(typeOf(u@at), resource())
+							eq(typeOf(expr@at), resource())
 						),
 						conditional( //"if([E] = string()) then (or([E--] = float(), [E--] = int(), [E--] = string())",
 							eq(typeOf(operand@at), \string()),
-							disjunction({eq(typeOf(u@at), \float()), eq(typeOf(u@at), \int()), eq(typeOf(u@at), \string())})
+							disjunction({eq(typeOf(expr@at), \float()), eq(typeOf(expr@at), \int()), eq(typeOf(expr@at), \string())})
 						)
 					};
 										
@@ -291,35 +320,35 @@ private void addConstraints(Expr e, M3 m3)
 					constraints += {
 						conditional( //"if([E] = array(any())) then ([E++] = array(any()))",
 							eq(typeOf(operand@at), array(\any())),
-							eq(typeOf(u@at), array(\any()))
+							eq(typeOf(expr@at), array(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E++] = bool())",
 							eq(typeOf(operand@at), \bool()),
-							eq(typeOf(u@at), \bool())
+							eq(typeOf(expr@at), \bool())
 						),
 						conditional( //"if([E] = float()) then ([E++] = float())",
 							eq(typeOf(operand@at), float()),
-							eq(typeOf(u@at), float())
+							eq(typeOf(expr@at), float())
 						),
 						conditional( //"if([E] = int()) then ([E++] = int())",
 							eq(typeOf(operand@at), \int()),
-							eq(typeOf(u@at), \int())
+							eq(typeOf(expr@at), \int())
 						),
 						conditional( //"if([E] = null()) then (or([E++] = null(), [E++] = int()))",
 							eq(typeOf(operand@at), \null()),
-							eq(typeOf(u@at), \int())
+							eq(typeOf(expr@at), \int())
 						),
 						conditional( //"if([E] = object()) then ([E++] = object())",
 							subtyp(typeOf(operand@at), \object()),
-							subtyp(typeOf(u@at), \object())
+							subtyp(typeOf(expr@at), \object())
 						),
 						conditional( //"if([E] = resource()) then ([E++] = resource())",
 							eq(typeOf(operand@at), resource()),
-							eq(typeOf(u@at), resource())
+							eq(typeOf(expr@at), resource())
 						),
 						conditional( //"if([E] = string()) then (or([E++] = float(), [E++] = int(), [E++] = string())",
 							eq(typeOf(operand@at), \string()),
-							disjunction({eq(typeOf(u@at), \float()), eq(typeOf(u@at), \int()), eq(typeOf(u@at), \string())})
+							disjunction({eq(typeOf(expr@at), \float()), eq(typeOf(expr@at), \int()), eq(typeOf(expr@at), \string())})
 						)
 					};
 										
@@ -327,35 +356,35 @@ private void addConstraints(Expr e, M3 m3)
 					constraints += {
 						conditional( //"if([E] = array(any())) then ([E--] = array(any()))",
 							eq(typeOf(operand@at), array(\any())),
-							eq(typeOf(u@at), array(\any()))
+							eq(typeOf(expr@at), array(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E--] = bool())",
 							eq(typeOf(operand@at), \bool()),
-							eq(typeOf(u@at), \bool())
+							eq(typeOf(expr@at), \bool())
 						),
 						conditional( //"if([E] = float()) then ([E--] = float())",
 							eq(typeOf(operand@at), float()),
-							eq(typeOf(u@at), float())
+							eq(typeOf(expr@at), float())
 						),
 						conditional( //"if([E] = int()) then ([E--] = int())",
 							eq(typeOf(operand@at), \int()),
-							eq(typeOf(u@at), \int())
+							eq(typeOf(expr@at), \int())
 						),
 						conditional( //"if([E] = null()) then (or([E--] = null(), [E++] = int()))",
 							eq(typeOf(operand@at), \null()),
-							eq(typeOf(u@at), \int())
+							eq(typeOf(expr@at), \int())
 						),
 						conditional( //"if([E] = object()) then ([E--] = object())",
 							subtyp(typeOf(operand@at), \object()),
-							subtyp(typeOf(u@at), \object())
+							subtyp(typeOf(expr@at), \object())
 						),
 						conditional( //"if([E] = resource()) then ([E--] = resource())",
 							eq(typeOf(operand@at), resource()),
-							eq(typeOf(u@at), resource())
+							eq(typeOf(expr@at), resource())
 						),
 						conditional( //"if([E] = string()) then (or([E--] = float(), [E--] = int(), [E--] = string())",
 							eq(typeOf(operand@at), \string()),
-							disjunction({eq(typeOf(u@at), \float()), eq(typeOf(u@at), \int()), eq(typeOf(u@at), \string())})
+							disjunction({eq(typeOf(expr@at), \float()), eq(typeOf(expr@at), \int()), eq(typeOf(expr@at), \string())})
 						)
 					};
 			}
@@ -402,14 +431,10 @@ private void addConstraints(Expr e, M3 m3)
 			}
 		}
 		
-		//var(NameOrExpr varName)	
-		case v:var(name(_)): { 
-			constraints += { subtyp(typeOf(v@at), \any()) };
-		}
+		// normal variable and variable variable (can be combined)
+		case v:var(name(_)): constraints += { subtyp(typeOf(v@at), \any()) };
+		case v:var(expr(e)): constraints += { subtyp(typeOf(v@at), \any()) };	
 		
-		case v:var(expr(e)): { // variable variable
-			constraints += { subtyp(typeOf(v@at), \any()) };	
-		}
 	//| yield(OptionExpr keyExpr, OptionExpr valueExpr)
 	//| listExpr(list[OptionExpr] listExprs
 	}

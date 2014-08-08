@@ -146,7 +146,24 @@ public test bool testBinaryOp() {
 		"or([$a + $b] \<: float(), [$a + $b] = array(any()))", // always array, or subtype of float()
 		"if(and([$a] = array(any()), [$b] = array(any()))) then ([$a + $b] = array(any()))", // ($a = array && $b = array) => [E] = array
 		"if(or(neg([$a] = array(any())), neg([$b] = array(any())))) then ([$a + $b] \<: float())", // ($a != array || $b = array) => [E] <: float 
-		""
+		
+		"[$c] \<: any()", "[$d] \<: any()",
+		"neg([$c] = array(any()))",
+		"neg([$d] = array(any()))",
+		"[$c - $d] \<: float()",
+		
+		"[$e] \<: any()", "[$f] \<: any()",
+		"neg([$e] = array(any()))",
+		"neg([$f] = array(any()))",
+		"[$e * $f] \<: float()",
+		
+		"[$g] \<: any()", "[$h] \<: any()",
+		"neg([$g] = array(any()))",
+		"neg([$h] = array(any()))",
+		"[$g / $h] \<: float()",
+		
+		"[$i] \<: any()", "[$j] \<: any()",
+		"[$i % $j] = int()"
 	];
 	return run("binaryOp", expected);
 }
@@ -177,8 +194,8 @@ private bool comparePrettyPrinted(list[str] expected, set[Constraint] actual)
 	a = sort(actualPP);
 	e = sort(expected);
 	
-	notInActual = a - e;
-	notInExpected = e - a;	
+	notInActual = e - a;
+	notInExpected = a - e;	
 	
 	if (!isEmpty(notInActual) || !isEmpty(notInExpected))	
 	{
