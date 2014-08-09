@@ -10,6 +10,15 @@ __METHOD__; // string
 __NAMESPACE__; // string
 __TRAIT__; // trait
 
+// boolean values
+TRUE;
+true;
+TrUe;
+
+false;
+FALSE;
+FalSe;
+
 // core standards
 // source: https://github.com/php/php-langspec/blob/master/spec/06-constants.md#core-predefined-constants
 DEFAULT_INCLUDE_PATH; // string

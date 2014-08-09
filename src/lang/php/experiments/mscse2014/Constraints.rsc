@@ -7,8 +7,7 @@ import lang::php::ast::System;
 
 import lang::php::types::TypeSymbol;
 import lang::php::types::TypeConstraints;
-
-import lang::php::language::Constants;
+import lang::php::types::Constants;
 
 import IO; // for debuggin
 
@@ -105,7 +104,6 @@ private void addConstraints(Expr e, M3 m3)
 			addConstraints(assignExpr, m3);
 			//constraints += getConstraints(assignExpr, m3);
 		}
-	//| assignWOp(Expr assignTo, Expr assignExpr, Op operation)
 		case a:assignWOp(Expr assignTo, Expr assignExpr, Op operation): {
 			switch(operation) {
 				case bitwiseAnd():	constraints += { eq(typeOf(assignTo@at), integer()) }; 
@@ -281,7 +279,6 @@ private void addConstraints(Expr e, M3 m3)
 			}
 		}
 	
-		//unaryOperation(Expr operand, Op operation)
 		case expr:unaryOperation(Expr operand, Op operation): {
 			addConstraints(operand, m3);	
 			switch (operation) {
@@ -495,7 +492,17 @@ private void addConstraints(Expr e, M3 m3)
 		}
 	//| clone(Expr expr)
 	//| closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static)
-	//| fetchConst(Name name)
+		case fc:fetchConst(name(name)): {
+			if (/true/i := name || /false/i := name) {
+				constraints += { eq(typeOf(fc@at), boolean()) };
+			} else if (/null/i := name) {
+				constraints += { eq(typeOf(fc@at), null()) };
+			} else if (name in predefinedConstants) {
+				constraints += { eq(typeOf(fc@at), predefinedConstants[name]) };
+			} else {
+				constraints += { subtyp(typeOf(fc@at), \any()) };
+			}
+		}
 	//| empty(Expr expr)
 	//| suppress(Expr expr)
 	//| eval(Expr expr)

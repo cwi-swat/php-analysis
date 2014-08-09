@@ -50,16 +50,92 @@ public test bool testScalars() {
 		// int -> int()
 		"[0] = integer()", "[1] = integer()", "[2] = integer()", "[10] = integer()", "[100] = integer()",
 		// strings -> string()
-		"[\"string\"] = string()", "[\'also a string\'] = string()", "[\"$encaped string\"] = string()", "[\"{$encaped} string\"] = string()"
+		"[\"string\"] = string()", "[\'also a string\'] = string()", 
+		"[\"$encaped string\"] = string()", "[\"{$encaped} string\"] = string()"
 	];
 	return run("scalar", expected);
 }
 
 public test bool testPredefinedConstants() {
 	list[str] expected = [
-		// magic constants -> string()
+		// magic constants -> string() (except for __LINE__ which is of type integer()
 		"[__CLASS__] = string()", "[__DIR__] = string()", "[__FILE__] = string()", "[__FUNCTION__] = string()", 
-		"[__LINE__] = integer()", "[__METHOD__] = string()", "[__NAMESPACE__] = string()", "[__TRAIT__] = string()"
+		"[__LINE__] = integer()", "[__METHOD__] = string()", "[__NAMESPACE__] = string()", "[__TRAIT__] = string()",
+		
+		// booleans -> boolean()
+		"[TRUE] = boolean()", "[true] = boolean()", "[TrUe] = boolean()",
+		"[FALSE] = boolean()", "[false] = boolean()", "[FalSe] = boolean()",
+		
+		"[DEFAULT_INCLUDE_PATH] = string()",
+		"[E_ALL] = integer()",
+		"[E_COMPILE_ERROR] = integer()",
+		"[E_COMPILE_WARNING] = integer()",
+		"[E_CORE_ERROR] = integer()",
+		"[E_CORE_WARNING] = integer()",
+		"[E_DEPRECATED] = integer()",
+		"[E_ERROR] = integer()",
+		"[E_NOTICE] = integer()",
+		"[E_PARSE] = integer()",
+		"[E_RECOVERABLE_ERROR] = integer()",
+		"[E_STRICT] = integer()",
+		"[E_USER_DEPRECATED] = integer()",
+		"[E_USER_ERROR] = integer()",
+		"[E_USER_NOTICE] = integer()",
+		"[E_USER_WARNING] = integer()",
+		"[E_WARNING] = integer()",
+		"[E_USER_DEPRECATED] = integer()",
+		"[FALSE] = boolean()",
+		"[INF] = float()",
+		"[M_1_PI] = float()",
+		"[M_2_PI] = float()",
+		"[M_2_SQRTPI] = float()",
+		"[M_E] = float()",
+		"[M_EULER] = float()",
+		"[M_LN10] = float()",
+		"[M_LN2] = float()",
+		"[M_LNPI] = float()",
+		"[M_LOG10E] = float()",
+		"[M_LOG2E] = float()",
+		"[M_PI] = float()",
+		"[M_PI_2] = float()",
+		"[M_PI_4] = float()",
+		"[M_SQRT1_2] = float()",
+		"[M_SQRT2] = float()",
+		"[M_SQRT3] = float()",
+		"[M_SQRTPI] = float()",
+		"[NAN] = float()",
+		"[NULL] = null()",
+		"[PHP_BINARY] = string()",
+		"[PHP_BINDIR] = string()",
+		"[PHP_CONFIG_FILE_PATH] = string()",
+		"[PHP_CONFIG_FILE_SCAN_DIR] = string()",
+		"[PHP_DEBUG] = integer()",
+		"[PHP_EOL] = string()",
+		"[PHP_EXTENSION_DIR] = string()",
+		"[PHP_EXTRA_VERSION] = string()",
+		"[PHP_INT_MAX] = integer()",
+		"[PHP_INT_SIZE] = integer()",
+		"[PHP_MAJOR_VERSION] = integer()",
+		"[PHP_MANDIR] = string()",
+		"[PHP_MAXPATHLEN] = integer()",
+		"[PHP_MINOR_VERSION] = integer()",
+		"[PHP_OS] = string()",
+		"[PHP_PREFIX] = string()",
+		"[PHP_RELEASE_VERSION] = integer()",
+		"[PHP_ROUND_HALF_DOWN] = integer()",
+		"[PHP_ROUND_HALF_EVEN] = integer()",
+		"[PHP_ROUND_HALF_ODD] = integer()",
+		"[PHP_ROUND_HALF_UP] = integer()",
+		"[PHP_SAPI] = string()",
+		"[PHP_SHLIB_SUFFIX] = string()",
+		"[PHP_SYSCONFDIR] = string()",
+		"[PHP_VERSION] = string()",
+		"[PHP_VERSION_ID] = integer()",
+		"[PHP_ZTS] = integer()",
+		"[STDIN] = resource()",
+		"[STDOUT] = resource()",
+		"[STDERR] = resource()",
+		"[TRUE] = boolean()"
 	];
 	return run("predefinedConstants", expected);
 }
