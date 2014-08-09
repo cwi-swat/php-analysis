@@ -7,7 +7,8 @@ import lang::php::ast::System;
 
 import lang::php::types::TypeSymbol;
 import lang::php::types::TypeConstraints;
-import lang::php::types::Constants;
+import lang::php::types::core::Constants;
+import lang::php::types::core::Variables;
 
 import IO; // for debuggin
 
@@ -115,12 +116,12 @@ private void addConstraints(Expr e, M3 m3)
 				
 				case div(): 		constraints += { 
 										eq(typeOf(assignTo@at), integer()), // LHS is int
-										negation(eq(typeOf(assignExpr@at), array(\any()))) // RHS is not an array
+										negation(subtyp(typeOf(assignExpr@at), array(\any()))) // RHS is not an array
 									};
 				
 				case minus(): 		constraints += { 
 										eq(typeOf(assignTo@at), integer()), // LHS is int
-										negation(eq(typeOf(assignExpr@at), array(\any()))) // RHS is not an array
+										negation(subtyp(typeOf(assignExpr@at), array(\any()))) // RHS is not an array
 									};
 				
 				case concat():		constraints += { eq(typeOf(assignTo@at), string()) };
@@ -145,23 +146,23 @@ private void addConstraints(Expr e, M3 m3)
 						// if left AND right are array: results is array
 						conditional(
 							conjunction({
-								eq(typeOf(left@at), array(\any())),
-								eq(typeOf(right@at), array(\any()))
+								subtyp(typeOf(left@at), array(\any())),
+								subtyp(typeOf(right@at), array(\any()))
 							}),
-							eq(typeOf(op@at), array(\any()))
+							subtyp(typeOf(op@at), array(\any()))
 						),
 						
 						// if left or right is NOT array: result is subytpe of float 
 						conditional(
 							disjunction({
-								negation(eq(typeOf(left@at), array(\any()))),
-								negation(eq(typeOf(right@at), array(\any())))
+								negation(subtyp(typeOf(left@at), array(\any()))),
+								negation(subtyp(typeOf(right@at), array(\any())))
 							}),
 							subtyp(typeOf(op@at), float())
 						),
 						// unconditional: result = array | double | int
 						disjunction({
-							eq(typeOf(op@at), array(\any())),
+							subtyp(typeOf(op@at), array(\any())),
 							subtyp(typeOf(op@at), float()) 
 						})
 						// todo ?
@@ -170,8 +171,8 @@ private void addConstraints(Expr e, M3 m3)
 					};
 				case minus():
 					constraints += {
-						negation(eq(typeOf(left@at),  array(\any()))), // LHS != array
-						negation(eq(typeOf(right@at), array(\any()))), // RHS != array
+						negation(subtyp(typeOf(left@at),  array(\any()))), // LHS != array
+						negation(subtyp(typeOf(right@at), array(\any()))), // RHS != array
 						subtyp(typeOf(op@at), float()) // result is subtype of float
 						// todo ?
 						// if (left XOR right = double) -> double
@@ -179,8 +180,8 @@ private void addConstraints(Expr e, M3 m3)
 					};
 				case mul(): // refactor: same as minus()
 					constraints += {
-						negation(eq(typeOf(left@at),  array(\any()))), // LHS != array
-						negation(eq(typeOf(right@at), array(\any()))), // RHS != array
+						negation(subtyp(typeOf(left@at),  array(\any()))), // LHS != array
+						negation(subtyp(typeOf(right@at), array(\any()))), // RHS != array
 						subtyp(typeOf(op@at), float()) // result is subtype of float
 						// todo ?
 						// if (left XOR right = double) -> double
@@ -188,8 +189,8 @@ private void addConstraints(Expr e, M3 m3)
 					};
 				case div(): // refactor: same as minus()
 					constraints += {
-						negation(eq(typeOf(left@at),  array(\any()))), // LHS != array
-						negation(eq(typeOf(right@at), array(\any()))), // RHS != array
+						negation(subtyp(typeOf(left@at),  array(\any()))), // LHS != array
+						negation(subtyp(typeOf(right@at), array(\any()))), // RHS != array
 						subtyp(typeOf(op@at), float()) // result is subtype of float
 						// todo ?
 						// if (left XOR right = double) -> double
@@ -285,7 +286,7 @@ private void addConstraints(Expr e, M3 m3)
 				case unaryPlus():
 					constraints += { 
 						subtyp(typeOf(expr@at), float()), // type of whole expression is int or float
-						negation(eq(typeOf(operand@at), array(\any()))) // type of the expression is not an array
+						negation(subtyp(typeOf(operand@at), array(\any()))) // type of the expression is not an array
 						// todo
 						// in: float -> out: float
 						// in: str 	 -> out: int|float
@@ -295,7 +296,7 @@ private void addConstraints(Expr e, M3 m3)
 				case unaryMinus():		
 					constraints += { 
 							subtyp(typeOf(expr@at), float()), // type of whole expression is int or float
-							negation(eq(typeOf(operand@at), array(\any()))) // type of the expression is not an array
+							negation(subtyp(typeOf(operand@at), array(\any()))) // type of the expression is not an array
 							// todo
 							// in: float -> out: float
 							// in: str 	 -> out: int|float
@@ -324,8 +325,8 @@ private void addConstraints(Expr e, M3 m3)
 				case postInc():
 					constraints += {
 						conditional( //"if([E] = array(any())) then ([E++] = array(any()))",
-							eq(typeOf(operand@at), array(\any())),
-							eq(typeOf(expr@at), array(\any()))
+							subtyp(typeOf(operand@at), array(\any())),
+							subtyp(typeOf(expr@at), array(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E++] = bool())",
 							eq(typeOf(operand@at), boolean()),
@@ -360,8 +361,8 @@ private void addConstraints(Expr e, M3 m3)
 				case postDec():
 					constraints += {
 						conditional( //"if([E] = array(any())) then ([E--] = array(any()))",
-							eq(typeOf(operand@at), array(\any())),
-							eq(typeOf(expr@at), array(\any()))
+							subtyp(typeOf(operand@at), array(\any())),
+							subtyp(typeOf(expr@at), array(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E--] = bool())",
 							eq(typeOf(operand@at), boolean()),
@@ -396,8 +397,8 @@ private void addConstraints(Expr e, M3 m3)
 				case preInc():
 					constraints += {
 						conditional( //"if([E] = array(any())) then ([E++] = array(any()))",
-							eq(typeOf(operand@at), array(\any())),
-							eq(typeOf(expr@at), array(\any()))
+							subtyp(typeOf(operand@at), array(\any())),
+							subtyp(typeOf(expr@at), array(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E++] = bool())",
 							eq(typeOf(operand@at), boolean()),
@@ -432,8 +433,8 @@ private void addConstraints(Expr e, M3 m3)
 				case preDec():
 					constraints += {
 						conditional( //"if([E] = array(any())) then ([E--] = array(any()))",
-							eq(typeOf(operand@at), array(\any())),
-							eq(typeOf(expr@at), array(\any()))
+							subtyp(typeOf(operand@at), array(\any())),
+							subtyp(typeOf(expr@at), array(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E--] = bool())",
 							eq(typeOf(operand@at), boolean()),
@@ -476,7 +477,7 @@ private void addConstraints(Expr e, M3 m3)
 				case \int() :	constraints += { eq(typeOf(c@at), integer()) };
 				case \bool() :	constraints += { eq(typeOf(c@at), boolean()) };
 				case float() :	constraints += { eq(typeOf(c@at), float()) };
-				case array() :	constraints += { eq(typeOf(c@at), array(\any())) };
+				case array() :	constraints += { subtyp(typeOf(c@at), array(\any())) };
 				case object() :	constraints += { subtyp(typeOf(c@at), object()) };
 				case unset():	constraints += { eq(typeOf(c@at), null()) };
 				// special case for string, when [expr] <: object, the class of the object needs to have method "__toString"
@@ -539,7 +540,17 @@ private void addConstraints(Expr e, M3 m3)
 		}
 		
 		// normal variable and variable variable (can be combined)
-		case v:var(name(_)): constraints += { subtyp(typeOf(v@at), \any()) };
+		case v:var(name(name(name))): {
+			if (name in predefinedVariables) {
+				if (array(\any()) := predefinedVariables[name]) {
+					constraints += { subtyp(typeOf(v@at), predefinedVariables[name]) };
+				} else {
+					constraints += { eq(typeOf(v@at), predefinedVariables[name]) };
+				}
+			} else {
+				constraints += { subtyp(typeOf(v@at), \any()) };
+			}
+		}
 		case v:var(expr(e)): constraints += { subtyp(typeOf(v@at), \any()) };	
 		
 	//| yield(OptionExpr keyExpr, OptionExpr valueExpr)

@@ -18,6 +18,7 @@ public void main()
 	assert true == testNormalAssign();
 	assert true == testScalars();
 	assert true == testPredefinedConstants();
+	assert true == testPredefinedVariables();
 	assert true == testOpAssign();
 	assert true == testUnaryOp();
 	assert true == testBinaryOp();
@@ -140,6 +141,26 @@ public test bool testPredefinedConstants() {
 	return run("predefinedConstants", expected);
 }
 
+public test bool testPredefinedVariables() {
+	list[str] expected = [
+		"[$argc] = integer()",
+		"[$argv] = array(string())",
+		"[$_COOKIE] \<: array(any())",
+		"[$_ENV] \<: array(any())",
+		"[$_FILES] \<: array(any())",
+		"[$_GET] \<: array(any())",
+		"[$GLOBALS] \<: array(any())",
+		"[$_REQUEST] \<: array(any())",
+		"[$_POST] \<: array(any())",
+		"[$_SERVER] \<: array(any())",
+		"[$_SESSION] \<: array(any())",
+    
+		"[$php_errormsg] = string()",
+		"[$HTTP_RAW_POST_DATA] = array(string())",
+		"[$http_response_header] = array(string())"
+	];
+	return run("predefinedVariables", expected);
+}
 public test bool testOpAssign() {
 	list[str] expected = [
 		// LHS = integer()
@@ -154,8 +175,8 @@ public test bool testOpAssign() {
 		"[$m] \<: any()", "[$n] \<: any()", "[$m] = string()", // $m .= $n
 	
 		// LHS = integer, RHS != array()	
-		"[$o] \<: any()", "[$p] \<: any()", "[$o] = integer()", "neg([$p] = array(any()))", // $o /= $p
-		"[$q] \<: any()", "[$r] \<: any()", "[$q] = integer()", "neg([$r] = array(any()))", // $q -= $r
+		"[$o] \<: any()", "[$p] \<: any()", "[$o] = integer()", "neg([$p] \<: array(any()))", // $o /= $p
+		"[$q] \<: any()", "[$r] \<: any()", "[$q] = integer()", "neg([$r] \<: array(any()))", // $q -= $r
 	
 		// LHS = integer || float => LHS <: float()	
 		"[$s] \<: any()", "[$t] \<: any()", "[$s] \<: float()", // $s *= $t
@@ -168,11 +189,11 @@ public test bool testUnaryOp() {
 	list[str] expected = [
 		"[$a] \<: any()",
 		"[+$a] \<: float()", // expression is float or int
-		"neg([$a] = array(any()))", // $a is not an array
+		"neg([$a] \<: array(any()))", // $a is not an array
 		
 		"[$b] \<: any()",
 		"[-$b] \<: float()", // expression is float or int
-		"neg([$b] = array(any()))", // $b is not an array
+		"neg([$b] \<: array(any()))", // $b is not an array
 		
 		"[$c] \<: any()", 
 		"[!$c] = boolean()", 
@@ -182,7 +203,7 @@ public test bool testUnaryOp() {
 		"or([~$d] = integer(), [~$d] = string())", 
 		
 		"[$e] \<: any()",
-		"if ([$e] = array(any())) then ([$e++] = array(any()))",
+		"if ([$e] \<: array(any())) then ([$e++] \<: array(any()))",
 		"if ([$e] = boolean()) then ([$e++] = boolean())",
 		"if ([$e] = float()) then ([$e++] = float())",
 		"if ([$e] = integer()) then ([$e++] = integer())",
@@ -192,7 +213,7 @@ public test bool testUnaryOp() {
 		"if ([$e] = string()) then (or([$e++] = float(), [$e++] = integer(), [$e++] = string()))",
 		
 		"[$f] \<: any()",
-		"if ([$f] = array(any())) then ([$f--] = array(any()))",
+		"if ([$f] \<: array(any())) then ([$f--] \<: array(any()))",
 		"if ([$f] = boolean()) then ([$f--] = boolean())",
 		"if ([$f] = float()) then ([$f--] = float())",
 		"if ([$f] = integer()) then ([$f--] = integer())",
@@ -202,7 +223,7 @@ public test bool testUnaryOp() {
 		"if ([$f] = string()) then (or([$f--] = float(), [$f--] = integer(), [$f--] = string()))",
 		
 		"[$g] \<: any()",
-		"if ([$g] = array(any())) then ([++$g] = array(any()))",
+		"if ([$g] \<: array(any())) then ([++$g] \<: array(any()))",
 		"if ([$g] = boolean()) then ([++$g] = boolean())",
 		"if ([$g] = float()) then ([++$g] = float())",
 		"if ([$g] = integer()) then ([++$g] = integer())",
@@ -212,7 +233,7 @@ public test bool testUnaryOp() {
 		"if ([$g] = string()) then (or([++$g] = float(), [++$g] = integer(), [++$g] = string()))",
 		
 		"[$h] \<: any()",
-		"if ([$h] = array(any())) then ([--$h] = array(any()))",
+		"if ([$h] \<: array(any())) then ([--$h] \<: array(any()))",
 		"if ([$h] = boolean()) then ([--$h] = boolean())",
 		"if ([$h] = float()) then ([--$h] = float())",
 		"if ([$h] = integer()) then ([--$h] = integer())",
@@ -228,23 +249,23 @@ public test bool testUnaryOp() {
 public test bool testBinaryOp() {
 	list[str] expected = [
 		"[$a] \<: any()", "[$b] \<: any()",
-		"or([$a + $b] \<: float(), [$a + $b] = array(any()))", // always array, or subtype of float()
-		"if (and([$a] = array(any()), [$b] = array(any()))) then ([$a + $b] = array(any()))", // ($a = array && $b = array) => [E] = array
-		"if (or(neg([$a] = array(any())), neg([$b] = array(any())))) then ([$a + $b] \<: float())", // ($a != array || $b = array) => [E] <: float 
+		"or([$a + $b] \<: array(any()), [$a + $b] \<: float())", // always array, or subtype of float()
+		"if (and([$a] \<: array(any()), [$b] \<: array(any()))) then ([$a + $b] \<: array(any()))", // ($a = array && $b = array) => [E] = array
+		"if (or(neg([$a] \<: array(any())), neg([$b] \<: array(any())))) then ([$a + $b] \<: float())", // ($a != array || $b = array) => [E] <: float 
 		
 		"[$c] \<: any()", "[$d] \<: any()",
-		"neg([$c] = array(any()))",
-		"neg([$d] = array(any()))",
+		"neg([$c] \<: array(any()))",
+		"neg([$d] \<: array(any()))",
 		"[$c - $d] \<: float()",
 		
 		"[$e] \<: any()", "[$f] \<: any()",
-		"neg([$e] = array(any()))",
-		"neg([$f] = array(any()))",
+		"neg([$e] \<: array(any()))",
+		"neg([$f] \<: array(any()))",
 		"[$e * $f] \<: float()",
 		
 		"[$g] \<: any()", "[$h] \<: any()",
-		"neg([$g] = array(any()))",
-		"neg([$h] = array(any()))",
+		"neg([$g] \<: array(any()))",
+		"neg([$h] \<: array(any()))",
 		"[$g / $h] \<: float()",
 		
 		"[$i] \<: any()", "[$j] \<: any()",
@@ -313,7 +334,7 @@ public test bool testCasts() {
 		"[$e] \<: any()", "[$f] \<: any()", "[$g] \<: any()", "[$h] \<: any()", 
 		"[$i] \<: any()", "[$j] \<: any()", "[$k] \<: any()", 
 		
-		"[(array)$a] = array(any())",
+		"[(array)$a] \<: array(any())",
 		"[(bool)$b] = boolean()",
 		"[(boolean)$c] = boolean()",
 		"[(int)$d] = integer()",
