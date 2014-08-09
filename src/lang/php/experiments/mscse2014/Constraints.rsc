@@ -8,6 +8,8 @@ import lang::php::ast::System;
 import lang::php::types::TypeSymbol;
 import lang::php::types::TypeConstraints;
 
+import lang::php::language::Constants;
+
 import IO; // for debuggin
 
 private set[Constraint] constraints = {};
@@ -196,12 +198,90 @@ private void addConstraints(Expr e, M3 m3)
 						// in all other cases: int
 					};
 				
-				case \mod(): constraints += { eq(typeOf(op@at), \int()) }; // [E] = int
+				case \mod(): 		constraints += { eq(typeOf(op@at), \int()) }; // [E] = int
+				case leftShift():	constraints += { eq(typeOf(op@at), \int()) }; // [E] = int
+				case rightShift():	constraints += { eq(typeOf(op@at), \int()) }; // [E] = int
+				
+				case bitwiseAnd():
+					constraints += {
+						conditional( // if [L] and [R] are string, then [E] is string
+							conjunction({
+								eq(typeOf(left@at), string()),
+								eq(typeOf(right@at), string())
+							}),
+							eq(typeOf(op@at), string())
+						),
+						conditional( // if [L] or [R] is not string, then [E] is int
+							disjunction({
+								negation(eq(typeOf(left@at), string())), 
+								negation(eq(typeOf(right@at), string())) 
+							}),
+							eq(typeOf(op@at), \int())
+						),
+						disjunction({ // [E] = int|string 
+							eq(typeOf(op@at), string()),
+							eq(typeOf(op@at), \int())
+						})
+					
+					};
+				case bitwiseOr(): // refactor: duplicate of bitwise And
+					constraints += {
+						conditional( // if [L] and [R] are string, then [E] is string
+							conjunction({
+								eq(typeOf(left@at), string()),
+								eq(typeOf(right@at), string())
+							}),
+							eq(typeOf(op@at), string())
+						),
+						conditional( // if [L] or [R] is not string, then [E] is int
+							disjunction({
+								negation(eq(typeOf(left@at), string())), 
+								negation(eq(typeOf(right@at), string())) 
+							}),
+							eq(typeOf(op@at), \int())
+						),
+						disjunction({ // [E] = int|string 
+							eq(typeOf(op@at), string()),
+							eq(typeOf(op@at), \int())
+						})
+					
+					};
+				case bitwiseXor(): // refactor: duplicate of bitwise And
+					constraints += {
+						conditional( // if [L] and [R] are string, then [E] is string
+							conjunction({
+								eq(typeOf(left@at), string()),
+								eq(typeOf(right@at), string())
+							}),
+							eq(typeOf(op@at), string())
+						),
+						conditional( // if [L] or [R] is not string, then [E] is int
+							disjunction({
+								negation(eq(typeOf(left@at), string())), 
+								negation(eq(typeOf(right@at), string())) 
+							}),
+							eq(typeOf(op@at), \int())
+						),
+						disjunction({ // [E] = int|string 
+							eq(typeOf(op@at), string()),
+							eq(typeOf(op@at), \int())
+						})
+					
+					};
+				
+				// comparison operators, all result in booleans
+				case lt(): 			 constraints += { eq(typeOf(op@at), \bool()) };
+				case leq():			 constraints += { eq(typeOf(op@at), \bool()) };
+				case gt():			 constraints += { eq(typeOf(op@at), \bool()) };
+				case geq():			 constraints += { eq(typeOf(op@at), \bool()) };
+				case equal():		 constraints += { eq(typeOf(op@at), \bool()) };
+				case identical():	 constraints += { eq(typeOf(op@at), \bool()) };
+				case notEqual():	 constraints += { eq(typeOf(op@at), \bool()) };
+				case notIdentical(): constraints += { eq(typeOf(op@at), \bool()) };
 			}
 		}
 	
 		//unaryOperation(Expr operand, Op operation)
-		// not final!!!!!!
 		case expr:unaryOperation(Expr operand, Op operation): {
 			addConstraints(operand, m3);	
 			switch (operation) {
@@ -393,6 +473,26 @@ private void addConstraints(Expr e, M3 m3)
 		
 	//| new(NameOrExpr className, list[ActualParameter] parameters)
 	//| cast(CastType castType, Expr expr)
+		case c:cast(CastType castType, Expr expr): {
+			addConstraints(expr, m3);	
+			switch(castType) {
+				case \int() :	constraints += { eq(typeOf(c@at), \int()) };
+				case \bool() :	constraints += { eq(typeOf(c@at), \bool()) };
+				case float() :	constraints += { eq(typeOf(c@at), float()) };
+				case array() :	constraints += { eq(typeOf(c@at), array(\any())) };
+				case object() :	constraints += { subtyp(typeOf(c@at), object()) };
+				case unset():	constraints += { eq(typeOf(c@at), \null()) };
+				// special case for string, when [expr] <: object, the class of the object needs to have method "__toString"
+				case string() :	
+					constraints += { 
+						eq(typeOf(c@at), string()),
+						conditional(
+							subtyp(typeOf(expr@at), object()),
+							hasMethod(typeOf(expr@at), "__tostring")
+						)
+					};
+			}
+		}
 	//| clone(Expr expr)
 	//| closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static)
 	//| fetchConst(Name name)
@@ -419,7 +519,7 @@ private void addConstraints(Expr e, M3 m3)
 				case dirConstant():			constraints += { eq(typeOf(s@at), string()) };
 				case fileConstant():		constraints += { eq(typeOf(s@at), string()) };
 				case funcConstant():		constraints += { eq(typeOf(s@at), string()) };
-				case lineConstant():		constraints += { eq(typeOf(s@at), string()) };
+				case lineConstant():		constraints += { eq(typeOf(s@at), \int()) };
 				case methodConstant():		constraints += { eq(typeOf(s@at), string()) };
 				case namespaceConstant():	constraints += { eq(typeOf(s@at), string()) };
 				case traitConstant():		constraints += { eq(typeOf(s@at), string()) };

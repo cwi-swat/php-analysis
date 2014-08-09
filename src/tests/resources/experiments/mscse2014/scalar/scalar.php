@@ -1,14 +1,4 @@
 <?php
-// magic constants
-__CLASS__;
-__DIR__;
-__FILE__;
-__FUNCTION__;
-__LINE__;
-__METHOD__;
-__NAMESPACE__;
-__TRAIT__;
-
 //| float(real realVal)
 0.0;
 0.5;
