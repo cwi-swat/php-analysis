@@ -24,14 +24,14 @@ public void main()
 	assert true == testBinaryOp();
 	assert true == testComparisonOp();
 	assert true == testCasts();
+	assert true == testFunction();
 }
 
 public test bool testVariable() {
-	str name = "variable";
 	list[str] expected = [
 		"[$a] \<: any()"
 	];
-	return run(name, expected);
+	return run("variable", expected);
 }
 public test bool testNormalAssign() {
 	list[str] expected = [
@@ -348,17 +348,29 @@ public test bool testCasts() {
 		
 		"[(object)$j] \<: object()",
 		"[(unset)$k] = null()"
-		
 	];
 	return run("casts", expected);
 }
 
+public test bool testFunction() {
+	list[str] expected = [
+		"[function a() {}] = null()",
+		"[function &b() {}] = null()",
+		"or([function c() { return; }] = null())",
+		"or([function d() { return true; return false; }] = [false], [function d() { return true; return false; }] = [true])",
+		"[function f() { function g() { return \"string\"; } }] = null()",
+		"or([function g() { return \"string\"; }] = [\"string\"])"
+	];
+	return run("function", expected);
+}
 public bool run(str fileName, list[str] expected)
 {
 	loc l = getFileLocation(fileName);
 	
 	System system = getSystem(l, false);
+	resetModifiedSystem();
 	M3 m3 = getM3ForSystem(system, false);
+	system = getModifiedSystem();
 
 	set[Constraint] actual = getConstraints(system, m3);
 

@@ -17,6 +17,10 @@ import lang::php::ast::System;
 
 import Set;
 
+private System modifiedSystem = ();
+public System getModifiedSystem() = modifiedSystem;
+public void resetModifiedSystem() { modifiedSystem = (); } // used in tests
+
 private bool useCacheDefault = false;
 // get a system for a specific location
 public System getSystem(loc l) = getSystem(l, useCacheDefault);
@@ -51,6 +55,7 @@ private M3 createM3forScript(loc filename, Script script)
 		script = addPublicModifierWhenNotProvided(script); // set Modifiers when they are not provided, like function => public function
    		m3 = fillDeclarations(m3, script); // fill @declarations and @names	
 	   	script = propagateDeclToScope(script); // propagate @decl to @scope
+	   	modifiedSystem[filename] = script; // a dirty hack to reuse this modified script...
    	
 		m3 = fillContainment(m3, script); // fill containment with declarations 
 		m3 = fillExtendsAndImplements(m3, script); // fill extends, implements and traitUse, by trying to look up class names 

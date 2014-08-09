@@ -53,6 +53,25 @@ private void addConstraints(Stmt statement, M3 m3)
 //	| \for(list[Expr] inits, list[Expr] conds, list[Expr] exprs, list[Stmt] body)
 //	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
 //	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
+	case f:function(str name, bool byRef, list[Param] params, list[Stmt] body): {
+		loc functionScope = f@scope[file=name][scheme="php+function"];
+		
+		for (stmt <- body) addConstraints(stmt, m3);
+	
+		bool isReturnStatementWithinScope(Stmt rs, loc scope) = (\return(_) := rs) && (scope == rs@scope);
+		set[OptionExpr] returnStmts = { rs.returnExpr | rs <- body, isReturnStatementWithinScope(rs, functionScope) };
+		
+		if (!isEmpty(returnStmts)) {
+			// if there are return statements, the disjunction of them is the return value of the function
+			constraints += { 
+				disjunction(
+					{ eq(typeOf(f@at), typeOf(e@at)) | rs <- returnStmts, someExpr(e) := rs }
+					+ { eq(typeOf(f@at), null()) | rs <- returnStmts, noExpr() := rs }
+				)};
+		} else {
+			constraints += { eq(typeOf(f@at), null()) }; 
+		}
+	}
 //	| global(list[Expr] exprs)
 //	| goto(Name gotoName)
 //	| haltCompiler(str remainingText)

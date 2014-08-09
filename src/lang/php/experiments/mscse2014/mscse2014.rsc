@@ -35,6 +35,7 @@ public void run() {
 	logMessage("Get system...", 1);
 	System system = getSystem(projectLocation, useCache);
 	M3 m3 = getM3ForSystem(system, useCache);
+	system = getModifiedSystem(); // for example the script is altered with scope information
 
 // all the needed 'facts' are already in the M3.
 //	logMessage("Gathering facts", 1);
