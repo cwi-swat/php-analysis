@@ -116,7 +116,7 @@ public rel[TypeSymbol, TypeSymbol] getSubTypes(M3 m3, System system)
 {
 	rel[TypeSymbol, TypeSymbol] subtypes
 		// add int() as subtype of float()
-		= { < \int(), float() > }
+		= { < integer(), float() > }
 		// use the extends relation from M3
 		+ { < class(c), class(e) > | <c,e> <- m3@extends }
 		// add subtype of object for all classes which do not extends a class

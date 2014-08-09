@@ -35,7 +35,7 @@ public test bool testVariable() {
 public test bool testNormalAssign() {
 	list[str] expected = [
 		"[2] \<: [$a]",
-		"[2] = int()",
+		"[2] = integer()",
 		"[$a] \<: [$b]",
 		"[$a] \<: any()", // twice because the variable occurs at two different places
 		"[$a] \<: any()", 
@@ -48,7 +48,7 @@ public test bool testScalars() {
 		// floats -> float()
 		"[0.0] = float()", "[0.5] = float()", "[1000.0382] = float()",
 		// int -> int()
-		"[0] = int()", "[1] = int()", "[2] = int()", "[10] = int()", "[100] = int()",
+		"[0] = integer()", "[1] = integer()", "[2] = integer()", "[10] = integer()", "[100] = integer()",
 		// strings -> string()
 		"[\"string\"] = string()", "[\'also a string\'] = string()", "[\"$encaped string\"] = string()", "[\"{$encaped} string\"] = string()"
 	];
@@ -59,29 +59,29 @@ public test bool testPredefinedConstants() {
 	list[str] expected = [
 		// magic constants -> string()
 		"[__CLASS__] = string()", "[__DIR__] = string()", "[__FILE__] = string()", "[__FUNCTION__] = string()", 
-		"[__LINE__] = int()", "[__METHOD__] = string()", "[__NAMESPACE__] = string()", "[__TRAIT__] = string()"
+		"[__LINE__] = integer()", "[__METHOD__] = string()", "[__NAMESPACE__] = string()", "[__TRAIT__] = string()"
 	];
 	return run("predefinedConstants", expected);
 }
 
 public test bool testOpAssign() {
 	list[str] expected = [
-		// LHS = int()
-		"[$a] \<: any()", "[$b] \<: any()", "[$a] = int()", // $a  &= $b
-		"[$c] \<: any()", "[$d] \<: any()", "[$c] = int()", // $c  |= $d
-		"[$e] \<: any()", "[$f] \<: any()", "[$e] = int()", // $e  ^= $f
-		"[$g] \<: any()", "[$h] \<: any()", "[$g] = int()", // $g  %= $h
-		"[$i] \<: any()", "[$j] \<: any()", "[$i] = int()", // $i <<= $j
-		"[$k] \<: any()", "[$l] \<: any()", "[$k] = int()", // $k >>= $l
+		// LHS = integer()
+		"[$a] \<: any()", "[$b] \<: any()", "[$a] = integer()", // $a  &= $b
+		"[$c] \<: any()", "[$d] \<: any()", "[$c] = integer()", // $c  |= $d
+		"[$e] \<: any()", "[$f] \<: any()", "[$e] = integer()", // $e  ^= $f
+		"[$g] \<: any()", "[$h] \<: any()", "[$g] = integer()", // $g  %= $h
+		"[$i] \<: any()", "[$j] \<: any()", "[$i] = integer()", // $i <<= $j
+		"[$k] \<: any()", "[$l] \<: any()", "[$k] = integer()", // $k >>= $l
 	
 		// LHS = string()	
 		"[$m] \<: any()", "[$n] \<: any()", "[$m] = string()", // $m .= $n
 	
-		// LHS = int, RHS != array()	
-		"[$o] \<: any()", "[$p] \<: any()", "[$o] = int()", "neg([$p] = array(any()))", // $o /= $p
-		"[$q] \<: any()", "[$r] \<: any()", "[$q] = int()", "neg([$r] = array(any()))", // $q -= $r
+		// LHS = integer, RHS != array()	
+		"[$o] \<: any()", "[$p] \<: any()", "[$o] = integer()", "neg([$p] = array(any()))", // $o /= $p
+		"[$q] \<: any()", "[$r] \<: any()", "[$q] = integer()", "neg([$r] = array(any()))", // $q -= $r
 	
-		// LHS = int || float => LHS <: float()	
+		// LHS = integer || float => LHS <: float()	
 		"[$s] \<: any()", "[$t] \<: any()", "[$s] \<: float()", // $s *= $t
 		"[$u] \<: any()", "[$v] \<: any()", "[$u] \<: float()"  // $u += $v
 	];
@@ -99,51 +99,51 @@ public test bool testUnaryOp() {
 		"neg([$b] = array(any()))", // $b is not an array
 		
 		"[$c] \<: any()", 
-		"[!$c] = bool()", 
+		"[!$c] = boolean()", 
 		
 		"[$d] \<: any()", 
-		"or([$d] = float(), [$d] = int(), [$d] = string())", 
-		"or([~$d] = int(), [~$d] = string())", 
+		"or([$d] = float(), [$d] = integer(), [$d] = string())", 
+		"or([~$d] = integer(), [~$d] = string())", 
 		
 		"[$e] \<: any()",
 		"if ([$e] = array(any())) then ([$e++] = array(any()))",
-		"if ([$e] = bool()) then ([$e++] = bool())",
+		"if ([$e] = boolean()) then ([$e++] = boolean())",
 		"if ([$e] = float()) then ([$e++] = float())",
-		"if ([$e] = int()) then ([$e++] = int())",
-		"if ([$e] = null()) then (or([$e++] = int(), [$e++] = null()))",
+		"if ([$e] = integer()) then ([$e++] = integer())",
+		"if ([$e] = null()) then (or([$e++] = integer(), [$e++] = null()))",
 		"if ([$e] \<: object()) then ([$e++] \<: object())",
 		"if ([$e] = resource()) then ([$e++] = resource())",
-		"if ([$e] = string()) then (or([$e++] = float(), [$e++] = int(), [$e++] = string()))",
+		"if ([$e] = string()) then (or([$e++] = float(), [$e++] = integer(), [$e++] = string()))",
 		
 		"[$f] \<: any()",
 		"if ([$f] = array(any())) then ([$f--] = array(any()))",
-		"if ([$f] = bool()) then ([$f--] = bool())",
+		"if ([$f] = boolean()) then ([$f--] = boolean())",
 		"if ([$f] = float()) then ([$f--] = float())",
-		"if ([$f] = int()) then ([$f--] = int())",
-		"if ([$f] = null()) then (or([$f--] = int(), [$f--] = null()))",
+		"if ([$f] = integer()) then ([$f--] = integer())",
+		"if ([$f] = null()) then (or([$f--] = integer(), [$f--] = null()))",
 		"if ([$f] \<: object()) then ([$f--] \<: object())",
 		"if ([$f] = resource()) then ([$f--] = resource())",
-		"if ([$f] = string()) then (or([$f--] = float(), [$f--] = int(), [$f--] = string()))",
+		"if ([$f] = string()) then (or([$f--] = float(), [$f--] = integer(), [$f--] = string()))",
 		
 		"[$g] \<: any()",
 		"if ([$g] = array(any())) then ([++$g] = array(any()))",
-		"if ([$g] = bool()) then ([++$g] = bool())",
+		"if ([$g] = boolean()) then ([++$g] = boolean())",
 		"if ([$g] = float()) then ([++$g] = float())",
-		"if ([$g] = int()) then ([++$g] = int())",
-		"if ([$g] = null()) then ([++$g] = int())",
+		"if ([$g] = integer()) then ([++$g] = integer())",
+		"if ([$g] = null()) then ([++$g] = integer())",
 		"if ([$g] \<: object()) then ([++$g] \<: object())",
 		"if ([$g] = resource()) then ([++$g] = resource())",
-		"if ([$g] = string()) then (or([++$g] = float(), [++$g] = int(), [++$g] = string()))",
+		"if ([$g] = string()) then (or([++$g] = float(), [++$g] = integer(), [++$g] = string()))",
 		
 		"[$h] \<: any()",
 		"if ([$h] = array(any())) then ([--$h] = array(any()))",
-		"if ([$h] = bool()) then ([--$h] = bool())",
+		"if ([$h] = boolean()) then ([--$h] = boolean())",
 		"if ([$h] = float()) then ([--$h] = float())",
-		"if ([$h] = int()) then ([--$h] = int())",
-		"if ([$h] = null()) then ([--$h] = int())",
+		"if ([$h] = integer()) then ([--$h] = integer())",
+		"if ([$h] = null()) then ([--$h] = integer())",
 		"if ([$h] \<: object()) then ([--$h] \<: object())",
 		"if ([$h] = resource()) then ([--$h] = resource())",
-		"if ([$h] = string()) then (or([--$h] = float(), [--$h] = int(), [--$h] = string()))"
+		"if ([$h] = string()) then (or([--$h] = float(), [--$h] = integer(), [--$h] = string()))"
 	];
 	return run("unaryOp", expected);
 }
@@ -172,28 +172,28 @@ public test bool testBinaryOp() {
 		"[$g / $h] \<: float()",
 		
 		"[$i] \<: any()", "[$j] \<: any()",
-		"[$i % $j] = int()",
+		"[$i % $j] = integer()",
 	
 		"[$k] \<: any()", "[$l] \<: any()",
 		"if (and([$k] = string(), [$l] = string())) then ([$k & $l] = string())",
-		"if (or(neg([$k] = string()), neg([$l] = string()))) then ([$k & $l] = int())",
-		"or([$k & $l] = int(), [$k & $l] = string())",
+		"if (or(neg([$k] = string()), neg([$l] = string()))) then ([$k & $l] = integer())",
+		"or([$k & $l] = integer(), [$k & $l] = string())",
 		
 		"[$m] \<: any()", "[$n] \<: any()",
 		"if (and([$m] = string(), [$n] = string())) then ([$m | $n] = string())",
-		"if (or(neg([$m] = string()), neg([$n] = string()))) then ([$m | $n] = int())",
-		"or([$m | $n] = int(), [$m | $n] = string())",
+		"if (or(neg([$m] = string()), neg([$n] = string()))) then ([$m | $n] = integer())",
+		"or([$m | $n] = integer(), [$m | $n] = string())",
 		
 		"[$o] \<: any()", "[$p] \<: any()",
 		"if (and([$o] = string(), [$p] = string())) then ([$o ^ $p] = string())",
-		"if (or(neg([$o] = string()), neg([$p] = string()))) then ([$o ^ $p] = int())",
-		"or([$o ^ $p] = int(), [$o ^ $p] = string())",
+		"if (or(neg([$o] = string()), neg([$p] = string()))) then ([$o ^ $p] = integer())",
+		"or([$o ^ $p] = integer(), [$o ^ $p] = string())",
 		
 		"[$q] \<: any()", "[$r] \<: any()",
-		"[$q \<\< $r] = int()",
+		"[$q \<\< $r] = integer()",
 		
 		"[$s] \<: any()", "[$t] \<: any()",
-		"[$s \>\> $t] = int()"
+		"[$s \>\> $t] = integer()"
 		
 	];
 	return run("binaryOp", expected);
@@ -202,31 +202,31 @@ public test bool testBinaryOp() {
 public test bool testComparisonOp() {
 	list[str] expected = [
 		"[$a] \<: any()", "[$b] \<: any()",
-		"[$a \< $b] = bool()",
+		"[$a \< $b] = boolean()",
 		
 		"[$c] \<: any()", "[$d] \<: any()",
-		"[$c \<= $d] = bool()",
+		"[$c \<= $d] = boolean()",
 		
 		"[$e] \<: any()", "[$f] \<: any()",
-		"[$e \> $f] = bool()",
+		"[$e \> $f] = boolean()",
 		
 		"[$g] \<: any()", "[$h] \<: any()",
-		"[$g \>= $h] = bool()",
+		"[$g \>= $h] = boolean()",
 		
 		"[$i] \<: any()", "[$j] \<: any()",
-		"[$i == $j] = bool()",
+		"[$i == $j] = boolean()",
 		
 		"[$k] \<: any()", "[$l] \<: any()",
-		"[$k === $l] = bool()",
+		"[$k === $l] = boolean()",
 	
 		"[$m] \<: any()", "[$n] \<: any()",
-		"[$m != $n] = bool()",
+		"[$m != $n] = boolean()",
 		
 		"[$o] \<: any()", "[$p] \<: any()",
-		"[$o \<\> $p] = bool()",
+		"[$o \<\> $p] = boolean()",
 		
 		"[$q] \<: any()", "[$r] \<: any()",
-		"[$q !== $r] = bool()"
+		"[$q !== $r] = boolean()"
 	];
 	return run("comparisonOp", expected);
 }
@@ -238,10 +238,10 @@ public test bool testCasts() {
 		"[$i] \<: any()", "[$j] \<: any()", "[$k] \<: any()", 
 		
 		"[(array)$a] = array(any())",
-		"[(bool)$b] = bool()",
-		"[(boolean)$c] = bool()",
-		"[(int)$d] = int()",
-		"[(integer)$e] = int()",
+		"[(bool)$b] = boolean()",
+		"[(boolean)$c] = boolean()",
+		"[(int)$d] = integer()",
+		"[(integer)$e] = integer()",
 		"[(float)$f] = float()",
 		"[(double)$g] = float()",
 		"[(real)$h] = float()",

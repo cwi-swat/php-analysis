@@ -5,12 +5,11 @@ extend analysis::m3::TypeSymbol;
 
 data TypeSymbol
   = array(TypeSymbol arrayType)
-  | \bool()
+  | boolean()
   | class(loc decl)
   | float()
-  | \int()
-  //| mixed()
-  | \null()
+  | integer()
+  | null()
   | object()
   | resource()
   | string()
@@ -20,5 +19,4 @@ data TypeSymbol
 
 default TypeSymbol lub(TypeSymbol s, TypeSymbol t) = s == t ? s : \any();
 
-public set[TypeSymbol] allTypes = {  array(\any()), \bool(), float(), \int(), \null(), object(), resource(), string() }; 
-//public set[TypeSymbol] allTypes = {  array(mixed()), boolean(), float(), integer(), null_(), object(), resource(), string() }; 
+public set[TypeSymbol] allTypes = {  array(\any()), boolean(), float(), integer(), null(), object(), resource(), string() }; 
