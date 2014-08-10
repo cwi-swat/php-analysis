@@ -69,6 +69,7 @@ private void addConstraints(Stmt statement, M3 m3)
 					+ { eq(typeOf(f@at), null()) | rs <- returnStmts, noExpr() := rs }
 				)};
 		} else {
+			// no return methods means that the function will always return null (unless an expception is thrown)
 			constraints += { eq(typeOf(f@at), null()) }; 
 		}
 	}

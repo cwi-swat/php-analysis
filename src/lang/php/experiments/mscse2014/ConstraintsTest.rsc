@@ -359,7 +359,15 @@ public test bool testFunction() {
 		"or([function c() { return; }] = null())",
 		"or([function d() { return true; return false; }] = [false], [function d() { return true; return false; }] = [true])",
 		"[function f() { function g() { return \"string\"; } }] = null()",
-		"or([function g() { return \"string\"; }] = [\"string\"])"
+		"or([function g() { return \"string\"; }] = [\"string\"])",
+		
+		"[\"str\"] \<: [$a]",
+		"[\"str\"] = string()",
+		"[$a] \<: any()",
+		"[$a] \<: any()",
+		"[100] \<: [$a]",
+		"[100] = integer()",
+		"[function h() { $a = \"str\"; $a = 100; }] = null()"
 	];
 	return run("function", expected);
 }
