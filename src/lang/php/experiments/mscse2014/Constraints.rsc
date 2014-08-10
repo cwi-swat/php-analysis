@@ -537,7 +537,29 @@ private void addConstraints(Expr e, M3 m3)
 	//| print(Expr expr)
 	//| propertyFetch(Expr target, NameOrExpr propertyName)
 	//| shellExec(list[Expr] parts)
-	//| ternary(Expr cond, OptionExpr ifBranch, Expr elseBranch)
+		// ternary: E1?E2:E3 == E => [E] = [E2] V [E3]
+		case t:ternary(Expr cond, someExpr(Expr ifBranch), Expr elseBranch): {
+			addConstraints(cond, m3);
+			addConstraints(ifBranch, m3);
+			addConstraints(elseBranch, m3);
+			constraints += { 
+				disjunction({
+					subtyp(typeOf(t@at), typeOf(ifBranch@at)),
+					subtyp(typeOf(t@at), typeOf(elseBranch@at))
+				})
+			};
+		}
+		// ternary: E1?:E3 == E => [E] = [E1] V [E3]
+		case t:ternary(Expr cond, noExpr(), Expr elseBranch): {
+			addConstraints(cond, m3);
+			addConstraints(elseBranch, m3);
+			constraints += { 
+				disjunction({
+					subtyp(typeOf(t@at), typeOf(cond@at)),
+					subtyp(typeOf(t@at), typeOf(elseBranch@at))
+				})
+			};
+		}
 	//| staticPropertyFetch(NameOrExpr className, NameOrExpr propertyName)
 	
 		//scalar(Scalar scalarVal)

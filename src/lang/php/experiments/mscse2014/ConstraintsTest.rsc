@@ -22,6 +22,7 @@ public void main()
 	assert true == testOpAssign();
 	assert true == testUnaryOp();
 	assert true == testBinaryOp();
+	assert true == testTernary();
 	assert true == testComparisonOp();
 	assert true == testCasts();
 	assert true == testFunction();
@@ -296,6 +297,28 @@ public test bool testBinaryOp() {
 	return run("binaryOp", expected);
 }
 
+public test bool testTernary() {
+	list[str] expected = [
+		"[$a] \<: any()", "[$b] \<: any()", // $a and $b
+		"[true] = boolean()", "[\"string\"] = string()", // true and "string"
+		"or([true ? $b : \"string\"] \<: [\"string\"], [true ? $b : \"string\"] \<: [$b])", // [E] = [E2] OR [E3]
+		"[true ? $b : \"string\"] \<: [$a]", // [E] <: $a
+		
+		"[$c] \<: any()", 
+		"[TRUE] = boolean()", "[\"str\"] = string()", // TRUE and "string"
+		"or([TRUE ? : \"str\"] \<: [\"str\"], [TRUE ? : \"str\"] \<: [TRUE])", // [E] = [E1] OR [E3]
+		"[TRUE ? : \"str\"] \<: [$c]", // [E] <: $c
+		
+		"[$d] \<: any()", "[$e] \<: any()", 
+		"[3] = integer()", "[\"l\"] = string()", "[\"r\"] = string()", // 3, "l" and "r"
+		"or([3 ? \"l\" : \"r\"] \<: [\"l\"], [3 ? \"l\" : \"r\"] \<: [\"r\"])", // [E] = [E1] OR [E3]
+		"[3 ? \"l\" : \"r\"] \<: [$e]", // [E] <: $e
+		"[$e] \<: [$d]" // $e <: $d
+	];
+	return run("ternary", expected);
+}
+	
+
 public test bool testComparisonOp() {
 	list[str] expected = [
 		"[$a] \<: any()", "[$b] \<: any()",
@@ -367,7 +390,7 @@ public test bool testFunction() {
 		"[$a] \<: any()",
 		"[100] \<: [$a]",
 		"[100] = integer()",
-		"[function h() { $a = \"str\"; $a = 100; }] = null()"
+		"[function h() { $a = \"str\"; $a = 100; }] = null()" 
 	];
 	return run("function", expected);
 }
