@@ -56,7 +56,11 @@ public test bool testScalars() {
 		"[0] = integer()", "[1] = integer()", "[2] = integer()", "[10] = integer()", "[100] = integer()",
 		// strings -> string()
 		"[\"string\"] = string()", "[\'also a string\'] = string()", 
-		"[\"$encaped string\"] = string()", "[\"{$encaped} string\"] = string()"
+		// encapsed -> string()
+		// also evaluate the items of the encapsed string
+		"[\"$encapsed string\"] = string()", "[\"{$encapsed} string\"] = string()",
+		"[$encapsed] \<: any()", "[$encapsed] \<: any()"
+		
 	];
 	return run("scalar", expected);
 }
@@ -177,6 +181,7 @@ public test bool testOpAssign() {
 	
 		// LHS = string()	
 		"[$m] \<: any()", "[$n] \<: any()", "[$m] = string()", // $m .= $n
+		"if ([$n] \<: object()) then (hasMethod([$n], __tostring))", // if (n == object) => [$n] has method __tostring
 	
 		// LHS = integer, RHS != array()	
 		"[$o] \<: any()", "[$p] \<: any()", "[$o] = integer()", "neg([$p] \<: array(any()))", // $o /= $p
@@ -252,47 +257,57 @@ public test bool testUnaryOp() {
 
 public test bool testBinaryOp() {
 	list[str] expected = [
+		// $a + $b;
 		"[$a] \<: any()", "[$b] \<: any()",
 		"or([$a + $b] \<: array(any()), [$a + $b] \<: float())", // always array, or subtype of float()
 		"if (and([$a] \<: array(any()), [$b] \<: array(any()))) then ([$a + $b] \<: array(any()))", // ($a = array && $b = array) => [E] = array
 		"if (or(neg([$a] \<: array(any())), neg([$b] \<: array(any())))) then ([$a + $b] \<: float())", // ($a != array || $b = array) => [E] <: float 
 		
+		// $c - $d;	
 		"[$c] \<: any()", "[$d] \<: any()",
 		"neg([$c] \<: array(any()))",
 		"neg([$d] \<: array(any()))",
 		"[$c - $d] \<: float()",
-		
+	
+		// $e * $f;	
 		"[$e] \<: any()", "[$f] \<: any()",
 		"neg([$e] \<: array(any()))",
 		"neg([$f] \<: array(any()))",
 		"[$e * $f] \<: float()",
-		
+	
+		// $g / $h;	
 		"[$g] \<: any()", "[$h] \<: any()",
 		"neg([$g] \<: array(any()))",
 		"neg([$h] \<: array(any()))",
 		"[$g / $h] \<: float()",
-		
+	
+		// $i % $j;	
 		"[$i] \<: any()", "[$j] \<: any()",
 		"[$i % $j] = integer()",
-	
+
+		// $k & $l;	
 		"[$k] \<: any()", "[$l] \<: any()",
 		"if (and([$k] = string(), [$l] = string())) then ([$k & $l] = string())",
 		"if (or(neg([$k] = string()), neg([$l] = string()))) then ([$k & $l] = integer())",
 		"or([$k & $l] = integer(), [$k & $l] = string())",
 		
+		// $m | $n;	
 		"[$m] \<: any()", "[$n] \<: any()",
 		"if (and([$m] = string(), [$n] = string())) then ([$m | $n] = string())",
 		"if (or(neg([$m] = string()), neg([$n] = string()))) then ([$m | $n] = integer())",
 		"or([$m | $n] = integer(), [$m | $n] = string())",
 		
+		// $o ^ $p;	
 		"[$o] \<: any()", "[$p] \<: any()",
 		"if (and([$o] = string(), [$p] = string())) then ([$o ^ $p] = string())",
 		"if (or(neg([$o] = string()), neg([$p] = string()))) then ([$o ^ $p] = integer())",
 		"or([$o ^ $p] = integer(), [$o ^ $p] = string())",
 		
+		// $q << $r;	
 		"[$q] \<: any()", "[$r] \<: any()",
 		"[$q \<\< $r] = integer()",
 		
+		// $s >> $t;	
 		"[$s] \<: any()", "[$t] \<: any()",
 		"[$s \>\> $t] = integer()"
 		
@@ -302,18 +317,21 @@ public test bool testBinaryOp() {
 
 public test bool testTernary() {
 	list[str] expected = [
+		// $a = true ? $b : "string";
 		"[$a] \<: any()", "[$b] \<: any()", // $a and $b
 		"[true] = boolean()", "[\"string\"] = string()", // true and "string"
 		"or([true ? $b : \"string\"] \<: [\"string\"], [true ? $b : \"string\"] \<: [$b])", // [E] = [E2] OR [E3]
 		"[true ? $b : \"string\"] \<: [$a]", // [E] <: $a
 		"[$a] \<: [$a = true ? $b : \"string\"]", // result of the whole expression is a subtype of $a
 		
+		// $c = TRUE ? : "str";
 		"[$c] \<: any()", 
 		"[TRUE] = boolean()", "[\"str\"] = string()", // TRUE and "string"
 		"or([TRUE ? : \"str\"] \<: [\"str\"], [TRUE ? : \"str\"] \<: [TRUE])", // [E] = [E1] OR [E3]
 		"[TRUE ? : \"str\"] \<: [$c]", // [E] <: $c
 		"[$c] \<: [$c = TRUE ? : \"str\"]", // result of the whole expression is a subtype of $c
-		
+	
+		// $d = $e = 3 ? "l" : "r";
 		"[$d] \<: any()", "[$e] \<: any()", 
 		"[3] = integer()", "[\"l\"] = string()", "[\"r\"] = string()", // 3, "l" and "r"
 		"or([3 ? \"l\" : \"r\"] \<: [\"l\"], [3 ? \"l\" : \"r\"] \<: [\"r\"])", // [E] = [E1] OR [E3]

@@ -16,5 +16,5 @@
 'also a string';
 
 //| encapsed(list[Expr] parts)
-"$encaped string";
-"{$encaped} string";
+"$encapsed string";
+"{$encapsed} string";

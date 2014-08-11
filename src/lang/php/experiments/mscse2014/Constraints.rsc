@@ -144,7 +144,14 @@ private void addConstraints(Expr e, M3 m3)
 										negation(subtyp(typeOf(assignExpr@at), array(\any()))) // RHS is not an array
 									};
 				
-				case concat():		constraints += { eq(typeOf(assignTo@at), string()) };
+				case concat():		
+					constraints += { 
+						eq(typeOf(assignTo@at), string()),
+						conditional(
+							subtyp(typeOf(assignExpr@at), object()),
+							hasMethod(typeOf(assignExpr@at), "__tostring")
+						)
+					};
 				
 				case mul(): 		constraints += { subtyp(typeOf(assignTo@at), float()) };
 				case plus(): 		constraints += { subtyp(typeOf(assignTo@at), float()) };
@@ -564,6 +571,7 @@ private void addConstraints(Expr e, M3 m3)
 	
 		//scalar(Scalar scalarVal)
 		case s:scalar(Scalar scalarVal): {
+			//println("Scalar :: <s>");
 			switch(scalarVal) {
 				case classConstant():		constraints += { eq(typeOf(s@at), string()) };
 				case dirConstant():			constraints += { eq(typeOf(s@at), string()) };
@@ -577,7 +585,10 @@ private void addConstraints(Expr e, M3 m3)
 				case float(_):				constraints += { eq(typeOf(s@at), float()) };
 				case integer(_):			constraints += { eq(typeOf(s@at), integer()) };
 				case string(_):				constraints += { eq(typeOf(s@at), string()) };
-				case encapsed(_):			constraints += { eq(typeOf(s@at), string()) };
+				case encapsed(list[Expr] parts): {
+					for (p <- parts, scalar(_) !:= p) addConstraints(p, m3);
+					constraints += { eq(typeOf(s@at), string()) };
+				}
 			}
 		}
 		
