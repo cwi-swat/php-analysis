@@ -24,6 +24,7 @@ public void main()
 	assert true == testBinaryOp();
 	assert true == testTernary();
 	assert true == testComparisonOp();
+	assert true == testLogicalOp();
 	assert true == testCasts();
 	assert true == testFunction();
 }
@@ -48,6 +49,7 @@ public test bool testNormalAssign() {
 	];
 	return run("normalAssign", expected);
 }
+
 public test bool testScalars() {
 	list[str] expected = [
 		// floats -> float()
@@ -169,6 +171,7 @@ public test bool testPredefinedVariables() {
 	];
 	return run("predefinedVariables", expected);
 }
+
 public test bool testOpAssign() {
 	list[str] expected = [
 		// LHS = integer()
@@ -253,7 +256,6 @@ public test bool testUnaryOp() {
 	];
 	return run("unaryOp", expected);
 }
-
 
 public test bool testBinaryOp() {
 	list[str] expected = [
@@ -342,8 +344,26 @@ public test bool testTernary() {
 	];
 	return run("ternary", expected);
 }
-	
 
+public test bool testLogicalOp() {
+	list[str] expected = [
+		"[$a] \<: any()", "[$b] \<: any()",
+		"[$a and $b] = boolean()",
+		
+		"[$c] \<: any()", "[$d] \<: any()",
+		"[$c or $d] = boolean()",
+		
+		"[$e] \<: any()", "[$f] \<: any()",
+		"[$e xor $f] = boolean()",
+		
+		"[$g] \<: any()", "[$h] \<: any()",
+		"[$g && $h] = boolean()",
+		
+		"[$i] \<: any()", "[$j] \<: any()",
+		"[$i || $j] = boolean()"
+	];
+	return run("logicalOp", expected);
+}
 public test bool testComparisonOp() {
 	list[str] expected = [
 		"[$a] \<: any()", "[$b] \<: any()",

@@ -304,6 +304,12 @@ private void addConstraints(Expr e, M3 m3)
 				case identical():	 constraints += { eq(typeOf(op@at), boolean()) };
 				case notEqual():	 constraints += { eq(typeOf(op@at), boolean()) };
 				case notIdentical(): constraints += { eq(typeOf(op@at), boolean()) };
+				// logical operators, all result in booleans
+				case logicalAnd():	 constraints += { eq(typeOf(op@at), boolean()) };
+				case logicalOr():	 constraints += { eq(typeOf(op@at), boolean()) };
+				case logicalXor():	 constraints += { eq(typeOf(op@at), boolean()) };
+				case booleanAnd():	 constraints += { eq(typeOf(op@at), boolean()) };
+				case booleanOr():	 constraints += { eq(typeOf(op@at), boolean()) };
 			}
 		}
 	
