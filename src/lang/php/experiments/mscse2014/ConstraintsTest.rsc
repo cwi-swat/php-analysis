@@ -440,24 +440,6 @@ public test bool testArray() {
 		"[0] = integer()", "[1] = integer()", "[2] = integer()", 
 		"[[0,1,2]] = array([0], [1], [2])"
 		
-		//"[$a] \<: any()", "[$b] \<: any()", "[$c] \<: any()", "[$d] \<: any()", 
-		//"[$e] \<: any()", "[$f] \<: any()", "[$g] \<: any()", "[$h] \<: any()", 
-		//"[$i] \<: any()", "[$j] \<: any()", "[$k] \<: any()", 
-		//
-		//"[(array)$a] \<: array(any())",
-		//"[(bool)$b] = boolean()",
-		//"[(boolean)$c] = boolean()",
-		//"[(int)$d] = integer()",
-		//"[(integer)$e] = integer()",
-		//"[(float)$f] = float()",
-		//"[(double)$g] = float()",
-		//"[(real)$h] = float()",
-		//
-		//"[(string)$i] = string()",
-		//"if ([$i] \<: object()) then (hasMethod([$i], __tostring))",
-		//
-		//"[(object)$j] \<: object()",
-		//"[(unset)$k] = null()"
 	];
 	return run("array", expected);
 }
