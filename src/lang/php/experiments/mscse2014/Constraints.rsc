@@ -120,10 +120,10 @@ private void addConstraints(Expr e, M3 m3)
 		case a:assign(Expr assignTo, Expr assignExpr): {
 			// add direct constraints
 			constraints += { subtyp(typeOf(assignExpr@at), typeOf(assignTo@at)) }; 
+			constraints += { subtyp(typeOf(assignTo@at), typeOf(a@at)) };
 			// add indirect constraints
 			addConstraints(assignTo, m3);
 			addConstraints(assignExpr, m3);
-			//constraints += getConstraints(assignExpr, m3);
 		}
 		case a:assignWOp(Expr assignTo, Expr assignExpr, Op operation): {
 			switch(operation) {

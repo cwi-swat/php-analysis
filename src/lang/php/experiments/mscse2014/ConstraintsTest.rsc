@@ -36,12 +36,15 @@ public test bool testVariable() {
 }
 public test bool testNormalAssign() {
 	list[str] expected = [
-		"[2] \<: [$a]",
-		"[2] = integer()",
-		"[$a] \<: [$b]",
-		"[$a] \<: any()", // twice because the variable occurs at two different places
-		"[$a] \<: any()", 
-		"[$b] \<: any()"
+		"[$a] \<: any()", "[$a] \<: any()", "[$b] \<: any()",
+		"[2] \<: [$a]", "[2] = integer()", // assign of int
+		"[$a] \<: [$b]", // assign assign of vars
+		"[$a] \<: [$a = 2]", "[$b] \<: [$b = $a]", // type of full expr is the type of the assignment
+		
+		"[$c] \<: any()", "[$d] \<: any()", "[$b] \<: any()",
+		"[$b] \<: [$d]", "[$d = $b] \<: [$c]",
+		"[$d] \<: [$d = $b]",
+		"[$c] \<: [$c = $d = $b]"
 	];
 	return run("normalAssign", expected);
 }
@@ -303,17 +306,21 @@ public test bool testTernary() {
 		"[true] = boolean()", "[\"string\"] = string()", // true and "string"
 		"or([true ? $b : \"string\"] \<: [\"string\"], [true ? $b : \"string\"] \<: [$b])", // [E] = [E2] OR [E3]
 		"[true ? $b : \"string\"] \<: [$a]", // [E] <: $a
+		"[$a] \<: [$a = true ? $b : \"string\"]", // result of the whole expression is a subtype of $a
 		
 		"[$c] \<: any()", 
 		"[TRUE] = boolean()", "[\"str\"] = string()", // TRUE and "string"
 		"or([TRUE ? : \"str\"] \<: [\"str\"], [TRUE ? : \"str\"] \<: [TRUE])", // [E] = [E1] OR [E3]
 		"[TRUE ? : \"str\"] \<: [$c]", // [E] <: $c
+		"[$c] \<: [$c = TRUE ? : \"str\"]", // result of the whole expression is a subtype of $c
 		
 		"[$d] \<: any()", "[$e] \<: any()", 
 		"[3] = integer()", "[\"l\"] = string()", "[\"r\"] = string()", // 3, "l" and "r"
 		"or([3 ? \"l\" : \"r\"] \<: [\"l\"], [3 ? \"l\" : \"r\"] \<: [\"r\"])", // [E] = [E1] OR [E3]
 		"[3 ? \"l\" : \"r\"] \<: [$e]", // [E] <: $e
-		"[$e] \<: [$d]" // $e <: $d
+		"[$e = 3 ? \"l\" : \"r\"] \<: [$d]", // $e <: $d
+		"[$d] \<: [$d = $e = 3 ? \"l\" : \"r\"]", // result of the whole expression is a subtype of $c
+		"[$e] \<: [$e = 3 ? \"l\" : \"r\"]" // result of the whole expression is a subtype of $c
 	];
 	return run("ternary", expected);
 }
@@ -390,7 +397,9 @@ public test bool testFunction() {
 		"[$a] \<: any()",
 		"[100] \<: [$a]",
 		"[100] = integer()",
-		"[function h() { $a = \"str\"; $a = 100; }] = null()" 
+		"[function h() { $a = \"str\"; $a = 100; }] = null()",
+		"[$a] \<: [$a = \"str\"]",
+		"[$a] \<: [$a = 100]"
 	];
 	return run("function", expected);
 }
