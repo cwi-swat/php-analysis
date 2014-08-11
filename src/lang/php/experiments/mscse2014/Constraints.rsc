@@ -113,7 +113,12 @@ private set[Constraint] getConstraints(ClassDef classDef, M3 m3)
 private void addConstraints(Expr e, M3 m3)
 {
 	top-down-break visit (e) {
-	//| array(list[ArrayElement] items)
+		case a:array(list[ArrayElement] items): {
+			constraints += { eq(typeOf(a@at), arrayType({ typeOf(i.val@at) | i <- items })) };
+			for (arrayElement(OptionExpr key, Expr val, bool byRef) <- items) {
+				addConstraints(val, m3);
+			}
+		}
 	//| fetchArrayDim(Expr var, OptionExpr dim)
 	//| fetchClassConst(NameOrExpr className, Name constantName)
 	//| assign(Expr assignTo, Expr assignExpr)

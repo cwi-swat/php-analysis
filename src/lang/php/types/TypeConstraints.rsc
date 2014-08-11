@@ -20,13 +20,14 @@ data Fact
 	
 data TypeOf 
 	= typeOf(loc ident)
+	| arrayType(set[TypeOf] expressions)
 	//| typeOf(TypeSymbol typeSymbol)
 	;
 
 data Constraint 
 	= eq(TypeOf a, TypeOf t)
-	//| eq(TypeOf a, set[TypeOf] alts)
 	| eq(TypeOf a, TypeSymbol ts)
+	//| eq(TypeOf a, set[TypeOf] alts)
 	//| eq(TypeOf a, set[TypeSymbol] altts)
     | subtyp(TypeOf a, TypeOf t)
     | subtyp(TypeOf a, TypeSymbol ts)

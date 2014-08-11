@@ -26,6 +26,7 @@ public void main()
 	assert true == testComparisonOp();
 	assert true == testLogicalOp();
 	assert true == testCasts();
+	assert true == testArray();
 	assert true == testFunction();
 }
 
@@ -364,6 +365,7 @@ public test bool testLogicalOp() {
 	];
 	return run("logicalOp", expected);
 }
+
 public test bool testComparisonOp() {
 	list[str] expected = [
 		"[$a] \<: any()", "[$b] \<: any()",
@@ -418,6 +420,46 @@ public test bool testCasts() {
 		"[(unset)$k] = null()"
 	];
 	return run("casts", expected);
+}
+
+public test bool testArray() {
+	list[str] expected = [
+		// array(); [];
+		"[array()] = array()",
+		"[[]] = array()",
+		
+		// array("a", "b", "c");
+		"[\"a\"] = string()", "[\"b\"] = string()", "[\"c\"] = string()",
+		"[array(\"a\", \"b\", \"c\")] = array([\"a\"], [\"b\"], [\"c\"])",
+	
+		// array(0, "b", 3.4); 
+		"[0] = integer()", "[\"b\"] = string()", "[3.4] = float()",
+		"[array(0, \"b\", 3.4)] = array([\"b\"], [0], [3.4])",
+		
+		// [0,1,2];
+		"[0] = integer()", "[1] = integer()", "[2] = integer()", 
+		"[[0,1,2]] = array([0], [1], [2])"
+		
+		//"[$a] \<: any()", "[$b] \<: any()", "[$c] \<: any()", "[$d] \<: any()", 
+		//"[$e] \<: any()", "[$f] \<: any()", "[$g] \<: any()", "[$h] \<: any()", 
+		//"[$i] \<: any()", "[$j] \<: any()", "[$k] \<: any()", 
+		//
+		//"[(array)$a] \<: array(any())",
+		//"[(bool)$b] = boolean()",
+		//"[(boolean)$c] = boolean()",
+		//"[(int)$d] = integer()",
+		//"[(integer)$e] = integer()",
+		//"[(float)$f] = float()",
+		//"[(double)$g] = float()",
+		//"[(real)$h] = float()",
+		//
+		//"[(string)$i] = string()",
+		//"if ([$i] \<: object()) then (hasMethod([$i], __tostring))",
+		//
+		//"[(object)$j] \<: object()",
+		//"[(unset)$k] = null()"
+	];
+	return run("array", expected);
 }
 
 public test bool testFunction() {
@@ -519,6 +561,7 @@ private str toStr(conditional(Constraint c, Constraint res)) = "if (<toStr(c)>) 
 private str toStr(hasMethod(TypeOf t, str name))		= "hasMethod(<toStr(t)>, <name>)";
 default str toStr(Constraint c) { throw "Please implement toStr for node :: <c>"; }
 
-private str toStr(typeOf(loc i)) 	= isFile(i) ? "["+readFile(i)+"]" : "[<i>]";
-private str toStr(TypeSymbol t) 	= "<t>";
+private str toStr(typeOf(loc i)) 				= isFile(i) ? "["+readFile(i)+"]" : "[<i>]";
+private str toStr(arrayType(set[TypeOf] expr))	= "array(<intercalate(", ", sort([ toStr(e) | e <- sort(toList(expr))]))>)";
+private str toStr(TypeSymbol t) 				= "<t>";
 default str toStr(TypeOf to) { throw "Please implement toStr for node :: <to>"; }
