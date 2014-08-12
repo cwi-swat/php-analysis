@@ -44,16 +44,20 @@ private void addConstraints(OptionElse::noElse(), M3 m3) {}
 private void addConstraints(OptionElse::someElse(\else(list[Stmt] body)), M3 m3) { addConstraints(body, m3); }
 
 // Wrappers for list[Expr|Stmt]
-private void addConstraints(list[Expr] exprs, M3 m3) { for (e <- exprs) addConstraints(e, m3); }
-private void addConstraints(list[Stmt] stmts, M3 m3) { for (s <- stmts) addConstraints(s, m3); }
+private void addConstraints(list[Expr] exprs, M3 m3)    { for (e <- exprs) addConstraints(e, m3); }
+private void addConstraints(list[Stmt] stmts, M3 m3)    { for (s <- stmts) addConstraints(s, m3); }
 
 
 private void addConstraints(Stmt statement, M3 m3)
 {
 	top-down-break visit (statement) { 
-		case classDef(ClassDef classDef): addConstraints(classDef, m3);
-//	| const(list[Const] consts)
-
+		case classDef(c:class(_, _, _, _, list[ClassItem] members)): {
+			for (m <- members) addConstraints(m, c, m3);
+		}
+		case interfaceDef(i:interface(_, _, list[ClassItem] members)): {
+			for (m <- members) addConstraints(m, i, m3);
+		}
+		
 		// Control structures:
 		// They do not much more than revisting the tree 
 		
@@ -102,66 +106,64 @@ private void addConstraints(Stmt statement, M3 m3)
 			}
 		}
 		
-		// emptyStmt() | empty statement does not have constraints
-		case block(list[Stmt] body): 			addConstraints(body, m3);
 		case \return(OptionExpr returnExpr):	addConstraints(returnExpr, m3);	
 		case exprstmt(Expr expr): 				addConstraints(expr, m3);
 		
+		case f:function(str name, bool byRef, list[Param] params, list[Stmt] body): {
+			addConstraintsOnAllVarsWithinScope(f);
+			addConstraintsOnAllReturnStatementsWithinScope(f);
+			
+			addConstraints(body, m3);
+			// todo add parameters
+		}
+		
+		// These items can be ignored, as they have no constraints or already visited
+		// - emptyStmt() 
+		// - label(str labelName) 
+		// - goto(Name gotoName) 
+		// - block(list[Stmt] body)
+		// - namespace(OptionName nsName, list[Stmt] body)
+		// - namespaceHeader(Name namespaceName)
+		// - use(list[Use] uses) 
+		// - haltCompiler(str remainingText)
+		// - tryCatch(list[Stmt] body, list[Catch] catches)
+		// - tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
+		
+// TODO :: (items below)
+//	| const(list[Const] consts)
 //	| echo(list[Expr] exprs)
-//	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
-	case f:function(str name, bool byRef, list[Param] params, list[Stmt] body): {
-		addConstraintsOnAllVarsWithinScope(f);
-		addConstraintsOnAllReturnStatementsWithinScope(f);
-		
-		for (stmt <- body) addConstraints(stmt, m3);
-		// todo add parameters
-	}
 //	| global(list[Expr] exprs)
-//	| goto(Name gotoName)
-//	| haltCompiler(str remainingText)
 //	| inlineHTML(str htmlText)
-//	| interfaceDef(InterfaceDef interfaceDef)
 //	| traitDef(TraitDef traitDef)
-//	| label(str labelName)
-//	| namespace(OptionName nsName, list[Stmt] body)
-//	| namespaceHeader(Name namespaceName)
 //	| static(list[StaticVar] vars)
-
 //	| \throw(Expr expr)
-		//case tryCatch(list[Stmt] body, list[Catch] catches): {
-		//	for (stmt <- body + catches.body) {
-		//		addConstraints(stmt, m3);
-		//	}
-		//}
-		//
-		//case tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody): {
-		//	for (stmt <- body + catches.body + finalyBody) {
-		//		addConstraints(stmt, m3);
-		//	}
-		//}
-//
 //	| unset(list[Expr] unsetVars)
-		// use(list[Use] uses) | use statment does not have constraints (only on names, which is already handled in m3)
-		
 	}	
 }
 
-private void addConstraints(classDef:ClassDef::class(_, _, _, _, list[ClassItem] members), M3 m3)
+private void addConstraints(ClassItem ci, &T <: node citDef, M3 m3) 
 {
-	// add constraints for all members
-	for (m <- members)	addConstraints(m, classDef, m3);
-	
-	//throw "implement ClassDef";
-	//return constraints;
-}
-
-private void addConstraints(ClassItem ci, ClassDef cd, M3 m3)
-{
+	// Precondition: cit = class/interface/trait
+	assert
+		class(_,_,_,_,_) := citDef || interface(_,_,_) := citDef || trait(_,_) := citDef: 
+		"Precondition failed. citDef must be [classDef|interfaceDef|traitDef]";
+		
 	// handle special keywords:
+	// TODO
 	
 	top-down-break visit (ci) {
 	//= property(set[Modifier] modifiers, list[Property] prop)
-	//| constCI(list[Const] consts)
+		case constCI(list[Const] consts): {
+			for (const:const(str name, Expr constValue) <- consts) {
+				constraints += {
+					eq(typeOf(const@decl), typeOf(const@at)),
+					eq(typeOf(const@at), typeOf(constValue@at))
+				};
+				addConstraints(constValue, m3);
+			}
+					
+		}
+		
 		case m:method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body): {
 			addConstraintsOnAllVarsWithinScope(m);
 			addConstraintsOnAllReturnStatementsWithinScope(m);

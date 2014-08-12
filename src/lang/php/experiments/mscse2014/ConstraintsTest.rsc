@@ -31,6 +31,7 @@ public void main()
 	assert true == testControlStructures();
 	assert true == testFunction();
 	assert true == testClassMethod();
+	assert true == testClassConstant();
 }
 
 public test bool testVariable() {
@@ -669,6 +670,28 @@ public test bool testClassMethod() {
 	];
 	return run("classMethod", expected);
 }
+
+public test bool testClassConstant() {
+	list[str] expected = [
+		// class C1 { const c1 = 100; }
+		"[c1 = 100] = [100]",
+		"[100] = integer()",
+		"[|php+classConstant:///classconstant/c1/c1|] = [c1 = 100]",
+		// class C2 { const c21 = 21, c22 = 22; }
+		"[c21 = 21] = [21]",
+		"[21] = integer()",
+		"[c22 = 22] = [22]",
+		"[22] = integer()",
+		"[|php+classConstant:///classconstant/c2/c21|] = [c21 = 21]",
+		"[|php+classConstant:///classconstant/c2/c22|] = [c22 = 22]",
+		 //interface C3 { const cInterface = "interface constant"; }
+		"[cInterface = \"interface constant\"] = [\"interface constant\"]",
+		"[\"interface constant\"] = string()",
+		"[|php+classConstant:///classconstant/c3/cInterface|] = [cInterface = \"interface constant\"]" 
+	];
+	return run("classConstant", expected);
+}
+
 public bool run(str fileName, list[str] expected)
 {
 	loc l = getFileLocation(fileName);
