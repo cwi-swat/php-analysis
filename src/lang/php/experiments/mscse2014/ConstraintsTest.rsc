@@ -580,7 +580,17 @@ public test bool testClassMethod() {
 		// class C2 { public function m2() { function f1() { return "a"; } return true; } }
 		"[\"a\"] = string()", "[true] = boolean()",
 		"or([public function m2() { function f1() { return \"a\"; } return true; }] = [true])",
-		"or([function f1() { return \"a\"; }] = [\"a\"])"
+		"or([function f1() { return \"a\"; }] = [\"a\"])",
+		
+		// class C3 { public function m3() { $a = 2; function f1() { $a = "a"; } return $a; } }
+		"[$a] \<: any()", "[$a] \<: any()", "[$a] \<: any()", // variables
+		"[2] = integer()", "[\"a\"] = string()",  // int/string
+		"[2] \<: [$a]", "[\"a\"] \<: [$a]", // assignment
+		"[$a] \<: [$a = 2]", "[$a] \<: [$a = \"a\"]", // result of assignment
+		"or([public function m3() { $a = 2; function f1() { $a = \"a\"; } return $a; }] = [$a])", // type of method
+		"[function f1() { $a = \"a\"; }] = null()", // type of function
+		"[|php+methodVar:///ns/c3/m3/a|] = [$a]",
+		"[|php+functionVar:///ns/f1/a|] = [$a]"
 	];
 	return run("classMethod", expected);
 }
