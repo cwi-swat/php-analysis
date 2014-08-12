@@ -119,7 +119,22 @@ private void addConstraints(Expr e, M3 m3)
 				addConstraints(val, m3);
 			}
 		}
-	//| fetchArrayDim(Expr var, OptionExpr dim)
+		case f:fetchArrayDim(Expr var, OptionExpr dim): {
+			// add constraints for var: var is subtype of array(xxx)
+			constraints += { subtyp(typeOf(var@at), array(\any())) };
+			addConstraints(var, m3);
+				
+			constraints += { subtyp(typeOf(f@at), \any()) }; // type of the array fetch...
+			constraints += { 
+				negation(
+					subtyp(typeOf(var@at), object()) 
+				)
+			};
+			
+			if (someExpr(dimExpr) := dim) {
+				addConstraints(dimExpr, m3);
+			}
+		}
 	//| fetchClassConst(NameOrExpr className, Name constantName)
 	//| assign(Expr assignTo, Expr assignExpr)
 		case a:assign(Expr assignTo, Expr assignExpr): {

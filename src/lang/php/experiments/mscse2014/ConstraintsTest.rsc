@@ -438,8 +438,40 @@ public test bool testArray() {
 		
 		// [0,1,2];
 		"[0] = integer()", "[1] = integer()", "[2] = integer()", 
-		"[[0,1,2]] = array([0], [1], [2])"
+		"[[0,1,2]] = array([0], [1], [2])",
 		
+		// $a[0];
+		"[$a[0]] \<: any()", // not very specific!!!
+		"[0] = integer()",
+		"[$a] \<: array(any())",
+		"[$a] \<: any()", 
+		"neg([$a] \<: object())",
+		
+		// $b["def"]
+		"[$b[\"def\"]] \<: any()", // not very specific!!!
+		"[\"def\"] = string()",
+		"[$b] \<: array(any())",
+		"[$b] \<: any()", 
+		"neg([$b] \<: object())",
+		
+		// $c[0][0]
+		"[$c[0][0]] \<: any()",
+		"[0] = integer()", "[0] = integer()",
+		"[$c] \<: array(any())",
+		"[$c] \<: any()", 
+		"[$c[0]] \<: array(any())",
+		"[$c[0]] \<: any()",
+		"neg([$c] \<: object())",
+		"neg([$c[0]] \<: object())",
+		
+		// $d[] = 1;
+		"[$d] \<: array(any())",
+		"[$d] \<: any()", 
+		"[$d[]] \<: any()", 
+		"neg([$d] \<: object())",
+		"[1] = integer()",
+		"[1] \<: [$d[]]",
+		"[$d[]] \<: [$d[] = 1]"
 	];
 	return run("array", expected);
 }
