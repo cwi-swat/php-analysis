@@ -11,6 +11,7 @@ import lang::php::types::core::Constants;
 import lang::php::types::core::Variables;
 
 import IO; // for debuggin
+import String; // for toLowerCase
 
 private set[Constraint] constraints = {};
 
@@ -39,11 +40,9 @@ private void addConstraints(Stmt statement, M3 m3)
 	//set[Constraint] constraints = {};
 
 	//println("Statment :: <statement>");
-	switch(statement) { 
-		case \break(_): ;
-		case classDef(ClassDef classDef): constraints += getConstraints(classDef, m3);
-//	= \break(OptionExpr breakExpr)
-//	| classDef(ClassDef classDef)
+	top-down-break visit (statement) { 
+		//case \break(_): ;
+		case classDef(ClassDef classDef): addConstraints(classDef, m3);
 //	| const(list[Const] consts)
 //	| \continue(OptionExpr continueExpr)
 //	| declare(list[Declaration] decls, list[Stmt] body)
@@ -54,24 +53,11 @@ private void addConstraints(Stmt statement, M3 m3)
 //	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
 //	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
 	case f:function(str name, bool byRef, list[Param] params, list[Stmt] body): {
-		loc functionScope = f@scope[file=name][scheme="php+function"];
+		addConstraintsOnAllVarsWithinScope(f);
+		addConstraintsOnAllReturnStatementsWithinScope(f);
 		
 		for (stmt <- body) addConstraints(stmt, m3);
-	
-		bool isReturnStatementWithinScope(Stmt rs, loc scope) = (\return(_) := rs) && (scope == rs@scope);
-		set[OptionExpr] returnStmts = { rs.returnExpr | rs <- body, isReturnStatementWithinScope(rs, functionScope) };
-		
-		if (!isEmpty(returnStmts)) {
-			// if there are return statements, the disjunction of them is the return value of the function
-			constraints += { 
-				disjunction(
-					{ eq(typeOf(f@at), typeOf(e@at)) | rs <- returnStmts, someExpr(e) := rs }
-					+ { eq(typeOf(f@at), null()) | rs <- returnStmts, noExpr() := rs }
-				)};
-		} else {
-			// no return methods means that the function will always return null (unless an expception is thrown)
-			constraints += { eq(typeOf(f@at), null()) }; 
-		}
+		// todo add parameters
 	}
 //	| global(list[Expr] exprs)
 //	| goto(Name gotoName)
@@ -83,7 +69,9 @@ private void addConstraints(Stmt statement, M3 m3)
 //	| label(str labelName)
 //	| namespace(OptionName nsName, list[Stmt] body)
 //	| namespaceHeader(Name namespaceName)
-//	| \return(OptionExpr returnExpr)
+		case \return(someExpr(returnExpr)): {
+			addConstraints(returnExpr, m3);	
+		}
 //	| static(list[StaticVar] vars)
 //	| \switch(Expr cond, list[Case] cases)
 //	| \throw(Expr expr)
@@ -100,14 +88,29 @@ private void addConstraints(Stmt statement, M3 m3)
 	//return constraints;
 }
 
-private set[Constraint] getConstraints(ClassDef classDef, M3 m3)
+private void addConstraints(classDef:ClassDef::class(_, _, _, _, list[ClassItem] members), M3 m3)
 {
-	set[Constraint] constraints = {};
+	// add constraints for all members
+	for (m <- members)	addConstraints(m, classDef, m3);
 	
-	//	
-	
-	throw "implement ClassDef";
-	return constraints;
+	//throw "implement ClassDef";
+	//return constraints;
+}
+
+private void addConstraints(ClassItem ci, ClassDef cd, M3 m3)
+{
+	top-down-break visit (ci) {
+	//= property(set[Modifier] modifiers, list[Property] prop)
+	//| constCI(list[Const] consts)
+		case m:method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body): {
+			addConstraintsOnAllVarsWithinScope(m);
+			addConstraintsOnAllReturnStatementsWithinScope(m);
+			
+			for (stmt <- body) addConstraints(stmt, m3);
+			// todo params
+		}
+	//| traitUse(list[Name] traits, list[Adaptation] adaptations)
+	}
 }
 
 private void addConstraints(Expr e, M3 m3)
@@ -522,8 +525,18 @@ private void addConstraints(Expr e, M3 m3)
 		
 		}
 		
-	//| new(NameOrExpr className, list[ActualParameter] parameters)
-	//| cast(CastType castType, Expr expr)
+		case n:new(NameOrExpr className, list[ActualParameter] parameters): {
+			if (name(nameNode:name(_)) := className) {
+				// literal class instantiation
+				constraints += { eq(typeOf(n@at), class(u)) | u <- m3@uses[nameNode@at] };
+			} else {
+				// variable class instantiation:
+				addConstraints(className.expr, m3);	
+				constraints += { subtyp(typeOf(n@at), object()) };
+			}	
+			// todo: parameters
+		}
+		
 		case c:cast(CastType castType, Expr expr): {
 			addConstraints(expr, m3);	
 			switch(castType) {
@@ -544,7 +557,13 @@ private void addConstraints(Expr e, M3 m3)
 					};
 			}
 		}
-	//| clone(Expr expr)
+		
+		case c:clone(Expr expr): {
+			addConstraints(expr, m3);	
+			// expression and result are of type clone
+			constraints += { subtyp(typeOf(expr@at), object()) };	
+			constraints += { subtyp(typeOf(c@at), object()) };	
+		}
 	//| closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static)
 		case fc:fetchConst(name(name)): {
 			if (/true/i := name || /false/i := name) {
@@ -597,7 +616,6 @@ private void addConstraints(Expr e, M3 m3)
 	
 		//scalar(Scalar scalarVal)
 		case s:scalar(Scalar scalarVal): {
-			//println("Scalar :: <s>");
 			switch(scalarVal) {
 				case classConstant():		constraints += { eq(typeOf(s@at), string()) };
 				case dirConstant():			constraints += { eq(typeOf(s@at), string()) };
@@ -635,5 +653,28 @@ private void addConstraints(Expr e, M3 m3)
 	//| yield(OptionExpr keyExpr, OptionExpr valueExpr)
 	//| listExpr(list[OptionExpr] listExprs
 	}
+}
+
+public void addConstraintsOnAllVarsWithinScope(&T <: node t) 
+{
+	// get all vars that have @decl annotations (which means that they are writable vars)
+	constraints += { eq(typeOf(v@decl), typeOf(v@at)) | /v:var(_) <- t, v@decl? && v@scope == t@decl };
+}
+
+public void addConstraintsOnAllReturnStatementsWithinScope(&T <: node t) 
+{
+	// get all return statements within a certain scope
+	set[OptionExpr] returnStmts = { expr | /\return(expr) <- t, expr@scope == t@decl };
 	
+	if (!isEmpty(returnStmts)) {
+		// if there are return statements, the disjunction of them is the return value of the function
+		constraints += { 
+			disjunction(
+				{ eq(typeOf(t@at), typeOf(e@at)) | rs <- returnStmts, someExpr(e) := rs }
+				+ { eq(typeOf(t@at), null()) | rs <- returnStmts, noExpr() := rs }
+			)};
+	} else {
+		// no return methods means that the function will always return null (unless an expception is thrown)
+		constraints += { eq(typeOf(t@at), null()) }; 
+	}
 }

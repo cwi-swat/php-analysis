@@ -27,7 +27,9 @@ public void main()
 	assert true == testLogicalOp();
 	assert true == testCasts();
 	assert true == testArray();
+	assert true == testVarious();
 	assert true == testFunction();
+	assert true == testClassMethod();
 }
 
 public test bool testVariable() {
@@ -200,21 +202,26 @@ public test bool testOpAssign() {
 
 public test bool testUnaryOp() {
 	list[str] expected = [
+		// +$a;
 		"[$a] \<: any()",
 		"[+$a] \<: float()", // expression is float or int
 		"neg([$a] \<: array(any()))", // $a is not an array
 		
+		// -$b;
 		"[$b] \<: any()",
 		"[-$b] \<: float()", // expression is float or int
 		"neg([$b] \<: array(any()))", // $b is not an array
 		
+		// !$c;
 		"[$c] \<: any()", 
 		"[!$c] = boolean()", 
-		
+	
+		// ~$d;	
 		"[$d] \<: any()", 
 		"or([$d] = float(), [$d] = integer(), [$d] = string())", 
 		"or([~$d] = integer(), [~$d] = string())", 
 		
+		// $e++;	
 		"[$e] \<: any()",
 		"if ([$e] \<: array(any())) then ([$e++] \<: array(any()))",
 		"if ([$e] = boolean()) then ([$e++] = boolean())",
@@ -224,7 +231,8 @@ public test bool testUnaryOp() {
 		"if ([$e] \<: object()) then ([$e++] \<: object())",
 		"if ([$e] = resource()) then ([$e++] = resource())",
 		"if ([$e] = string()) then (or([$e++] = float(), [$e++] = integer(), [$e++] = string()))",
-		
+	
+		// $f--;	
 		"[$f] \<: any()",
 		"if ([$f] \<: array(any())) then ([$f--] \<: array(any()))",
 		"if ([$f] = boolean()) then ([$f--] = boolean())",
@@ -234,7 +242,8 @@ public test bool testUnaryOp() {
 		"if ([$f] \<: object()) then ([$f--] \<: object())",
 		"if ([$f] = resource()) then ([$f--] = resource())",
 		"if ([$f] = string()) then (or([$f--] = float(), [$f--] = integer(), [$f--] = string()))",
-		
+	
+		// ++$g;	
 		"[$g] \<: any()",
 		"if ([$g] \<: array(any())) then ([++$g] \<: array(any()))",
 		"if ([$g] = boolean()) then ([++$g] = boolean())",
@@ -245,6 +254,7 @@ public test bool testUnaryOp() {
 		"if ([$g] = resource()) then ([++$g] = resource())",
 		"if ([$g] = string()) then (or([++$g] = float(), [++$g] = integer(), [++$g] = string()))",
 		
+		// --$h;
 		"[$h] \<: any()",
 		"if ([$h] \<: array(any())) then ([--$h] \<: array(any()))",
 		"if ([$h] = boolean()) then ([--$h] = boolean())",
@@ -348,18 +358,23 @@ public test bool testTernary() {
 
 public test bool testLogicalOp() {
 	list[str] expected = [
+		// $a and $b;
 		"[$a] \<: any()", "[$b] \<: any()",
 		"[$a and $b] = boolean()",
 		
+		// $c or $d;
 		"[$c] \<: any()", "[$d] \<: any()",
 		"[$c or $d] = boolean()",
 		
+		// $e xor $f;
 		"[$e] \<: any()", "[$f] \<: any()",
 		"[$e xor $f] = boolean()",
 		
+		// $g && $h;
 		"[$g] \<: any()", "[$h] \<: any()",
 		"[$g && $h] = boolean()",
 		
+		// $i || $j;
 		"[$i] \<: any()", "[$j] \<: any()",
 		"[$i || $j] = boolean()"
 	];
@@ -368,30 +383,39 @@ public test bool testLogicalOp() {
 
 public test bool testComparisonOp() {
 	list[str] expected = [
+		// $a < $b;
 		"[$a] \<: any()", "[$b] \<: any()",
 		"[$a \< $b] = boolean()",
 		
+		// $c <= $d;
 		"[$c] \<: any()", "[$d] \<: any()",
 		"[$c \<= $d] = boolean()",
 		
+		// $e > $f;
 		"[$e] \<: any()", "[$f] \<: any()",
 		"[$e \> $f] = boolean()",
 		
+		// $g >= $h;
 		"[$g] \<: any()", "[$h] \<: any()",
 		"[$g \>= $h] = boolean()",
 		
+		// $i == $j;
 		"[$i] \<: any()", "[$j] \<: any()",
 		"[$i == $j] = boolean()",
 		
+		// $k === $l;
 		"[$k] \<: any()", "[$l] \<: any()",
 		"[$k === $l] = boolean()",
 	
+		// $m != $n;
 		"[$m] \<: any()", "[$n] \<: any()",
 		"[$m != $n] = boolean()",
 		
+		// $o <> $p;
 		"[$o] \<: any()", "[$p] \<: any()",
 		"[$o \<\> $p] = boolean()",
 		
+		// $q !== $r;
 		"[$q] \<: any()", "[$r] \<: any()",
 		"[$q !== $r] = boolean()"
 	];
@@ -404,6 +428,7 @@ public test bool testCasts() {
 		"[$e] \<: any()", "[$f] \<: any()", "[$g] \<: any()", "[$h] \<: any()", 
 		"[$i] \<: any()", "[$j] \<: any()", "[$k] \<: any()", 
 		
+		// (cast)$var;	
 		"[(array)$a] \<: array(any())",
 		"[(bool)$b] = boolean()",
 		"[(boolean)$c] = boolean()",
@@ -476,15 +501,46 @@ public test bool testArray() {
 	return run("array", expected);
 }
 
+public test bool testVarious() {
+	list[str] expected = [
+		// $a = clone($b);
+		"[$a] \<: any()", 
+		"[$a] \<: object()", 
+		"[clone($a)] \<: object()",
+		
+		// new ABC();	
+		"[new ABC()] = class(|php+class:///abc|)",
+		// new \DEF();	
+		"[new \\DEF()] = class(|php+class:///def|)",
+		// new \GHI\JKL;	
+		"[new \\GHI\\JKL] = class(|php+class:///ghi/jkl|)",
+		// new MNO\PQR;	
+		"[new MNO\\PQR] = class(|php+class:///qwerty/mno/pqr|)",
+		
+		// new $b();
+		"[$b] \<: any()",
+		"[new $b()] \<: object()"
+	];
+	return run("various", expected);
+}
+
 public test bool testFunction() {
 	list[str] expected = [
+		// function a() {}
 		"[function a() {}] = null()",
+		// function &b() {}
 		"[function &b() {}] = null()",
+		// function c() { return; }
 		"or([function c() { return; }] = null())",
+		// function d() { return true; return false; }
 		"or([function d() { return true; return false; }] = [false], [function d() { return true; return false; }] = [true])",
+		"[false] = boolean()", "[true] = boolean()",
+		// function f() { function g() { return "string"; } }
 		"[function f() { function g() { return \"string\"; } }] = null()",
 		"or([function g() { return \"string\"; }] = [\"string\"])",
+		"[\"string\"] = string()",
 		
+		// function h() { $a = "str"; $a = 100; }
 		"[\"str\"] \<: [$a]",
 		"[\"str\"] = string()",
 		"[$a] \<: any()",
@@ -493,9 +549,40 @@ public test bool testFunction() {
 		"[100] = integer()",
 		"[function h() { $a = \"str\"; $a = 100; }] = null()",
 		"[$a] \<: [$a = \"str\"]",
-		"[$a] \<: [$a = 100]"
+		"[$a] \<: [$a = 100]",
+		"[|php+functionVar:///h/a|] = [$a]",
+		"[|php+functionVar:///h/a|] = [$a]",
+		
+		// function i() { $i = "str"; function j() { $i = 100; } }
+		"[\"str\"] \<: [$i]",
+		"[\"str\"] = string()",
+		"[$i] \<: any()",
+		"[$i] \<: any()",
+		"[100] \<: [$i]",
+		"[100] = integer()",
+		"[function i() { $i = \"str\"; function j() { $i = 100; } }] = null()",
+		"[function j() { $i = 100; }] = null()",
+		"[$i] \<: [$i = \"str\"]",
+		"[$i] \<: [$i = 100]",
+		"[|php+functionVar:///i/i|] = [$i]",
+		"[|php+functionVar:///j/i|] = [$i]"
+		
+		// add constraint on variables
 	];
 	return run("function", expected);
+}
+
+public test bool testClassMethod() {
+	list[str] expected = [
+		// [public function m1() {}] = null()
+		"[public function m1() {}] = null()",
+		
+		// class C2 { public function m2() { function f1() { return "a"; } return true; } }
+		"[\"a\"] = string()", "[true] = boolean()",
+		"or([public function m2() { function f1() { return \"a\"; } return true; }] = [true])",
+		"or([function f1() { return \"a\"; }] = [\"a\"])"
+	];
+	return run("classMethod", expected);
 }
 public bool run(str fileName, list[str] expected)
 {
