@@ -35,22 +35,79 @@ private void addConstraints(Script script, M3 m3)
 	}
 }
 
+// Wrappers for OptionExpr
+private void addConstraints(OptionExpr::noExpr(), M3 m3) {}
+private void addConstraints(OptionExpr::someExpr(Expr e), M3 m3) { addConstraints(e, m3); }
+
+// Wrappers for OptionElse
+private void addConstraints(OptionElse::noElse(), M3 m3) {}
+private void addConstraints(OptionElse::someElse(\else(list[Stmt] body)), M3 m3) { addConstraints(body, m3); }
+
+// Wrappers for list[Expr|Stmt]
+private void addConstraints(list[Expr] exprs, M3 m3) { for (e <- exprs) addConstraints(e, m3); }
+private void addConstraints(list[Stmt] stmts, M3 m3) { for (s <- stmts) addConstraints(s, m3); }
+
+
 private void addConstraints(Stmt statement, M3 m3)
 {
-	//set[Constraint] constraints = {};
-
-	//println("Statment :: <statement>");
 	top-down-break visit (statement) { 
-		//case \break(_): ;
 		case classDef(ClassDef classDef): addConstraints(classDef, m3);
 //	| const(list[Const] consts)
-//	| \continue(OptionExpr continueExpr)
-//	| declare(list[Declaration] decls, list[Stmt] body)
-//	| do(Expr cond, list[Stmt] body)
+
+		// Control structures:
+		// They do not much more than revisting the tree 
+		
+		// Continue | Declare | Break are not handled.
+		// \continue(OptionExpr continueExpr): ; 
+		// declare(list[Declaration] decls, list[Stmt] body) // visit handles this
+		// \break(OptionExpr breakExpr) // > php5.4 $num=4 is not allowed
+		
+		case \if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, OptionElse elseClause): {
+			addConstraints(cond, m3);
+			addConstraints(body, m3);
+			addConstraints([ *ei.cond | ei <- elseIfs ], m3) ;
+			addConstraints([ *ei.body | ei <- elseIfs ], m3) ;
+			addConstraints(elseClause, m3);
+		}
+		
+		case \while(Expr cond, list[Stmt] body): {
+			addConstraints(cond, m3);
+			addConstraints(body, m3);
+		}
+		
+		case do(Expr cond, list[Stmt] body): {
+			addConstraints(cond, m3);
+			addConstraints(body, m3);
+		}
+		
+		case \for(list[Expr] inits, list[Expr] conds, list[Expr] exprs, list[Stmt] body): {
+			addConstraints(inits, m3);
+			addConstraints(conds, m3);
+			addConstraints(exprs, m3);
+			addConstraints(body, m3);
+		}
+		
+		case foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body): {
+			addConstraints(arrayExpr, m3);
+			addConstraints(keyvar, m3);
+			addConstraints(asVar, m3);
+			addConstraints(body, m3);
+		}
+		
+		case \switch(Expr cond, list[Case] cases): {
+			addConstraints(cond, m3);
+			for (Case c <- cases) {
+				addConstraints(c.cond, m3);
+				addConstraints(c.body, m3);
+			}
+		}
+		
+		// emptyStmt() | empty statement does not have constraints
+		case block(list[Stmt] body): 			addConstraints(body, m3);
+		case \return(OptionExpr returnExpr):	addConstraints(returnExpr, m3);	
+		case exprstmt(Expr expr): 				addConstraints(expr, m3);
+		
 //	| echo(list[Expr] exprs)
-		case exprstmt(Expr expr): addConstraints(expr, m3);
-//	| \for(list[Expr] inits, list[Expr] conds, list[Expr] exprs, list[Stmt] body)
-//	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
 //	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
 	case f:function(str name, bool byRef, list[Param] params, list[Stmt] body): {
 		addConstraintsOnAllVarsWithinScope(f);
@@ -62,30 +119,31 @@ private void addConstraints(Stmt statement, M3 m3)
 //	| global(list[Expr] exprs)
 //	| goto(Name gotoName)
 //	| haltCompiler(str remainingText)
-//	| \if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, OptionElse elseClause)
 //	| inlineHTML(str htmlText)
 //	| interfaceDef(InterfaceDef interfaceDef)
 //	| traitDef(TraitDef traitDef)
 //	| label(str labelName)
 //	| namespace(OptionName nsName, list[Stmt] body)
 //	| namespaceHeader(Name namespaceName)
-		case \return(someExpr(returnExpr)): {
-			addConstraints(returnExpr, m3);	
-		}
 //	| static(list[StaticVar] vars)
-//	| \switch(Expr cond, list[Case] cases)
+
 //	| \throw(Expr expr)
-//	| tryCatch(list[Stmt] body, list[Catch] catches)
-//	| tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
+		//case tryCatch(list[Stmt] body, list[Catch] catches): {
+		//	for (stmt <- body + catches.body) {
+		//		addConstraints(stmt, m3);
+		//	}
+		//}
+		//
+		//case tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody): {
+		//	for (stmt <- body + catches.body + finalyBody) {
+		//		addConstraints(stmt, m3);
+		//	}
+		//}
 //
 //	| unset(list[Expr] unsetVars)
-//	| use(list[Use] uses)
-//	| \while(Expr cond, list[Stmt] body)
-//	| emptyStmt()
-//	| block(list[Stmt] body)
+		// use(list[Use] uses) | use statment does not have constraints (only on names, which is already handled in m3)
+		
 	}	
-	
-	//return constraints;
 }
 
 private void addConstraints(classDef:ClassDef::class(_, _, _, _, list[ClassItem] members), M3 m3)
@@ -99,6 +157,8 @@ private void addConstraints(classDef:ClassDef::class(_, _, _, _, list[ClassItem]
 
 private void addConstraints(ClassItem ci, ClassDef cd, M3 m3)
 {
+	// handle special keywords:
+	
 	top-down-break visit (ci) {
 	//= property(set[Modifier] modifiers, list[Property] prop)
 	//| constCI(list[Const] consts)
@@ -134,9 +194,7 @@ private void addConstraints(Expr e, M3 m3)
 				)
 			};
 			
-			if (someExpr(dimExpr) := dim) {
-				addConstraints(dimExpr, m3);
-			}
+			addConstraints(dim, m3);
 		}
 	//| fetchClassConst(NameOrExpr className, Name constantName)
 	//| assign(Expr assignTo, Expr assignExpr)

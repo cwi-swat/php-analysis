@@ -28,6 +28,7 @@ public void main()
 	assert true == testCasts();
 	assert true == testArray();
 	assert true == testVarious();
+	assert true == testControlStructures();
 	assert true == testFunction();
 	assert true == testClassMethod();
 }
@@ -522,6 +523,80 @@ public test bool testVarious() {
 		"[new $b()] \<: object()"
 	];
 	return run("various", expected);
+}
+
+public test bool testControlStructures() {
+	list[str] expected = [
+		// if ($a1) {"10";}
+		"[$a1] \<: any()", "[\"10\"] = string()", 
+		// if ($b1) {"20";} else {"30";}
+		"[$b1] \<: any()", "[\"20\"] = string()", "[\"30\"] = string()", 
+		// if ($c1) {"40";} else if ("50") {$d1;} else {$e1;}
+		// if ($c1) {"40";} elseif ("50") {$d1;} else {$e1;}
+		"[$c1] \<: any()", 		"[$c1] \<: any()", 
+		"[\"40\"] = string()",	"[\"40\"] = string()", 
+		"[\"50\"] = string()",	"[\"50\"] = string()", 
+		"[$d1] \<: any()",		"[$d1] \<: any()", 
+		"[$e1] \<: any()",		"[$e1] \<: any()", 
+		// if ($a2) "11";
+		"[$a2] \<: any()", "[\"11\"] = string()", 
+		// if ($b2) "21"; else "31";
+		"[$b2] \<: any()", "[\"21\"] = string()", "[\"31\"] = string()", 
+		// if ($c2) "41"; else if ("51") $d2; else $e2;
+		"[$c2] \<: any()", "[$d2] \<: any()", "[$e2] \<: any()",
+		"[\"41\"] = string()", "[\"51\"] = string()", 
+		// if ($a1): "12"; endif;
+		"[$a1] \<: any()", "[\"12\"] = string()", 
+		
+		// while($f1) { "60"; }
+		"[$f1] \<: any()", "[\"60\"] = string()", 
+		// while($f2)  "61";
+		"[$f2] \<: any()", "[\"61\"] = string()", 
+		// while ($f3): "62"; endwhile;	
+		"[$f3] \<: any()", "[\"62\"] = string()", 
+		
+		// do { $g1; } while ($h1);
+		"[$g1] \<: any()", "[$h1] \<: any()", 
+		// do $g2; while ($h2);
+		"[$g2] \<: any()", "[$h2] \<: any()", 
+	
+		// for ($i1=0; $i2<10; $i3++) { "70"; }	
+		"[$i1] \<: any()", "[$i2] \<: any()", "[$i3] \<: any()", "[\"70\"] = string()", 
+		// for ($i4; ;$i5) { "71"; }
+		"[$i4] \<: any()", "[$i5] \<: any()", "[\"71\"] = string()", 
+		// for (; ; ) { "72"; }
+		"[\"72\"] = string()", 
+		// for ($i6, $j7; $i8; $j9, $i11, $i12);
+		"[$i6] \<: any()", "[$j7] \<: any()", "[$i8] \<: any()", 
+		"[$j9] \<: any()", "[$i11] \<: any()", "[$i12] \<: any()", 
+		
+		// foreach ($k as $v) foreach ($kk as $vv) "80";
+		"[$k] \<: any()", "[$v] \<: any()", 
+		"[$kk] \<: any()", "[$vv] \<: any()", "[\"80\"] = string()", 
+		// foreach ($arr as $key => $value) { "statement"; }
+		"[$arr] \<: any()", "[$key] \<: any()", "[$value] \<: any()", "[\"statement\"] = string()",
+		// foreach ($array as $element): "81"; endforeach;
+		"[$array] \<: any()", "[$element] \<: any()", "[\"81\"] = string()", 
+	
+		// switch ($l2) { case 10; case "1str": "string"; break; default: "def"; }
+		"[$l2] \<: any()", "[10] = integer()", 
+		"[\"1str\"] = string()", "[\"string\"] = string()", "[\"def\"] = string()", 
+		// switch ($l2): case 20: "zero2"; break; case "2str": "string"; break; default: "def"; endswitch;	
+		"[$l2] \<: any()", "[20] = integer()", "[\"2str\"] = string()",
+		"[\"zero2\"] = string()", "[\"string\"] = string()", "[\"def\"] = string()", 
+		
+		// declare(ticks=1) { $m; }
+		"[$m] \<: any()",
+		
+		// goto a; 'Foo';  a: 'Bar';
+		"[\'Foo\'] = string()", "[\'Bar\'] = string()",
+		
+		// try { $n1; } catch (\Exception $e) { $n2; };
+		"[$n1] \<: any()", "[$n2] \<: any()",
+		// try { $n3; } catch (\Exception $e) { $n4; } finally { $n5; };
+		"[$n3] \<: any()", "[$n4] \<: any()", "[$n5] \<: any()"
+	];
+	return run("controlStructures", expected);
 }
 
 public test bool testFunction() {
