@@ -182,3 +182,6 @@ public loc getNamespace(loc name)
 	
 	return |php+namespace:///<namespacePath>|;
 }
+
+
+public set[TypeSymbol] getTypesForExpression(M3 m3, &T <: node e) = m3@types[e@at];

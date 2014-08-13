@@ -33,6 +33,8 @@ public void main()
 	assert true == testClassMethod();
 	assert true == testClassConstant();
 	assert true == testClassProperty();
+	assert true == testClassKeywords();
+	assert true == testMethodCall();
 }
 
 public test bool testVariable() {
@@ -642,9 +644,26 @@ public test bool testFunction() {
 		"[$i] \<: [$i = \"str\"]",
 		"[$i] \<: [$i = 100]",
 		"[|php+functionVar:///i/i|] = [$i]",
-		"[|php+functionVar:///j/i|] = [$i]"
+		"[|php+functionVar:///j/i|] = [$i]",
+	
+		// if (true) { function k() { $k1; } } else { function k() { $k2; } }	
+		"[$k1] \<: any()",
+		"[$k2] \<: any()",
+		"[function k() { $k1; }] = null()",
+		"[function k() { $k2; }] = null()",
+		"[true] = boolean()",
 		
-		// add constraint on variables
+		// a();	
+		"[a()] \<: [|php+function:///a|]",
+		// b();
+		"[b()] \<: [|php+function:///b|]",
+		// x(); // function does not exist
+		"[x()] \<: [|php+function:///x|]",
+		
+		//$x(); // variable call
+		"[$x()] \<: any()",
+		"or([$x] \<: object(), [$x] = string())",
+		"if ([$x] \<: object()) then (hasMethod([$x], __invoke))"
 	];
 	return run("function", expected);
 }
@@ -714,12 +733,50 @@ public test bool testClassProperty() {
 	return run("classProperty", expected);
 }
 
+public test bool testClassKeywords() {
+	// information is retreived from m3, declares in uses
+	list[str] expected = [
+		// public function se() { self::foo(); }
+		"[public function se() { self::foo(); }] = null()",
+		// public function pa() { parent::foo(); }
+		"[public function pa() { parent::foo(); }] = null()",
+		// public function st() { static::foo(); }	
+		"[public function st() { static::foo(); }] = null()",
+		"[self] = class(|php+class:///ns/c|)",
+		//"[self::foo()] = null()",
+		"or([parent] = class(|php+class:///ns/p|))",
+		//"[parent::foo()] = null()",
+		"or([static] = class(|php+class:///ns/c|), [static] = class(|php+class:///ns/p|))"
+		//"[static::foo()] = null()",
+    ];
+	return run("classKeywords", expected);
+}
+
+public test bool testMethodCall() {
+	// information is retreived from m3, declares in uses
+	list[str] expected = [
+		// public function se() { self::foo(); }
+		"[public function se() { self::foo(); }] = null()",
+		// public function pa() { parent::foo(); }
+		"[public function pa() { parent::foo(); }] = null()",
+		// public function st() { static::foo(); }	
+		"[public function st() { static::foo(); }] = null()",
+		"[self] = class(|php+class:///ns/c|)",
+		//"[self::foo()] = null()",
+		"or([parent] = class(|php+class:///ns/p|))",
+		//"[parent::foo()] = null()",
+		"or([static] = class(|php+class:///ns/c|), [static] = class(|php+class:///ns/p|))"
+		//"[static::foo()] = null()",
+    ];
+	return run("methodCall", expected);
+}
+
 public bool run(str fileName, list[str] expected)
 {
 	loc l = getFileLocation(fileName);
 	
 	System system = getSystem(l, false);
-	resetModifiedSystem();
+	resetModifiedSystem(); // this is only needed for the tests
 	M3 m3 = getM3ForSystem(system, false);
 	system = getModifiedSystem();
 

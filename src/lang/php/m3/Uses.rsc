@@ -210,9 +210,6 @@ public M3 calculateUsesAfterTypes(M3 m3, Script script)
     return m3;
 }
 
-// move to types?
-public set[TypeSymbol] getTypesForExpression(M3 m3, Expr e) = m3@types[e@at];
-
 public M3 addUse(M3 m3, NameOrExpr nameOrExpr, str \type)
 {
     return addUse(m3, nameOrExpr@at, toString(nameOrExpr), \type, nameOrExpr@scope);

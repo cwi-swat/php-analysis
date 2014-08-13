@@ -33,7 +33,8 @@ data Constraint
     | subtyp(TypeOf a, TypeSymbol ts)
     //| subtyp(TypeOf a, set[TypeOf] alts)
     //| subtyp(TypeOf a, set[TypeSymbol] altts)
-    
+   
+   	// query the m3 to solve these 
     | hasMethod(TypeOf a, str name)
     
     | conditional(Constraint preCondition, Constraint result)
