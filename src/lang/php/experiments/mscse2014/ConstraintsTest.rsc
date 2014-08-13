@@ -32,6 +32,7 @@ public void main()
 	assert true == testFunction();
 	assert true == testClassMethod();
 	assert true == testClassConstant();
+	assert true == testClassProperty();
 }
 
 public test bool testVariable() {
@@ -690,6 +691,27 @@ public test bool testClassConstant() {
 		"[|php+classConstant:///classconstant/c3/cInterface|] = [cInterface = \"interface constant\"]" 
 	];
 	return run("classConstant", expected);
+}
+
+public test bool testClassProperty() {
+	list[str] expected = [
+		// class cl1 { public $pub1; public $pub2 = 2; }
+		"[2] = integer()",
+		"[$pub2 = 2] = [2]",
+		"[|php+field:///randomnamespace/cl1/pub1|] = [$pub1]",
+		"[|php+field:///randomnamespace/cl1/pub2|] = [$pub2 = 2]",
+		// class cl2 { private $priv1; private $priv2 = 2; }
+		"[2] = integer()",
+		"[$priv2 = 2] = [2]",
+		"[|php+field:///randomnamespace/cl2/priv1|] = [$priv1]",
+		"[|php+field:///randomnamespace/cl2/priv2|] = [$priv2 = 2]",
+		// class cl3 { protected $pro1; protected $pro2 = 2; }
+		"[2] = integer()",
+		"[$pro2 = 2] = [2]",
+		"[|php+field:///randomnamespace/cl3/pro1|] = [$pro1]",
+		"[|php+field:///randomnamespace/cl3/pro2|] = [$pro2 = 2]"
+	];
+	return run("classProperty", expected);
 }
 
 public bool run(str fileName, list[str] expected)

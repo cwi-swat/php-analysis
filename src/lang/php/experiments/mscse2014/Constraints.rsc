@@ -128,12 +128,12 @@ private void addConstraints(Stmt statement, M3 m3)
 		// - haltCompiler(str remainingText)
 		// - tryCatch(list[Stmt] body, list[Catch] catches)
 		// - tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
+		// - inlineHTML(str htmlText)
 		
 // TODO :: (items below)
 //	| const(list[Const] consts)
 //	| echo(list[Expr] exprs)
 //	| global(list[Expr] exprs)
-//	| inlineHTML(str htmlText)
 //	| traitDef(TraitDef traitDef)
 //	| static(list[StaticVar] vars)
 //	| \throw(Expr expr)
@@ -141,18 +141,28 @@ private void addConstraints(Stmt statement, M3 m3)
 	}	
 }
 
-private void addConstraints(ClassItem ci, &T <: node citDef, M3 m3) 
+private void addConstraints(ClassItem ci, &T <: node parentNode, M3 m3) 
 {
 	// Precondition: cit = class/interface/trait
 	assert
-		class(_,_,_,_,_) := citDef || interface(_,_,_) := citDef || trait(_,_) := citDef: 
-		"Precondition failed. citDef must be [classDef|interfaceDef|traitDef]";
+		class(_,_,_,_,_) := parentNode || interface(_,_,_) := parentNode || trait(_,_) := parentNode: 
+		"Precondition failed. parentNode must be [classDef|interfaceDef|traitDef]";
 		
-	// handle special keywords:
+	// handle special keywords $this | static | parent:
 	// TODO
 	
 	top-down-break visit (ci) {
-	//= property(set[Modifier] modifiers, list[Property] prop)
+		case property(set[Modifier] modifiers, list[Property] prop): {
+			for (p:property(str propertyName, OptionExpr defaultValue) <- prop) {
+				constraints += { eq(typeOf(p@decl), typeOf(p@at)) };
+				
+				if (someExpr(e) := defaultValue) {
+					addConstraints(e, m3);
+					constraints += { eq(typeOf(p@at), typeOf(e@at)) };
+				}
+			}
+		}
+		
 		case constCI(list[Const] consts): {
 			for (const:const(str name, Expr constValue) <- consts) {
 				constraints += {
