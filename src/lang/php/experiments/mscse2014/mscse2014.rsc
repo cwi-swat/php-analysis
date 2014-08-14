@@ -16,7 +16,7 @@ import lang::php::m3::Declarations;
 import lang::php::m3::Containment;
 import lang::php::pp::PrettyPrinter;
 import lang::php::types::TypeSymbol;
-//import lang::php::types::TypeConstraints;
+import lang::php::types::TypeConstraints;
 
 import lang::php::experiments::mscse2014::Constraints;
 
@@ -28,23 +28,44 @@ loc projectLocation = |file:///PHPAnalysis/systems/Kohana|;
 loc cacheFolder = |file:///Users/ruud/tmp/m3/|;
 loc firstM3CacheFile = cacheFolder + "first_m3_<projectLocation.file>.txt";
 loc finalM3CacheFile = cacheFolder + "final_m3_<projectLocation.file>.txt";
+
+loc lastM3CacheFile = cacheFolder + "last_m3_<projectLocation.file>.txt";
+loc lastSystemCacheFile = cacheFolder + "last_system_<projectLocation.file>.txt";
 //loc projectLocation = |file:///Users/ruud/test/types|;
 
-public void run() {
-	bool useCache = true;
+public void run1() {
+	bool useCache = false;
 	logMessage("Get system...", 1);
 	System system = getSystem(projectLocation, useCache);
 	M3 m3 = getM3ForSystem(system, useCache);
 	system = getModifiedSystem(); // for example the script is altered with scope information
-
-// all the needed 'facts' are already in the M3.
-//	logMessage("Gathering facts", 1);
-//	TypeFacts facts = getFacts(globalM3, system);
+	m3 = calculateAfterM3Creation(m3, system);
 
 	logMessage("Fill subtype relation...", 1);
 	rel[TypeSymbol, TypeSymbol] subTypeRelations = getSubTypes(m3, system);
+
+	logMessage("Writing system and m3 to filesystem", 1);	
+	writeTextValueFile(lastM3CacheFile, m3);
+	writeTextValueFile(lastSystemCacheFile, system);
 	
+	logMessage("M3 and System are written to the file system. Please run run2() now.",1);
+}
+public void run2() {
+	// add precondition that the files exist	
+	
+	logMessage("Reading system from cache...", 1);
+	System system = readTextValueFile(#System, lastSystemCacheFile);
+	logMessage("Reading M3 from cache...", 1);
+	M3 m3 = readTextValueFile(#M3, lastM3CacheFile);
+	logMessage("Reading done.", 1);
+
+	logMessage("Get constraints for system", 1);
 	set[Constraint] constraints = getConstraints(system, m3);
+	
+	logMessage("Yay. You have <size(constraints)> constraints collected!", 1);
+	logMessage("Writing contraints to the file system", 1);
+	writeTextValueFile(lastConstraintsCacheFile, constraints);
+	logMessage("Writing done. Now please run run3() (once it is created...), 1");
 
 	// find illegal subtype relations
 	//globalM3 = calculateAfterM3Creation(globalM3, system);
@@ -65,6 +86,11 @@ public void run() {
 	//iprintln(globalM3@constructors);
 	//iprintln(globalM3@modifiers);
 	//iprintln(size(globalM3@modifiers));
+}
+
+public void run3()
+{
+
 }
 
 private M3 getM3ForSystem(System system, bool useCache)
