@@ -286,3 +286,16 @@ public M3 addVarDecl(M3 m3, node n, node parent) {
 	}
 	return decl;
 }
+
+// Clone detected!! This method is similar to method getClassOrInterface.
+@memo public bool inClassOrInterface(rel[loc from, loc to] containment, loc decl) {
+	containment = invert(containment);
+	solve(decl) {
+		if (!isClass(decl) && !isInterface(decl)) {
+			if (size(containment[decl]) != 1) 
+				return false; // some error occured, not inside a class
+			decl = getOneFrom(containment[decl]);	
+		}
+	}
+	return isClass(decl) || isInterface(decl);
+}

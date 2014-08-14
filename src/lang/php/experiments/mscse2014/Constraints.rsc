@@ -25,6 +25,9 @@ public set[Constraint] getConstraints(System system, M3 m3)
 		addConstraints(system[s], m3);
 	}	
 	
+	// add constraints for all declarations?
+	// eq(@decl = @at)
+	
 	return constraints;
 }
 
@@ -723,7 +726,7 @@ private void addConstraints(Expr e, M3 m3)
 			if (name(Name name) := funName) {
 				// literal name is resolved in uses and can be found in @uses
 				// get all locations for the function decl
-				constraints += { subtyp(typeOf(c@at), typeOf(funcDecl)) | funcDecl <- m3@uses[name@at] };
+				constraints += { subtyp(typeOf(c@at), typeOf(funcDecl)) | funcDecl <- (m3@uses o m3@declarations)[name@at] };
 			} else if (expr(Expr expr) := funName) {
 				// method call on an expression:
 				// type of this expression is either a string, or an object with the method __invoke()
@@ -741,46 +744,110 @@ private void addConstraints(Expr e, M3 m3)
 	//| methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters)
 	case sc:staticCall(NameOrExpr staticTarget, NameOrExpr methodName, list[ActualParameter] parameters): {
 		// handle class names
+		constraints += { subtyp(typeOf(staticTarget@at), object()) };
+		
+		bool inClass = inClassOrInterface(m3@containment, sc@scope);
+		set[Constraint] inClassConstraints = {};
+	
+		// first add constraints for when this call is performed from within a class
+		if (inClass) {		
+			loc currentClass = getClassOrInterface(m3@containment, sc@scope);
+			set[loc] parentClasses = range(domainR(m3@extends+, {currentClass}));
+		
+			switch (staticTarget) // borrowed this structure of Uses.rsc
+			{
+				// refers to the class itself
+				case name(name(/self/i)): 
+				{
+					constraints += { eq(typeOf(staticTarget@at), class(currentClass)) };
+				}
+				
+				// refers to all parents
+				case name(name(/parent/i)): 
+				{	
+					constraints += {
+						disjunction({
+							eq(typeOf(staticTarget@at), class(p)) | p <- parentClasses
+						})
+					};
+		       	}
+		       	 
+				// refers to the instance 
+				case name(name(/static/i)): 
+				{
+					constraints += {
+						disjunction({
+							eq(typeOf(staticTarget@at), class(p)) | p <- {currentClass} + parentClasses
+						})
+					};
+				}
+				
+				// staticTarget is a literal name
+				case name(lhsName): 
+				{
+					// when called from within a class add:
+					// - [E1] = this class hasMethod(E2.name, !static)
+					// - [E1] = parent class hasMethod(E2.name, (public or protected) AND !static) 
+					
+					// RHS == literal string
+					if (name(rhsName) := methodName) {
+						inClassConstraints += {
+							conditional( // if LHS is same as the current class,
+								eq(typeOf(staticTarget@at), class(currentClass)),
+								hasProperty(typeOf(staticTarget@at), rhsName.name, { notAllowed(static()) })
+							);	
+						}
+					}
+				}
+				
+				case expr(expr): // staticTarget is an expression, resolve to all classes 
+				{
+					;
+				}
+			}
+		}			
+
 		switch (staticTarget) // borrowed this structure of Uses.rsc
 		{
-			case name(name(/self/i)): // refers to the class itself
+			case name(name): 
 			{
-				loc currentClass = getClassOrInterface(m3@containment, sc@scope);
-				constraints += { eq(typeOf(staticTarget@at), class(currentClass)) };
-			}
-			
-			case name(name(/parent/i)): // refers to all parents
-			{
-				loc currentClass = getClassOrInterface(m3@containment, sc@scope);
-	   			set[loc] parentClasses = range(domainR(m3@extends+, {currentClass}));
-				constraints += {
-					disjunction({
-						eq(typeOf(staticTarget@at), class(p)) | p <- parentClasses
-					})
-				};
-	       	}
-	       	 
-			case name(name(/static/i)): // refers to the instance 
-			{
-				loc currentClass = getClassOrInterface(m3@containment, sc@scope);
-	   			set[loc] parentClasses = range(domainR(m3@extends+, {currentClass}));
-				constraints += {
-					disjunction({
-						eq(typeOf(staticTarget@at), class(p)) | p <- {currentClass} + parentClasses
-					})
-				};
-			}
-			
-			case name(name): // staticTarget is a literal name
-			{
+				// staticTarget is a literal name, which means that we can directly add the class
+				constraints += { subtyp(typeOf(staticTarget@at), typeOf(classLoc)) | classLoc <- (m3@uses o m3@declarations)[staticTarget@at] };
+				
+				// PRECONDITION: RHS = literal name, add if statement
+				if (name(rhsName) := methodName) {
+					// methodName resolves to the method itself...
+					constraints += { isMethodName(typeOf(methodName@at), rhsName.name) };
+					// type of whole expression is the return type of the invoked method;
+					constraints += { subtyp(typeOf(sc@at), typeOf(methodName@at)) };
+					
 				;
-				// todo
-				//m3@uses += { <staticTarget@at, nameToLoc(name, t)> | t <- ["class", "interface"] };
+					//if (inClass) {
+						//set[Constraint] inClassConstraints = {};
+					//}
+					// rules:
+					// - [E1] = this class hasMethod(E2.name, !static)
+					// - [E1] = parent class hasMethod(E2.name, (public or protected) AND !static) 
+					// - [E1] = any class hasMethod(E2.name, public AND !static)
+					
+					//constraints += {
+					//	disjunction({
+					//		hasMethod(typeOf(staticTarget@at), rhsName.name, { required({ static() }) })
+					//		//,
+					//		//parentHas(hasMethod(typeOf(staticTarget@at), name.name, { required({ static() }) }))
+					//	})
+					//};
+				} else {
+					println("Variable call not supported (yet), please implement!!");	
+				}
+				
+				//public data Modifier = \public() | \private() | protected() | static() | abstract() | final();
 			}
 			
 			case expr(expr): // staticTarget is an expression, resolve to all classes 
 			{
-				;
+				addConstraints(expr, m3);
+				constraints += { subtyp(typeOf(expr@at), object()); };
 				// todo
 				//m3@uses += { <staticTarget@at, t> | t <- classes(m3) + interfaces(m3) };
 			}

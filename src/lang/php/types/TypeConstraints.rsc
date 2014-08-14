@@ -35,7 +35,9 @@ data Constraint
     //| subtyp(TypeOf a, set[TypeSymbol] altts)
    
    	// query the m3 to solve these 
+    | isMethodName(TypeOf a, str name)
     | hasMethod(TypeOf a, str name)
+    | hasMethod(TypeOf a, str name, set[ModifierConstraint] modifiers)
     
     | conditional(Constraint preCondition, Constraint result)
     | disjunction(set[Constraint] constraints)
@@ -43,6 +45,11 @@ data Constraint
     | conjunction(set[Constraint] constraints) 
     | negation(Constraint constraint) 
     ;
+    
+data ModifierConstraint
+	= required(set[Modifier] modifiers)
+	| notAllowed(set[Modifier] modifiers)
+	;
 
 data TypeSet
 	= Universe()

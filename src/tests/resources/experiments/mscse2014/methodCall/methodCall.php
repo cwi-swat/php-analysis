@@ -1,7 +1,8 @@
 <?php
 
-$a->b();
-//$c::d();
+class C { public static function d() {} }
+c::d();
+//$a->b();
 
 // variable calls
 //$a->$b();

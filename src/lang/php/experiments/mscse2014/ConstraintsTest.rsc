@@ -9,7 +9,7 @@ import Set; // toList
 import List; // sort
 
 loc getFileLocation(str name) = analysisLoc + "/src/tests/resources/experiments/mscse2014/<name>/";
-loc getFileLocationFull(str name) = getFileLocation(name) + "/<name>.php";
+//loc getFileLocationFull(str name) = getFileLocation(name) + "/<name>.php";
 
 public void main()
 {
@@ -33,8 +33,8 @@ public void main()
 	assert true == testClassMethod();
 	assert true == testClassConstant();
 	assert true == testClassProperty();
-	assert true == testClassKeywords();
 	assert true == testMethodCall();
+	assert true == testClassKeywords();
 }
 
 public test bool testVariable() {
@@ -654,11 +654,11 @@ public test bool testFunction() {
 		"[true] = boolean()",
 		
 		// a();	
-		"[a()] \<: [|php+function:///a|]",
+		"[a()] \<: [function a() {}]",
 		// b();
-		"[b()] \<: [|php+function:///b|]",
+		"[b()] \<: [function &b() {}]",
 		// x(); // function does not exist
-		"[x()] \<: [|php+function:///x|]",
+		// no constraints.... function does not exists
 		
 		//$x(); // variable call
 		"[$x()] \<: any()",
@@ -738,16 +738,16 @@ public test bool testClassKeywords() {
 	list[str] expected = [
 		// public function se() { self::foo(); }
 		"[public function se() { self::foo(); }] = null()",
+		"[self] = class(|php+class:///ns/c|)",
+		"or(hasMethod([self], foo, { static() }))",
 		// public function pa() { parent::foo(); }
 		"[public function pa() { parent::foo(); }] = null()",
+		"or([parent] = class(|php+class:///ns/p|))",
+		"or(hasMethod([parent], foo, { static() }))",
 		// public function st() { static::foo(); }	
 		"[public function st() { static::foo(); }] = null()",
-		"[self] = class(|php+class:///ns/c|)",
-		//"[self::foo()] = null()",
-		"or([parent] = class(|php+class:///ns/p|))",
-		//"[parent::foo()] = null()",
-		"or([static] = class(|php+class:///ns/c|), [static] = class(|php+class:///ns/p|))"
-		//"[static::foo()] = null()",
+		"or([static] = class(|php+class:///ns/c|), [static] = class(|php+class:///ns/p|))",
+		"or(hasMethod([static], foo, { static() }))"
     ];
 	return run("classKeywords", expected);
 }
@@ -755,18 +755,18 @@ public test bool testClassKeywords() {
 public test bool testMethodCall() {
 	// information is retreived from m3, declares in uses
 	list[str] expected = [
-		// public function se() { self::foo(); }
-		"[public function se() { self::foo(); }] = null()",
-		// public function pa() { parent::foo(); }
-		"[public function pa() { parent::foo(); }] = null()",
-		// public function st() { static::foo(); }	
-		"[public function st() { static::foo(); }] = null()",
-		"[self] = class(|php+class:///ns/c|)",
-		//"[self::foo()] = null()",
-		"or([parent] = class(|php+class:///ns/p|))",
-		//"[parent::foo()] = null()",
-		"or([static] = class(|php+class:///ns/c|), [static] = class(|php+class:///ns/p|))"
-		//"[static::foo()] = null()",
+		// $a->b();
+		//"[$a] \<: any()",
+		//"or(hasMethod([$a], b, { !static() })",
+		
+		// c::d(); // static call of (static) method d off class c
+		"[c] \<: object()",
+		"[c] \<: [class C { public static function d() {} }]",
+		"[public static function d() {}] = null()",
+		//"or(hasMethod([$c], d, { static() })",
+		// if LHS is of type: current class -> 
+		// if LHS is of one of the parent classes ->
+		""
     ];
 	return run("methodCall", expected);
 }
@@ -779,6 +779,7 @@ public bool run(str fileName, list[str] expected)
 	resetModifiedSystem(); // this is only needed for the tests
 	M3 m3 = getM3ForSystem(system, false);
 	system = getModifiedSystem();
+	m3 = calculateAfterM3Creation(m3, system);
 
 	set[Constraint] actual = getConstraints(system, m3);
 
@@ -822,10 +823,14 @@ private bool comparePrettyPrinted(list[str] expected, set[Constraint] actual)
 
 private void printResult(str fileName, list[str] expected, set[Constraint] actual)
 {
-	println();
-	println("----------File Content: <fileName>----------");
-	println(readFile(getFileLocationFull(fileName)));
-	println();
+	loc l = getFileLocation(fileName);
+	
+	for (f <- l.ls) {
+		println();
+		println("----------File Content: <f>----------");
+		println(readFile(f));
+		println();
+	}
 	println("---------------- Actual: -------------------");
 	for (a <- actual) println(toStr(a));
 	println("--------------------------------------------");
@@ -846,10 +851,15 @@ private str toStr(exclusiveDisjunction(set[Constraint] cs))	= "xor(<intercalate(
 private str toStr(conjunction(set[Constraint] cs))		= "and(<intercalate(", ", sort([ toStr(c) | c <- sort(toList(cs))]))>)";
 private str toStr(negation(Constraint c)) 				= "neg(<toStr(c)>)";
 private str toStr(conditional(Constraint c, Constraint res)) = "if (<toStr(c)>) then (<toStr(res)>)";
-private str toStr(hasMethod(TypeOf t, str name))		= "hasMethod(<toStr(t)>, <name>)";
+private str toStr(isMethodName(TypeOf t, str n))		= "isMethodName(<toStr(t)>, <n>)";
+private str toStr(hasMethod(TypeOf t, str n))			= "hasMethod(<toStr(t)>, <n>)";
+private str toStr(hasMethod(TypeOf t, str n, set[ModifierConstraint] mcs))	= "hasMethod(<toStr(t)>, <n>, { <intercalate(", ", sort([ toStr(mc) | mc <- sort(toList(mcs))]))> })";
+private str toStr(required(set[Modifier] mfs))			= "<intercalate(", ", sort([ toStr(mf) | mf <- sort(toList(mfs))]))>";
+private str toStr(notAllowed(set[Modifier] mfs))		= "<intercalate(", ", sort([ "!"+toStr(mf) | mf <- sort(toList(mfs))]))>";
 default str toStr(Constraint c) { throw "Please implement toStr for node :: <c>"; }
 
 private str toStr(typeOf(loc i)) 				= isFile(i) ? "["+readFile(i)+"]" : "[<i>]";
 private str toStr(arrayType(set[TypeOf] expr))	= "array(<intercalate(", ", sort([ toStr(e) | e <- sort(toList(expr))]))>)";
 private str toStr(TypeSymbol t) 				= "<t>";
+private str toStr(Modifier m) 					= "<m>";
 default str toStr(TypeOf to) { throw "Please implement toStr for node :: <to>"; }

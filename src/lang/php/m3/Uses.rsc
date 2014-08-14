@@ -307,8 +307,8 @@ private M3 addUseClassItem(M3 m3, NameOrExpr className, NameOrExpr itemName, loc
 		// some call on an expression
 		case expr(e): 
 		{ 
-			println("Adding expressions:");
-			println({ <lhs, |php+unresolved+<\type>:///|> | lhs <- [itemName@at,at] });
+			//println("Adding expressions:");
+			//println({ <lhs, |php+unresolved+<\type>:///|> | lhs <- [itemName@at,at] });
 			m3@uses += { <lhs, |php+unresolved+<\type>:///|> | lhs <- [itemName@at,at] };
 		}
 	}

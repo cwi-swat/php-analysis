@@ -77,17 +77,19 @@ private M3 createM3forScript(loc filename, Script script)
 }
 
 public M3 calculateAfterM3Creation(M3 m3, System system) 
-{
-	m3 = fillM3Constructors(m3); // all classes with a constructor will be added
-	
+{ 
 	// todo, add these predefined classes as scripts and run them through createM3forScript
+	// tood: also add function like this
 	m3 = addPredefinedDeclarations(m3);
+	
+	for (l <- system)
+		m3 = calculateUsesAfterTypes(m3, system[l]);
 	
 	// todo enable this!
 	//m3 = resolveTypes(m3, system);
 	
-	logMessage("propagateUsesForUnresolvedItems", 2);
-	m3 = propagateUsesForUnresolvedItems(m3);
+	//logMessage("propagateUsesForUnresolvedItems", 2);
+	//m3 = propagateUsesForUnresolvedItems(m3);
 	
 	return m3;
 }
