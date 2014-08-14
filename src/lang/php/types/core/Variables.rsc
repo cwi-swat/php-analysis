@@ -7,19 +7,19 @@ import lang::php::types::TypeSymbol;
 
 public map[str, TypeSymbol] predefinedVariables =
 (
-	"argc": integer(),
-	"argv": array(string()),
-	"_COOKIE": array(\any()),
-	"_ENV": array(\any()),
-	"_FILES": array(\any()),
-	"_GET": array(\any()),
-	"GLOBALS": array(\any()),
-	"_REQUEST": array(\any()),
-	"_POST": array(\any()),
-	"_SERVER": array(\any()),
-	"_SESSION": array(\any()),
+	"argc": integerType(),
+	"argv": arrayType(stringType()),
+	"_COOKIE": arrayType(\any()),
+	"_ENV": arrayType(\any()),
+	"_FILES": arrayType(\any()),
+	"_GET": arrayType(\any()),
+	"GLOBALS": arrayType(\any()),
+	"_REQUEST": arrayType(\any()),
+	"_POST": arrayType(\any()),
+	"_SERVER": arrayType(\any()),
+	"_SESSION": arrayType(\any()),
 
-	"php_errormsg": string(),
-	"HTTP_RAW_POST_DATA": array(string()),
-	"http_response_header": array(string())
+	"php_errormsg": stringType(),
+	"HTTP_RAW_POST_DATA": arrayType(stringType()),
+	"http_response_header": arrayType(stringType())
 );

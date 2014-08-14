@@ -12,6 +12,7 @@ import lang::php::types::core::Variables;
 
 import IO; // for debuggin
 import String; // for toLowerCase
+import Set; // for isEmpty
 
 private set[Constraint] constraints = {};
 
@@ -202,14 +203,14 @@ private void addConstraints(Expr e, M3 m3)
 			}
 		}
 		case f:fetchArrayDim(Expr var, OptionExpr dim): {
-			// add constraints for var: var is subtype of array(xxx)
-			constraints += { subtyp(typeOf(var@at), array(\any())) };
+			// add constraints for var: var is subtype of arrayType(xxx)
+			constraints += { subtyp(typeOf(var@at), arrayType(\any())) };
 			addConstraints(var, m3);
 				
 			constraints += { subtyp(typeOf(f@at), \any()) }; // type of the array fetch...
 			constraints += { 
 				negation(
-					subtyp(typeOf(var@at), object()) 
+					subtyp(typeOf(var@at), objectType()) 
 				)
 			};
 			
@@ -230,32 +231,32 @@ private void addConstraints(Expr e, M3 m3)
 			addConstraints(assignExpr, m3);
 			
 			switch(operation) {
-				case bitwiseAnd():	constraints += { eq(typeOf(assignTo@at), integer()) }; 
-				case bitwiseOr():	constraints += { eq(typeOf(assignTo@at), integer()) }; 
-				case bitwiseXor():	constraints += { eq(typeOf(assignTo@at), integer()) }; 
-				case leftShift():	constraints += { eq(typeOf(assignTo@at), integer()) }; 
-				case rightShift():	constraints += { eq(typeOf(assignTo@at), integer()) }; 
-				case \mod():		constraints += { eq(typeOf(assignTo@at), integer()) };
-				case mul(): 		constraints += { subtyp(typeOf(assignTo@at), float()) };
-				case plus(): 		constraints += { subtyp(typeOf(assignTo@at), float()) };
+				case bitwiseAnd():	constraints += { eq(typeOf(assignTo@at), integerType()) }; 
+				case bitwiseOr():	constraints += { eq(typeOf(assignTo@at), integerType()) }; 
+				case bitwiseXor():	constraints += { eq(typeOf(assignTo@at), integerType()) }; 
+				case leftShift():	constraints += { eq(typeOf(assignTo@at), integerType()) }; 
+				case rightShift():	constraints += { eq(typeOf(assignTo@at), integerType()) }; 
+				case \mod():		constraints += { eq(typeOf(assignTo@at), integerType()) };
+				case mul(): 		constraints += { subtyp(typeOf(assignTo@at), floatType()) };
+				case plus(): 		constraints += { subtyp(typeOf(assignTo@at), floatType()) };
 				
 				case div(): 
 					constraints += { 
-						eq(typeOf(assignTo@at), integer()), // LHS is int
-						negation(subtyp(typeOf(assignExpr@at), array(\any()))) // RHS is not an array
+						eq(typeOf(assignTo@at), integerType()), // LHS is int
+						negation(subtyp(typeOf(assignExpr@at), arrayType(\any()))) // RHS is not an array
 					};
 				
 				case minus():
 					constraints += { 
-						eq(typeOf(assignTo@at), integer()), // LHS is int
-						negation(subtyp(typeOf(assignExpr@at), array(\any()))) // RHS is not an array
+						eq(typeOf(assignTo@at), integerType()), // LHS is int
+						negation(subtyp(typeOf(assignExpr@at), arrayType(\any()))) // RHS is not an array
 					};
 				
 				case concat():		
 					constraints += { 
-						eq(typeOf(assignTo@at), string()),
+						eq(typeOf(assignTo@at), stringType()),
 						conditional(
-							subtyp(typeOf(assignExpr@at), object()),
+							subtyp(typeOf(assignExpr@at), objectType()),
 							hasMethod(typeOf(assignExpr@at), "__tostring")
 						)
 					};
@@ -272,24 +273,24 @@ private void addConstraints(Expr e, M3 m3)
 						// if left AND right are array: results is array
 						conditional(
 							conjunction({
-								subtyp(typeOf(left@at), array(\any())),
-								subtyp(typeOf(right@at), array(\any()))
+								subtyp(typeOf(left@at), arrayType(\any())),
+								subtyp(typeOf(right@at), arrayType(\any()))
 							}),
-							subtyp(typeOf(op@at), array(\any()))
+							subtyp(typeOf(op@at), arrayType(\any()))
 						),
 						
 						// if left or right is NOT array: result is subytpe of float 
 						conditional(
 							disjunction({
-								negation(subtyp(typeOf(left@at), array(\any()))),
-								negation(subtyp(typeOf(right@at), array(\any())))
+								negation(subtyp(typeOf(left@at), arrayType(\any()))),
+								negation(subtyp(typeOf(right@at), arrayType(\any())))
 							}),
-							subtyp(typeOf(op@at), float())
+							subtyp(typeOf(op@at), floatType())
 						),
 						// unconditional: result = array | double | int
 						disjunction({
-							subtyp(typeOf(op@at), array(\any())),
-							subtyp(typeOf(op@at), float()) 
+							subtyp(typeOf(op@at), arrayType(\any())),
+							subtyp(typeOf(op@at), floatType()) 
 						})
 						// todo ?
 						// if (left XOR right = double) -> double
@@ -298,9 +299,9 @@ private void addConstraints(Expr e, M3 m3)
 					
 				case minus():
 					constraints += {
-						negation(subtyp(typeOf(left@at),  array(\any()))), // LHS != array
-						negation(subtyp(typeOf(right@at), array(\any()))), // RHS != array
-						subtyp(typeOf(op@at), float()) // result is subtype of float
+						negation(subtyp(typeOf(left@at),  arrayType(\any()))), // LHS != array
+						negation(subtyp(typeOf(right@at), arrayType(\any()))), // RHS != array
+						subtyp(typeOf(op@at), floatType()) // result is subtype of float
 						// todo ?
 						// if (left XOR right = double) -> double
 						// in all other cases: int
@@ -308,9 +309,9 @@ private void addConstraints(Expr e, M3 m3)
 					
 				case mul(): // refactor: same as minus()
 					constraints += {
-						negation(subtyp(typeOf(left@at),  array(\any()))), // LHS != array
-						negation(subtyp(typeOf(right@at), array(\any()))), // RHS != array
-						subtyp(typeOf(op@at), float()) // result is subtype of float
+						negation(subtyp(typeOf(left@at),  arrayType(\any()))), // LHS != array
+						negation(subtyp(typeOf(right@at), arrayType(\any()))), // RHS != array
+						subtyp(typeOf(op@at), floatType()) // result is subtype of float
 						// todo ?
 						// if (left XOR right = double) -> double
 						// in all other cases: int
@@ -318,37 +319,37 @@ private void addConstraints(Expr e, M3 m3)
 					
 				case div(): // refactor: same as minus()
 					constraints += {
-						negation(subtyp(typeOf(left@at),  array(\any()))), // LHS != array
-						negation(subtyp(typeOf(right@at), array(\any()))), // RHS != array
-						subtyp(typeOf(op@at), float()) // result is subtype of float
+						negation(subtyp(typeOf(left@at),  arrayType(\any()))), // LHS != array
+						negation(subtyp(typeOf(right@at), arrayType(\any()))), // RHS != array
+						subtyp(typeOf(op@at), floatType()) // result is subtype of float
 						// todo ?
 						// if (left XOR right = double) -> double
 						// in all other cases: int
 					};
 				
-				case \mod(): 		constraints += { eq(typeOf(op@at), integer()) }; // [E] = int
-				case leftShift():	constraints += { eq(typeOf(op@at), integer()) }; // [E] = int
-				case rightShift():	constraints += { eq(typeOf(op@at), integer()) }; // [E] = int
+				case \mod(): 		constraints += { eq(typeOf(op@at), integerType()) }; // [E] = int
+				case leftShift():	constraints += { eq(typeOf(op@at), integerType()) }; // [E] = int
+				case rightShift():	constraints += { eq(typeOf(op@at), integerType()) }; // [E] = int
 				
 				case bitwiseAnd():
 					constraints += {
 						conditional( // if [L] and [R] are string, then [E] is string
 							conjunction({
-								eq(typeOf(left@at), string()),
-								eq(typeOf(right@at), string())
+								eq(typeOf(left@at), stringType()),
+								eq(typeOf(right@at), stringType())
 							}),
-							eq(typeOf(op@at), string())
+							eq(typeOf(op@at), stringType())
 						),
 						conditional( // if [L] or [R] is not string, then [E] is int
 							disjunction({
-								negation(eq(typeOf(left@at), string())), 
-								negation(eq(typeOf(right@at), string())) 
+								negation(eq(typeOf(left@at), stringType())), 
+								negation(eq(typeOf(right@at), stringType())) 
 							}),
-							eq(typeOf(op@at), integer())
+							eq(typeOf(op@at), integerType())
 						),
 						disjunction({ // [E] = int|string 
-							eq(typeOf(op@at), string()),
-							eq(typeOf(op@at), integer())
+							eq(typeOf(op@at), stringType()),
+							eq(typeOf(op@at), integerType())
 						})
 					
 					};
@@ -357,21 +358,21 @@ private void addConstraints(Expr e, M3 m3)
 					constraints += {
 						conditional( // if [L] and [R] are string, then [E] is string
 							conjunction({
-								eq(typeOf(left@at), string()),
-								eq(typeOf(right@at), string())
+								eq(typeOf(left@at), stringType()),
+								eq(typeOf(right@at), stringType())
 							}),
-							eq(typeOf(op@at), string())
+							eq(typeOf(op@at), stringType())
 						),
 						conditional( // if [L] or [R] is not string, then [E] is int
 							disjunction({
-								negation(eq(typeOf(left@at), string())), 
-								negation(eq(typeOf(right@at), string())) 
+								negation(eq(typeOf(left@at), stringType())), 
+								negation(eq(typeOf(right@at), stringType())) 
 							}),
-							eq(typeOf(op@at), integer())
+							eq(typeOf(op@at), integerType())
 						),
 						disjunction({ // [E] = int|string 
-							eq(typeOf(op@at), string()),
-							eq(typeOf(op@at), integer())
+							eq(typeOf(op@at), stringType()),
+							eq(typeOf(op@at), integerType())
 						})
 					
 					};
@@ -380,40 +381,40 @@ private void addConstraints(Expr e, M3 m3)
 					constraints += {
 						conditional( // if [L] and [R] are string, then [E] is string
 							conjunction({
-								eq(typeOf(left@at), string()),
-								eq(typeOf(right@at), string())
+								eq(typeOf(left@at), stringType()),
+								eq(typeOf(right@at), stringType())
 							}),
-							eq(typeOf(op@at), string())
+							eq(typeOf(op@at), stringType())
 						),
 						conditional( // if [L] or [R] is not string, then [E] is int
 							disjunction({
-								negation(eq(typeOf(left@at), string())), 
-								negation(eq(typeOf(right@at), string())) 
+								negation(eq(typeOf(left@at), stringType())), 
+								negation(eq(typeOf(right@at), stringType())) 
 							}),
-							eq(typeOf(op@at), integer())
+							eq(typeOf(op@at), integerType())
 						),
 						disjunction({ // [E] = int|string 
-							eq(typeOf(op@at), string()),
-							eq(typeOf(op@at), integer())
+							eq(typeOf(op@at), stringType()),
+							eq(typeOf(op@at), integerType())
 						})
 					
 					};
 				
 				// comparison operators, all result in booleans
-				case lt(): 			 constraints += { eq(typeOf(op@at), boolean()) };
-				case leq():			 constraints += { eq(typeOf(op@at), boolean()) };
-				case gt():			 constraints += { eq(typeOf(op@at), boolean()) };
-				case geq():			 constraints += { eq(typeOf(op@at), boolean()) };
-				case equal():		 constraints += { eq(typeOf(op@at), boolean()) };
-				case identical():	 constraints += { eq(typeOf(op@at), boolean()) };
-				case notEqual():	 constraints += { eq(typeOf(op@at), boolean()) };
-				case notIdentical(): constraints += { eq(typeOf(op@at), boolean()) };
+				case lt(): 			 constraints += { eq(typeOf(op@at), booleanType()) };
+				case leq():			 constraints += { eq(typeOf(op@at), booleanType()) };
+				case gt():			 constraints += { eq(typeOf(op@at), booleanType()) };
+				case geq():			 constraints += { eq(typeOf(op@at), booleanType()) };
+				case equal():		 constraints += { eq(typeOf(op@at), booleanType()) };
+				case identical():	 constraints += { eq(typeOf(op@at), booleanType()) };
+				case notEqual():	 constraints += { eq(typeOf(op@at), booleanType()) };
+				case notIdentical(): constraints += { eq(typeOf(op@at), booleanType()) };
 				// logical operators, all result in booleans
-				case logicalAnd():	 constraints += { eq(typeOf(op@at), boolean()) };
-				case logicalOr():	 constraints += { eq(typeOf(op@at), boolean()) };
-				case logicalXor():	 constraints += { eq(typeOf(op@at), boolean()) };
-				case booleanAnd():	 constraints += { eq(typeOf(op@at), boolean()) };
-				case booleanOr():	 constraints += { eq(typeOf(op@at), boolean()) };
+				case logicalAnd():	 constraints += { eq(typeOf(op@at), booleanType()) };
+				case logicalOr():	 constraints += { eq(typeOf(op@at), booleanType()) };
+				case logicalXor():	 constraints += { eq(typeOf(op@at), booleanType()) };
+				case booleanAnd():	 constraints += { eq(typeOf(op@at), booleanType()) };
+				case booleanOr():	 constraints += { eq(typeOf(op@at), booleanType()) };
 			}
 		}
 	
@@ -423,8 +424,8 @@ private void addConstraints(Expr e, M3 m3)
 			switch (operation) {
 				case unaryPlus():
 					constraints += { 
-						subtyp(typeOf(expr@at), float()), // type of whole expression is int or float
-						negation(subtyp(typeOf(operand@at), array(\any()))) // type of the expression is not an array
+						subtyp(typeOf(expr@at), floatType()), // type of whole expression is int or float
+						negation(subtyp(typeOf(operand@at), arrayType(\any()))) // type of the expression is not an array
 						// todo ?
 						// in: float -> out: float
 						// in: str 	 -> out: int|float
@@ -433,26 +434,26 @@ private void addConstraints(Expr e, M3 m3)
 										
 				case unaryMinus():		
 					constraints += { 
-							subtyp(typeOf(expr@at), float()), // type of whole expression is int or float
-							negation(subtyp(typeOf(operand@at), array(\any()))) // type of the expression is not an array
+							subtyp(typeOf(expr@at), floatType()), // type of whole expression is int or float
+							negation(subtyp(typeOf(operand@at), arrayType(\any()))) // type of the expression is not an array
 							// todo
 							// in: float -> out: float
 							// in: str 	 -> out: int|float
 							// in: _	 -> out: int
 						};
 				
-				case booleanNot():		constraints += { eq(typeOf(expr@at), boolean()) }; // type of whole expression is bool
+				case booleanNot():		constraints += { eq(typeOf(expr@at), booleanType()) }; // type of whole expression is bool
 				
 				case bitwiseNot():		
 					constraints += { 
 						disjunction({ // the sub expression is int, float or string (rest results in fatal error)
-							eq(typeOf(operand@at), integer()),  
-							eq(typeOf(operand@at), float()),
-							eq(typeOf(operand@at), string()) 
+							eq(typeOf(operand@at), integerType()),  
+							eq(typeOf(operand@at), floatType()),
+							eq(typeOf(operand@at), stringType()) 
 						}),
 						disjunction({ // the whole expression is always a int or string
-							eq(typeOf(expr@at), integer()),  
-							eq(typeOf(expr@at), string()) 
+							eq(typeOf(expr@at), integerType()),  
+							eq(typeOf(expr@at), stringType()) 
 						})
 						// todo:
 						// in: int 	  -> out: int
@@ -462,145 +463,145 @@ private void addConstraints(Expr e, M3 m3)
 				
 				case postInc():
 					constraints += {
-						conditional( //"if([E] = array(any())) then ([E++] = array(any()))",
-							subtyp(typeOf(operand@at), array(\any())),
-							subtyp(typeOf(expr@at), array(\any()))
+						conditional( //"if([E] = arrayType(any())) then ([E++] = arrayType(any()))",
+							subtyp(typeOf(operand@at), arrayType(\any())),
+							subtyp(typeOf(expr@at), arrayType(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E++] = bool())",
-							eq(typeOf(operand@at), boolean()),
-							eq(typeOf(expr@at), boolean())
+							eq(typeOf(operand@at), booleanType()),
+							eq(typeOf(expr@at), booleanType())
 						),
-						conditional( //"if([E] = float()) then ([E++] = float())",
-							eq(typeOf(operand@at), float()),
-							eq(typeOf(expr@at), float())
+						conditional( //"if([E] = floatType()) then ([E++] = floatType())",
+							eq(typeOf(operand@at), floatType()),
+							eq(typeOf(expr@at), floatType())
 						),
 						conditional( //"if([E] = int()) then ([E++] = int())",
-							eq(typeOf(operand@at), integer()),
-							eq(typeOf(expr@at), integer())
+							eq(typeOf(operand@at), integerType()),
+							eq(typeOf(expr@at), integerType())
 						),
-						conditional( //"if([E] = null()) then (or([E++] = null(), [E++] = int()))",
-							eq(typeOf(operand@at), null()),
-							disjunction({eq(typeOf(expr@at), null()), eq(typeOf(expr@at), integer())})
+						conditional( //"if([E] = nullType()) then (or([E++] = nullType(), [E++] = int()))",
+							eq(typeOf(operand@at), nullType()),
+							disjunction({eq(typeOf(expr@at), nullType()), eq(typeOf(expr@at), integerType())})
 						),
-						conditional( //"if([E] = object()) then ([E++] = object())",
-							subtyp(typeOf(operand@at), \object()),
-							subtyp(typeOf(expr@at), \object())
+						conditional( //"if([E] = objectType()) then ([E++] = objectType())",
+							subtyp(typeOf(operand@at), objectType()),
+							subtyp(typeOf(expr@at), objectType())
 						),
-						conditional( //"if([E] = resource()) then ([E++] = resource())",
-							eq(typeOf(operand@at), resource()),
-							eq(typeOf(expr@at), resource())
+						conditional( //"if([E] = resourceType()) then ([E++] = resourceType())",
+							eq(typeOf(operand@at), resourceType()),
+							eq(typeOf(expr@at), resourceType())
 						),
-						conditional( //"if([E] = string()) then (or([E++] = float(), [E++] = int(), [E++] = string())",
-							eq(typeOf(operand@at), \string()),
-							disjunction({eq(typeOf(expr@at), \float()), eq(typeOf(expr@at), integer()), eq(typeOf(expr@at), \string())})
+						conditional( //"if([E] = stringType()) then (or([E++] = floatType(), [E++] = int(), [E++] = stringType())",
+							eq(typeOf(operand@at), stringType()),
+							disjunction({eq(typeOf(expr@at), floatType()), eq(typeOf(expr@at), integerType()), eq(typeOf(expr@at), stringType())})
 						)
 					};
 										
 				case postDec():
 					constraints += {
-						conditional( //"if([E] = array(any())) then ([E--] = array(any()))",
-							subtyp(typeOf(operand@at), array(\any())),
-							subtyp(typeOf(expr@at), array(\any()))
+						conditional( //"if([E] = arrayType(any())) then ([E--] = arrayType(any()))",
+							subtyp(typeOf(operand@at), arrayType(\any())),
+							subtyp(typeOf(expr@at), arrayType(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E--] = bool())",
-							eq(typeOf(operand@at), boolean()),
-							eq(typeOf(expr@at), boolean())
+							eq(typeOf(operand@at), booleanType()),
+							eq(typeOf(expr@at), booleanType())
 						),
-						conditional( //"if([E] = float()) then ([E--] = float())",
-							eq(typeOf(operand@at), float()),
-							eq(typeOf(expr@at), float())
+						conditional( //"if([E] = floatType()) then ([E--] = floatType())",
+							eq(typeOf(operand@at), floatType()),
+							eq(typeOf(expr@at), floatType())
 						),
 						conditional( //"if([E] = int()) then ([E--] = int())",
-							eq(typeOf(operand@at), integer()),
-							eq(typeOf(expr@at), integer())
+							eq(typeOf(operand@at), integerType()),
+							eq(typeOf(expr@at), integerType())
 						),
-						conditional( //"if([E] = null()) then (or([E--] = null(), [E++] = int()))",
-							eq(typeOf(operand@at), null()),
-							disjunction({eq(typeOf(expr@at), null()), eq(typeOf(expr@at), integer())})
+						conditional( //"if([E] = nullType()) then (or([E--] = nullType(), [E++] = int()))",
+							eq(typeOf(operand@at), nullType()),
+							disjunction({eq(typeOf(expr@at), nullType()), eq(typeOf(expr@at), integerType())})
 						),
-						conditional( //"if([E] = object()) then ([E--] = object())",
-							subtyp(typeOf(operand@at), \object()),
-							subtyp(typeOf(expr@at), \object())
+						conditional( //"if([E] = objectType()) then ([E--] = objectType())",
+							subtyp(typeOf(operand@at), objectType()),
+							subtyp(typeOf(expr@at), objectType())
 						),
-						conditional( //"if([E] = resource()) then ([E--] = resource())",
-							eq(typeOf(operand@at), resource()),
-							eq(typeOf(expr@at), resource())
+						conditional( //"if([E] = resourceType()) then ([E--] = resourceType())",
+							eq(typeOf(operand@at), resourceType()),
+							eq(typeOf(expr@at), resourceType())
 						),
-						conditional( //"if([E] = string()) then (or([E--] = float(), [E--] = int(), [E--] = string())",
-							eq(typeOf(operand@at), \string()),
-							disjunction({eq(typeOf(expr@at), \float()), eq(typeOf(expr@at), integer()), eq(typeOf(expr@at), \string())})
+						conditional( //"if([E] = stringType()) then (or([E--] = floatType(), [E--] = int(), [E--] = stringType())",
+							eq(typeOf(operand@at), stringType()),
+							disjunction({eq(typeOf(expr@at), floatType()), eq(typeOf(expr@at), integerType()), eq(typeOf(expr@at), stringType())})
 						)
 					};
 										
 				case preInc():
 					constraints += {
-						conditional( //"if([E] = array(any())) then ([E++] = array(any()))",
-							subtyp(typeOf(operand@at), array(\any())),
-							subtyp(typeOf(expr@at), array(\any()))
+						conditional( //"if([E] = arrayType(any())) then ([E++] = arrayType(any()))",
+							subtyp(typeOf(operand@at), arrayType(\any())),
+							subtyp(typeOf(expr@at), arrayType(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E++] = bool())",
-							eq(typeOf(operand@at), boolean()),
-							eq(typeOf(expr@at), boolean())
+							eq(typeOf(operand@at), booleanType()),
+							eq(typeOf(expr@at), booleanType())
 						),
-						conditional( //"if([E] = float()) then ([E++] = float())",
-							eq(typeOf(operand@at), float()),
-							eq(typeOf(expr@at), float())
+						conditional( //"if([E] = floatType()) then ([E++] = floatType())",
+							eq(typeOf(operand@at), floatType()),
+							eq(typeOf(expr@at), floatType())
 						),
 						conditional( //"if([E] = int()) then ([E++] = int())",
-							eq(typeOf(operand@at), integer()),
-							eq(typeOf(expr@at), integer())
+							eq(typeOf(operand@at), integerType()),
+							eq(typeOf(expr@at), integerType())
 						),
-						conditional( //"if([E] = null()) then (or([E++] = null(), [E++] = int()))",
-							eq(typeOf(operand@at), null()),
-							eq(typeOf(expr@at), integer())
+						conditional( //"if([E] = nullType()) then (or([E++] = nullType(), [E++] = int()))",
+							eq(typeOf(operand@at), nullType()),
+							eq(typeOf(expr@at), integerType())
 						),
-						conditional( //"if([E] = object()) then ([E++] = object())",
-							subtyp(typeOf(operand@at), \object()),
-							subtyp(typeOf(expr@at), \object())
+						conditional( //"if([E] = objectType()) then ([E++] = objectType())",
+							subtyp(typeOf(operand@at), objectType()),
+							subtyp(typeOf(expr@at), objectType())
 						),
-						conditional( //"if([E] = resource()) then ([E++] = resource())",
-							eq(typeOf(operand@at), resource()),
-							eq(typeOf(expr@at), resource())
+						conditional( //"if([E] = resourceType()) then ([E++] = resourceType())",
+							eq(typeOf(operand@at), resourceType()),
+							eq(typeOf(expr@at), resourceType())
 						),
-						conditional( //"if([E] = string()) then (or([E++] = float(), [E++] = int(), [E++] = string())",
-							eq(typeOf(operand@at), \string()),
-							disjunction({eq(typeOf(expr@at), \float()), eq(typeOf(expr@at), integer()), eq(typeOf(expr@at), \string())})
+						conditional( //"if([E] = stringType()) then (or([E++] = floatType(), [E++] = int(), [E++] = stringType())",
+							eq(typeOf(operand@at), stringType()),
+							disjunction({eq(typeOf(expr@at), floatType()), eq(typeOf(expr@at), integerType()), eq(typeOf(expr@at), stringType())})
 						)
 					};
 										
 				case preDec():
 					constraints += {
-						conditional( //"if([E] = array(any())) then ([E--] = array(any()))",
-							subtyp(typeOf(operand@at), array(\any())),
-							subtyp(typeOf(expr@at), array(\any()))
+						conditional( //"if([E] = arrayType(any())) then ([E--] = arrayType(any()))",
+							subtyp(typeOf(operand@at), arrayType(\any())),
+							subtyp(typeOf(expr@at), arrayType(\any()))
 						),
 						conditional( //"if([E] = bool()) then ([E--] = bool())",
-							eq(typeOf(operand@at), boolean()),
-							eq(typeOf(expr@at), boolean())
+							eq(typeOf(operand@at), booleanType()),
+							eq(typeOf(expr@at), booleanType())
 						),
-						conditional( //"if([E] = float()) then ([E--] = float())",
-							eq(typeOf(operand@at), float()),
-							eq(typeOf(expr@at), float())
+						conditional( //"if([E] = floatType()) then ([E--] = floatType())",
+							eq(typeOf(operand@at), floatType()),
+							eq(typeOf(expr@at), floatType())
 						),
 						conditional( //"if([E] = int()) then ([E--] = int())",
-							eq(typeOf(operand@at), integer()),
-							eq(typeOf(expr@at), integer())
+							eq(typeOf(operand@at), integerType()),
+							eq(typeOf(expr@at), integerType())
 						),
-						conditional( //"if([E] = null()) then (or([E--] = null(), [E++] = int()))",
-							eq(typeOf(operand@at), null()),
-							eq(typeOf(expr@at), integer())
+						conditional( //"if([E] = nullType()) then (or([E--] = nullType(), [E++] = int()))",
+							eq(typeOf(operand@at), nullType()),
+							eq(typeOf(expr@at), integerType())
 						),
-						conditional( //"if([E] = object()) then ([E--] = object())",
-							subtyp(typeOf(operand@at), \object()),
-							subtyp(typeOf(expr@at), \object())
+						conditional( //"if([E] = objectType()) then ([E--] = objectType())",
+							subtyp(typeOf(operand@at), objectType()),
+							subtyp(typeOf(expr@at), objectType())
 						),
-						conditional( //"if([E] = resource()) then ([E--] = resource())",
-							eq(typeOf(operand@at), resource()),
-							eq(typeOf(expr@at), resource())
+						conditional( //"if([E] = resourceType()) then ([E--] = resourceType())",
+							eq(typeOf(operand@at), resourceType()),
+							eq(typeOf(expr@at), resourceType())
 						),
-						conditional( //"if([E] = string()) then (or([E--] = float(), [E--] = int(), [E--] = string())",
-							eq(typeOf(operand@at), \string()),
-							disjunction({eq(typeOf(expr@at), \float()), eq(typeOf(expr@at), integer()), eq(typeOf(expr@at), \string())})
+						conditional( //"if([E] = stringType()) then (or([E--] = floatType(), [E--] = int(), [E--] = stringType())",
+							eq(typeOf(operand@at), stringType()),
+							disjunction({eq(typeOf(expr@at), floatType()), eq(typeOf(expr@at), integerType()), eq(typeOf(expr@at), stringType())})
 						)
 					};
 			}
@@ -610,11 +611,11 @@ private void addConstraints(Expr e, M3 m3)
 		case n:new(NameOrExpr className, list[ActualParameter] parameters): {
 			if (name(nameNode:name(_)) := className) {
 				// literal class instantiation
-				constraints += { eq(typeOf(n@at), class(u)) | u <- m3@uses[nameNode@at] };
+				constraints += { eq(typeOf(n@at), classType(u)) | u <- m3@uses[nameNode@at] };
 			} else {
 				// variable class instantiation:
 				addConstraints(className.expr, m3);	
-				constraints += { subtyp(typeOf(n@at), object()) };
+				constraints += { subtyp(typeOf(n@at), objectType()) };
 			}	
 			// todo: parameters
 		}
@@ -623,19 +624,19 @@ private void addConstraints(Expr e, M3 m3)
 			addConstraints(expr, m3);	
 			
 			switch(castType) {
-				case \int() :	constraints += { eq(typeOf(c@at), integer()) };
-				case \bool() :	constraints += { eq(typeOf(c@at), boolean()) };
-				case float() :	constraints += { eq(typeOf(c@at), float()) };
-				case array() :	constraints += { subtyp(typeOf(c@at), array(\any())) };
-				case object() :	constraints += { subtyp(typeOf(c@at), object()) };
-				case unset():	constraints += { eq(typeOf(c@at), null()) };
+				case \int() :	constraints += { eq(typeOf(c@at), integerType()) };
+				case \bool() :	constraints += { eq(typeOf(c@at), booleanType()) };
+				case float() :	constraints += { eq(typeOf(c@at), floatType()) };
+				case array() :	constraints += { subtyp(typeOf(c@at), arrayType(\any())) };
+				case object() :	constraints += { subtyp(typeOf(c@at), objectType()) };
+				case unset():	constraints += { eq(typeOf(c@at), nullType()) };
 				
 				// special case for string, when [expr] <: object, the class of the object needs to have method "__toString"
 				case string() :	
 					constraints += { 
-						eq(typeOf(c@at), string()),
+						eq(typeOf(c@at), stringType()),
 						conditional(
-							subtyp(typeOf(expr@at), object()),
+							subtyp(typeOf(expr@at), objectType()),
 							hasMethod(typeOf(expr@at), "__tostring")
 						)
 					};
@@ -645,16 +646,16 @@ private void addConstraints(Expr e, M3 m3)
 		case c:clone(Expr expr): {
 			addConstraints(expr, m3);	
 			// expression and result are of type clone
-			constraints += { subtyp(typeOf(expr@at), object()) };	
-			constraints += { subtyp(typeOf(c@at), object()) };	
+			constraints += { subtyp(typeOf(expr@at), objectType()) };	
+			constraints += { subtyp(typeOf(c@at), objectType()) };	
 		}
 		
 	
 		case fc:fetchConst(name(name)): {
 			if (/true/i := name || /false/i := name) {
-				constraints += { eq(typeOf(fc@at), boolean()) };
+				constraints += { eq(typeOf(fc@at), booleanType()) };
 			} else if (/null/i := name) {
-				constraints += { eq(typeOf(fc@at), null()) };
+				constraints += { eq(typeOf(fc@at), nullType()) };
 			} else if (name in predefinedConstants) {
 				constraints += { eq(typeOf(fc@at), predefinedConstants[name]) };
 			} else {
@@ -689,21 +690,21 @@ private void addConstraints(Expr e, M3 m3)
 		//scalar(Scalar scalarVal)
 		case s:scalar(Scalar scalarVal): {
 			switch(scalarVal) {
-				case classConstant():		constraints += { eq(typeOf(s@at), string()) };
-				case dirConstant():			constraints += { eq(typeOf(s@at), string()) };
-				case fileConstant():		constraints += { eq(typeOf(s@at), string()) };
-				case funcConstant():		constraints += { eq(typeOf(s@at), string()) };
-				case lineConstant():		constraints += { eq(typeOf(s@at), integer()) };
-				case methodConstant():		constraints += { eq(typeOf(s@at), string()) };
-				case namespaceConstant():	constraints += { eq(typeOf(s@at), string()) };
-				case traitConstant():		constraints += { eq(typeOf(s@at), string()) };
+				case classConstant():		constraints += { eq(typeOf(s@at), stringType()) };
+				case dirConstant():			constraints += { eq(typeOf(s@at), stringType()) };
+				case fileConstant():		constraints += { eq(typeOf(s@at), stringType()) };
+				case funcConstant():		constraints += { eq(typeOf(s@at), stringType()) };
+				case lineConstant():		constraints += { eq(typeOf(s@at), integerType()) };
+				case methodConstant():		constraints += { eq(typeOf(s@at), stringType()) };
+				case namespaceConstant():	constraints += { eq(typeOf(s@at), stringType()) };
+				case traitConstant():		constraints += { eq(typeOf(s@at), stringType()) };
 				
-				case float(_):				constraints += { eq(typeOf(s@at), float()) };
-				case integer(_):			constraints += { eq(typeOf(s@at), integer()) };
-				case string(_):				constraints += { eq(typeOf(s@at), string()) };
+				case float(_):				constraints += { eq(typeOf(s@at), floatType()) };
+				case integer(_):			constraints += { eq(typeOf(s@at), integerType()) };
+				case string(_):				constraints += { eq(typeOf(s@at), stringType()) };
 				case encapsed(list[Expr] parts): {
 					for (p <- parts, scalar(_) !:= p) addConstraints(p, m3);
-					constraints += { eq(typeOf(s@at), string()) };
+					constraints += { eq(typeOf(s@at), stringType()) };
 				}
 			}
 		}
@@ -711,7 +712,7 @@ private void addConstraints(Expr e, M3 m3)
 		// normal variable and variable variable (can be combined)
 		case v:var(name(name(name))): {
 			if (name in predefinedVariables) {
-				if (array(\any()) := predefinedVariables[name]) {
+				if (arrayType(\any()) := predefinedVariables[name]) {
 					constraints += { subtyp(typeOf(v@at), predefinedVariables[name]) };
 				} else {
 					constraints += { eq(typeOf(v@at), predefinedVariables[name]) };
@@ -744,7 +745,7 @@ private void addConstraints(Expr e, M3 m3)
 	//| methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters)
 	case sc:staticCall(NameOrExpr staticTarget, NameOrExpr methodName, list[ActualParameter] parameters): {
 		// handle class names
-		constraints += { subtyp(typeOf(staticTarget@at), object()) };
+		constraints += { subtyp(typeOf(staticTarget@at), objectType()) };
 		
 		bool inClass = inClassOrInterface(m3@containment, sc@scope);
 		set[Constraint] inClassConstraints = {};
@@ -759,7 +760,7 @@ private void addConstraints(Expr e, M3 m3)
 				// refers to the class itself
 				case name(name(/self/i)): 
 				{
-					constraints += { eq(typeOf(staticTarget@at), class(currentClass)) };
+					constraints += { eq(typeOf(staticTarget@at), classType(currentClass)) };
 				}
 				
 				// refers to all parents
@@ -767,7 +768,7 @@ private void addConstraints(Expr e, M3 m3)
 				{	
 					constraints += {
 						disjunction({
-							eq(typeOf(staticTarget@at), class(p)) | p <- parentClasses
+							eq(typeOf(staticTarget@at), classType(p)) | p <- parentClasses
 						})
 					};
 		       	}
@@ -777,7 +778,7 @@ private void addConstraints(Expr e, M3 m3)
 				{
 					constraints += {
 						disjunction({
-							eq(typeOf(staticTarget@at), class(p)) | p <- {currentClass} + parentClasses
+							eq(typeOf(staticTarget@at), classType(p)) | p <- {currentClass} + parentClasses
 						})
 					};
 				}
@@ -793,7 +794,7 @@ private void addConstraints(Expr e, M3 m3)
 					if (name(rhsName) := methodName) {
 						inClassConstraints += {
 							conditional( // if LHS is same as the current class,
-								eq(typeOf(staticTarget@at), class(currentClass)),
+								eq(typeOf(staticTarget@at), classType(currentClass)),
 								hasProperty(typeOf(staticTarget@at), rhsName.name, { notAllowed(static()) })
 							);	
 						}
@@ -847,7 +848,7 @@ private void addConstraints(Expr e, M3 m3)
 			case expr(expr): // staticTarget is an expression, resolve to all classes 
 			{
 				addConstraints(expr, m3);
-				constraints += { subtyp(typeOf(expr@at), object()); };
+				constraints += { subtyp(typeOf(expr@at), objectType()); };
 				// todo
 				//m3@uses += { <staticTarget@at, t> | t <- classes(m3) + interfaces(m3) };
 			}
@@ -902,11 +903,11 @@ public void addConstraintsOnAllReturnStatementsWithinScope(&T <: node t)
 		constraints += { 
 			disjunction(
 				{ eq(typeOf(t@at), typeOf(e@at)) | rs <- returnStmts, someExpr(e) := rs }
-				+ { eq(typeOf(t@at), null()) | rs <- returnStmts, noExpr() := rs }
+				+ { eq(typeOf(t@at), nullType()) | rs <- returnStmts, noExpr() := rs }
 			)};
 	} else {
 		// no return methods means that the function will always return null (unless an expception is thrown)
-		constraints += { eq(typeOf(t@at), null()) }; 
+		constraints += { eq(typeOf(t@at), nullType()) }; 
 	}
 }
 
@@ -920,11 +921,11 @@ public void addConstraintsForCallableExpression(Expr expr)
 {
 	constraints += {
 		disjunction({
-			eq(typeOf(expr@at), string()),
-			subtyp(typeOf(expr@at), object())
+			eq(typeOf(expr@at), stringType()),
+			subtyp(typeOf(expr@at), objectType())
 		}),
 		conditional(
-			subtyp(typeOf(expr@at), object()),
+			subtyp(typeOf(expr@at), objectType()),
 			hasMethod(typeOf(expr@at), "__invoke")
 		)
 	};
