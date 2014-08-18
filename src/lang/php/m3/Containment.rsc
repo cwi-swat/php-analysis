@@ -277,10 +277,11 @@ public M3 addVarDecl(M3 m3, node n, node parent) {
 }
 
 @memo public loc getClassOrInterface(rel[loc from, loc to] containment, loc decl) {
+	loc input = decl;
 	containment = invert(containment);
 	solve(decl) {
 		if (!isClass(decl) && !isInterface(decl)) {
-			assert size(containment[decl]) == 1 : "getClassOrInterface failed for decl: <decl>";
+			assert size(containment[decl]) == 1 : "getClassOrInterface failed for decl: <decl> (started at: <input>)";
 			decl = getOneFrom(containment[decl]);	
 		}
 	}

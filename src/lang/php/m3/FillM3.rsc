@@ -81,9 +81,16 @@ public M3 calculateAfterM3Creation(M3 m3, System system)
 	// todo, add these predefined classes as scripts and run them through createM3forScript
 	// tood: also add function like this
 	m3 = addPredefinedDeclarations(m3);
-	
-	for (l <- system)
+
+	int counter = 0;
+	int total = size(system);	
+	println("calculateUsesAfterTypes for <total> files");
+	for (l <- system) {
+		counter += 1;
+		logMessage("running file: <l>", 1);
+		if (counter%10==0) logMessage("<counter> (<(100*counter)/total>)%.. ", 1);	
 		m3 = calculateUsesAfterTypes(m3, system[l]);
+	}
 	
 	// todo enable this!
 	//m3 = resolveTypes(m3, system);

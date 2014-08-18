@@ -3,16 +3,23 @@ module lang::php::experiments::mscse2014::Constraints
 import lang::php::ast::AbstractSyntax;
 
 import lang::php::m3::Core;
+import lang::php::m3::Containment;
 import lang::php::ast::System;
+//import lang::php::ast::Scopes;
 
 import lang::php::types::TypeSymbol;
 import lang::php::types::TypeConstraints;
 import lang::php::types::core::Constants;
 import lang::php::types::core::Variables;
 
+
+import lang::php::util::Utils;
+
 import IO; // for debuggin
 import String; // for toLowerCase
 import Set; // for isEmpty
+import Map; // for size
+import Relation; // for domainu
 
 private set[Constraint] constraints = {};
 
@@ -22,9 +29,16 @@ public set[Constraint] getConstraints(System system, M3 m3)
 	// reset the constraints of previous runs
 	constraints = {};
 	
+	int counter = 0, total = size(system);
+	logMessage("Get constraints for system (<total> files)", 1);
+	
 	for(s <- system) {
+		counter+=1; 
+		if (total > 20 && counter%(total/20) == 0) logMessage("<counter> items are done... (<(counter*total)/100>%", 1);
 		addConstraints(system[s], m3);
 	}	
+	
+	logMessage("Yay. You have <size(constraints)> constraints collected! (<m3.id>)", 1);
 	
 	// add constraints for all declarations?
 	// eq(@decl = @at)
@@ -46,6 +60,10 @@ private void addConstraints(OptionExpr::someExpr(Expr e), M3 m3) { addConstraint
 // Wrappers for OptionElse
 private void addConstraints(OptionElse::noElse(), M3 m3) {}
 private void addConstraints(OptionElse::someElse(\else(list[Stmt] body)), M3 m3) { addConstraints(body, m3); }
+
+// Wrappers for NameOrExpr 
+private void addConstraints(NameOrExpr::name(_), M3 m3) { }
+private void addConstraints(NameOrExpr::expr(e), M3 m3) { addConstraints(e, m3); }
 
 // Wrappers for list[Expr|Stmt]
 private void addConstraints(list[Expr] exprs, M3 m3)    { for (e <- exprs) addConstraints(e, m3); }
@@ -155,9 +173,6 @@ private void addConstraints(ClassItem ci, &T <: node parentNode, M3 m3)
 		class(_,_,_,_,_) := parentNode || interface(_,_,_) := parentNode || trait(_,_) := parentNode: 
 		"Precondition failed. parentNode must be [classDef|interfaceDef|traitDef]";
 		
-	// handle special keywords $this | static | parent: // are already provided in m3
-	// TODO
-	
 	top-down-break visit (ci) {
 		case property(set[Modifier] modifiers, list[Property] prop): {
 			for (p:property(str propertyName, OptionExpr defaultValue) <- prop) {
@@ -652,9 +667,9 @@ private void addConstraints(Expr e, M3 m3)
 		
 	
 		case fc:fetchConst(name(name)): {
-			if (/true/i := name || /false/i := name) {
+			if (/^true$/i := name || /^false$/i := name) {
 				constraints += { eq(typeOf(fc@at), booleanType()) };
-			} else if (/null/i := name) {
+			} else if (/^null$/i := name) {
 				constraints += { eq(typeOf(fc@at), nullType()) };
 			} else if (name in predefinedConstants) {
 				constraints += { eq(typeOf(fc@at), predefinedConstants[name]) };
@@ -709,7 +724,7 @@ private void addConstraints(Expr e, M3 m3)
 			}
 		}
 		
-		// normal variable and variable variable (can be combined)
+		// normal variable and variable variable 
 		case v:var(name(name(name))): {
 			if (name in predefinedVariables) {
 				if (arrayType(\any()) := predefinedVariables[name]) {
@@ -727,7 +742,13 @@ private void addConstraints(Expr e, M3 m3)
 			if (name(Name name) := funName) {
 				// literal name is resolved in uses and can be found in @uses
 				// get all locations for the function decl
-				constraints += { subtyp(typeOf(c@at), typeOf(funcDecl)) | funcDecl <- (m3@uses o m3@declarations)[name@at] };
+				set[loc] possibleFunctions = (m3@uses o m3@declarations)[name@at];
+				if (isEmpty(possibleFunctions)) {
+					// the function called does not exists.
+					constraints += { subtyp(typeOf(c@at), \any()) };
+				} else {
+					constraints += { subtyp(typeOf(c@at), typeOf(funcDecl)) | funcDecl <- possibleFunctions };
+				}
 			} else if (expr(Expr expr) := funName) {
 				// method call on an expression:
 				// type of this expression is either a string, or an object with the method __invoke()
@@ -744,8 +765,14 @@ private void addConstraints(Expr e, M3 m3)
 	
 	//| methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters)
 	case sc:staticCall(NameOrExpr staticTarget, NameOrExpr methodName, list[ActualParameter] parameters): {
-		// handle class names
-		constraints += { subtyp(typeOf(staticTarget@at), objectType()) };
+		// add some general constraints
+		addConstraintsForStaticMethodCallLHS(staticTarget, sc, m3);
+		addConstraintsForStaticMethodCallRHS(methodName, sc, m3);
+		addConstraints(staticTarget, m3);
+		addConstraints(methodName, m3);
+	
+		// RHS is a method of class LHS	
+		constraints += { isMethodOfClass(typeOf(methodName@at), typeOf(staticTarget@at)) };	
 		
 		bool inClass = inClassOrInterface(m3@containment, sc@scope);
 		set[Constraint] inClassConstraints = {};
@@ -755,16 +782,36 @@ private void addConstraints(Expr e, M3 m3)
 			loc currentClass = getClassOrInterface(m3@containment, sc@scope);
 			set[loc] parentClasses = range(domainR(m3@extends+, {currentClass}));
 		
-			switch (staticTarget) // borrowed this structure of Uses.rsc
+			switch (staticTarget)  // refactor this out of here, can be reused.
 			{
+				// refers to the instance 
+				case expr(var(name(name(/^this$/i)))): 
+				{
+				 //if RHS is a literal string
+					if (name(name(mName)) := methodName) {
+						constraints += {
+							//isMethod(typeOf(methodName))
+						//	disjunction({
+						//		conditional(
+						//		eq()),
+						//			eq(hasMethod(staticTarget@at, mName))
+						//		}),
+						//		eq(typeOf(staticTarget@at), classType(p)) | p <- {currentClass} + parentClasses
+						//	})
+						};
+					} else {
+						println("todo:: handle $this::Expr <sc>");
+					}
+				}
+				
 				// refers to the class itself
-				case name(name(/self/i)): 
+				case name(name(/^self$/i)): 
 				{
 					constraints += { eq(typeOf(staticTarget@at), classType(currentClass)) };
 				}
 				
 				// refers to all parents
-				case name(name(/parent/i)): 
+				case name(name(/^parent$/i)): 
 				{	
 					constraints += {
 						disjunction({
@@ -774,7 +821,7 @@ private void addConstraints(Expr e, M3 m3)
 		       	}
 		       	 
 				// refers to the instance 
-				case name(name(/static/i)): 
+				case name(name(/^static$/i)): 
 				{
 					constraints += {
 						disjunction({
@@ -792,12 +839,13 @@ private void addConstraints(Expr e, M3 m3)
 					
 					// RHS == literal string
 					if (name(rhsName) := methodName) {
-						inClassConstraints += {
-							conditional( // if LHS is same as the current class,
-								eq(typeOf(staticTarget@at), classType(currentClass)),
-								hasProperty(typeOf(staticTarget@at), rhsName.name, { notAllowed(static()) })
-							);	
-						}
+						//inClassConstraints += {
+						//	conditional( // if LHS is same as the current class,
+						//		eq(typeOf(staticTarget@at), classType(currentClass)),
+						//		hasProperty(typeOf(staticTarget@at), rhsName.name, { notAllowed(static()) })
+						//	);	
+						//}
+					;
 					}
 				}
 				
@@ -818,7 +866,11 @@ private void addConstraints(Expr e, M3 m3)
 				// PRECONDITION: RHS = literal name, add if statement
 				if (name(rhsName) := methodName) {
 					// methodName resolves to the method itself...
-					constraints += { isMethodName(typeOf(methodName@at), rhsName.name) };
+					constraints += { 
+						isAMethod(typeOf(methodName@at)),
+						hasName(typeOf(methodName@at), rhsName.name) 
+					};
+					//constraints += { isMethodName(typeOf(methodName@at), rhsName.name) };
 					// type of whole expression is the return type of the invoked method;
 					constraints += { subtyp(typeOf(sc@at), typeOf(methodName@at)) };
 					
@@ -827,17 +879,18 @@ private void addConstraints(Expr e, M3 m3)
 						//set[Constraint] inClassConstraints = {};
 					//}
 					// rules:
-					// - [E1] = this class hasMethod(E2.name, !static)
+					// - [E1] = this class hasMethod(E2.name)
 					// - [E1] = parent class hasMethod(E2.name, (public or protected) AND !static) 
 					// - [E1] = any class hasMethod(E2.name, public AND !static)
 					
 					//constraints += {
 					//	disjunction({
-					//		hasMethod(typeOf(staticTarget@at), rhsName.name, { required({ static() }) })
+					//		hasMethod(typeOf(staticTarget@at), rhsName.name)
 					//		//,
 					//		//parentHas(hasMethod(typeOf(staticTarget@at), name.name, { required({ static() }) }))
 					//	})
-					//};
+					//}
+					;
 				} else {
 					println("Variable call not supported (yet), please implement!!");	
 				}
@@ -929,4 +982,144 @@ public void addConstraintsForCallableExpression(Expr expr)
 			hasMethod(typeOf(expr@at), "__invoke")
 		)
 	};
+}
+
+// the stuff below will be used to solve constraints.
+// maybe move this to a different module...
+
+public map[TypeOf var, TypeSet possibles] solveConstraints(set[Constraint] constraints, M3 m3)
+{
+	// change (eq|subtyp) TypeOf, TypeSymbol 
+	//     to (eq|subtyp) TypeOf, typeOf(TypeSymbol)
+	// this is easier than rewiting all code
+	constraints = visit(constraints) {
+		case     eq(TypeOf a, TypeSymbol ts) =>     eq(a, typeOf(ts))
+		case subtyp(TypeOf a, TypeSymbol ts) => subtyp(a, typeOf(ts))
+   };
+   
+	estimates = initialEstimates(constraints);
+	iprintln(estimates);
+	
+	solve (estimates) {
+		//println("Solve triggered!!!");
+		//iprintln(estimates);
+		for (TypeOf v <- estimates, subtyp(v, typeOf(TypeSymbol t)) <- constraints) {
+			println("x");
+			println(estimates[v]);
+ 			estimates[v] = Intersection({ estimates[v], Subtypes(Single(t)) });
+			println(estimates[v]);
+ 		}
+ 	}
+		//for (TypeOf v <- estimates, eq(v, TypeSymbol t) <- constraints) {
+ 	//		estimates[v] = estimates[v] + {t};
+ 	//	}
+ 	
+ 		// rewrite ? 
+
+		// replace all resolved TypeSymbol.	
+		//println(estimates); 
+ 		//estimates = innermost visit(estimates) {
+ 		//	case Subtypes(Set({s , set[Type] rest })) => Union({Single(s ), Set ( subtypes [s ]), Subtypes(Set({ rest }))}) 
+ 		//};
+ 	
+ 		
+ 	return estimates;
+}
+
+public map[TypeOf, TypeSet] initialEstimates (set[Constraint] constraints) 
+{
+ 	map[TypeOf, TypeSet] result = ();
+ 	
+ 	visit (constraints) {
+ 		// fix cases
+ 		case eq(TypeOf t, typeOf(TypeSymbol ts)): result = addToMap(result, t, Single(ts)); 
+ 		case TypeOf t : result = addToMap(result, t, Universe());
+ 	};
+ 	return result;
+}
+
+// stupid wrapper to add or concat values
+public map[TypeOf, TypeSet] addToMap(map[TypeOf, TypeSet] m, TypeOf k, TypeSet ts)
+{
+	if (m[k]?) {
+		m[k] = Intersection({m[k], ts});	
+	} else {
+		m[k] = ts;	
+	}
+	
+	return m;
+}
+
+public void addConstraintsForStaticMethodCallLHS(NameOrExpr staticTarget, &T <: node parentNode, M3 m3) {
+	constraints += { subtyp(typeOf(staticTarget@at), objectType()) }; // LHS is an object
+	if (name(name) := staticTarget) {
+		addConstraintsForPreservedKeywords(name, parentNode, m3);	
+	} else if (expr(expr) := staticTarget) {
+		addConstraintsForPreservedKeywords(expr, parentNode, m3);	
+	}
+}
+public void addConstraintsForStaticMethodCallRHS(NameOrExpr methodName, &T <: node parentNode, M3 m3) {
+	constraints += { isAMethod(typeOf(methodName@at)) }; // RHS is a method
+	if (name(name(name)) := methodName) {
+		constraints += { hasName(typeOf(methodName@at), name) }; // RHS has name:
+	}
+}
+
+// add constraints for self/parent/static
+public void addConstraintsForPreservedKeywords(Name name, &T <: node parentNode, M3 m3) {
+	bool inClass = inClassOrInterface(m3@containment, parentNode@scope);
+	if (inClass) {
+		loc currentClass = getClassOrInterface(m3@containment, parentNode@scope);
+		set[loc] parentClasses = range(domainR(m3@extends+, {currentClass}));
+		switch(name)
+		{
+			// refers to the class itself
+			case name(name(/^self$/i)): 
+			{
+				constraints += { eq(typeOf(staticTarget@at), classType(currentClass)) };
+			}
+			
+			// refers to all parents
+			case name(name(/^parent$/i)): 
+			{	
+				constraints += {
+					disjunction({
+						eq(typeOf(staticTarget@at), classType(p)) | p <- parentClasses
+					})
+				};
+	       	}
+	       	 
+			// refers to the instance 
+			case name(name(/^static$/i)): 
+			{
+				constraints += {
+					disjunction({
+						eq(typeOf(staticTarget@at), classType(p)) | p <- {currentClass} + parentClasses
+					})
+				};
+			}
+		}
+	}
+}
+
+// add constraints for $this
+public void addConstraintsForPreservedKeywords(Expr expr, &T <: node parentNode, M3 m3) {
+	bool inClass = inClassOrInterface(m3@containment, parentNode@scope);
+	if (inClass) {
+		loc currentClass = getClassOrInterface(m3@containment, parentNode@scope);
+		switch (expr) {
+			case var(name(name(/^this$/i))): 
+			{
+				// $this refers to the current class or the parent class.
+				constraints += { 
+					disjunction({
+						eq(typeOf(expr@at), classType(currentClass)),
+						supertyp(typeOf(expr@at), classType(currentClass))
+					})
+				};
+			}
+		}
+		
+		;// add if  
+	}
 }
