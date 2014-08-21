@@ -7,10 +7,10 @@ if (true) {
     class C { public static function d() {} }
 }
 
-//$c = c::d();
+$c = c::d();
 
-//$d = "d";
-//$x = c::$d();
+$d = "d";
+$x = c::$d();
 
 //$c = new C;
 //$c::d();

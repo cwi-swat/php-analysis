@@ -46,7 +46,7 @@ private M3 createM3forScript(loc filename, Script script)
 
 	if (errscript(m) := script)
 	{
-		m3@messages += error(m, filename);
+		m3@messages += [ error(m, filename) ];
 		return m3;
 	}
 	
@@ -87,7 +87,7 @@ public M3 calculateAfterM3Creation(M3 m3, System system)
 	println("calculateUsesAfterTypes for <total> files");
 	for (l <- system) {
 		counter += 1;
-		logMessage("running file: <l>", 1);
+		//logMessage("running file: <l>", 1);
 		if (counter%10==0) logMessage("<counter> (<(100*counter)/total>)%.. ", 1);	
 		m3 = calculateUsesAfterTypes(m3, system[l]);
 	}
@@ -230,7 +230,7 @@ private set[loc] getConstructorForClass(loc class, M3 m3) {
 	// if a class is in a global namespace, the constructor can be the name of the class (but only if __construct does not exist);		
 	if (globalNamespace == getNamespace(scriptM3@containment, methodDecl)) 
 	{
-		loc classDecl = getClassOrInterface(scriptM3@containment, methodDecl);
+		loc classDecl = getClassTraitOrInterface(scriptM3@containment, methodDecl);
 		set[str] classMethods = { elm.file | elm <- elements(scriptM3, classDecl), isMethod(elm) };
 		if ("__construct" in classMethods) 
 		{

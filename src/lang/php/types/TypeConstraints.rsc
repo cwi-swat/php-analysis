@@ -6,44 +6,45 @@ import lang::php::types::TypeSymbol;
 alias TypeFacts = rel[loc decl, Fact fact];
 
 // these facts can be extracted from the M3.
-data Fact
-	= className(str name) // = FQN (= fully qualified name) 
-	| classMethod(str name)
-	| classProperty(str name)
-	| classConstant(str name)
-	| classConstructorParameters(PhpParams params)
-	| methodName(str name)
-	| methodParameters(PhpParams params)
-	| functionName(str name) 
-	| functionParameters(PhpParams params)
+//data Fact
+//	= className(str name) // = FQN (= fully qualified name) 
+//	| classMethod(str name)
+//	| classProperty(str name)
+//	| classConstant(str name)
+//	| classConstructorParameters(PhpParams params)
+//	| methodName(str name)
+//	| methodParameters(PhpParams params)
+//	| functionName(str name) 
+//	| functionParameters(PhpParams params)
+//	;
+
+data TypeEnvironment
+	= var()
+	| method()
 	;
 	
 data TypeOf 
 	= typeOf(loc ident)
 	| typeOf(TypeSymbol ts)
 	| arrayType(set[TypeOf] expressions)
-	//| typeOf(TypeSymbol typeSymbol)
 	;
 
 data Constraint 
 	= eq(TypeOf a, TypeOf t)
 	| eq(TypeOf a, TypeSymbol ts)
-	//| eq(TypeOf a, set[TypeOf] alts)
-	//| eq(TypeOf a, set[TypeSymbol] altts)
     | subtyp(TypeOf a, TypeOf t)
     | subtyp(TypeOf a, TypeSymbol ts)
-    //| subtyp(TypeOf a, set[TypeOf] alts)
-    //| subtyp(TypeOf a, set[TypeSymbol] altts)
     | supertyp(TypeOf a, TypeOf t)
     | supertyp(TypeOf a, TypeSymbol ts)
-   
+  
+  	| lub(set[TypeOf] elms) 
+  	
    	// query the m3 to solve these 
     | isAFunction(TypeOf a)
     | isAMethod(TypeOf a)
     | hasName(TypeOf a, str name)
     
-    | isMethodOfClass(TypeOf a, TypeOf t)
-    //| isMethodOfClass(TypeOf a, TypeSymbol ts)
+    | isItemOfClass(TypeOf a, TypeOf t)
     | hasMethod(TypeOf a, str name)
     | hasMethod(TypeOf a, str name, set[ModifierConstraint] modifiers)
     //| parentHasMethod(TypeOf a, str name)

@@ -107,7 +107,7 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
         	if (v@scope == globalNamespace) {
         		m3@uses += { <v@at, v@scope> };
         	} else {
-				loc currentClassDecl = getClassOrInterface(m3@containment, v@scope);
+				loc currentClassDecl = getClassTraitOrInterface(m3@containment, v@scope);
         		m3@uses += { <v@at, currentClassDecl> };
         	}
         }
@@ -255,20 +255,20 @@ private M3 addUseClass(M3 m3, NameOrExpr className)
 	{
 		case name(name(/^self$/i)): // refers to the class itself
 		{
-			loc currentClass = getClassOrInterface(m3@containment, className@scope);
+			loc currentClass = getClassTraitOrInterface(m3@containment, className@scope);
 			m3@uses += { <className@at, currentClass> };
 		}
 		
 		case name(name(/^parent$/i)): // refers to all parents
 		{
-			loc currentClass = getClassOrInterface(m3@containment, className@scope);
+			loc currentClass = getClassTraitOrInterface(m3@containment, className@scope);
    			set[loc] parentClasses = range(domainR(m3@extends+, {currentClass}));
 			m3@uses += { <className@at, p> | p <- parentClasses };
        	}
        	 
 		case name(name(/^static$/i)): // refers to the instance, can be itself or its children 
 		{
-			loc currentClass = getClassOrInterface(m3@containment, className@scope);
+			loc currentClass = getClassTraitOrInterface(m3@containment, className@scope);
    			set[loc] parentClasses = range(domainR(m3@extends+, {currentClass}));
    			set[loc] childrenClasses = range(domainR(invert(m3@extends)+, {currentClass}));
 			m3@uses += { <className@at, p> | p <- parentClasses + {currentClass} + childrenClasses };

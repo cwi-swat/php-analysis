@@ -276,23 +276,23 @@ public M3 addVarDecl(M3 m3, node n, node parent) {
 	return decl;
 }
 
-@memo public loc getClassOrInterface(rel[loc from, loc to] containment, loc decl) {
+@memo public loc getClassTraitOrInterface(rel[loc from, loc to] containment, loc decl) {
 	loc input = decl;
 	containment = invert(containment);
 	solve(decl) {
-		if (!isClass(decl) && !isInterface(decl)) {
-			assert size(containment[decl]) == 1 : "getClassOrInterface failed for decl: <decl> (started at: <input>)";
+		if (!isClass(decl) && !isInterface(decl) && !isTrait(decl)) {
+			assert size(containment[decl]) == 1 : "getClassTraitOrInterface failed for decl: <decl> (started at: <input>)";
 			decl = getOneFrom(containment[decl]);	
 		}
 	}
 	return decl;
 }
 
-// Clone detected!! This method is similar to method getClassOrInterface.
-@memo public bool inClassOrInterface(rel[loc from, loc to] containment, loc decl) {
+// Clone detected!! This method is similar to method getClassTraitOrInterface.
+@memo public bool inClassTraitOrInterface(rel[loc from, loc to] containment, loc decl) {
 	containment = invert(containment);
 	solve(decl) {
-		if (!isClass(decl) && !isInterface(decl)) {
+		if (!isClass(decl) && !isInterface(decl) && !isTrait(decl)) {
 			if (size(containment[decl]) != 1) 
 				return false; // some error occured, not inside a class
 			decl = getOneFrom(containment[decl]);	

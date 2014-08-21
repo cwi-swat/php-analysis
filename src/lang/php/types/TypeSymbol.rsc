@@ -4,7 +4,8 @@ extend analysis::m3::TypeSymbol;
 // type `mixed()` is omitted, `\any()` will be used
 
 data TypeSymbol
-  = arrayType(TypeSymbol arrayType)
+  = arrayType()
+  | arrayType(TypeSymbol arrayType)
   | booleanType()
   | classType(loc decl)
   | floatType()
@@ -13,6 +14,7 @@ data TypeSymbol
   | objectType()
   | resourceType()
   | stringType()
+  | scalarType()
   ; 
  
 //default bool subtyp(TypeSymbol s, TypeSymbol t) = s == t;

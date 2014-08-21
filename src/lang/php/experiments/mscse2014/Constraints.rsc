@@ -48,6 +48,7 @@ public set[Constraint] getConstraints(System system, M3 m3)
 
 private void addConstraints(Script script, M3 m3)
 { 
+	addConstraintsOnAllVarsWithinScope(script);
 	for (stmt <- script.body) {
 		addConstraints(stmt, m3);
 	}
@@ -630,7 +631,13 @@ private void addConstraints(Expr e, M3 m3)
 			} else {
 				// variable class instantiation:
 				addConstraints(className.expr, m3);	
-				constraints += { subtyp(typeOf(n@at), objectType()) };
+				constraints += { // result is an object, className is a string or an object
+					subtyp(typeOf(n@at), objectType()),
+					disjunction({
+						subtyp(typeOf(className@at), objectType()),
+						eq(typeOf(className@at), stringType())
+					})
+				};
 			}	
 			// todo: parameters
 		}
@@ -772,14 +779,14 @@ private void addConstraints(Expr e, M3 m3)
 		addConstraints(methodName, m3);
 	
 		// RHS is a method of class LHS	
-		constraints += { isMethodOfClass(typeOf(methodName@at), typeOf(staticTarget@at)) };	
+		constraints += { isItemOfClass(typeOf(methodName@at), typeOf(staticTarget@at)) };	
 		
-		bool inClass = inClassOrInterface(m3@containment, sc@scope);
+		bool inClass = inClassTraitOrInterface(m3@containment, sc@scope);
 		set[Constraint] inClassConstraints = {};
 	
 		// first add constraints for when this call is performed from within a class
 		if (inClass) {		
-			loc currentClass = getClassOrInterface(m3@containment, sc@scope);
+			loc currentClass = getClassTraitOrInterface(m3@containment, sc@scope);
 			set[loc] parentClasses = range(domainR(m3@extends+, {currentClass}));
 		
 			switch (staticTarget)  // refactor this out of here, can be reused.
@@ -954,7 +961,7 @@ public void addConstraintsOnAllReturnStatementsWithinScope(&T <: node t)
 	if (!isEmpty(returnStmts)) {
 		// if there are return statements, the disjunction of them is the return value of the function
 		constraints += { 
-			disjunction(
+			lub(
 				{ eq(typeOf(t@at), typeOf(e@at)) | rs <- returnStmts, someExpr(e) := rs }
 				+ { eq(typeOf(t@at), nullType()) | rs <- returnStmts, noExpr() := rs }
 			)};
@@ -984,37 +991,55 @@ public void addConstraintsForCallableExpression(Expr expr)
 	};
 }
 
-// the stuff below will be used to solve constraints.
-// maybe move this to a different module...
+// start of solving constraints (move this stuff somewhere else)
 
-public map[TypeOf var, TypeSet possibles] solveConstraints(set[Constraint] constraints, M3 m3)
+public map[TypeOf var, set[TypeSymbol] possibles] solveConstraints(set[Constraint] constraints, M3 m3, System system)
 {
 	// change (eq|subtyp) TypeOf, TypeSymbol 
 	//     to (eq|subtyp) TypeOf, typeOf(TypeSymbol)
 	// this is easier than rewiting all code
 	constraints = visit(constraints) {
-		case     eq(TypeOf a, TypeSymbol ts) =>     eq(a, typeOf(ts))
-		case subtyp(TypeOf a, TypeSymbol ts) => subtyp(a, typeOf(ts))
-   };
-   
-	estimates = initialEstimates(constraints);
-	iprintln(estimates);
+		case       eq(TypeOf a, TypeSymbol ts) =>       eq(a, typeOf(ts))
+		case   subtyp(TypeOf a, TypeSymbol ts) =>   subtyp(a, typeOf(ts))
+		case supertyp(TypeOf a, TypeSymbol ts) => supertyp(a, typeOf(ts))
+ 	};
+  
+  	subtypes = getSubTypes(m3, system);
+	estimates = initialEstimates(constraints, subtypes);
+
+	iprintln("Initial results:");	
+	for (to:typeOf(est) <- estimates) {
+		println("<toStr(to)> :: <estimates[to]>");
+	}
 	
 	solve (estimates) {
-		//println("Solve triggered!!!");
-		//iprintln(estimates);
-		for (TypeOf v <- estimates, subtyp(v, typeOf(TypeSymbol t)) <- constraints) {
-			println("x");
-			println(estimates[v]);
- 			estimates[v] = Intersection({ estimates[v], Subtypes(Single(t)) });
-			println(estimates[v]);
+		//for (v <- estimates, subtyp(t:typeOf(loc ident), v) <- constraints) {
+		for (v <- estimates, subtyp(t:typeOf(loc ident), v) <- constraints) {
+			//println("Merge 1: <readFile(v.ident)> && <readFile(t.ident)>");
+			//println(estimates[v]);
+			//println(estimates[t]);
+ 			estimates[v] = estimates[v] & estimates[t];
  		}
+		for (v <- estimates, subtyp(v, t:typeOf(loc ident)) <- constraints) {
+			//println("Merge 2: <readFile(v.ident)> && <readFile(t.ident)>");
+			//println(estimates[v]);
+			//println(estimates[t]);
+ 			estimates[v] = estimates[v] & estimates[t];
+ 		}
+		//for (v <- estimates, eq(v, typeOf(TypeSymbol t)) <- constraints) {
+ 		//	estimates[v] = estimates[v] & {t};
+		//}
+		
+		
+		
+		// last step is: check lub
+		// union of known types
  	}
-		//for (TypeOf v <- estimates, eq(v, TypeSymbol t) <- constraints) {
- 	//		estimates[v] = estimates[v] + {t};
- 	//	}
- 	
- 		// rewrite ? 
+
+	iprintln("After solve:");	
+	for (to:typeOf(est) <- estimates) {
+		println("<toStr(to)> :: <estimates[to]>");
+	}
 
 		// replace all resolved TypeSymbol.	
 		//println(estimates); 
@@ -1026,29 +1051,63 @@ public map[TypeOf var, TypeSet possibles] solveConstraints(set[Constraint] const
  	return estimates;
 }
 
-public map[TypeOf, TypeSet] initialEstimates (set[Constraint] constraints) 
+public map[TypeOf, set[TypeSymbol]] initialEstimates (set[Constraint] constraints, rel[TypeSymbol, TypeSymbol] subtypes) 
 {
- 	map[TypeOf, TypeSet] result = ();
+ 	map[TypeOf, set[TypeSymbol]] result = ();
  	
  	visit (constraints) {
- 		// fix cases
- 		case eq(TypeOf t, typeOf(TypeSymbol ts)): result = addToMap(result, t, Single(ts)); 
- 		case TypeOf t : result = addToMap(result, t, Universe());
+ 		case eq(TypeOf t, typeOf(TypeSymbol ts)): {
+ 			//println("ABC");
+ 			result = addToMap(result, t, {ts}); 
+ 		}
+ 		case subtype(TypeOf t, typeOf(TypeSymbol ts)): {
+ 			result = addToMap(result, t, getSubTypes(subtypes, {ts})); 
+ 		}
+ 		case supertype(TypeOf t, typeOf(TypeSymbol ts)): {
+ 			result = addToMap(result, t, getSuperTypes(subtypes, {ts})); 
+ 		}
+ 		case TypeOf t:typeOf(loc ident): {
+ 			result = addToMap(result, t, getSubTypes(subtypes, {\any()}));
+ 		}
  	};
  	return result;
 }
 
-// stupid wrapper to add or concat values
-public map[TypeOf, TypeSet] addToMap(map[TypeOf, TypeSet] m, TypeOf k, TypeSet ts)
+public set[TypeSymbol]   getSubTypes(rel[TypeSymbol, TypeSymbol] subtypes, set[TypeSymbol] ts) = domain(rangeR(subtypes, ts));
+public set[TypeSymbol] getSuperTypes(rel[TypeSymbol, TypeSymbol] subtypes, set[TypeSymbol] ts) = domain(rangeR(invert(subtypes), ts));
+
+// Stupid wrapper to add or take the intersection of values
+public map[TypeOf, set[TypeSymbol]] addToMap(map[TypeOf, set[TypeSymbol]] m, TypeOf k, set[TypeSymbol] ts)
 {
 	if (m[k]?) {
-		m[k] = Intersection({m[k], ts});	
+		m[k] = m[k] & ts;	
 	} else {
 		m[k] = ts;	
 	}
 	
 	return m;
 }
+
+public rel[TypeSymbol, TypeSymbol] getSubTypes(M3 m3, System system) 
+{
+	rel[TypeSymbol, TypeSymbol] subtypes
+		// subtypes of any()
+		= { < rootType, \any() > | rootType <- { arrayType(\any()), booleanType(), floatType(), nullType(), objectType(), resourceType(), stringType()  } }
+		// add int() as subtype of float()
+		+ { < integerType(), floatType() > }
+		// use the extends relation from M3
+		+ { < classType(c), classType(e) > | <c,e> <- m3@extends }
+		// add subtype of object for all classes which do not extends a class
+		+ { < classType(c@decl), objectType() > | l <- system, /c:class(n,_,noName(),_,_) <- system[l] };
+		
+	// compute reflexive transitive closure and return the result 
+	subtypes = subtypes*;
+
+	// todo, add subtypes for arrays
+	return subtypes;
+}
+
+// end of solving constraints (move this stuff somewhere else)
 
 public void addConstraintsForStaticMethodCallLHS(NameOrExpr staticTarget, &T <: node parentNode, M3 m3) {
 	constraints += { subtyp(typeOf(staticTarget@at), objectType()) }; // LHS is an object
@@ -1067,9 +1126,9 @@ public void addConstraintsForStaticMethodCallRHS(NameOrExpr methodName, &T <: no
 
 // add constraints for self/parent/static
 public void addConstraintsForPreservedKeywords(Name name, &T <: node parentNode, M3 m3) {
-	bool inClass = inClassOrInterface(m3@containment, parentNode@scope);
+	bool inClass = inClassTraitOrInterface(m3@containment, parentNode@scope);
 	if (inClass) {
-		loc currentClass = getClassOrInterface(m3@containment, parentNode@scope);
+		loc currentClass = getClassTraitOrInterface(m3@containment, parentNode@scope);
 		set[loc] parentClasses = range(domainR(m3@extends+, {currentClass}));
 		switch(name)
 		{
@@ -1104,9 +1163,9 @@ public void addConstraintsForPreservedKeywords(Name name, &T <: node parentNode,
 
 // add constraints for $this
 public void addConstraintsForPreservedKeywords(Expr expr, &T <: node parentNode, M3 m3) {
-	bool inClass = inClassOrInterface(m3@containment, parentNode@scope);
+	bool inClass = inClassTraitOrInterface(m3@containment, parentNode@scope);
 	if (inClass) {
-		loc currentClass = getClassOrInterface(m3@containment, parentNode@scope);
+		loc currentClass = getClassTraitOrInterface(m3@containment, parentNode@scope);
 		switch (expr) {
 			case var(name(name(/^this$/i))): 
 			{

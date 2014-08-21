@@ -41,55 +41,86 @@ loc getLastConstraintsCacheFile() = cacheFolder + "last_constraints_<getProjectL
 loc getParsedSystemCacheFile() = cacheFolder + "plain_system_<getProjectLocation().file>.bin";
 
 
-//public void main() {
-//	println("Run instructions:");
-//	println("----------------");
-//	println("1) Run run1() to create the m3 (and save system and m3 to cache)");
-//	println("2) Run run3() to collect constraints (and save the constraints to cache)");
-//	println("3) Run run4() to solve the constraints (and print the results)");
-//	println("----------------");
-//}
 private map[str,str] corpus = (
-	"osCommerce":"2.3.1",
-	"ZendFramework":"1.11.12",
-	"CodeIgniter":"2.1.2",
-	"Symfony":"2.0.12",
-	"SilverStripe":"2.4.7",
-	"WordPress":"3.4",
-	"Joomla":"2.5.4",
-	"phpBB":"3",
-	"Drupal":"7.14",
-	"MediaWiki":"1.19.1",
-	"Gallery":"3.0.4",
-	"SquirrelMail":"1.4.22",
-	"Moodle":"2.3",
-	//"Smarty":"3.1.11"//,
-	"Kohana":"3.2",
-	"phpMyAdmin":"3.5.0-english",
-	"PEAR":"1.9.4",
-	"CakePHP":"2.2.0-0",
-	"DoctrineORM":"2.2.2",
+	//"osCommerce":"2.3.1",
+	//"ZendFramework":"1.11.12",
+	//"CodeIgniter":"2.1.2",
+	//"Symfony":"2.0.12",
+	//"SilverStripe":"2.4.7",
+	//"WordPress":"3.4",
+	//"Joomla":"2.5.4",
+	//"phpBB":"3",
+	//"Drupal":"7.14",
+	//"MediaWiki":"1.19.1",
+	//"Gallery":"3.0.4",
+	//"SquirrelMail":"1.4.22",
+	//"Moodle":"2.3",
+	//"Smarty":"3.1.11",
+	//"Kohana":"3.2",
+	//"phpMyAdmin":"3.5.0-english",
+	//"PEAR":"1.9.4",
+	//"CakePHP":"2.2.0-0",
+	//"DoctrineORM":"2.2.2"//,
+	
+	// sorted in LOC
+	"doctrine_lexer":"1.0", // 1
+	"doctrine_inflector":"1.0", // 2
+	"psr_log":"1.0.0", // 3
+	"symfony_filesystem":"2.5.3", // 4
+	"symfony_event-dispatcher":"2.5.3", // 5
+	"phpunit_php-token-stream":"1.2.2", // 6
+	"symfony_yaml":"2.5.3", // 7
+	"symfony_debug":"2.5.3", // 8
+	"doctrine_collections":"1.2", // 9
+	"doctrine_cache":"1.3.0", // 10
+	"symfony_dom-crawler":"2.5.3", // 11
+	"symfony_process":"2.5.3", // 12
+	"doctrine_annotations":"1.2.0", // 13
+	"symfony_translation":"2.5.3", // 14
+	"symfony_browser-kit":"2.5.3", // 15
+	"symfony_finder":"2.5.3", // 16
+	"symfony_css-selector":"2.5.3", // 17
+	"symfony_routing":"2.5.3", // 18
+	"phpunit_phpunit-mock-objects":"2.2.0", // 19
+	"monolog_monolog":"1.10.0", // 20
+	"phpunit_php-code-coverage":"2.0.10", // 21
+	"symfony_console":"2.5.3", // 22
+	"symfony_http-foundation":"2.5.3", // 23
+	"twig_twig":"1.16.0", // 24
+	"doctrine_common":"2.4.2", // 25
+	"swiftmailer_swiftmailer":"5.2.1", // 26
+	"guzzle_guzzle":"3.9.2", // 27
+	"symfony_http-kernel":"2.5.3", // 28
+	"phpunit_phpunit":"4.2.2", // 29
+	"doctrine_dbal":"2.4.2", // 30
+	
 	"WerkspotNoTests":"oldWebsiteNoTests"
 );
 
 public void run() {
-	run1();
-	run3();
-	run4();
-	run4();
+	println("Run instructions:");
+	println("----------------");
+	println("1) Run run1() to parse the files (and save the parsed files to the cache)");
+	println("2) Run run2() to create the m3 (and save system and m3 to cache)");
+	println("3) Run run3() to collect constraints (and save the constraints to cache)");
+	println("4) Run run4() to solve the constraints (and print the results)");
+	println("----------------");
 }
 
 public void run1() {
 	println("This first step will save the parsed files to the filesystem");
-	bool useCache = false;
 	logMessage("Get system...", 1);
+	
+	bool useCache = false;
+	resetModifiedSystem(); // this is only needed when running multiple tests
 	System system = getSystem(getProjectLocation(), useCache);
 	writeBinaryValueFile(getParsedSystemCacheFile(), system);
-	println("This first step will save the parsed files to the filesystem");
 	
+	println("The scripts are now parsed into ASTs. Please run run2() now.");
 }
 
 public void run2() {
+	// precondition: plain parsed system file should exists for this project
 	assert isFile(getParsedSystemCacheFile()) : "Please run run1() first. Error: file(<getParsedSystemCacheFile()>) was not found";
 	
 	println("This second step will save a modified system and create a global M3 file");
@@ -98,6 +129,7 @@ public void run2() {
 	
 	bool useCache = false;
 	logMessage("Get M3 For System...", 1);
+	resetModifiedSystem(); // this is only needed when running multiple tests
 	M3 m3 = getM3ForSystem(system, useCache);
 	logMessage("Get modified system...", 1);
 	system = getModifiedSystem(); // for example the script is altered with scope information
@@ -114,7 +146,7 @@ public void run2() {
 public void run3() {
 	// precondition: system and m3 cache file must exist
 	assert isFile(getModifiedSystemCacheFile()) : "Please run run1() first. Error: file(<getModifiedSystemCacheFile()>) was not found";
-	assert isFile(getLastM3CacheFile())     : "Please run run1() first. Error: file(<getLastM3CacheFile()>) was not found";
+	assert isFile(getLastM3CacheFile())     	: "Please run run1() first. Error: file(<getLastM3CacheFile()>) was not found";
 	
 	logMessage("Reading system from cache...", 1);
 	System system = readBinaryValueFile(#System, getModifiedSystemCacheFile());
@@ -212,7 +244,6 @@ public rel[loc,loc] getPropagatedImplementations(M3 m3)
 	return implSet;
 }
 
-// moved to constraints
 //public rel[TypeSymbol, TypeSymbol] getSubTypes(M3 m3, System system) 
 //{
 //	rel[TypeSymbol, TypeSymbol] subtypes
