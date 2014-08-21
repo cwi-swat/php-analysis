@@ -40,7 +40,7 @@ public M3 getM3ForSystem(System system, loc l)
 public M3 M3CollectionToM3 (M3Collection m3s, loc l) = composePhpM3(l, range(m3s));
 
 @doc { extract M3 relations from a single PHP script }
-private M3 createM3forScript(loc filename, Script script)
+public M3 createM3forScript(loc filename, Script script)
 {
 	M3 m3 = createEmptyM3(filename);
 

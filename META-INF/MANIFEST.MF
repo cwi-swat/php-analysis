@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: PHPAnalysis
 Bundle-SymbolicName: PHPAnalysis
 Bundle-Version: 1.0.0
-Require-Bundle: org.eclipse.imp.pdb.values,
- rascal
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: org.eclipse.imp.pdb.facts,
+ org.eclipse.imp.pdb.facts.type,
+ org.rascalmpl.interpreter.utils

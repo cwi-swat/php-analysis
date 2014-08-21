@@ -43,7 +43,7 @@ public data Language(str version="")
 
 public M3 createEmptyM3(loc file)
 {
-	m = composeM3(file, {});
+	m = emptyM3(file);
 	
 	m@extends = {};
 	m@implements = {};

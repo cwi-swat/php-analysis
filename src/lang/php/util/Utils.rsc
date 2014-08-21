@@ -25,22 +25,61 @@ import util::ShellExec;
 
 import lang::php::pp::PrettyPrinter;
 
+
+@javaClass{org.rascal.phpanalysis.PhpJarExtractor}
+@memo
+private java loc getPhpParserLocFromJar() throws IO(str msg);
+
+
+private str executePHP(list[str] opts, loc cwd) {
+	str phpBinLoc = usePhpParserJar ? "php" : phploc.path;
+
+  	PID pid = createProcess(phpBinLoc, opts, cwd);
+	str phcOutput = readEntireStream(pid);
+	str phcErr = readEntireErrStream(pid);
+	killProcess(pid);
+
+	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
+		return phcOutput;
+	}
+	
+	throw IO("error calling php");
+}
+
+private Script parsePHPfile(loc f, list[str] opts, Script error) {
+	str parserLoc = usePhpParserJar ? getPhpParserLocFromJar() + astToRascal : rgenLoc.path;
+
+	try {
+		phpOut = executePHP(["-d memory_limit="+parserMemLimit, rgenLoc.path, "-f<f.path>"] + opts, rgenCwd);
+	}
+	catch RuntimeException:
+		return error;
+
+	if (trim(phpOut) == "")
+		res = errscript("Parser failed in unknown way");
+	else 
+		res = readTextValueString(#Script, phpOut);
+
+	return res;
+}
+
+@doc{Test if a running version php is available on the path}
+@memo
+public bool testPHPInstallation() {
+	str hello = "hello world";
+	try {
+		return hello == trim(executePHP(["-r echo \"<hello>\";"], |tmp:///|));
+	}
+	catch RuntimeException:
+	 	return false;
+}
+
 @doc{Parse an individual PHP statement using the external parser, returning the associated AST.}
 public Stmt parsePHPStatement(str s) {
 	tempFile = |file:///tmp/parseStmt.php|;
 	writeFile(tempFile, "\<?php\n<s>?\>");
-	PID pid = createProcess(phploc.path, ["-d memory_limit="+parserMemLimit, rgenLoc.path, "-f<tempFile.path>"], rgenCwd);
-	str phcOutput = readEntireStream(pid);
-	str phcErr = readEntireErrStream(pid);
-	Script res = errscript("Could not parse <s>");
-	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
-		if (trim(phcOutput) == "")
-			throw "Parser failed in unknown way";
-		else
-			res = readTextValueString(#Script, phcOutput);
-	}
+	Script res = executePHPfile(tempFile, [], errscript("Could not parse <s>"));
 	if (errscript(_) := res) throw "Found error in PHP code to parse";
-	killProcess(pid);
 	if (script(sl) := res && size(sl) == 1) return head(sl);
 	if (script(sl) := res) return block(sl);
 	throw "Could not parse statement <s>";
@@ -72,18 +111,8 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	if (l.scheme == "home") opts += "-r";
 	if (includePhpDocs) opts += "--phpdocs";
 	
-	PID pid = createProcess(phploc.path, ["-d memory_limit="+parserMemLimit, rgenLoc.path, "-f<l.path>"] + opts, rgenCwd);
-	str phcOutput = readEntireStream(pid);
-	str phcErr = readEntireErrStream(pid);
-	Script res = errscript("Could not parse file <l.path>: <phcErr>");
-	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
-		if (trim(phcOutput) == "")
-			res = errscript("Parser failed in unknown way");
-		else 
-			res = readTextValueString(#Script, phcOutput);
-	}
+	Script res = executePHPfile(l, opts, errscript("Could not parse file <l.path>: <phcErr>")); 
 	if (errscript(err) := res) println("Found error in file <l.path>. Error: <err>");
-	killProcess(pid);
 	return res;
 }
 
