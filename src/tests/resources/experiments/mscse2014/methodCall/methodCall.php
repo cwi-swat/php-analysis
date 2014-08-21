@@ -1,8 +1,15 @@
 <?php
 
-class C { public static function d() {} }
-c::d();
-//$a->b();
+// static call
+class C { public function d() { } }
+
+$c = new C;
+$c->d();
+
+$d = "d";
+$c->$d();
+
+$c->$d();
 
 // variable calls
 //$a->$b();

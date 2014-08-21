@@ -26,27 +26,32 @@ public void main()
 	assert true == testComparisonOp();
 	assert true == testLogicalOp();
 	assert true == testCasts();
-	assert true == testArray();
+	assert true == testarrayType();
 	assert true == testVarious();
 	assert true == testControlStructures();
 	assert true == testFunction();
 	assert true == testClassMethod();
 	assert true == testClassConstant();
 	assert true == testClassProperty();
-	assert true == testMethodCall();
+	assert true == testMethodCallStatic();
 	assert true == testClassKeywords();
+	assert true == testMethodCall();
 }
 
 public test bool testVariable() {
-	list[str] expected = [
+	list[str] expectedC = [
 		"[$a] \<: any()"
 	];
-	return run("variable", expected);
+	list[str] expectedT = [];
+	return testConstraints("variable", expectedC, expectedT);
 }
 public test bool testNormalAssign() {
-	list[str] expected = [
+	list[str] expectedC = [
+		// $a = 2; 
+		// $b = $a; 
+		// $c = $d = $b; 
 		"[$a] \<: any()", "[$a] \<: any()", "[$b] \<: any()",
-		"[2] \<: [$a]", "[2] = integer()", // assign of int
+		"[2] \<: [$a]", "[2] = integerType()", // assign of int
 		"[$a] \<: [$b]", // assign assign of vars
 		"[$a] \<: [$a = 2]", "[$b] \<: [$b = $a]", // type of full expr is the type of the assignment
 		
@@ -55,509 +60,549 @@ public test bool testNormalAssign() {
 		"[$d] \<: [$d = $b]",
 		"[$c] \<: [$c = $d = $b]"
 	];
-	return run("normalAssign", expected);
+	list[str] expectedT = [
+		"[2] = { integerType() }",
+		"[$a] = { integerType() }",
+		"[$a = 2] = { integerType() }",
+		"[$a] = { integerType() }",
+		"[$a] = { integerType(), integerType() }",
+		"[$b = $a] = { integerType() }",
+		"[$b] = { integerType() }",
+		"[$b] = { integerType() }",
+		"[$c = $d = $b] = { integerType() }",
+		"[$c] = { integerType() }",
+		"[$d = $b] = { integerType() }",
+		"[$d] = { integerType() }"
+	];
+	return testConstraints("normalAssign", expectedC, expectedT);
 }
 
 public test bool testScalars() {
-	list[str] expected = [
-		// floats -> float()
-		"[0.0] = float()", "[0.5] = float()", "[1000.0382] = float()",
+	list[str] expectedC = [
+		// floats -> floatType()
+		"[0.0] = floatType()", "[0.5] = floatType()", "[1000.0382] = floatType()",
 		// int -> int()
-		"[0] = integer()", "[1] = integer()", "[2] = integer()", "[10] = integer()", "[100] = integer()",
-		// strings -> string()
-		"[\"string\"] = string()", "[\'also a string\'] = string()", 
-		// encapsed -> string()
+		"[0] = integerType()", "[1] = integerType()", "[2] = integerType()", "[10] = integerType()", "[100] = integerType()",
+		// strings -> stringType()
+		"[\"string\"] = stringType()", "[\'also a string\'] = stringType()", 
+		// encapsed -> stringType()
 		// also evaluate the items of the encapsed string
-		"[\"$encapsed string\"] = string()", "[\"{$encapsed} string\"] = string()",
+		"[\"$encapsed string\"] = stringType()", "[\"{$encapsed} string\"] = stringType()",
 		"[$encapsed] \<: any()", "[$encapsed] \<: any()"
 		
 	];
-	return run("scalar", expected);
+	list[str] expectedT = [
+		//"[\"$encapsed string\"] = { stringType() }",
+		//"[\"string\"] = { stringType() }",
+		//"[\"{$encapsed} string\"] = { stringType() }",
+		//"[\'also a string\'] = { stringType() }",
+		//"[0.0] = { floatType() }",
+		//"[0.5] = { floatType() }",
+		//"[0] = { integerType() }",
+		//"[1000.0382] = { floatType() }",
+		//"[100] = { integerType() }",
+		//"[10] = { integerType() }",
+		//"[1] = { integerType() }",
+		//"[2] = { integerType() }"
+	];
+	return testConstraints("scalar", expectedC, expectedT);
 }
 
 public test bool testPredefinedConstants() {
-	list[str] expected = [
-		// magic constants -> string() (except for __LINE__ which is of type integer()
-		"[__CLASS__] = string()", "[__DIR__] = string()", "[__FILE__] = string()", "[__FUNCTION__] = string()", 
-		"[__LINE__] = integer()", "[__METHOD__] = string()", "[__NAMESPACE__] = string()", "[__TRAIT__] = string()",
+	list[str] expectedC = [
+		// magic constants -> stringType() (except for __LINE__ which is of type integerType()
+		"[__CLASS__] = stringType()", "[__DIR__] = stringType()", "[__FILE__] = stringType()", "[__FUNCTION__] = stringType()", 
+		"[__LINE__] = integerType()", "[__METHOD__] = stringType()", "[__NAMESPACE__] = stringType()", "[__TRAIT__] = stringType()",
 		
-		// booleans -> boolean()
-		"[TRUE] = boolean()", "[true] = boolean()", "[TrUe] = boolean()",
-		"[FALSE] = boolean()", "[false] = boolean()", "[FalSe] = boolean()",
+		// booleans -> booleanType()
+		"[TRUE] = booleanType()", "[true] = booleanType()", "[TrUe] = booleanType()",
+		"[FALSE] = booleanType()", "[false] = booleanType()", "[FalSe] = booleanType()",
 		
-		"[DEFAULT_INCLUDE_PATH] = string()",
-		"[E_ALL] = integer()",
-		"[E_COMPILE_ERROR] = integer()",
-		"[E_COMPILE_WARNING] = integer()",
-		"[E_CORE_ERROR] = integer()",
-		"[E_CORE_WARNING] = integer()",
-		"[E_DEPRECATED] = integer()",
-		"[E_ERROR] = integer()",
-		"[E_NOTICE] = integer()",
-		"[E_PARSE] = integer()",
-		"[E_RECOVERABLE_ERROR] = integer()",
-		"[E_STRICT] = integer()",
-		"[E_USER_DEPRECATED] = integer()",
-		"[E_USER_ERROR] = integer()",
-		"[E_USER_NOTICE] = integer()",
-		"[E_USER_WARNING] = integer()",
-		"[E_WARNING] = integer()",
-		"[E_USER_DEPRECATED] = integer()",
-		"[FALSE] = boolean()",
-		"[INF] = float()",
-		"[M_1_PI] = float()",
-		"[M_2_PI] = float()",
-		"[M_2_SQRTPI] = float()",
-		"[M_E] = float()",
-		"[M_EULER] = float()",
-		"[M_LN10] = float()",
-		"[M_LN2] = float()",
-		"[M_LNPI] = float()",
-		"[M_LOG10E] = float()",
-		"[M_LOG2E] = float()",
-		"[M_PI] = float()",
-		"[M_PI_2] = float()",
-		"[M_PI_4] = float()",
-		"[M_SQRT1_2] = float()",
-		"[M_SQRT2] = float()",
-		"[M_SQRT3] = float()",
-		"[M_SQRTPI] = float()",
-		"[NAN] = float()",
-		"[NULL] = null()",
-		"[PHP_BINARY] = string()",
-		"[PHP_BINDIR] = string()",
-		"[PHP_CONFIG_FILE_PATH] = string()",
-		"[PHP_CONFIG_FILE_SCAN_DIR] = string()",
-		"[PHP_DEBUG] = integer()",
-		"[PHP_EOL] = string()",
-		"[PHP_EXTENSION_DIR] = string()",
-		"[PHP_EXTRA_VERSION] = string()",
-		"[PHP_INT_MAX] = integer()",
-		"[PHP_INT_SIZE] = integer()",
-		"[PHP_MAJOR_VERSION] = integer()",
-		"[PHP_MANDIR] = string()",
-		"[PHP_MAXPATHLEN] = integer()",
-		"[PHP_MINOR_VERSION] = integer()",
-		"[PHP_OS] = string()",
-		"[PHP_PREFIX] = string()",
-		"[PHP_RELEASE_VERSION] = integer()",
-		"[PHP_ROUND_HALF_DOWN] = integer()",
-		"[PHP_ROUND_HALF_EVEN] = integer()",
-		"[PHP_ROUND_HALF_ODD] = integer()",
-		"[PHP_ROUND_HALF_UP] = integer()",
-		"[PHP_SAPI] = string()",
-		"[PHP_SHLIB_SUFFIX] = string()",
-		"[PHP_SYSCONFDIR] = string()",
-		"[PHP_VERSION] = string()",
-		"[PHP_VERSION_ID] = integer()",
-		"[PHP_ZTS] = integer()",
-		"[STDIN] = resource()",
-		"[STDOUT] = resource()",
-		"[STDERR] = resource()",
-		"[TRUE] = boolean()"
+		"[DEFAULT_INCLUDE_PATH] = stringType()",
+		"[E_ALL] = integerType()",
+		"[E_COMPILE_ERROR] = integerType()",
+		"[E_COMPILE_WARNING] = integerType()",
+		"[E_CORE_ERROR] = integerType()",
+		"[E_CORE_WARNING] = integerType()",
+		"[E_DEPRECATED] = integerType()",
+		"[E_ERROR] = integerType()",
+		"[E_NOTICE] = integerType()",
+		"[E_PARSE] = integerType()",
+		"[E_RECOVERABLE_ERROR] = integerType()",
+		"[E_STRICT] = integerType()",
+		"[E_USER_DEPRECATED] = integerType()",
+		"[E_USER_ERROR] = integerType()",
+		"[E_USER_NOTICE] = integerType()",
+		"[E_USER_WARNING] = integerType()",
+		"[E_WARNING] = integerType()",
+		"[E_USER_DEPRECATED] = integerType()",
+		"[FALSE] = booleanType()",
+		"[INF] = floatType()",
+		"[M_1_PI] = floatType()",
+		"[M_2_PI] = floatType()",
+		"[M_2_SQRTPI] = floatType()",
+		"[M_E] = floatType()",
+		"[M_EULER] = floatType()",
+		"[M_LN10] = floatType()",
+		"[M_LN2] = floatType()",
+		"[M_LNPI] = floatType()",
+		"[M_LOG10E] = floatType()",
+		"[M_LOG2E] = floatType()",
+		"[M_PI] = floatType()",
+		"[M_PI_2] = floatType()",
+		"[M_PI_4] = floatType()",
+		"[M_SQRT1_2] = floatType()",
+		"[M_SQRT2] = floatType()",
+		"[M_SQRT3] = floatType()",
+		"[M_SQRTPI] = floatType()",
+		"[NAN] = floatType()",
+		"[NULL] = nullType()",
+		"[PHP_BINARY] = stringType()",
+		"[PHP_BINDIR] = stringType()",
+		"[PHP_CONFIG_FILE_PATH] = stringType()",
+		"[PHP_CONFIG_FILE_SCAN_DIR] = stringType()",
+		"[PHP_DEBUG] = integerType()",
+		"[PHP_EOL] = stringType()",
+		"[PHP_EXTENSION_DIR] = stringType()",
+		"[PHP_EXTRA_VERSION] = stringType()",
+		"[PHP_INT_MAX] = integerType()",
+		"[PHP_INT_SIZE] = integerType()",
+		"[PHP_MAJOR_VERSION] = integerType()",
+		"[PHP_MANDIR] = stringType()",
+		"[PHP_MAXPATHLEN] = integerType()",
+		"[PHP_MINOR_VERSION] = integerType()",
+		"[PHP_OS] = stringType()",
+		"[PHP_PREFIX] = stringType()",
+		"[PHP_RELEASE_VERSION] = integerType()",
+		"[PHP_ROUND_HALF_DOWN] = integerType()",
+		"[PHP_ROUND_HALF_EVEN] = integerType()",
+		"[PHP_ROUND_HALF_ODD] = integerType()",
+		"[PHP_ROUND_HALF_UP] = integerType()",
+		"[PHP_SAPI] = stringType()",
+		"[PHP_SHLIB_SUFFIX] = stringType()",
+		"[PHP_SYSCONFDIR] = stringType()",
+		"[PHP_VERSION] = stringType()",
+		"[PHP_VERSION_ID] = integerType()",
+		"[PHP_ZTS] = integerType()",
+		"[STDIN] = resourceType()",
+		"[STDOUT] = resourceType()",
+		"[STDERR] = resourceType()",
+		"[TRUE] = booleanType()"
 	];
-	return run("predefinedConstants", expected);
+	list[str] expectedT = [];
+	return testConstraints("predefinedConstants", expectedC, expectedT);
 }
 
 public test bool testPredefinedVariables() {
-	list[str] expected = [
-		"[$argc] = integer()",
-		"[$argv] = array(string())",
-		"[$_COOKIE] \<: array(any())",
-		"[$_ENV] \<: array(any())",
-		"[$_FILES] \<: array(any())",
-		"[$_GET] \<: array(any())",
-		"[$GLOBALS] \<: array(any())",
-		"[$_REQUEST] \<: array(any())",
-		"[$_POST] \<: array(any())",
-		"[$_SERVER] \<: array(any())",
-		"[$_SESSION] \<: array(any())",
+	list[str] expectedC = [
+		"[$argc] = integerType()",
+		"[$argv] = arrayType(stringType())",
+		"[$_COOKIE] \<: arrayType(any())",
+		"[$_ENV] \<: arrayType(any())",
+		"[$_FILES] \<: arrayType(any())",
+		"[$_GET] \<: arrayType(any())",
+		"[$GLOBALS] \<: arrayType(any())",
+		"[$_REQUEST] \<: arrayType(any())",
+		"[$_POST] \<: arrayType(any())",
+		"[$_SERVER] \<: arrayType(any())",
+		"[$_SESSION] \<: arrayType(any())",
     
-		"[$php_errormsg] = string()",
-		"[$HTTP_RAW_POST_DATA] = array(string())",
-		"[$http_response_header] = array(string())"
+		"[$php_errormsg] = stringType()",
+		"[$HTTP_RAW_POST_DATA] = arrayType(stringType())",
+		"[$http_response_header] = arrayType(stringType())"
 	];
-	return run("predefinedVariables", expected);
+	list[str] expectedT = [];
+	return testConstraints("predefinedVariables", expectedC, expectedT);
 }
 
 public test bool testOpAssign() {
-	list[str] expected = [
-		// LHS = integer()
-		"[$a] \<: any()", "[$b] \<: any()", "[$a] = integer()", // $a  &= $b
-		"[$c] \<: any()", "[$d] \<: any()", "[$c] = integer()", // $c  |= $d
-		"[$e] \<: any()", "[$f] \<: any()", "[$e] = integer()", // $e  ^= $f
-		"[$g] \<: any()", "[$h] \<: any()", "[$g] = integer()", // $g  %= $h
-		"[$i] \<: any()", "[$j] \<: any()", "[$i] = integer()", // $i <<= $j
-		"[$k] \<: any()", "[$l] \<: any()", "[$k] = integer()", // $k >>= $l
+	list[str] expectedC = [
+		// LHS = integerType()
+		"[$a] \<: any()", "[$b] \<: any()", "[$a] = integerType()", // $a  &= $b
+		"[$c] \<: any()", "[$d] \<: any()", "[$c] = integerType()", // $c  |= $d
+		"[$e] \<: any()", "[$f] \<: any()", "[$e] = integerType()", // $e  ^= $f
+		"[$g] \<: any()", "[$h] \<: any()", "[$g] = integerType()", // $g  %= $h
+		"[$i] \<: any()", "[$j] \<: any()", "[$i] = integerType()", // $i <<= $j
+		"[$k] \<: any()", "[$l] \<: any()", "[$k] = integerType()", // $k >>= $l
 	
-		// LHS = string()	
-		"[$m] \<: any()", "[$n] \<: any()", "[$m] = string()", // $m .= $n
-		"if ([$n] \<: object()) then (hasMethod([$n], __tostring))", // if (n == object) => [$n] has method __tostring
+		// LHS = stringType()	
+		"[$m] \<: any()", "[$n] \<: any()", "[$m] = stringType()", // $m .= $n
+		"if ([$n] \<: objectType()) then (hasMethod([$n], __tostring))", // if (n == object) => [$n] has method __tostring
 	
-		// LHS = integer, RHS != array()	
-		"[$o] \<: any()", "[$p] \<: any()", "[$o] = integer()", "neg([$p] \<: array(any()))", // $o /= $p
-		"[$q] \<: any()", "[$r] \<: any()", "[$q] = integer()", "neg([$r] \<: array(any()))", // $q -= $r
+		// LHS = integer, RHS != arrayType()	
+		"[$o] \<: any()", "[$p] \<: any()", "[$o] = integerType()", "neg([$p] \<: arrayType(any()))", // $o /= $p
+		"[$q] \<: any()", "[$r] \<: any()", "[$q] = integerType()", "neg([$r] \<: arrayType(any()))", // $q -= $r
 	
-		// LHS = integer || float => LHS <: float()	
-		"[$s] \<: any()", "[$t] \<: any()", "[$s] \<: float()", // $s *= $t
-		"[$u] \<: any()", "[$v] \<: any()", "[$u] \<: float()"  // $u += $v
+		// LHS = integer || float => LHS <: floatType()	
+		"[$s] \<: any()", "[$t] \<: any()", "[$s] \<: floatType()", // $s *= $t
+		"[$u] \<: any()", "[$v] \<: any()", "[$u] \<: floatType()"  // $u += $v
 	];
-	return run("opAssign", expected);
+	list[str] expectedT = [];
+	return testConstraints("opAssign", expectedC, expectedT);
 }
 
 public test bool testUnaryOp() {
-	list[str] expected = [
+	list[str] expectedC = [
 		// +$a;
 		"[$a] \<: any()",
-		"[+$a] \<: float()", // expression is float or int
-		"neg([$a] \<: array(any()))", // $a is not an array
+		"[+$a] \<: floatType()", // expression is float or int
+		"neg([$a] \<: arrayType(any()))", // $a is not an array
 		
 		// -$b;
 		"[$b] \<: any()",
-		"[-$b] \<: float()", // expression is float or int
-		"neg([$b] \<: array(any()))", // $b is not an array
+		"[-$b] \<: floatType()", // expression is float or int
+		"neg([$b] \<: arrayType(any()))", // $b is not an array
 		
 		// !$c;
 		"[$c] \<: any()", 
-		"[!$c] = boolean()", 
+		"[!$c] = booleanType()", 
 	
 		// ~$d;	
 		"[$d] \<: any()", 
-		"or([$d] = float(), [$d] = integer(), [$d] = string())", 
-		"or([~$d] = integer(), [~$d] = string())", 
+		"or([$d] = floatType(), [$d] = integerType(), [$d] = stringType())", 
+		"or([~$d] = integerType(), [~$d] = stringType())", 
 		
 		// $e++;	
 		"[$e] \<: any()",
-		"if ([$e] \<: array(any())) then ([$e++] \<: array(any()))",
-		"if ([$e] = boolean()) then ([$e++] = boolean())",
-		"if ([$e] = float()) then ([$e++] = float())",
-		"if ([$e] = integer()) then ([$e++] = integer())",
-		"if ([$e] = null()) then (or([$e++] = integer(), [$e++] = null()))",
-		"if ([$e] \<: object()) then ([$e++] \<: object())",
-		"if ([$e] = resource()) then ([$e++] = resource())",
-		"if ([$e] = string()) then (or([$e++] = float(), [$e++] = integer(), [$e++] = string()))",
+		"if ([$e] \<: arrayType(any())) then ([$e++] \<: arrayType(any()))",
+		"if ([$e] = booleanType()) then ([$e++] = booleanType())",
+		"if ([$e] = floatType()) then ([$e++] = floatType())",
+		"if ([$e] = integerType()) then ([$e++] = integerType())",
+		"if ([$e] = nullType()) then (or([$e++] = integerType(), [$e++] = nullType()))",
+		"if ([$e] \<: objectType()) then ([$e++] \<: objectType())",
+		"if ([$e] = resourceType()) then ([$e++] = resourceType())",
+		"if ([$e] = stringType()) then (or([$e++] = floatType(), [$e++] = integerType(), [$e++] = stringType()))",
 	
 		// $f--;	
 		"[$f] \<: any()",
-		"if ([$f] \<: array(any())) then ([$f--] \<: array(any()))",
-		"if ([$f] = boolean()) then ([$f--] = boolean())",
-		"if ([$f] = float()) then ([$f--] = float())",
-		"if ([$f] = integer()) then ([$f--] = integer())",
-		"if ([$f] = null()) then (or([$f--] = integer(), [$f--] = null()))",
-		"if ([$f] \<: object()) then ([$f--] \<: object())",
-		"if ([$f] = resource()) then ([$f--] = resource())",
-		"if ([$f] = string()) then (or([$f--] = float(), [$f--] = integer(), [$f--] = string()))",
+		"if ([$f] \<: arrayType(any())) then ([$f--] \<: arrayType(any()))",
+		"if ([$f] = booleanType()) then ([$f--] = booleanType())",
+		"if ([$f] = floatType()) then ([$f--] = floatType())",
+		"if ([$f] = integerType()) then ([$f--] = integerType())",
+		"if ([$f] = nullType()) then (or([$f--] = integerType(), [$f--] = nullType()))",
+		"if ([$f] \<: objectType()) then ([$f--] \<: objectType())",
+		"if ([$f] = resourceType()) then ([$f--] = resourceType())",
+		"if ([$f] = stringType()) then (or([$f--] = floatType(), [$f--] = integerType(), [$f--] = stringType()))",
 	
 		// ++$g;	
 		"[$g] \<: any()",
-		"if ([$g] \<: array(any())) then ([++$g] \<: array(any()))",
-		"if ([$g] = boolean()) then ([++$g] = boolean())",
-		"if ([$g] = float()) then ([++$g] = float())",
-		"if ([$g] = integer()) then ([++$g] = integer())",
-		"if ([$g] = null()) then ([++$g] = integer())",
-		"if ([$g] \<: object()) then ([++$g] \<: object())",
-		"if ([$g] = resource()) then ([++$g] = resource())",
-		"if ([$g] = string()) then (or([++$g] = float(), [++$g] = integer(), [++$g] = string()))",
+		"if ([$g] \<: arrayType(any())) then ([++$g] \<: arrayType(any()))",
+		"if ([$g] = booleanType()) then ([++$g] = booleanType())",
+		"if ([$g] = floatType()) then ([++$g] = floatType())",
+		"if ([$g] = integerType()) then ([++$g] = integerType())",
+		"if ([$g] = nullType()) then ([++$g] = integerType())",
+		"if ([$g] \<: objectType()) then ([++$g] \<: objectType())",
+		"if ([$g] = resourceType()) then ([++$g] = resourceType())",
+		"if ([$g] = stringType()) then (or([++$g] = floatType(), [++$g] = integerType(), [++$g] = stringType()))",
 		
 		// --$h;
 		"[$h] \<: any()",
-		"if ([$h] \<: array(any())) then ([--$h] \<: array(any()))",
-		"if ([$h] = boolean()) then ([--$h] = boolean())",
-		"if ([$h] = float()) then ([--$h] = float())",
-		"if ([$h] = integer()) then ([--$h] = integer())",
-		"if ([$h] = null()) then ([--$h] = integer())",
-		"if ([$h] \<: object()) then ([--$h] \<: object())",
-		"if ([$h] = resource()) then ([--$h] = resource())",
-		"if ([$h] = string()) then (or([--$h] = float(), [--$h] = integer(), [--$h] = string()))"
+		"if ([$h] \<: arrayType(any())) then ([--$h] \<: arrayType(any()))",
+		"if ([$h] = booleanType()) then ([--$h] = booleanType())",
+		"if ([$h] = floatType()) then ([--$h] = floatType())",
+		"if ([$h] = integerType()) then ([--$h] = integerType())",
+		"if ([$h] = nullType()) then ([--$h] = integerType())",
+		"if ([$h] \<: objectType()) then ([--$h] \<: objectType())",
+		"if ([$h] = resourceType()) then ([--$h] = resourceType())",
+		"if ([$h] = stringType()) then (or([--$h] = floatType(), [--$h] = integerType(), [--$h] = stringType()))"
 	];
-	return run("unaryOp", expected);
+	list[str] expectedT = [];
+	return testConstraints("unaryOp", expectedC, expectedT);
 }
 
 public test bool testBinaryOp() {
-	list[str] expected = [
+	list[str] expectedC = [
 		// $a + $b;
 		"[$a] \<: any()", "[$b] \<: any()",
-		"or([$a + $b] \<: array(any()), [$a + $b] \<: float())", // always array, or subtype of float()
-		"if (and([$a] \<: array(any()), [$b] \<: array(any()))) then ([$a + $b] \<: array(any()))", // ($a = array && $b = array) => [E] = array
-		"if (or(neg([$a] \<: array(any())), neg([$b] \<: array(any())))) then ([$a + $b] \<: float())", // ($a != array || $b = array) => [E] <: float 
+		"or([$a + $b] \<: arrayType(any()), [$a + $b] \<: floatType())", // always array, or subtype of floatType()
+		"if (and([$a] \<: arrayType(any()), [$b] \<: arrayType(any()))) then ([$a + $b] \<: arrayType(any()))", // ($a = array && $b = array) => [E] = array
+		"if (or(neg([$a] \<: arrayType(any())), neg([$b] \<: arrayType(any())))) then ([$a + $b] \<: floatType())", // ($a != array || $b = array) => [E] <: float 
 		
 		// $c - $d;	
 		"[$c] \<: any()", "[$d] \<: any()",
-		"neg([$c] \<: array(any()))",
-		"neg([$d] \<: array(any()))",
-		"[$c - $d] \<: float()",
+		"neg([$c] \<: arrayType(any()))",
+		"neg([$d] \<: arrayType(any()))",
+		"[$c - $d] \<: floatType()",
 	
 		// $e * $f;	
 		"[$e] \<: any()", "[$f] \<: any()",
-		"neg([$e] \<: array(any()))",
-		"neg([$f] \<: array(any()))",
-		"[$e * $f] \<: float()",
+		"neg([$e] \<: arrayType(any()))",
+		"neg([$f] \<: arrayType(any()))",
+		"[$e * $f] \<: floatType()",
 	
 		// $g / $h;	
 		"[$g] \<: any()", "[$h] \<: any()",
-		"neg([$g] \<: array(any()))",
-		"neg([$h] \<: array(any()))",
-		"[$g / $h] \<: float()",
+		"neg([$g] \<: arrayType(any()))",
+		"neg([$h] \<: arrayType(any()))",
+		"[$g / $h] \<: floatType()",
 	
 		// $i % $j;	
 		"[$i] \<: any()", "[$j] \<: any()",
-		"[$i % $j] = integer()",
+		"[$i % $j] = integerType()",
 
 		// $k & $l;	
 		"[$k] \<: any()", "[$l] \<: any()",
-		"if (and([$k] = string(), [$l] = string())) then ([$k & $l] = string())",
-		"if (or(neg([$k] = string()), neg([$l] = string()))) then ([$k & $l] = integer())",
-		"or([$k & $l] = integer(), [$k & $l] = string())",
+		"if (and([$k] = stringType(), [$l] = stringType())) then ([$k & $l] = stringType())",
+		"if (or(neg([$k] = stringType()), neg([$l] = stringType()))) then ([$k & $l] = integerType())",
+		"or([$k & $l] = integerType(), [$k & $l] = stringType())",
 		
 		// $m | $n;	
 		"[$m] \<: any()", "[$n] \<: any()",
-		"if (and([$m] = string(), [$n] = string())) then ([$m | $n] = string())",
-		"if (or(neg([$m] = string()), neg([$n] = string()))) then ([$m | $n] = integer())",
-		"or([$m | $n] = integer(), [$m | $n] = string())",
+		"if (and([$m] = stringType(), [$n] = stringType())) then ([$m | $n] = stringType())",
+		"if (or(neg([$m] = stringType()), neg([$n] = stringType()))) then ([$m | $n] = integerType())",
+		"or([$m | $n] = integerType(), [$m | $n] = stringType())",
 		
 		// $o ^ $p;	
 		"[$o] \<: any()", "[$p] \<: any()",
-		"if (and([$o] = string(), [$p] = string())) then ([$o ^ $p] = string())",
-		"if (or(neg([$o] = string()), neg([$p] = string()))) then ([$o ^ $p] = integer())",
-		"or([$o ^ $p] = integer(), [$o ^ $p] = string())",
+		"if (and([$o] = stringType(), [$p] = stringType())) then ([$o ^ $p] = stringType())",
+		"if (or(neg([$o] = stringType()), neg([$p] = stringType()))) then ([$o ^ $p] = integerType())",
+		"or([$o ^ $p] = integerType(), [$o ^ $p] = stringType())",
 		
 		// $q << $r;	
 		"[$q] \<: any()", "[$r] \<: any()",
-		"[$q \<\< $r] = integer()",
+		"[$q \<\< $r] = integerType()",
 		
 		// $s >> $t;	
 		"[$s] \<: any()", "[$t] \<: any()",
-		"[$s \>\> $t] = integer()"
+		"[$s \>\> $t] = integerType()"
 		
 	];
-	return run("binaryOp", expected);
+	list[str] expectedT = [];
+	return testConstraints("binaryOp", expectedC, expectedT);
 }
 
 public test bool testTernary() {
-	list[str] expected = [
+	list[str] expectedC = [
 		// $a = true ? $b : "string";
 		"[$a] \<: any()", "[$b] \<: any()", // $a and $b
-		"[true] = boolean()", "[\"string\"] = string()", // true and "string"
+		"[true] = booleanType()", "[\"string\"] = stringType()", // true and "string"
 		"or([true ? $b : \"string\"] \<: [\"string\"], [true ? $b : \"string\"] \<: [$b])", // [E] = [E2] OR [E3]
 		"[true ? $b : \"string\"] \<: [$a]", // [E] <: $a
 		"[$a] \<: [$a = true ? $b : \"string\"]", // result of the whole expression is a subtype of $a
 		
 		// $c = TRUE ? : "str";
 		"[$c] \<: any()", 
-		"[TRUE] = boolean()", "[\"str\"] = string()", // TRUE and "string"
+		"[TRUE] = booleanType()", "[\"str\"] = stringType()", // TRUE and "string"
 		"or([TRUE ? : \"str\"] \<: [\"str\"], [TRUE ? : \"str\"] \<: [TRUE])", // [E] = [E1] OR [E3]
 		"[TRUE ? : \"str\"] \<: [$c]", // [E] <: $c
 		"[$c] \<: [$c = TRUE ? : \"str\"]", // result of the whole expression is a subtype of $c
 	
 		// $d = $e = 3 ? "l" : "r";
 		"[$d] \<: any()", "[$e] \<: any()", 
-		"[3] = integer()", "[\"l\"] = string()", "[\"r\"] = string()", // 3, "l" and "r"
+		"[3] = integerType()", "[\"l\"] = stringType()", "[\"r\"] = stringType()", // 3, "l" and "r"
 		"or([3 ? \"l\" : \"r\"] \<: [\"l\"], [3 ? \"l\" : \"r\"] \<: [\"r\"])", // [E] = [E1] OR [E3]
 		"[3 ? \"l\" : \"r\"] \<: [$e]", // [E] <: $e
 		"[$e = 3 ? \"l\" : \"r\"] \<: [$d]", // $e <: $d
 		"[$d] \<: [$d = $e = 3 ? \"l\" : \"r\"]", // result of the whole expression is a subtype of $c
 		"[$e] \<: [$e = 3 ? \"l\" : \"r\"]" // result of the whole expression is a subtype of $c
 	];
-	return run("ternary", expected);
+	list[str] expectedT = [];
+	return testConstraints("ternary", expectedC, expectedT);
 }
 
 public test bool testLogicalOp() {
-	list[str] expected = [
+	list[str] expectedC = [
 		// $a and $b;
 		"[$a] \<: any()", "[$b] \<: any()",
-		"[$a and $b] = boolean()",
+		"[$a and $b] = booleanType()",
 		
 		// $c or $d;
 		"[$c] \<: any()", "[$d] \<: any()",
-		"[$c or $d] = boolean()",
+		"[$c or $d] = booleanType()",
 		
 		// $e xor $f;
 		"[$e] \<: any()", "[$f] \<: any()",
-		"[$e xor $f] = boolean()",
+		"[$e xor $f] = booleanType()",
 		
 		// $g && $h;
 		"[$g] \<: any()", "[$h] \<: any()",
-		"[$g && $h] = boolean()",
+		"[$g && $h] = booleanType()",
 		
 		// $i || $j;
 		"[$i] \<: any()", "[$j] \<: any()",
-		"[$i || $j] = boolean()"
+		"[$i || $j] = booleanType()"
 	];
-	return run("logicalOp", expected);
+	list[str] expectedT = [];
+	return testConstraints("logicalOp", expectedC, expectedT);
 }
 
 public test bool testComparisonOp() {
-	list[str] expected = [
+	list[str] expectedC = [
 		// $a < $b;
 		"[$a] \<: any()", "[$b] \<: any()",
-		"[$a \< $b] = boolean()",
+		"[$a \< $b] = booleanType()",
 		
 		// $c <= $d;
 		"[$c] \<: any()", "[$d] \<: any()",
-		"[$c \<= $d] = boolean()",
+		"[$c \<= $d] = booleanType()",
 		
 		// $e > $f;
 		"[$e] \<: any()", "[$f] \<: any()",
-		"[$e \> $f] = boolean()",
+		"[$e \> $f] = booleanType()",
 		
 		// $g >= $h;
 		"[$g] \<: any()", "[$h] \<: any()",
-		"[$g \>= $h] = boolean()",
+		"[$g \>= $h] = booleanType()",
 		
 		// $i == $j;
 		"[$i] \<: any()", "[$j] \<: any()",
-		"[$i == $j] = boolean()",
+		"[$i == $j] = booleanType()",
 		
 		// $k === $l;
 		"[$k] \<: any()", "[$l] \<: any()",
-		"[$k === $l] = boolean()",
+		"[$k === $l] = booleanType()",
 	
 		// $m != $n;
 		"[$m] \<: any()", "[$n] \<: any()",
-		"[$m != $n] = boolean()",
+		"[$m != $n] = booleanType()",
 		
 		// $o <> $p;
 		"[$o] \<: any()", "[$p] \<: any()",
-		"[$o \<\> $p] = boolean()",
+		"[$o \<\> $p] = booleanType()",
 		
 		// $q !== $r;
 		"[$q] \<: any()", "[$r] \<: any()",
-		"[$q !== $r] = boolean()"
+		"[$q !== $r] = booleanType()"
 	];
-	return run("comparisonOp", expected);
+	list[str] expectedT = [];
+	return testConstraints("comparisonOp", expectedC, expectedT);
 }
 
 public test bool testCasts() {
-	list[str] expected = [
+	list[str] expectedC = [
 		"[$a] \<: any()", "[$b] \<: any()", "[$c] \<: any()", "[$d] \<: any()", 
 		"[$e] \<: any()", "[$f] \<: any()", "[$g] \<: any()", "[$h] \<: any()", 
 		"[$i] \<: any()", "[$j] \<: any()", "[$k] \<: any()", 
 		
 		// (cast)$var;	
-		"[(array)$a] \<: array(any())",
-		"[(bool)$b] = boolean()",
-		"[(boolean)$c] = boolean()",
-		"[(int)$d] = integer()",
-		"[(integer)$e] = integer()",
-		"[(float)$f] = float()",
-		"[(double)$g] = float()",
-		"[(real)$h] = float()",
+		"[(array)$a] \<: arrayType(any())",
+		"[(bool)$b] = booleanType()",
+		"[(boolean)$c] = booleanType()",
+		"[(int)$d] = integerType()",
+		"[(integer)$e] = integerType()",
+		"[(float)$f] = floatType()",
+		"[(double)$g] = floatType()",
+		"[(real)$h] = floatType()",
 		
-		"[(string)$i] = string()",
-		"if ([$i] \<: object()) then (hasMethod([$i], __tostring))",
+		"[(string)$i] = stringType()",
+		"if ([$i] \<: objectType()) then (hasMethod([$i], __tostring))",
 		
-		"[(object)$j] \<: object()",
-		"[(unset)$k] = null()"
+		"[(object)$j] \<: objectType()",
+		"[(unset)$k] = nullType()"
 	];
-	return run("casts", expected);
+	list[str] expectedT = [];
+	return testConstraints("casts", expectedC, expectedT);
 }
 
-public test bool testArray() {
-	list[str] expected = [
-		// array(); [];
-		"[array()] = array()",
-		"[[]] = array()",
+public test bool testarrayType() {
+	list[str] expectedC = [
+		// arrayType(); [];
+		"[array()] = arrayType()",
+		"[[]] = arrayType()",
 		
-		// array("a", "b", "c");
-		"[\"a\"] = string()", "[\"b\"] = string()", "[\"c\"] = string()",
-		"[array(\"a\", \"b\", \"c\")] = array([\"a\"], [\"b\"], [\"c\"])",
+		// arrayType("a", "b", "c");
+		"[\"a\"] = stringType()", "[\"b\"] = stringType()", "[\"c\"] = stringType()",
+		"[array(\"a\", \"b\", \"c\")] = arrayType([\"a\"], [\"b\"], [\"c\"])",
 	
-		// array(0, "b", 3.4); 
-		"[0] = integer()", "[\"b\"] = string()", "[3.4] = float()",
-		"[array(0, \"b\", 3.4)] = array([\"b\"], [0], [3.4])",
+		// arrayType(0, "b", 3.4); 
+		"[0] = integerType()", "[\"b\"] = stringType()", "[3.4] = floatType()",
+		"[array(0, \"b\", 3.4)] = arrayType([\"b\"], [0], [3.4])",
 		
 		// [0,1,2];
-		"[0] = integer()", "[1] = integer()", "[2] = integer()", 
-		"[[0,1,2]] = array([0], [1], [2])",
+		"[0] = integerType()", "[1] = integerType()", "[2] = integerType()", 
+		"[[0,1,2]] = arrayType([0], [1], [2])",
 		
 		// $a[0];
 		"[$a[0]] \<: any()", // not very specific!!!
-		"[0] = integer()",
-		"[$a] \<: array(any())",
+		"[0] = integerType()",
+		"[$a] \<: arrayType(any())",
 		"[$a] \<: any()", 
-		"neg([$a] \<: object())",
+		"neg([$a] \<: objectType())",
 		
 		// $b["def"]
 		"[$b[\"def\"]] \<: any()", // not very specific!!!
-		"[\"def\"] = string()",
-		"[$b] \<: array(any())",
+		"[\"def\"] = stringType()",
+		"[$b] \<: arrayType(any())",
 		"[$b] \<: any()", 
-		"neg([$b] \<: object())",
+		"neg([$b] \<: objectType())",
 		
 		// $c[0][0]
 		"[$c[0][0]] \<: any()",
-		"[0] = integer()", "[0] = integer()",
-		"[$c] \<: array(any())",
+		"[0] = integerType()", "[0] = integerType()",
+		"[$c] \<: arrayType(any())",
 		"[$c] \<: any()", 
-		"[$c[0]] \<: array(any())",
+		"[$c[0]] \<: arrayType(any())",
 		"[$c[0]] \<: any()",
-		"neg([$c] \<: object())",
-		"neg([$c[0]] \<: object())",
+		"neg([$c] \<: objectType())",
+		"neg([$c[0]] \<: objectType())",
 		
 		// $d[] = 1;
-		"[$d] \<: array(any())",
+		"[$d] \<: arrayType(any())",
 		"[$d] \<: any()", 
 		"[$d[]] \<: any()", 
-		"neg([$d] \<: object())",
-		"[1] = integer()",
+		"neg([$d] \<: objectType())",
+		"[1] = integerType()",
 		"[1] \<: [$d[]]",
 		"[$d[]] \<: [$d[] = 1]"
 	];
-	return run("array", expected);
+	list[str] expectedT = [];
+	return testConstraints("array", expectedC, expectedT);
 }
 
 public test bool testVarious() {
-	list[str] expected = [
+	list[str] expectedC = [
 		// $a = clone($b);
 		"[$a] \<: any()", 
-		"[$a] \<: object()", 
-		"[clone($a)] \<: object()",
+		"[$a] \<: objectType()", 
+		"[clone($a)] \<: objectType()",
 		
 		// new ABC();	
-		"[new ABC()] = class(|php+class:///abc|)",
+		"[new ABC()] = classType(|php+class:///abc|)",
 		// new \DEF();	
-		"[new \\DEF()] = class(|php+class:///def|)",
+		"[new \\DEF()] = classType(|php+class:///def|)",
 		// new \GHI\JKL;	
-		"[new \\GHI\\JKL] = class(|php+class:///ghi/jkl|)",
+		"[new \\GHI\\JKL] = classType(|php+class:///ghi/jkl|)",
 		// new MNO\PQR;	
-		"[new MNO\\PQR] = class(|php+class:///qwerty/mno/pqr|)",
+		"[new MNO\\PQR] = classType(|php+class:///qwerty/mno/pqr|)",
 		
 		// new $b();
 		"[$b] \<: any()",
-		"[new $b()] \<: object()"
+		"[new $b()] \<: objectType()",
+		"or([$b] \<: objectType(), [$b] = stringType())"
 	];
-	return run("various", expected);
+	list[str] expectedT = [];
+	return testConstraints("various", expectedC, expectedT);
 }
 
 public test bool testControlStructures() {
-	list[str] expected = [
+	list[str] expectedC = [
 		// if ($a1) {"10";}
-		"[$a1] \<: any()", "[\"10\"] = string()", 
+		"[$a1] \<: any()", "[\"10\"] = stringType()", 
 		// if ($b1) {"20";} else {"30";}
-		"[$b1] \<: any()", "[\"20\"] = string()", "[\"30\"] = string()", 
+		"[$b1] \<: any()", "[\"20\"] = stringType()", "[\"30\"] = stringType()", 
 		// if ($c1) {"40";} else if ("50") {$d1;} else {$e1;}
 		// if ($c1) {"40";} elseif ("50") {$d1;} else {$e1;}
 		"[$c1] \<: any()", 		"[$c1] \<: any()", 
-		"[\"40\"] = string()",	"[\"40\"] = string()", 
-		"[\"50\"] = string()",	"[\"50\"] = string()", 
+		"[\"40\"] = stringType()",	"[\"40\"] = stringType()", 
+		"[\"50\"] = stringType()",	"[\"50\"] = stringType()", 
 		"[$d1] \<: any()",		"[$d1] \<: any()", 
 		"[$e1] \<: any()",		"[$e1] \<: any()", 
 		// if ($a2) "11";
-		"[$a2] \<: any()", "[\"11\"] = string()", 
+		"[$a2] \<: any()", "[\"11\"] = stringType()", 
 		// if ($b2) "21"; else "31";
-		"[$b2] \<: any()", "[\"21\"] = string()", "[\"31\"] = string()", 
+		"[$b2] \<: any()", "[\"21\"] = stringType()", "[\"31\"] = stringType()", 
 		// if ($c2) "41"; else if ("51") $d2; else $e2;
 		"[$c2] \<: any()", "[$d2] \<: any()", "[$e2] \<: any()",
-		"[\"41\"] = string()", "[\"51\"] = string()", 
+		"[\"41\"] = stringType()", "[\"51\"] = stringType()", 
 		// if ($a1): "12"; endif;
-		"[$a1] \<: any()", "[\"12\"] = string()", 
+		"[$a1] \<: any()", "[\"12\"] = stringType()", 
 		
 		// while($f1) { "60"; }
-		"[$f1] \<: any()", "[\"60\"] = string()", 
+		"[$f1] \<: any()", "[\"60\"] = stringType()", 
 		// while($f2)  "61";
-		"[$f2] \<: any()", "[\"61\"] = string()", 
+		"[$f2] \<: any()", "[\"61\"] = stringType()", 
 		// while ($f3): "62"; endwhile;	
-		"[$f3] \<: any()", "[\"62\"] = string()", 
+		"[$f3] \<: any()", "[\"62\"] = stringType()", 
 		
 		// do { $g1; } while ($h1);
 		"[$g1] \<: any()", "[$h1] \<: any()", 
@@ -565,68 +610,69 @@ public test bool testControlStructures() {
 		"[$g2] \<: any()", "[$h2] \<: any()", 
 	
 		// for ($i1=0; $i2<10; $i3++) { "70"; }	
-		"[$i1] \<: any()", "[$i2] \<: any()", "[$i3] \<: any()", "[\"70\"] = string()", 
+		"[$i1] \<: any()", "[$i2] \<: any()", "[$i3] \<: any()", "[\"70\"] = stringType()", 
 		// for ($i4; ;$i5) { "71"; }
-		"[$i4] \<: any()", "[$i5] \<: any()", "[\"71\"] = string()", 
+		"[$i4] \<: any()", "[$i5] \<: any()", "[\"71\"] = stringType()", 
 		// for (; ; ) { "72"; }
-		"[\"72\"] = string()", 
+		"[\"72\"] = stringType()", 
 		// for ($i6, $j7; $i8; $j9, $i11, $i12);
 		"[$i6] \<: any()", "[$j7] \<: any()", "[$i8] \<: any()", 
 		"[$j9] \<: any()", "[$i11] \<: any()", "[$i12] \<: any()", 
 		
 		// foreach ($k as $v) foreach ($kk as $vv) "80";
 		"[$k] \<: any()", "[$v] \<: any()", 
-		"[$kk] \<: any()", "[$vv] \<: any()", "[\"80\"] = string()", 
+		"[$kk] \<: any()", "[$vv] \<: any()", "[\"80\"] = stringType()", 
 		// foreach ($arr as $key => $value) { "statement"; }
-		"[$arr] \<: any()", "[$key] \<: any()", "[$value] \<: any()", "[\"statement\"] = string()",
+		"[$arr] \<: any()", "[$key] \<: any()", "[$value] \<: any()", "[\"statement\"] = stringType()",
 		// foreach ($array as $element): "81"; endforeach;
-		"[$array] \<: any()", "[$element] \<: any()", "[\"81\"] = string()", 
+		"[$array] \<: any()", "[$element] \<: any()", "[\"81\"] = stringType()", 
 	
 		// switch ($l2) { case 10; case "1str": "string"; break; default: "def"; }
-		"[$l2] \<: any()", "[10] = integer()", 
-		"[\"1str\"] = string()", "[\"string\"] = string()", "[\"def\"] = string()", 
+		"[$l2] \<: any()", "[10] = integerType()", 
+		"[\"1str\"] = stringType()", "[\"string\"] = stringType()", "[\"def\"] = stringType()", 
 		// switch ($l2): case 20: "zero2"; break; case "2str": "string"; break; default: "def"; endswitch;	
-		"[$l2] \<: any()", "[20] = integer()", "[\"2str\"] = string()",
-		"[\"zero2\"] = string()", "[\"string\"] = string()", "[\"def\"] = string()", 
+		"[$l2] \<: any()", "[20] = integerType()", "[\"2str\"] = stringType()",
+		"[\"zero2\"] = stringType()", "[\"string\"] = stringType()", "[\"def\"] = stringType()", 
 		
 		// declare(ticks=1) { $m; }
 		"[$m] \<: any()",
 		
 		// goto a; 'Foo';  a: 'Bar';
-		"[\'Foo\'] = string()", "[\'Bar\'] = string()",
+		"[\'Foo\'] = stringType()", "[\'Bar\'] = stringType()",
 		
 		// try { $n1; } catch (\Exception $e) { $n2; };
 		"[$n1] \<: any()", "[$n2] \<: any()",
 		// try { $n3; } catch (\Exception $e) { $n4; } finally { $n5; };
 		"[$n3] \<: any()", "[$n4] \<: any()", "[$n5] \<: any()"
 	];
-	return run("controlStructures", expected);
+	list[str] expectedT = [];
+	return testConstraints("controlStructures", expectedC, expectedT);
 }
 
 public test bool testFunction() {
-	list[str] expected = [
+	list[str] expectedC = [
 		// function a() {}
-		"[function a() {}] = null()",
+		"[function a() {}] = nullType()",
 		// function &b() {}
-		"[function &b() {}] = null()",
+		"[function &b() {}] = nullType()",
 		// function c() { return; }
-		"or([function c() { return; }] = null())",
+		"or([function c() { return; }] = nullType())",
 		// function d() { return true; return false; }
 		"or([function d() { return true; return false; }] = [false], [function d() { return true; return false; }] = [true])",
-		"[false] = boolean()", "[true] = boolean()",
+		"[false] = booleanType()", "[true] = booleanType()",
 		// function f() { function g() { return "string"; } }
-		"[function f() { function g() { return \"string\"; } }] = null()",
+		"[function f() { function g() { return \"string\"; } }] = nullType()",
 		"or([function g() { return \"string\"; }] = [\"string\"])",
-		"[\"string\"] = string()",
+		"[\"string\"] = stringType()",
 		
 		// function h() { $a = "str"; $a = 100; }
 		"[\"str\"] \<: [$a]",
-		"[\"str\"] = string()",
+		"[\"str\"] = stringType()",
 		"[$a] \<: any()",
 		"[$a] \<: any()",
 		"[100] \<: [$a]",
-		"[100] = integer()",
-		"[function h() { $a = \"str\"; $a = 100; }] = null()",
+		"[100] = integerType()",
+		"[function h() { $a = \"str\"; $a = 100; }] = nullType()",
 		"[$a] \<: [$a = \"str\"]",
 		"[$a] \<: [$a = 100]",
 		"[|php+functionVar:///h/a|] = [$a]",
@@ -634,13 +680,13 @@ public test bool testFunction() {
 		
 		// function i() { $i = "str"; function j() { $i = 100; } }
 		"[\"str\"] \<: [$i]",
-		"[\"str\"] = string()",
+		"[\"str\"] = stringType()",
 		"[$i] \<: any()",
 		"[$i] \<: any()",
 		"[100] \<: [$i]",
-		"[100] = integer()",
-		"[function i() { $i = \"str\"; function j() { $i = 100; } }] = null()",
-		"[function j() { $i = 100; }] = null()",
+		"[100] = integerType()",
+		"[function i() { $i = \"str\"; function j() { $i = 100; } }] = nullType()",
+		"[function j() { $i = 100; }] = nullType()",
 		"[$i] \<: [$i = \"str\"]",
 		"[$i] \<: [$i = 100]",
 		"[|php+functionVar:///i/i|] = [$i]",
@@ -649,156 +695,249 @@ public test bool testFunction() {
 		// if (true) { function k() { $k1; } } else { function k() { $k2; } }	
 		"[$k1] \<: any()",
 		"[$k2] \<: any()",
-		"[function k() { $k1; }] = null()",
-		"[function k() { $k2; }] = null()",
-		"[true] = boolean()",
+		"[function k() { $k1; }] = nullType()",
+		"[function k() { $k2; }] = nullType()",
+		"[true] = booleanType()",
 		
 		// a();	
 		"[a()] \<: [function a() {}]",
 		// b();
 		"[b()] \<: [function &b() {}]",
 		// x(); // function does not exist
+		"[x()] \<: any()",
 		// no constraints.... function does not exists
 		
 		//$x(); // variable call
 		"[$x()] \<: any()",
-		"or([$x] \<: object(), [$x] = string())",
-		"if ([$x] \<: object()) then (hasMethod([$x], __invoke))"
+		"or([$x] \<: objectType(), [$x] = stringType())",
+		"if ([$x] \<: objectType()) then (hasMethod([$x], __invoke))"
 	];
-	return run("function", expected);
+	list[str] expectedT = [];
+	return testConstraints("function", expectedC, expectedT);
 }
 
 public test bool testClassMethod() {
-	list[str] expected = [
-		// [public function m1() {}] = null()
-		"[public function m1() {}] = null()",
+	list[str] expectedC = [
+		// [public function m1() {}] = nullType()
+		"[public function m1() {}] = nullType()",
 		
 		// class C2 { public function m2() { function f1() { return "a"; } return true; } }
-		"[\"a\"] = string()", "[true] = boolean()",
+		"[\"a\"] = stringType()", "[true] = booleanType()",
 		"or([public function m2() { function f1() { return \"a\"; } return true; }] = [true])",
 		"or([function f1() { return \"a\"; }] = [\"a\"])",
 		
 		// class C3 { public function m3() { $a = 2; function f1() { $a = "a"; } return $a; } }
 		"[$a] \<: any()", "[$a] \<: any()", "[$a] \<: any()", // variables
-		"[2] = integer()", "[\"a\"] = string()",  // int/string
+		"[2] = integerType()", "[\"a\"] = stringType()",  // int/string
 		"[2] \<: [$a]", "[\"a\"] \<: [$a]", // assignment
 		"[$a] \<: [$a = 2]", "[$a] \<: [$a = \"a\"]", // result of assignment
 		"or([public function m3() { $a = 2; function f1() { $a = \"a\"; } return $a; }] = [$a])", // type of method
-		"[function f1() { $a = \"a\"; }] = null()", // type of function
+		"[function f1() { $a = \"a\"; }] = nullType()", // type of function
 		"[|php+methodVar:///ns/c3/m3/a|] = [$a]",
 		"[|php+functionVar:///ns/f1/a|] = [$a]"
 	];
-	return run("classMethod", expected);
+	list[str] expectedT = [];
+	return testConstraints("classMethod", expectedC, expectedT);
 }
 
 public test bool testClassConstant() {
-	list[str] expected = [
+	list[str] expectedC = [
 		// class C1 { const c1 = 100; }
 		"[c1 = 100] = [100]",
-		"[100] = integer()",
+		"[100] = integerType()",
 		"[|php+classConstant:///classconstant/c1/c1|] = [c1 = 100]",
 		// class C2 { const c21 = 21, c22 = 22; }
 		"[c21 = 21] = [21]",
-		"[21] = integer()",
+		"[21] = integerType()",
 		"[c22 = 22] = [22]",
-		"[22] = integer()",
+		"[22] = integerType()",
 		"[|php+classConstant:///classconstant/c2/c21|] = [c21 = 21]",
 		"[|php+classConstant:///classconstant/c2/c22|] = [c22 = 22]",
 		 //interface C3 { const cInterface = "interface constant"; }
 		"[cInterface = \"interface constant\"] = [\"interface constant\"]",
-		"[\"interface constant\"] = string()",
+		"[\"interface constant\"] = stringType()",
 		"[|php+classConstant:///classconstant/c3/cInterface|] = [cInterface = \"interface constant\"]" 
 	];
-	return run("classConstant", expected);
+	list[str] expectedT = [];
+	return testConstraints("classConstant", expectedC, expectedT);
 }
 
 public test bool testClassProperty() {
-	list[str] expected = [
+	list[str] expectedC = [
 		// class cl1 { public $pub1; public $pub2 = 2; }
-		"[2] = integer()",
+		"[2] = integerType()",
 		"[$pub2 = 2] = [2]",
 		"[|php+field:///randomnamespace/cl1/pub1|] = [$pub1]",
 		"[|php+field:///randomnamespace/cl1/pub2|] = [$pub2 = 2]",
 		// class cl2 { private $priv1; private $priv2 = 2; }
-		"[2] = integer()",
+		"[2] = integerType()",
 		"[$priv2 = 2] = [2]",
 		"[|php+field:///randomnamespace/cl2/priv1|] = [$priv1]",
 		"[|php+field:///randomnamespace/cl2/priv2|] = [$priv2 = 2]",
 		// class cl3 { protected $pro1; protected $pro2 = 2; }
-		"[2] = integer()",
+		"[2] = integerType()",
 		"[$pro2 = 2] = [2]",
 		"[|php+field:///randomnamespace/cl3/pro1|] = [$pro1]",
 		"[|php+field:///randomnamespace/cl3/pro2|] = [$pro2 = 2]"
 	];
-	return run("classProperty", expected);
+	list[str] expectedT = [];
+	return testConstraints("classProperty", expectedC, expectedT);
 }
 
-public test bool testClassKeywords() {
+public test bool testMethodCallStatic() {
 	// information is retreived from m3, declares in uses
-	list[str] expected = [
-		// public function se() { self::foo(); }
-		"[public function se() { self::foo(); }] = null()",
-		"[self] = class(|php+class:///ns/c|)",
-		"or(hasMethod([self], foo, { static() }))",
-		// public function pa() { parent::foo(); }
-		"[public function pa() { parent::foo(); }] = null()",
-		"or([parent] = class(|php+class:///ns/p|))",
-		"or(hasMethod([parent], foo, { static() }))",
-		// public function st() { static::foo(); }	
-		"[public function st() { static::foo(); }] = null()",
-		"or([static] = class(|php+class:///ns/c|), [static] = class(|php+class:///ns/p|))",
-		"or(hasMethod([static], foo, { static() }))"
-    ];
-	return run("classKeywords", expected);
-}
-
-public test bool testMethodCall() {
-	// information is retreived from m3, declares in uses
-	list[str] expected = [
-		// $a->b();
-		//"[$a] \<: any()",
-		//"or(hasMethod([$a], b, { !static() })",
+	list[str] expectedC = [
+		// if (true)
+		"[true] = booleanType()",
+		// class C { public static function d() {return true; } public function e() { $this::f(); } }
+		"[public static function d() {}] = nullType()",
+		"[public function e() { $this::f(); }] = nullType()",
+		// $this
+		"[$this] \<: any()",
+		"[$this] \<: objectType()",
+		"or([$this] :\> classType(|php+class:///c|), [$this] = classType(|php+class:///c|))",
+		// f()
+		"[f] = someMethod", // resolve all method
+		"hasName([f], f)",
+		"isItemOfClass([f], [$this])",
+		// $this::f()
 		
-		// c::d(); // static call of (static) method d off class c
-		"[c] \<: object()",
+		// class C { public static function d() {} }
+		"[public static function d() {}] = nullType()",
+		
+		//$c = c::d();
+		"[$c] \<: [$c = c::d()]",
+		"[$c] \<: any()",
+		"[c::d()] \<: [$c]",
+		"[c::d()] \<: [d]",
+		"[c] \<: [class C { public static function d() {} public function e() { $this::f(); } }]",
 		"[c] \<: [class C { public static function d() {} }]",
-		"[public static function d() {}] = null()",
+		"[c] \<: objectType()",
+		"[d] = someMethod",
+		"hasName([d], d)",
+		"isItemOfClass([d], [c])",
+	
+		// $d = "d";
+		"[$d] \<: any()",
+		"[\"d\"] = stringType()",
+		
+		// $x = c::$d();	
+		// c::d(); // static call of (static) method d of class c
+		//"[c] \<: objectType()",
+		//"[c] = (class(|php+class:///c|)",
+		//"or(hasMethod([c], \"d\"), hasMethod([c], \"__callStatic\")",
+		//"[c] \<: [class C { public static function d() {} }]",
+		//"[public static function d() {}] = nullType()",
 		//"or(hasMethod([$c], d, { static() })",
 		// if LHS is of type: current class -> 
 		// if LHS is of one of the parent classes ->
 		""
     ];
-	return run("methodCall", expected);
+	list[str] expectedT = [];
+	return testConstraints("methodCallStatic", expectedC, expectedT);
 }
 
-public bool run(str fileName, list[str] expected)
+public test bool testClassKeywords() {
+	// information is retreived from m3, declares in uses
+	list[str] expectedC = [
+		// public function se() { self::foo(); }
+		"[public function se() { self::foo(); }] = nullType()",
+		"[self] = classType(|php+class:///ns/c|)",
+		"[foo] = someMethod",
+		//"or(hasMethod([self], foo, { static() }))",
+		
+		// public function pa() { parent::foo(); }
+		"[public function pa() { parent::foo(); }] = nullType()",
+		"or([parent] = classType(|php+class:///ns/p|))",
+		"[foo] = someMethod",
+		//"or(hasMethod([parent], foo, { static() }))",
+		
+		// public function st() { static::foo(); }	
+		"[public function st() { static::foo(); }] = nullType()",
+		"or([static] = classType(|php+class:///ns/c|), [static] = classType(|php+class:///ns/p|))"
+		//"or(hasMethod([static], foo, { static() }))"
+    ];
+	list[str] expectedT = [];
+	return testConstraints("classKeywords", expectedC, expectedT);
+}
+
+public test bool testMethodCall() {
+	// information is retreived from m3, declares in uses
+	list[str] expectedC = [
+		// $a->b();
+		//"[$a] \<: any()",
+		//"or(hasMethod([$a], b, { !static() })",
+		// class and method declaration information
+		 //c::d(); // static call of (static) method d off class c
+		//"[c] \<: objectType()",
+		//"[c] \<: [class C { public static function d() {} }]",
+		//"[public static function d() {}] = nullType()",
+		//"or(hasMethod([$c], d, { static() })",
+		// if LHS is of type: current class -> 
+		// if LHS is of one of the parent classes ->
+		""
+    ];
+	list[str] expectedT = [];
+	return testConstraints("methodCall", expectedC, expectedT);
+}
+
+public bool testConstraints(str fileName, list[str] expectedC, list[str] expectedT)
 {
 	loc l = getFileLocation(fileName);
+	projectLocation = l;
 	
 	System system = getSystem(l, false);
 	resetModifiedSystem(); // this is only needed for the tests
 	M3 m3 = getM3ForSystem(system, false);
 	system = getModifiedSystem();
-	m3 = calculateAfterM3Creation(m3, system);
+	//m3 = calculateAfterM3Creation(m3, system);
 
 	set[Constraint] actual = getConstraints(system, m3);
 
 	// for debugging purposes
-	//printResult(fileName, expected, actual);
+	//printResult(fileName, expectedC, actual);
 	
-	// assert that expectedConstraints is a subset of ActualConstraints
-	return comparePrettyPrinted(expected, actual);
+	// assert that expectedCConstraints is equal to ActualConstraints
+	bool test1 = comparePrettyPrintedConstraints(expectedC, actual);
+
+	bool test2;
+	
+	if (isEmpty(expectedT)) {
+		test2 = true;
+	} else {
+		map[TypeOf var, set[TypeSymbol] possibles] solveResult = solveConstraints(constraints, m3, system);
+		test2 = comparePrettyPrintedTypes(expectedT, solveResult);
+	}
+
+	if (!test1) println("Constraints test failed..");
+	if (!test2) println("Solving constraints test failed..");
+	return test1 && test2;
 }
 
 //
-// Assert pretty printed
+// Compare pretty printed constraints
 //
-private bool comparePrettyPrinted(list[str] expected, set[Constraint] actual) 
+private bool comparePrettyPrintedConstraints(list[str] expectedC, set[Constraint] actual) 
 {
 	list[str] actualPP = [ toStr(a) | a <- actual ];
+	return comparePrettyPrinted(expectedC, actualPP);
+}
 
-	a = sort(actualPP);
-	e = sort(expected);
+//
+// Compare pretty printed constraints
+//
+private bool comparePrettyPrintedTypes(list[str] expectedT, map[TypeOf, set[TypeSymbol]] actual) {
+	// FOR NOW: when actual is empty, do not perform this test
+	if (isEmpty(expectedT)) return true;
+	
+	list[str] actualPP = [ toStr(a) + " = " + toStr(actual[a]) | a <- actual ];
+	
+	return comparePrettyPrinted(expectedT, actualPP);
+}
+
+private bool comparePrettyPrinted(list[str] e, list[str] a) {
+	a = sort(a);
+	e = sort(e);
 	
 	notInActual = e - a;
 	notInExpected = a - e;	
@@ -809,7 +948,7 @@ private bool comparePrettyPrinted(list[str] expected, set[Constraint] actual)
 		iprintln("Expected: <e>");
 		iprintln("Not in actual:");
 		for (nia <- notInActual) println(nia);
-		iprintln("Not in expected:");
+		iprintln("Not in expectedC:");
 		for (nie <- notInExpected) println(nie);
 	}
 	
@@ -821,14 +960,14 @@ private bool comparePrettyPrinted(list[str] expected, set[Constraint] actual)
 // Printer functions:
 //
 
-private void printResult(str fileName, list[str] expected, set[Constraint] actual)
+private void printResult(str fileName, list[str] expectedC, set[Constraint] actual)
 {
 	loc l = getFileLocation(fileName);
 	
 	for (f <- l.ls) {
 		println();
 		println("----------File Content: <f>----------");
-		println(readFile(f));
+		if (isFile(f)) println(readFile(f)); else println("<f>");
 		println();
 	}
 	println("---------------- Actual: -------------------");
@@ -836,7 +975,7 @@ private void printResult(str fileName, list[str] expected, set[Constraint] actua
 	println("--------------------------------------------");
 	println();
 	println("--------------- Expected: ------------------");
-	for (e <- expected) println(e);
+	for (e <- expectedC) println(e);
 	println("--------------------------------------------");
 	println();
 }
@@ -846,20 +985,38 @@ private str toStr(eq(TypeOf t1, TypeOf t2)) 			= "<toStr(t1)> = <toStr(t2)>";
 private str toStr(eq(TypeOf t1, TypeSymbol ts)) 		= "<toStr(t1)> = <toStr(ts)>";
 private str toStr(subtyp(TypeOf t1, TypeOf t2)) 		= "<toStr(t1)> \<: <toStr(t2)>";
 private str toStr(subtyp(TypeOf t1, TypeSymbol ts)) 	= "<toStr(t1)> \<: <toStr(ts)>";
+private str toStr(supertyp(TypeOf t1, TypeOf t2)) 		= "<toStr(t1)> :\> <toStr(t2)>";
+private str toStr(supertyp(TypeOf t1, TypeSymbol ts)) 	= "<toStr(t1)> :\> <toStr(ts)>";
 private str toStr(disjunction(set[Constraint] cs))		= "or(<intercalate(", ", sort([ toStr(c) | c <- sort(toList(cs))]))>)";
 private str toStr(exclusiveDisjunction(set[Constraint] cs))	= "xor(<intercalate(", ", sort([ toStr(c) | c <- sort(toList(cs))]))>)";
 private str toStr(conjunction(set[Constraint] cs))		= "and(<intercalate(", ", sort([ toStr(c) | c <- sort(toList(cs))]))>)";
 private str toStr(negation(Constraint c)) 				= "neg(<toStr(c)>)";
 private str toStr(conditional(Constraint c, Constraint res)) = "if (<toStr(c)>) then (<toStr(res)>)";
-private str toStr(isMethodName(TypeOf t, str n))		= "isMethodName(<toStr(t)>, <n>)";
+private str toStr(isAMethod(TypeOf t))					= "<toStr(t)> = someMethod";
+private str toStr(isAFunction(TypeOf t))				= "<toStr(t)> = someFunction";
+private str toStr(isItemOfClass(TypeOf t, TypeOf t2))	= "isItemOfClass(<toStr(t)>, <toStr(t2)>)";
+private str toStr(hasName(TypeOf t, str n))				= "hasName(<toStr(t)>, <n>)";
 private str toStr(hasMethod(TypeOf t, str n))			= "hasMethod(<toStr(t)>, <n>)";
 private str toStr(hasMethod(TypeOf t, str n, set[ModifierConstraint] mcs))	= "hasMethod(<toStr(t)>, <n>, { <intercalate(", ", sort([ toStr(mc) | mc <- sort(toList(mcs))]))> })";
 private str toStr(required(set[Modifier] mfs))			= "<intercalate(", ", sort([ toStr(mf) | mf <- sort(toList(mfs))]))>";
 private str toStr(notAllowed(set[Modifier] mfs))		= "<intercalate(", ", sort([ "!"+toStr(mf) | mf <- sort(toList(mfs))]))>";
 default str toStr(Constraint c) { throw "Please implement toStr for node :: <c>"; }
 
-private str toStr(typeOf(loc i)) 				= isFile(i) ? "["+readFile(i)+"]" : "[<i>]";
-private str toStr(arrayType(set[TypeOf] expr))	= "array(<intercalate(", ", sort([ toStr(e) | e <- sort(toList(expr))]))>)";
-private str toStr(TypeSymbol t) 				= "<t>";
-private str toStr(Modifier m) 					= "<m>";
+private str toStr(typeOf(loc i)) 						= isFile(i) ? "["+readFile(i)+"]" : "[<i>]";
+private str toStr(typeOf(TypeSymbol ts))				= "<toStr(ts)>";
+private str toStr(TypeOf::arrayType(set[TypeOf] expr))	= "arrayType(<intercalate(", ", sort([ toStr(e) | e <- sort(toList(expr))]))>)";
+private str toStr(TypeSymbol t) 						= "<t>";
+private str toStr(Modifier m) 							= "<m>";
+
+private str toStr(set[TypeSymbol] ts)					= "{ <intercalate(", ", sort([ toStr(t) | t <- sort(toList(ts))]))> }";
+// deprecated
+private str toStr(TypeSet::Universe())							= "{ any() }";
+private str toStr(TypeSet::EmptySet())							= "{}";
+private str toStr(TypeSet::Root())								= "{ any() }";
+private str toStr(TypeSet::Single(TypeSymbol t))				= "<toStr(t)>";
+private str toStr(TypeSet::Set(set[TypeSymbol] ts))				= "{ <intercalate(", ", sort([ toStr(t) | t <- sort(toList(ts))]))> }";
+private str toStr(TypeSet::Subtypes(TypeSet subs))				= "sub({ <intercalate(", ", sort([ toStr(s) | s <- sort(toList(subs))]))> }";
+private str toStr(TypeSet::Union(set[TypeSet] args))			= "<intercalate(", ", sort([ toStr(s) | s <- sort(toList(args))]))>";
+private str toStr(TypeSet::Intersection(set[TypeSet] args))		= "<intercalate(", ", sort([ toStr(s) | s <- sort(toList(args))]))>";
+
 default str toStr(TypeOf to) { throw "Please implement toStr for node :: <to>"; }

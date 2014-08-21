@@ -44,7 +44,7 @@ public data Language(str version="")
 public M3 createEmptyM3(loc file)
 {
 	m = emptyM3(file);
-	
+
 	m@extends = {};
 	m@implements = {};
 	m@traitUses = {};

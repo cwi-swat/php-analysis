@@ -4,19 +4,21 @@ extend analysis::m3::TypeSymbol;
 // type `mixed()` is omitted, `\any()` will be used
 
 data TypeSymbol
-  = array(TypeSymbol arrayType)
-  | boolean()
-  | class(loc decl)
-  | float()
-  | integer()
-  | null()
-  | object()
-  | resource()
-  | string()
+  = arrayType()
+  | arrayType(TypeSymbol arrayType)
+  | booleanType()
+  | classType(loc decl)
+  | floatType()
+  | integerType()
+  | nullType()
+  | objectType()
+  | resourceType()
+  | stringType()
+  | scalarType()
   ; 
-  
+ 
 //default bool subtyp(TypeSymbol s, TypeSymbol t) = s == t;
 
 default TypeSymbol lub(TypeSymbol s, TypeSymbol t) = s == t ? s : \any();
 
-public set[TypeSymbol] allTypes = {  array(\any()), boolean(), float(), integer(), null(), object(), resource(), string() }; 
+public set[TypeSymbol] allTypes = {  arrayType(\any()), booleanType(), floatType(), integerType(), nullType(), objectType(), resourceType(), stringType() }; 
