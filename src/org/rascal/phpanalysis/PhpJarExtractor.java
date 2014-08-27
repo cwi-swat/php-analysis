@@ -1,82 +1,50 @@
 package org.rascal.phpanalysis;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.Enumeration;
+import java.nio.file.StandardCopyOption;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 
+import org.eclipse.imp.pdb.facts.ISourceLocation;
 import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.IValueFactory;
-import org.rascalmpl.interpreter.utils.RuntimeExceptionFactory;
 
 public class PhpJarExtractor {
 	protected final IValueFactory values;
+	private static ISourceLocation phpParserLoc = null;
 	
 	public PhpJarExtractor(IValueFactory values){
 		this.values = values;
 	}
 		
 	public IValue getPhpParserLocFromJar() throws IOException {
-		InputStream is = null;
-		FileOutputStream fo = null;
-		JarFile jarFile = null;
-		
-		try {
+		if (phpParserLoc == null) {
 			File tempDir = Files.createTempDirectory("rascal-php-parser-jar").toAbsolutePath().toFile();
-			File tempJar = new File(tempDir, "php-parser.jar");
-			
-			//System.out.println(getClass().getClassLoader().);
-			
-			if (!tempJar.exists()) {
-				Files.copy(getClass().getClassLoader().getResourceAsStream("php-parser.jar"), tempJar.toPath());
-			}		
-			
-			jarFile = new JarFile(tempJar);
-			Enumeration<JarEntry> entries = jarFile.entries();
-			
-		    while (entries.hasMoreElements())
-		    {
-		        JarEntry je = entries.nextElement();
-		        File fl = new File(tempDir, je.getName());
-		        
-		        if (!fl.exists())
-		        {
-		            fl.getParentFile().mkdirs();
-		            //fl = new File(tempDir, je.getName());
-		        }
-		        if (je.isDirectory())
-		        {
-		            continue;
-		        }
-		        
-		        is = jarFile.getInputStream(je);
-		        fo = new FileOutputStream(fl);
-		        
-		        while (is.available() > 0)
-		        {
-		            fo.write(is.read());
-		        }
-		        
-		        fo.close();
-		        is.close();
-		        
-		        fo = null;
-		        is = null;
-		    }
 	
-		    return values.sourceLocation(tempDir.getAbsolutePath());
+			try (JarInputStream jarStream = new JarInputStream(getClass().getClassLoader().getResourceAsStream("php-parser.jar"))) {	
+				JarEntry je;
+			    while ((je = jarStream.getNextJarEntry()) != null)
+			    {
+			        File fl = new File(tempDir, je.getName());
+			        
+			        if (!fl.exists())
+			        {
+			            fl.getParentFile().mkdirs();
+			            //fl = new File(tempDir, je.getName());
+			        }
+			        if (je.isDirectory())
+			        {
+			            continue;
+			        }
+			        
+			        Files.copy(jarStream, fl.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			    }
+		
+			    phpParserLoc = values.sourceLocation(tempDir.getAbsolutePath() + "/PHP-Parser/");
+			}
 		}
-		catch(IOException ioex) {
-			throw RuntimeExceptionFactory.io(values.string(ioex.getMessage()), null, null);
-		}
-		finally {
-			if (fo != null)	fo.close();
-	        if (is != null) is.close();
-	        if (jarFile != null) jarFile.close();
-		}
+		return phpParserLoc;
 	}
 }

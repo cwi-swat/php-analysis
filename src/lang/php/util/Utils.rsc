@@ -47,10 +47,11 @@ private str executePHP(list[str] opts, loc cwd) {
 }
 
 private Script parsePHPfile(loc f, list[str] opts, Script error) {
-	str parserLoc = usePhpParserJar ? getPhpParserLocFromJar() + astToRascal : rgenLoc.path;
+	loc parserLoc = usePhpParserJar ? getPhpParserLocFromJar() : lang::php::util::Config::parserLoc;
 
+	str phpOut;
 	try {
-		phpOut = executePHP(["-d memory_limit="+parserMemLimit, rgenLoc.path, "-f<f.path>"] + opts, rgenCwd);
+		phpOut = executePHP(["-d memory_limit="+parserMemLimit, (parserLoc + astToRascal).path, "-f<f.path>"] + opts, parserLoc + libRascal);
 	}
 	catch RuntimeException:
 		return error;
@@ -78,7 +79,7 @@ public bool testPHPInstallation() {
 public Stmt parsePHPStatement(str s) {
 	tempFile = |file:///tmp/parseStmt.php|;
 	writeFile(tempFile, "\<?php\n<s>?\>");
-	Script res = executePHPfile(tempFile, [], errscript("Could not parse <s>"));
+	Script res = parsePHPfile(tempFile, [], errscript("Could not parse <s>"));
 	if (errscript(_) := res) throw "Found error in PHP code to parse";
 	if (script(sl) := res && size(sl) == 1) return head(sl);
 	if (script(sl) := res) return block(sl);
@@ -111,8 +112,8 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	if (l.scheme == "home") opts += "-r";
 	if (includePhpDocs) opts += "--phpdocs";
 	
-	Script res = executePHPfile(l, opts, errscript("Could not parse file <l.path>: <phcErr>")); 
-	if (errscript(err) := res) println("Found error in file <l.path>. Error: <err>");
+	Script res = parsePHPfile(l, opts, errscript("Could not parse file <l.path>")); 
+	if (errscript(err) := res) logMessage("Found error in file <l.path>. Error: <err>", 2);
 	return res;
 }
 
