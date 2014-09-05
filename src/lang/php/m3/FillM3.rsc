@@ -10,6 +10,7 @@ import lang::php::m3::Containment;
 import lang::php::m3::Declarations;
 import lang::php::m3::Types;
 import lang::php::m3::Uses;
+import lang::php::m3::Calls;
 
 import lang::php::ast::NormalizeAST;
 import lang::php::ast::Scopes;
@@ -66,8 +67,15 @@ public M3 createM3forScript(loc filename, Script script)
 		m3 = calculateUsesFlowInsensitive(m3, script); // fill uses which are resolvable without type information
 		
 		m3 = fillParameters(m3, script); // add the parameters of all the methods
+		
+		m3 = gatherMethodCallsAndFieldAccesses(m3, script);
 	}
 	catch Exception e:
+	{
+		logMessage("Error: <e>", 1);
+		m3@messages += error("<e>", filename); 
+	}
+	catch RuntimeException e:
 	{
 		logMessage("Error: <e>", 1);
 		m3@messages += error("<e>", filename); 

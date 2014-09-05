@@ -160,6 +160,14 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
                 m3 = addUse(m3, nameNode, \type);
         	}
         }
+        
+        case c:staticCall(name(classNameNode), _, _):            
+        {
+        	for (\type <- ["class", "interface"])
+        	{
+        		m3 = addUse(m3, classNameNode, \type);
+        	}
+        }
 
         // ignore these		
         case Stmt: ;
@@ -377,7 +385,7 @@ public M3 addUse(M3 m3, loc at, str name, str \type, loc scope)
                     str postFix = isEmpty(nameParts.rest) ? "" : "/" + intercalate("/", nameParts.rest);
                     fullyQualifiedName = getOneFrom(aliases) + toLowerCase(postFix);
                 } else if (size(aliases) > 1) {
-                    throw ("more than one alias found");
+                    throw ("more than one alias found for <fullyQualifiedName>");
             	}
         	}
         }
@@ -522,7 +530,10 @@ public map[int, int] calculateResolutionHistogram(map[loc, int] countPerLoc)
 			}
 		}
 
-		counts[i] = c;
+		if (c > 0)
+		{
+			counts[i] = c;
+		}
 	}
 
 	return counts;

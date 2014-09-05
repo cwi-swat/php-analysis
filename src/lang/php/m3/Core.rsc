@@ -22,8 +22,8 @@ import Prelude;
 /* todo move to different file. This didnt work beacuse of an import loop */
 data Annotation = 
 	returnType(set[TypeSymbol]) | 
-	parameterType(loc var, set[TypeSymbol]) | 
-	varType(loc var, set[TypeSymbol]);
+	parameterType(loc var, set[TypeSymbol] \type) | 
+	varType(loc var, set[TypeSymbol] \type);
 	
 alias M3Collection = map[loc fileloc, M3 model];
 
@@ -34,6 +34,9 @@ anno rel[loc decl, PhpParams params] M3@parameters;   // formal parameters of fu
 anno rel[loc decl, loc to] M3@constructors; // a list of classes that have a constructor
 anno rel[loc from, loc to] M3@aliases;      // class name aliases (new name -> old name)
 anno rel[loc pos, Annotation annotation] M3@annotations;    // result of parsed php docs
+anno rel[loc from, loc to] M3@calls;     // method/function calls
+anno rel[loc from, loc to] M3@accesses;  // methods/functions accessing variables/fields
+
 
 public loc globalNamespace = |php+namespace:///|;
 public loc unknownLocation = |php+unknown:///|;
@@ -52,6 +55,8 @@ public M3 createEmptyM3(loc file)
 	m@parameters = {};
 	m@constructors = {};
 	m@annotations = {};
+	m@calls = {};
+	m@accesses = {};
 
 	return m;
 }
@@ -67,6 +72,8 @@ public M3 composePhpM3(loc id, set[M3] models)
     m@parameters = {*model@parameters | model <- models};
     m@constructors = {*model@constructors | model <- models};
     m@annotations = {*model@annotations | model <- models};
+    m@calls = {*model@calls | model <- models};
+    m@accesses = {*model@accesses | model <- models};
     
     return m;
 }
@@ -88,7 +95,7 @@ public bool isField(loc entity) = entity.scheme == "php+field";
 public bool isConstant(loc entity) = entity.scheme == "php+constant";
 public bool isClassConstant(loc entity) = entity.scheme == "php+classConstant";
 
-public bool isUnresolved(loc entity) = "unresolved" in entity.scheme;
+public bool isUnresolved(loc entity) = contains(entity.scheme, "unresolved");
 
 @memo public set[loc] namespaces(M3 m) = {e | e <- m@declarations<name>, isNamespace(e)};
 @memo public set[loc] classes(M3 m) =  {e | e <- m@declarations<name>, isClass(e)};
@@ -99,7 +106,7 @@ public bool isUnresolved(loc entity) = "unresolved" in entity.scheme;
 @memo public set[loc] methods(M3 m) = {e | e <- m@declarations<name>, isMethod(e)};
 @memo public set[loc] parameters(M3 m)  = {e | e <- m@declarations<name>, isParameter(e)};
 @memo public set[loc] fields(M3 m) = {e | e <- m@declarations<name>, isField(e)};
-@memo public set[loc] constants(M3 m) =  {e | e <- m@declarations<name>, isconstant(e)};
+@memo public set[loc] constants(M3 m) =  {e | e <- m@declarations<name>, isConstant(e)};
 @memo public set[loc] classConstants(M3 m) =  {e | e <- m@declarations<name>, isClassConstant(e)};
 
 public set[loc] elements(M3 m, loc parent) = { e | <parent, e> <- m@containment };
@@ -184,4 +191,11 @@ public loc getNamespace(loc name)
 }
 
 
-public set[TypeSymbol] getTypesForExpression(M3 m3, &T <: node e) = m3@types[e@at];
+public set[loc] getMemberParents(loc methodOrField, M3 m3)
+{
+	if (methodOrField.path == "/") return {};
+	
+	str parentName = methodOrField.parent.path;
+
+	return { p | p <- domain(m3@declarations), p.path == parentName	};
+}
