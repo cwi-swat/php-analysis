@@ -23,10 +23,14 @@ public &T <: node annotateWithDeclScopes(&T <: node t, loc scope, set[str] allow
 	// alternative: makeNode(getName(t),[ top-down-break visit(c) { case ... } | c <- getChildren(t) ]) 
 	for (i <- [0..arity(t)])
 	{
-		t[i] = top-down-break visit (t[i])
+		//try
 		{
-			case node n => annotateWithDeclScopes(n, scope, allowedScopeTypes)
-		}
+			t[i] = top-down-break visit (t[i])
+			{
+				case node n => annotateWithDeclScopes(n, scope, allowedScopeTypes)
+			}
+		} 
+		// catch 
 	}
 	
 	return t;

@@ -46,12 +46,11 @@ public M3 gatherFieldAccesses(M3 m3, ast)
 	return m3;
 }
 
-rel[loc, loc] resolveUnknownMethodCalls(M3 m3) = resolveUnknownMemberAccesses(m3, m3@calls, isMethod, unknownMethodScheme);
+public rel[loc, loc] resolveUnknownMethodCalls(M3 m3) = resolveUnknownMemberAccesses(m3, m3@calls, isMethod, unknownMethodScheme);
 
-rel[loc, loc] resolveUnknownFieldAccesses(M3 m3) = resolveUnknownMemberAccesses(m3, m3@accesses, isField, unknownFieldScheme);
+public rel[loc, loc] resolveUnknownFieldAccesses(M3 m3) = resolveUnknownMemberAccesses(m3, m3@accesses, isField, unknownFieldScheme);
 
-
-rel[loc, loc] resolveUnknownMemberAccesses(M3 m3, rel[loc, loc] accesses, bool(loc) isMember, str unknownMemberScheme)
+private rel[loc, loc] resolveUnknownMemberAccesses(M3 m3, rel[loc, loc] accesses, bool(loc) isMember, str unknownMemberScheme)
 {
 	//qualifiedCalls = { <m, c> | <m, c> <- m3@calls, isMethod(m), isMethod(c) };
 	//unqualifiedCalls = { <m, c> | <m, c> <- m3@calls, isMethod(m), c.scheme == "php+unknown+method" };
@@ -66,8 +65,22 @@ rel[loc, loc] resolveUnknownMemberAccesses(M3 m3, rel[loc, loc] accesses, bool(l
 }
 
 
+public M3 replaceUnknownMethodCalls(M3 m3, rel[loc, loc] resolvedCalls) {
+	m3@calls = replaceUnknownMemberAccesses(m3@calls, resolvedCalls);
+	return m3;
+}
 
-map[int, int] memberResolutionHistogram(rel[loc, loc] possibleMembers, M3 m3) {
+public M3 replaceUnknownFieldAccesses(M3 m3, rel[loc, loc] resolvedAccesses) {
+	m3@accesses = replaceUnknownMemberAccesses(m3@accesses, resolvedAccesses);
+	return m3;
+}
+
+private rel[loc, loc] replaceUnknownMemberAccesses(rel[loc, loc] orig, rel[loc, loc] resolved) {
+	return rangeX(orig, domain(resolved)) + orig o rangeX(resolved, {unknownLocation}); 
+}
+
+
+public map[int, int] memberResolutionHistogram(rel[loc, loc] possibleMembers, M3 m3) {
 	// group members of classes with the same base class
 
 	descendants = (invert(m3@extends + m3@implements))+;

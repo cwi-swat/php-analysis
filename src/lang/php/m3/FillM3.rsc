@@ -65,10 +65,11 @@ public M3 createM3forScript(loc filename, Script script)
 	
 		m3 = calculateAliasesFlowInsensitive(m3, script); // fill aliases 
 		m3 = calculateUsesFlowInsensitive(m3, script); // fill uses which are resolvable without type information
-		
+		m3 = propagateAliasesInUses(m3); // add aliases to uses relation
+				
+		m3 = gatherMethodCallsAndFieldAccesses(m3, script); // based on uses
+
 		m3 = fillParameters(m3, script); // add the parameters of all the methods
-		
-		m3 = gatherMethodCallsAndFieldAccesses(m3, script);
 	}
 	catch Exception e:
 	{
