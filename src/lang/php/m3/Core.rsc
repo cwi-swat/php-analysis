@@ -33,7 +33,7 @@ anno rel[loc from, loc to] M3@traitUses;    // classes using traits and traits u
 anno rel[loc decl, PhpParams params] M3@parameters;   // formal parameters of functions and methods
 anno rel[loc decl, loc to] M3@constructors; // a list of classes that have a constructor
 anno rel[loc from, loc to] M3@aliases;      // class name aliases (new name -> old name)
-anno rel[loc pos, Annotation annotation] M3@annotations;    // result of parsed php docs
+//anno rel[loc pos, Annotation annotation] M3@annotations;    // result of parsed php docs
 anno rel[loc from, loc to] M3@calls;     // method/function calls
 anno rel[loc from, loc to] M3@accesses;  // methods/functions accessing variables/fields
 
@@ -54,7 +54,7 @@ public M3 createEmptyM3(loc file)
 	m@aliases = {};
 	m@parameters = {};
 	m@constructors = {};
-	m@annotations = {};
+	//m@annotations = {};
 	m@calls = {};
 	m@accesses = {};
 
@@ -71,7 +71,7 @@ public M3 composePhpM3(loc id, set[M3] models)
     m@aliases = {*model@aliases | model <- models};
     m@parameters = {*model@parameters | model <- models};
     m@constructors = {*model@constructors | model <- models};
-    m@annotations = {*model@annotations | model <- models};
+    //m@annotations = {*model@annotations | model <- models};
     m@calls = {*model@calls | model <- models};
     m@accesses = {*model@accesses | model <- models};
     
