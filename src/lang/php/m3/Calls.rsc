@@ -8,7 +8,7 @@ public str unknownFieldScheme = "php+unknown+field";
 
 public M3 gatherMethodCallsAndFieldAccesses(M3 m3, node ast)
 {
-	visit (ast)
+    visit (ast)
     {
     	case c:call(name(functionNameNode), _):
     		m3@calls += { <c@scope, fn> | fn <- m3@uses[functionNameNode@at] };

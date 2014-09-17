@@ -516,6 +516,10 @@ public map[int, int] calculateResolutionHistogram(map[loc, int] countPerLoc)
 {
 	map[int, int] counts = ();
 
+	if (countPerLoc == ()) {
+		return ();
+	}
+
 	maxCount = max(range(countPerLoc));
 
 	// calculation written for efficiency
