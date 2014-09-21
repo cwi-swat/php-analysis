@@ -1,2 +1,1 @@
 Source: src
-Main-Module: Main
