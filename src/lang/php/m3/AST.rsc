@@ -10,6 +10,9 @@ module lang::php::m3::AST
 
 extend analysis::m3::AST;
 import lang::php::ast::AbstractSyntax;
+import lang::php::ast::System;
 
 public data AST(loc file = |file:///unknown|)
-	= phpAST(Script script);
+	= phpAST(Script script)
+	| phpSystem(System sys)
+	;
