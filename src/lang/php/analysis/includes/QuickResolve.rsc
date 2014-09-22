@@ -11,7 +11,7 @@ import Set;
 import Relation;
 import String;
 
-private Expr replaceConstants(Expr e, IncludesInfo iinfo) {
+public Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 	return bottom-up visit(e) {
 		case fc:fetchConst(name(cn)) => (iinfo.constMap[cn])[@at=fc@at]
 			when cn in iinfo.constMap
