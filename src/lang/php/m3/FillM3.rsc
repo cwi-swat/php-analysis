@@ -57,17 +57,17 @@ public M3 createM3forScript(loc filename, Script script)
    		m3 = fillDeclarations(m3, script); // fill @declarations and @names	
 	   	script = propagateDeclToScope(script); // propagate @decl to @scope
 	   	modifiedSystem[filename] = script; // a dirty hack to reuse this modified script...
-   	
-		m3 = fillContainment(m3, script); // fill containment with declarations 
-		m3 = fillExtendsAndImplements(m3, script); // fill extends, implements and traitUse, by trying to look up class names 
+
+		m3 = fillContainment(m3, script); // fill containment with declarations
 		m3 = fillModifiers(m3, script); // fill modifiers for classes, class fields and class methods 
 		m3 = fillPhpDocAnnotations(m3, script); // fill documentation, defined as @phpdoc
-	
+
 		m3 = calculateAliasesFlowInsensitive(m3, script); // fill aliases 
 		m3 = calculateUsesFlowInsensitive(m3, script); // fill uses which are resolvable without type information
 		m3 = propagateAliasesInUses(m3); // add aliases to uses relation
-				
-		m3 = gatherMethodCallsAndFieldAccesses(m3, script); // based on uses
+
+		m3 = fillExtendsAndImplements(m3, script); // fill extends, implements and traitUse, based on uses		
+		m3 = gatherMethodCallsAndFieldAccesses(m3, script); // fill calls and accesses, based on uses
 
 		m3 = fillParameters(m3, script); // add the parameters of all the methods
 	}
@@ -123,27 +123,32 @@ private M3 propagateUsesForUnresolvedItems(M3 m3)
 	return m3;
 }
 
+@doc{
+	Requires m3@uses
+}
 private M3 fillExtendsAndImplements(M3 m3, Script script) 
 {
 	visit (script) 
 	{
-		case c:class(_, _, someName(extends), implements, body): {
-			m3@extends += {<c@decl, nameToLoc(extends, "class")>};
-			m3@implements += {<c@decl, nameToLoc(name, "interface")> | name <- implements};
+		case c:class(_, _, extends, implements, body): {
+			if (someName(className) := extends) {
+				m3@extends += { c@decl } * m3@uses[className@at];
+			}
+			m3@implements += { c@decl } * { *m3@uses[name@at] | name <- implements };
 			
 			for (traitUse(names, _) <- body) {
-				m3@traitUses += {<c@decl, nameToLoc(name, "trait")> | name <- names};
-			}		
+				m3@traitUses += { c@decl } * { *m3@uses[name@at] | name <- names };
+			}
 		}
 		
 		case i:interface(_, extends, _): {
-			m3@extends += {<i@decl, nameToLoc(name, "interface")> | name <- extends};
+			m3@extends += { i@decl } * { *m3@uses[name@at] | name <- extends};
 		}
 		
-		case t:trait(_, body): { 
+		case t:trait(_, body): {
 			for (traitUse(names, _) <- body) {
-				m3@traitUses += {<t@decl, nameToLoc(name, "trait")> | name <- names};
-			}		
+				m3@traitUses += { t@decl } * { *m3@uses[name@at] | name <- names};
+			}
 		}
    	}	
    	
