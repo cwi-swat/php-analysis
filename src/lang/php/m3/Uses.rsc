@@ -107,8 +107,12 @@ public M3 calculateUsesFlowInsensitive(M3 m3, node ast)
         	if (v@scope == globalNamespace) {
         		m3@uses += { <v@at, v@scope> };
         	} else {
-				loc currentClassDecl = getClassTraitOrInterface(m3@containment, v@scope);
-        		m3@uses += { <v@at, currentClassDecl> };
+        		try {
+        			loc currentClassDecl = getClassTraitOrInterface(m3@containment, v@scope);
+        			m3@uses += { <v@at, currentClassDecl> };
+        		}
+        		catch AssertionFailed(): ; // use of $this outside class, ignore
+        		catch AssertionFailed(_): ; // ignore
         	}
         }
         

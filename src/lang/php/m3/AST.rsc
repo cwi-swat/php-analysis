@@ -14,5 +14,4 @@ import lang::php::ast::System;
 
 public data AST(loc file = |file:///unknown|)
 	= phpAST(Script script)
-	| phpSystem(System sys)
 	;
