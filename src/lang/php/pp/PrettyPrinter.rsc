@@ -78,16 +78,16 @@ public str pp(fetchClassConst(name(Name className), str constName)) = "<pp(class
 public str pp(fetchClassConst(expr(Expr className), str constName)) = "$<pp(className)>::<constName>";
 
 //	| assign(Expr assignTo, Expr assignExpr)
-public str pp(assign(Expr assignTo, Expr assignExpr)) = "<pp(assignTo@phpdoc)><pp(assignTo)> = <pp(assignExpr)>";
+public str pp(assign(Expr assignTo, Expr assignExpr)) = "<if ( (assignTo@phpdoc)? ){><pp(assignTo@phpdoc)><}><pp(assignTo)> = <pp(assignExpr)>";
 
 //	| assignWOp(Expr assignTo, Expr assignExpr, Op operation)
-public str pp(assignWOp(Expr assignTo, Expr assignExpr, Op operation)) = "<pp(assignTo@phpdoc)><pp(assignTo)> <pp(operation)>= <pp(assignExpr)>";
+public str pp(assignWOp(Expr assignTo, Expr assignExpr, Op operation)) = "<if ( (assignTo@phpdoc)? ){><pp(assignTo@phpdoc)><}><pp(assignTo)> <pp(operation)>= <pp(assignExpr)>";
 
 //	| listAssign(list[OptionExpr] assignsTo, Expr assignExpr)
 public str pp(listAssign(list[OptionExpr] assignsTo, Expr assignExpr)) = "list(<intercalate(",",[pp(a)|a<-assignsTo])>) = <pp(assignExpr)>";
 
 //	| refAssign(Expr assignTo, Expr assignExpr)
-public str pp(refAssign(Expr assignTo, Expr assignExpr)) = "<pp(assignTo@phpdoc)><pp(assignTo)> =& <pp(assignExpr)>";
+public str pp(refAssign(Expr assignTo, Expr assignExpr)) = "<if ( (assignTo@phpdoc)? ){><pp(assignTo@phpdoc)><}><pp(assignTo)> =& <pp(assignExpr)>";
 
 //	| binaryOperation(Expr left, Expr right, Op operation)
 public str pp(binaryOperation(Expr left, Expr right, Op operation)) = "<pp(left)> <pp(operation)> <pp(right)>";

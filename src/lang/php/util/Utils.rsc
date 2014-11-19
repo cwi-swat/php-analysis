@@ -78,6 +78,7 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
 	Script res = errscript("Could not parse file <l.path>: <phcErr>");
+	//writeFile(|file:///tmp/parserOutput.txt|,phcOutput);
 	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
 		if (trim(phcOutput) == "")
 			res = errscript("Parser failed in unknown way");
@@ -145,7 +146,7 @@ public void buildBinaries(str product, str version, loc l, bool addLocationAnnot
 	files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 	
 	loc binLoc = parsedDir + "<product>-<version>.pt";
-	writeBinaryValueFile(binLoc, files);
+	writeBinaryValueFile(binLoc, files, compression=false);
 }
 
 @doc{Build the serialized ASTs for a specific system at the default location}
@@ -170,20 +171,20 @@ public void buildMissingBinaries(str product, str version, bool addLocationAnnot
 	loc l = getCorpusItem(product,version);
 	loc binLoc = parsedDir + "<product>-<version>.pt";
 	if (!exists(binLoc)) {
-		buildBinaries(product, version, l, addLocationAnnotations, addUniqueIds);
+		buildBinaries(product, version, l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds);
 	}
 }
 
 @doc{Build the serialized ASTs for all versions of a specific product (e.g., WordPress) where these serialized ASTs are missing}
 public void buildMissingBinaries(str product, bool addLocationAnnotations = true, bool addUniqueIds = false) {
 	for (version <- getVersions(product))
-		buildMissingBinaries(product, version, getCorpusItem(product, version), addLocationAnnotations, addUniqueIds);
+		buildMissingBinaries(product, version, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds);
 }
 
 @doc{Build the serialized ASTs for all product/version combos in the corpus where these serialized ASTs are missing }
 public void buildMissingBinaries(bool addLocationAnnotations = true, bool addUniqueIds = false) {
 	for (product <- getProducts(), version <- getVersions(product))
-		buildMissingBinaries(product, version, getCorpusItem(product,version), addLocationAnnotations, addUniqueIds);
+		buildMissingBinaries(product, version, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds);
 }
 
 @doc{Build the serialized ASTs only for the newest version of each system in the corpus.}
@@ -278,7 +279,7 @@ public map[tuple[str product, str version], map[loc l, Script scr]] getLatestTre
 	Log level 1 => main logging;
 	Log level 2 => debug logging;
 }
-private int logLevel = 0;
+private int logLevel = 2;
 
 @doc { }
 public void logMessage(str message, int level) {
