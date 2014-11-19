@@ -18,6 +18,7 @@ import String;
 import ValueIO;
 import DateTime;
 import util::Math;
+import Node;
 
 private map[str,set[str]] extensions = (
 	//"Symfony" : { "php", "inc", "cache", "map", "phar", "dist" }
@@ -225,7 +226,8 @@ public str createQuickResolveCountsTable() {
 		return res;
 	}
 	
-	str productLine(str p, str v) {
+
+	tuple[int total, int st, int dyn, int unique, int missing, int anyinc, int other, int otherhits] countsForSys(str p, str v) {
 		map[int hits, int includes] m = counts[<p,v>];
 		total = ( 0 | it + m[h] | h <- m<0> );
 		pt = loadBinary(p,v);
@@ -237,12 +239,46 @@ public str createQuickResolveCountsTable() {
 		threshold = floor(files * 0.9);
 		anyinc = ( 0 | it + m[h] | h <- m<0>, h >= threshold );
 		other = total - unique - anyinc - missing;
-		denom = ( 0 | it + m[h] | h <- m<0>, h > 1, h < threshold );
-		avg = (denom == 0) ? 0 : ( ( 0 | it + (m[h] * h) | h <- m<0>, h > 1, h < threshold ) * 1.000 / denom);
-							
-		return "<p> & \\numprint{<total>} & \\numprint{<st>} & \\numprint{<dyn>} & & \\numprint{<unique>} & \\numprint{<missing>} & \\numprint{<anyinc>} & \\numprint{<other>} & \\nprounddigits{2} \\numprint{<avg>} \\npnoround \\\\";
+		hits = ( 0 | it + (m[h] * h) | h <- m<0>, h > 1, h < threshold );
+		
+		return < total, st, dyn, unique, missing, anyinc, other, hits >;
 	}
 
+	str productLine(str p, str v) {
+		< total, st, dyn, unique, missing, anyinc, other, otherhits > = countsForSys(p,v);
+		avg = (other == 0) ? 0.00 : (otherhits * 1.00 / other);					
+		return "<p> & \\numprint{<total>} & \\numprint{<st>} & \\numprint{<dyn>} & & \\numprint{<unique>} & \\numprint{<missing>} & \\numprint{<anyinc>} & \\numprint{<other>} & \\nprounddigits{2} \\numprint{<avg>} \\npnoround \\\\";
+	}
+	
+	str totalLine() {
+		totalMap = ( );
+		stMap = ( );
+		dynMap = ( );
+		uniqueMap = ( );
+		missingMap = ( );
+		anyMap = ( );
+		otherMap = ( );
+		hitsMap = ( );
+		
+		for (pv:<p,v> <- counts) {
+			< total, st, dyn, unique, missing, anyinc, other, otherhits > = countsForSys(p,v);
+			totalMap[pv] = total; stMap[pv] = st; dynMap[pv] = dyn; uniqueMap[pv] = unique;
+			missingMap[pv] = missing; anyMap[pv] = anyinc; otherMap[pv] = other; hitsMap[pv] = otherhits;
+		}
+		
+		total = ( 0 | it + totalMap[pv] | pv <- counts );
+		st = ( 0 | it + stMap[pv] | pv <- counts );
+		dyn = ( 0 | it + dynMap[pv] | pv <- counts );
+		unique = ( 0 | it + uniqueMap[pv] | pv <- counts );
+		missing = ( 0 | it + missingMap[pv] | pv <- counts );
+		anyinc = ( 0 | it + anyMap[pv] | pv <- counts );
+		other = ( 0 | it + otherMap[pv] | pv <- counts );
+		totalhits = ( 0 | it + hitsMap[pv] | pv <- counts);
+		avghits = (other == 0) ? 0.00 : (totalhits * 1.00 / other);
+		
+		return "TOTAL & \\numprint{<total>} & \\numprint{<st>} & \\numprint{<dyn>} & & \\numprint{<unique>} & \\numprint{<missing>} & \\numprint{<anyinc>} & \\numprint{<other>} & \\nprounddigits{2} \\numprint{<avghits>} \\npnoround \\\\";	
+	}
+	
 	res = "\\npaddmissingzero
 		  '\\npfourdigitsep
 		  '\\begin{table*}
@@ -251,6 +287,8 @@ public str createQuickResolveCountsTable() {
 		  '\\begin{tabular}{@{}lrrrcrrrrr@{}} \\toprule 
 		  '<headerLine()> <for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1)<toUpperCase(s2); })) {>
 		  '  <productLine(p,corpus[p])> <}>
+		  '\\midrule
+		  '<totalLine()>
 		  '\\bottomrule
 		  '\\end{tabular}
 		  '\\caption{Results of running {\\sf FLRES} on the corpus.\\label{table-quick}}
@@ -394,4 +432,23 @@ public list[int] getResolveInfoTimes() {
 		res = res + (d.milliseconds + (d.seconds * 1000) + (d.minutes * 60 * 1000) + (d.hours * 60 * 60 * 1000));		
 	}
 	return res;
+}
+
+public map[str,int] includeFeatureCounts() {
+	corpus = getBaseCorpus();
+	map[str,int] fcounts = ( );
+	for (p <- corpus, v := corpus[p]) {
+		pt = loadBinary(p,v);
+		for (/i:include(ip,_) := pt) {
+			usedInIp = { getName(e) | /Expr e := ip } + { getName(s) | /Scalar s := ip };
+			for (e <- usedInIp) {
+				if (e in fcounts) {
+					fcounts[e] = fcounts[e] + 1;
+				} else {
+					fcounts[e] = 1;
+				}
+			}
+		}
+	}
+	return fcounts;
 }
