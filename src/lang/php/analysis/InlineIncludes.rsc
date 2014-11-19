@@ -134,16 +134,16 @@ private str resolveInclude(str include, list[str] prefixes, bool(str) fileExists
 
 private node replaceInvokes(node scr, map[str,list[node]] inclusionInserts) {
 	switch(scr) {
-		case eval_expr(invoke(target(),method_name("require_once"),actuals([actual(ref(false),str(s))]))) :
+		case eval_expr(invoke(target(),method_name("require_once"),actuals([actual(ref(false),string(s))]))) :
 			if (s in inclusionInserts) return "unwrapme"(inclusionInserts[s]);
 			
-		case eval_expr(invoke(target(),method_name("require"),actuals([actual(ref(false),str(s))]))) : 
+		case eval_expr(invoke(target(),method_name("require"),actuals([actual(ref(false),string(s))]))) : 
 			if (s in inclusionInserts) return "unwrapme"(inclusionInserts[s]);
 			
-		case eval_expr(invoke(target(),method_name("include_once"),actuals([actual(ref(false),str(s))]))) : 
+		case eval_expr(invoke(target(),method_name("include_once"),actuals([actual(ref(false),string(s))]))) : 
 			if (s in inclusionInserts) return "unwrapme"(inclusionInserts[s]);
 			
-		case eval_expr(invoke(target(),method_name("include"),actuals([actual(ref(false),str(s))]))) : 
+		case eval_expr(invoke(target(),method_name("include"),actuals([actual(ref(false),string(s))]))) : 
 			if (s in inclusionInserts) return "unwrapme"(inclusionInserts[s]);
 			
 		case invoke(target(), method_name(_), actuals(_)) :
@@ -195,8 +195,8 @@ private bool startsWithTempPrefix(str s) {
 }
 
 private set[str] getLiteralIncludes(node scr) {
-	return { s | /i:invoke(target(),method_name("require_once"),actuals([actual(ref(false),str(s))])) <- scr } +
-		   { s | /i:invoke(target(),method_name("require"),actuals([actual(ref(false),str(s))])) <- scr } +
-		   { s | /i:invoke(target(),method_name("include_once"),actuals([actual(ref(false),str(s))])) <- scr } +
-		   { s | /i:invoke(target(),method_name("include"),actuals([actual(ref(false),str(s))])) <- scr };
+	return { s | /i:invoke(target(),method_name("require_once"),actuals([actual(ref(false),string(s))])) <- scr } +
+		   { s | /i:invoke(target(),method_name("require"),actuals([actual(ref(false),string(s))])) <- scr } +
+		   { s | /i:invoke(target(),method_name("include_once"),actuals([actual(ref(false),string(s))])) <- scr } +
+		   { s | /i:invoke(target(),method_name("include"),actuals([actual(ref(false),string(s))])) <- scr };
 }
