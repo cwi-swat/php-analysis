@@ -42,7 +42,7 @@ public CFG createBasicBlocks(CFG g) {
 	// in some cases there is only one incoming edge). 
 	headerNodes = { n | n <- (g.nodes - entryNode), size(backwards[n]) > 1 } + 
 				  { n | n <- (g.nodes - entryNode), size(backwards[n]) == 1, size(forwards[backwards[n]]) > 1 } +
-				  { n | n <- (g.nodes - entryNode), n is joinNode } +
+				  { n | n <- (g.nodes - entryNode), n is footerNode } +
 				  forwards[entryNode] +
 				  exitNode +
 				  entryNode;

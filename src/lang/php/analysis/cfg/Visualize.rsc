@@ -38,7 +38,7 @@ public void renderCFGAsDot(CFG c, loc writeTo, str title) {
 	str getID(CFGNode n) = "<n@lab>";
 	c = visit(c) { case inlineHTML(_) => inlineHTML("HTMLCode") }
 	
-	nodes = [ "\"<getID(n)>\" [ label = \"<escapeForDot(printCFGNode(n))>\", labeljust=\"l\" ];" | n <- c.nodes ];
+	nodes = [ "\"<getID(n)>\" [ label = \"<getID(n)>:<escapeForDot(printCFGNode(n))>\", labeljust=\"l\" ];" | n <- c.nodes ];
 	edges = [ "\"<e.from>\" -\> \"<e.to>\" [ label = \"<printFlowEdgeLabel(e)>\"];" | e <- c.edges ];
 	str dotGraph = "digraph \"CFG\" {
 				   '	graph [ label = \"Control Flow Graph<size(title)>0?" for <title>":"">\" ];

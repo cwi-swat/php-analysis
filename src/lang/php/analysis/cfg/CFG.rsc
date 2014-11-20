@@ -15,6 +15,7 @@ import lang::php::analysis::cfg::Label;
 import lang::php::analysis::cfg::FlowEdge;
 import analysis::graphs::Graph;
 import Set;
+import Node;
 
 @doc{Representations of the control flow graph}
 public data CFG 
@@ -35,7 +36,10 @@ data CFGNode
 	| foreachTest(Expr expr, Lab l)
 	| foreachAssignKey(Expr expr, Lab l)
 	| foreachAssignValue(Expr expr, Lab l)
-	| joinNode(Lab l)
+	| headerNode(Stmt stmt, Lab footer, Lab l)
+	| headerNode(Expr expr, Lab footer, Lab l)
+	| footerNode(Stmt stmt, Lab header, Lab l)
+	| footerNode(Expr expr, Lab header, Lab l)
 	| actualProvided(str paramName, bool refAssign)
 	| actualNotProvided(str paramName, Expr expr, bool refAssign)
 	;
@@ -55,7 +59,10 @@ public str printCFGNode(scriptExit()) = "Exit";
 public str printCFGNode(foreachTest(Expr expr, Lab l)) = "Iteration Test";
 public str printCFGNode(foreachAssignKey(Expr expr, Lab l)) = "Assign Foreach Key <pp(expr)>";
 public str printCFGNode(foreachAssignValue(Expr expr, Lab l)) = "Assign Foreach Value <pp(expr)>";
-public str printCFGNode(joinNode(Lab l)) = "join";
+public str printCFGNode(headerNode(Expr e,_,Lab l)) = "header: <getName(e)>";
+public str printCFGNode(headerNode(Stmt s,_,Lab l)) = "header: <getName(s)>";
+public str printCFGNode(footerNode(Expr e,_,Lab l)) = "footer: <getName(e)>";
+public str printCFGNode(footerNode(Stmt s,_,Lab l)) = "footer: <getName(s)>";
 public str printCFGNode(stmtNode(Stmt s, Lab l)) {
 	switch(s) {
 		case classDef(ClassDef cd) : return "Class <cd.className>";

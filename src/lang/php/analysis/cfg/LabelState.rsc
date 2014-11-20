@@ -18,7 +18,7 @@ import List;
 @doc{The labeling state keeps track of information needed during the labeling and edge computation operations.}
 data LabelState 
 	= ls(int counter) 
-	| ls(int counter, CFGNode entryNode, CFGNode exitNode, set[CFGNode] nodes, list[Lab] breakLabels, list[Lab] continueLabels, map[Lab,Lab] joinNodes, map[str,Lab] gotoNodes, map[str,Lab] catchHandlers)
+	| ls(int counter, CFGNode entryNode, CFGNode exitNode, set[CFGNode] nodes, list[Lab] breakLabels, list[Lab] continueLabels, map[Lab,Lab] headerNodes, map[Lab,Lab] footerNodes, map[str,Lab] gotoNodes, map[str,Lab] catchHandlers)
 	;
 
 @doc{Initialize the label state}	
@@ -26,7 +26,7 @@ public LabelState newLabelState() = ls(0);
 
 @doc{Expand the label state to include entry and exit information.}
 public LabelState addEntryAndExit(LabelState lstate, CFGNode entryNode, CFGNode exitNode) {
-	return ls(lstate.counter, entryNode, exitNode, { entryNode, exitNode }, [ ], [ ], ( ), ( ), ( ));
+	return ls(lstate.counter, entryNode, exitNode, { entryNode, exitNode }, [ ], [ ], ( ), ( ), ( ), ( ));
 }
 
 @doc{Throw away the entry and exit information, leaving just the counter.}
