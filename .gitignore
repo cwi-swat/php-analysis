@@ -1,5 +1,22 @@
-bin
 .idea
 Config.rsc
+
+# Files generated for Rascal resources
 src/*.rsc
 
+# eclipse stuff
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+**/*.rvm
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+.DS_Store
