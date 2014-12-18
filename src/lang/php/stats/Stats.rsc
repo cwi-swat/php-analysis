@@ -265,7 +265,7 @@ public list[str] exprKeyOrder() {
 public str getOpKey(bitwiseAnd()) = "bitwise and";
 public str getOpKey(bitwiseOr()) = "bitwise or";
 public str getOpKey(bitwiseXor()) = "bitwise xor";
-public str getOpKey(concat()) = "concat";
+public str getOpKey(Op::concat()) = "concat";
 public str getOpKey(div()) = "div";
 public str getOpKey(minus()) = "minus";
 public str getOpKey(\mod()) = "mod";
