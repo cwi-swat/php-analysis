@@ -21,6 +21,7 @@ import IO;
 import List;
 import Set;
 import Node;
+import Relation;
 import Exception;
 
 // TODOs:
@@ -95,17 +96,17 @@ public Script stripLabels(Script scr) {
 }
 
 @doc{Retrieve all method declarations from a script.}
-public map[NamePath, ClassItem] getScriptMethods(Script scr) =
+private map[NamePath, ClassItem] getScriptMethods(Script scr) =
 	( [class(cname),method(mname)] : m | /class(cname,_,_,_,mbrs) := scr, m:method(mname,_,_,params,body) <- mbrs );
 
 // TODO: It is possible in PHP to have non-unique or conditional declarations. We may need a way to represent
 // that here, assuming we ever run across it.
 
 @doc{Retrieve all function declarations from a script. Note: this assumes that definitions are unique.}
-public map[NamePath, Stmt] getScriptFunctions(Script scr) =
+private map[NamePath, Stmt] getScriptFunctions(Script scr) =
 	( [global(),function(fname)] : f | /f:function(fname,_,_,_) := scr );
 
-public tuple[set[CFGNode] nodes, set[FlowEdge] edges] cleanUpGraph(LabelState lstate, set[FlowEdge] edges) {
+private tuple[set[CFGNode] nodes, set[FlowEdge] edges] cleanUpGraph(LabelState lstate, set[FlowEdge] edges) {
 	allTargets = { e.to | e <- edges };
 	allSources = { e.from | e <- edges };
 	unusedFooters = { n | n <- lstate.nodes, n is footerNode, n@lab notin allTargets };
@@ -118,7 +119,7 @@ public tuple[set[CFGNode] nodes, set[FlowEdge] edges] cleanUpGraph(LabelState ls
 	return < nodes, edges >;
 }
 
-public set[FlowEdge] removeUnrealizablePaths(set[FlowEdge] edges) {
+private set[FlowEdge] removeUnrealizablePaths(set[FlowEdge] edges) {
 	jumpingEdgeNames = { "jumpEdge", "escapingBreakEdge", "escapingContinueEdge", "escapingGotoEdge" };
 	jumpingEdges = { e | e <- edges, getName(e) in jumpingEdgeNames };
 	jumpSources = { e.from | e <- jumpingEdges };
@@ -127,7 +128,7 @@ public set[FlowEdge] removeUnrealizablePaths(set[FlowEdge] edges) {
 	return edges - unrealizableEdges;
 }
 
-public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, LabelState lstate) {
+private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
 		return lab(lstate.counter); 
@@ -186,7 +187,7 @@ public tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Label
 
 // TODO: The code for functions and methods is very similar, so refactor to remove
 // this duplication...
-public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, ClassItem m, LabelState lstate) {
+private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, ClassItem m, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
 		return lab(lstate.counter); 
@@ -265,7 +266,7 @@ public tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Clas
 
 // TODO: The code for functions and methods is very similar, so refactor to remove
 // this duplication...
-public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, Stmt f, LabelState lstate) {
+private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, Stmt f, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
 		return lab(lstate.counter); 
@@ -338,7 +339,7 @@ public tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, 
 
 // Find the initial label for each statement. We return a set since, in some cases,
 // there may be no initial label available.
-public set[Lab] init(Stmt s, LabelState lstate) {
+private set[Lab] init(Stmt s, LabelState lstate) {
 	if (s@lab in lstate.headerNodes) return { lstate.headerNodes[s@lab] };
 
 	switch(s) {
@@ -475,7 +476,7 @@ public set[Lab] init(Stmt s, LabelState lstate) {
 // children, this is the label of the first child that is executed. If the 
 // expression is instead viewed as a whole (e.g., a scalar, or a variable
 // lookup), the initial label is the label of the expression itself.
-public set[Lab] init(Expr e, LabelState lstate) {
+private set[Lab] init(Expr e, LabelState lstate) {
 	if (e@lab in lstate.headerNodes) return { lstate.headerNodes[s@lab] };
 
 	switch(e) {
@@ -606,7 +607,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 }
 
 @doc{Find the label of the final step taken in computing the given statement.}
-public set[Lab] final(Stmt s, LabelState lstate) {
+private set[Lab] final(Stmt s, LabelState lstate) {
 	if (s@lab in lstate.footerNodes) return { lstate.footerNodes[s@lab] };
 
 	switch(s) {
@@ -804,7 +805,7 @@ public set[Lab] final(Stmt s, LabelState lstate) {
 	return {  };
 }
 
-public set[Lab] final(Expr e, LabelState lstate) {
+private set[Lab] final(Expr e, LabelState lstate) {
 	if (e@lab in lstate.footerNodes) return { lstate.footerNodes[e@lab] };
 	
 	switch(e) {
@@ -824,25 +825,25 @@ public set[Lab] final(Expr e, LabelState lstate) {
 }
 
 @doc{Add internal edges between subexpressions of an expression.}
-public tuple[FlowEdges, LabelState] addExpEdges(FlowEdges edges, LabelState lstate, Expr e) {
+private tuple[FlowEdges, LabelState] addExpEdges(FlowEdges edges, LabelState lstate, Expr e) {
 	< eedges, lstate > = internalFlow(e, lstate);
 	return < edges + eedges, lstate >;
 }
 
 @doc{Add internal edges between internal expressions and statements of a statement.}
-public tuple[FlowEdges, LabelState] addStmtEdges(FlowEdges edges, LabelState lstate, Stmt s) {
+private tuple[FlowEdges, LabelState] addStmtEdges(FlowEdges edges, LabelState lstate, Stmt s) {
 	< sedges, lstate > = internalFlow(s, lstate);
 	return < edges + sedges, lstate >;
 }
 
 @doc{Add edges between statements given as a sequence, such as in the bodies of other statements.}
-public tuple[FlowEdges, LabelState] addBodyEdges(FlowEdges edges, LabelState lstate, list[Stmt] body) {
+private tuple[FlowEdges, LabelState] addBodyEdges(FlowEdges edges, LabelState lstate, list[Stmt] body) {
 	for ([_*,b1,b2,_*] := body) edges += { flowEdge(f, i) | f <- final(b1, lstate), i <- init(b2, lstate) };
 	return < edges, lstate >;
 }
 
 @doc{Add edges between expressions that are given as a sequence.}
-public tuple[FlowEdges, LabelState] addExpSeqEdges(FlowEdges edges, LabelState lstate, list[Expr] exps) {
+private tuple[FlowEdges, LabelState] addExpSeqEdges(FlowEdges edges, LabelState lstate, list[Expr] exps) {
 	for ([_*,e1,e2,_*] := exps) edges += { flowEdge(f, i) | f <- final(e1, lstate), i <- init(e2, lstate) };
 	return < edges, lstate >;
 }
@@ -853,7 +854,7 @@ public tuple[FlowEdges, LabelState] addExpSeqEdges(FlowEdges edges, LabelState l
 // Note: Currently, we always have the statements in the body linked one to
 // the next. This will be patched elsewhere -- if we have a return, we should
 // not have an edge going to the next statement, since it is no longer reachable.
-public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
+private tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
 		return lab(lstate.counter); 
@@ -1531,7 +1532,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 
 // Compute all the internal flow edges for an expression. We pass around the label
 // state in case we need to construct new labels.
-public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
+private tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
 		return lab(lstate.counter); 
@@ -1897,4 +1898,87 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 	}
 
 	return < edges, lstate >;			
+}
+
+@doc{Collapse expressions, which are unrolled into chains of individual nodes, back into single expression nodes.}
+public CFG collapseExpressions(CFG g) {
+	entryNode = getEntryNode(g);
+	exitNode = getExitNode(g);
+	forwards = cfgAsGraph(g);
+	backwards = invert(forwards);
+	
+	// Find all the expressions that are the start of a chain of expressions. This is done by, for each expression node,
+	// checking the preceding nodes. We must either have more than 1 (in which case this is a join point, and we shouldn't
+	// merge it with the prior node), or no preceding expressions (we could have a preceding statement).
+	startingExps = { n | n <- g.nodes, n is exprNode, bn := backwards[n], bnfilt := {bni | bni <- bn, bni is exprNode}, size(bn) > 1 || size(bnfilt) == 0 };
+	
+	// A function to chase through the node graph; given a node, keep going forward as long as we only have one following
+	// expression node. This is similar to the logic used to form basic blocks, but we ensure we only have "runs" of
+	// expressions here, not of arbitrary types.
+	list[CFGNode] chaseNodes(CFGNode n) {
+		forwardFromN = forwards[n];
+		if (size(forwardFromN) == 1 && getOneFrom(forwardFromN) is exprNode) {
+			return getOneFrom(forwardFromN) + chaseNodes(getOneFrom(forwardFromN));
+		}
+		return [ ];
+	}
+	
+	// Given a node list, this will "split" the list so the first part contains the original
+	// first node and any children of this node, while the second part contains the remainder
+	// of the list.
+	tuple[list[CFGNode],list[CFGNode]] splitNodeList(list[CFGNode] nl) {
+		nLabels = { n@lab | /Expr n := nl[0], (n@lab)? }; // The labels of all subnodes, including the label of nl itself
+		return < [ n | n <- nl, n@lab in nLabels ], [ n | n <- nl, n@lab notin nLabels ] >; 
+	}
+	
+	// Get the top nodes from the node list. We do this by splitting it, as above, and taking
+	// the first node from the first part of each split, which is the parent of the rest of
+	// the nodes in the first part. We do this until the second part is empty, which means
+	// we have no nodes yet to process.
+	set[CFGNode] getTopNodes(list[CFGNode] nl) {
+		set[CFGNode] res = { };
+		while(size(nl) > 0) {
+			< bl, nl > = splitNodeList(nl);
+			res += bl[0];
+		}
+		return res;
+	}
+	
+	// For each starting expression, figure out which other nodes will be collapsed into it
+	map[CFGNode,list[CFGNode]] collapseNodes = ( );
+	for (e <- startingExps) {
+		collapseNodes[e] = e + chaseNodes(e);
+	}
+
+	// Get the top nodes -- e.g., for (a+b)*c, we would actually have nodes for a, b, a+b, c, and
+	// (a+b)*c, and we only want to keep the last one of these.	
+	topNodes = { *getTopNodes(reverse(collapseNodes[e])) | e <- collapseNodes };
+	
+	// For each of these nodes, we remove any child nodes from the graph and move any edges that
+	// point to children of this node to instead point to the top node.
+	redirectMap = ( n@lab : tn@lab | tn <- topNodes, /Expr n := tn, (n@lab)?, n@lab != tn@lab );
+	newNodes = { n | n <- g.nodes, n@lab notin redirectMap };
+	newEdges = { e | e <- g.edges, e.from notin redirectMap, e.to notin redirectMap } +
+			   { e[to=redirectMap[e.to]] | e <- g.edges, e.from notin redirectMap, e.to in redirectMap };
+			   
+	return g[nodes=newNodes][edges=newEdges];	 
+}
+
+@doc{Remove expression nodes that are children of statement nodes}
+public CFG removeChildExpressions(CFG g) {
+	g = collapseExpressions(g);
+	backwards = invert(cfgAsGraph(g));
+	
+	stmtLabels = ( s@lab : { e@lab | /Expr e := s } | s <- g.nodes, s is stmtNode );
+	
+	solve(backwards) {
+		redirectMap = ( e@lab : s@lab | < s, e > <- backwards, s@lab in stmtLabels, e@lab in stmtLabels[s@lab] );
+		newNodes = { n | n <- g.nodes, n@lab notin redirectMap };
+		newEdges = { e | e <- g.edges, e.from notin redirectMap, e.to notin redirectMap } +
+				   { e[to=redirectMap[e.to]] | e <- g.edges, e.from notin redirectMap, e.to in redirectMap };
+		g = g[nodes=newNodes][edges=newEdges];
+		backwards = invert(cfgAsGraph(g));
+	}
+	
+	return g;
 }
