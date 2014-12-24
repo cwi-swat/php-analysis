@@ -1910,7 +1910,11 @@ public CFG collapseExpressions(CFG g) {
 	// Find all the expressions that are the start of a chain of expressions. This is done by, for each expression node,
 	// checking the preceding nodes. We must either have more than 1 (in which case this is a join point, and we shouldn't
 	// merge it with the prior node), or no preceding expressions (we could have a preceding statement).
-	startingExps = { n | n <- g.nodes, n is exprNode, bn := backwards[n], bnfilt := {bni | bni <- bn, bni is exprNode}, size(bn) > 1 || size(bnfilt) == 0 };
+	startingExps = { n | n <- g.nodes, 
+						 n is exprNode, 
+						 bn := backwards[n], 
+						 bnfilt := { bni | bni <- bn, bni is exprNode, size(forwards[bni]) == 1 }, 
+						 size(bn) > 1 || (size(bn) == 1 && size(bnfilt) == 0) };
 	
 	// A function to chase through the node graph; given a node, keep going forward as long as we only have one following
 	// expression node. This is similar to the logic used to form basic blocks, but we ensure we only have "runs" of
