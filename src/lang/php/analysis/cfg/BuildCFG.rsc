@@ -143,10 +143,10 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 	
 	scriptBody = scr.body;
 	sbReduced = visit(scriptBody) {
-		case classDef(_) => emptyStmt()
-		case interfaceDef(_) => emptyStmt()
-		case traitDef(_) => emptyStmt()
-		case function(_,_,_,_) => emptyStmt()
+		case r:classDef(_) => emptyStmt()[@lab=r@lab]
+		case r:interfaceDef(_) => emptyStmt()[@lab=r@lab]
+		case r:traitDef(_) => emptyStmt()[@lab=r@lab]
+		case r:function(_,_,_,_) => emptyStmt()[@lab=r@lab]
 	}
 	
 	lstate.gotoNodes = ( ln : lstmt@lab | /lstmt:label(ln) := sbReduced ); 
@@ -154,18 +154,18 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 	// Add all the statements and expressions as CFG nodes
 	// TODO: Remove this, we should only add nodes that correspond to
 	// sources or targets for edges...
-	lstate.nodes += { stmtNode(s, s@lab)[@lab=s@lab] | /Stmt s := scriptBody };
-	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := scriptBody };
+	lstate.nodes += { stmtNode(s, s@lab)[@lab=s@lab] | /Stmt s := sbReduced };
+	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := sbReduced };
 	
 	set[FlowEdge] edges = { };
-	for (b <- scriptBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
-	< edges, lstate > = addBodyEdges(edges, lstate, scriptBody);
-	if (size(scriptBody) > 0) {
-		edges += { flowEdge(cfgEntryNode@lab, i) | i <- init(head(scriptBody), lstate) };
-		edges += { flowEdge(f, cfgExitNode@lab) | f <- final(last(scriptBody), lstate)};
+	for (b <- sbReduced) < edges, lstate > = addStmtEdges(edges, lstate, b);
+	< edges, lstate > = addBodyEdges(edges, lstate, sbReduced);
+	if (size(sbReduced) > 0) {
+		edges += { flowEdge(cfgEntryNode@lab, i) | i <- init(head(sbReduced), lstate) };
+		edges += { flowEdge(f, cfgExitNode@lab) | f <- final(last(sbReduced), lstate)};
 		// TODO: Need to be more careful with adding edges, it may be a dup if we have
 		// another type of edge here already
-		//edges += { flowEdge(f, lstate.footerNodes[f]), flowEdge(lstate.footerNodes[f], cfgExitNode@lab) | f <- final(last(scriptBody)), f in lstate.footerNodes };
+		//edges += { flowEdge(f, lstate.footerNodes[f]), flowEdge(lstate.footerNodes[f], cfgExitNode@lab) | f <- final(last(sbReduced)), f in lstate.footerNodes };
 	} else {
 		edges += flowEdge(cfgEntryNode@lab, cfgExitNode@lab);
 	}
@@ -341,8 +341,10 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np,
 // there may be no initial label available.
 private set[Lab] init(Stmt s, LabelState lstate) {
 	if (s@lab in lstate.headerNodes) return { lstate.headerNodes[s@lab] };
-
+	
 	switch(s) {
+		case emptyStmt() : return { s@lab };
+		
 		// If the break statement has an expression, that is the first thing that occurs in
 		// the statement. If not, the break itself is the first thing that occurs.
 		case \break(someExpr(Expr e)) : return init(e, lstate);
@@ -611,6 +613,10 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 	if (s@lab in lstate.footerNodes) return { lstate.footerNodes[s@lab] };
 
 	switch(s) {
+		case emptyStmt() : {
+			return { s@lab };
+		}
+		
 		// The final thing a break does is break, so the statement itself
 		// provides the final label.
 		case \break(_) : {
