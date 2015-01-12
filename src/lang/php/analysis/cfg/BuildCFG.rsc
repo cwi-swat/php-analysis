@@ -476,7 +476,7 @@ public set[Lab] init(Stmt s, LabelState lstate) {
 // expression is instead viewed as a whole (e.g., a scalar, or a variable
 // lookup), the initial label is the label of the expression itself.
 public set[Lab] init(Expr e, LabelState lstate) {
-	if (e@lab in lstate.headerNodes) return { lstate.headerNodes[s@lab] };
+	if (e@lab in lstate.headerNodes) return { lstate.headerNodes[e@lab] };
 
 	switch(e) {
 		case array(list[ArrayElement] items) : {
@@ -1820,7 +1820,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 				   { flowEdge(fe, footernode) | fe <- final(elseBranch, lstate) };
 
 			for (il <- initLabels) edges += flowEdge(headernode, il);
-			for (il <- (initLabels+s@lab), il notin lstate.headerNodes) lstate.headerNodes[il] = headernode;
+			for (il <- (initLabels+e@lab), il notin lstate.headerNodes) lstate.headerNodes[il] = headernode;
 			for (fl <- (finalLabels+e@lab), fl notin lstate.footerNodes) lstate.footerNodes[fl] = footernode;
 		}
 		
