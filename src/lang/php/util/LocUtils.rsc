@@ -98,21 +98,25 @@ public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str pat
 	set[str] paths = { };
 	set[loc] matchedLocs = { };
 
-	if (size(trim(path)) > 0 && ( path[0] == "/" || path[0] == "\\") ) {
+	if (size(trim(path)) == 0) {
+		throw UnavailableLoc(path);
+	}
+	
+	if (path[0] == "/" || path[0] == "\\") {
 		// If the path starts with \ or / we compute the loc for file `path`
 		// starting at the root of the site.
 		paths = { (rootLoc + path).path };
 		qualifiedPath = true;
-	} else if (size(trim(path)) > 0 && ( path[0] == "." ) ) {
+	} else if (path[0] == "." ) {
 		// If the path starts with . it could be either . or ..
 		paths = { (baseLoc.parent + path).path };
 		qualifiedPath = true;
-	//} else if (size(trim(path)) > 0) {
-	//	paths = { ip + "/" + path | ip <- ipath } + ((baseLoc.parent + path).path); 		
 	} else {
-		throw UnavailableLoc(path);
+		paths = { ip + "/" + path | ip <- ipath } + ((baseLoc.parent + path).path); 		
+	//} else {
+	//	throw UnavailableLoc(path);
 	}
-
+	
 	// If the path is not qualified, meaning we look at the include path, but we may have
 	// changed the include path, just fall back to matching -- don't even try to look up the
 	// file, it could be in any directory
@@ -122,7 +126,7 @@ public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str pat
 	// For each possible path, see if we can find it
 	for (p <- paths) {
 		list[str] parts = split("/",p);
-		while([a*,b,"..",c*] := parts) parts = [*a,*c];
+		while([a*,b,"..",c*] := parts, b != "..") parts = [*a,*c];
 		while([a*,".",c*] := parts) parts = [*a,*c];
 		newPath = intercalate("/", parts);
 
@@ -135,12 +139,19 @@ public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str pat
 		}
 
 		// Create the new loc and look it up, if we find it as a file we know exists
-		// return it		
+		// return it
 		newLoc = (newPath[0] == "/") ? |home://<newPath>| : |home:///<newPath>|;
 		if (newLoc in possibleLocs) { 
 			matchedLocs += newLoc;
 		} else if (checkFS && exists(newLoc)) {
 			matchedLocs += newLoc;
+		} else {
+			newLoc = (newPath[0] == "/") ? |file://<newPath>| : |file:///<newPath>|;
+			if (newLoc in possibleLocs) { 
+				matchedLocs += newLoc;
+			} else if (checkFS && exists(newLoc)) {
+				matchedLocs += newLoc;
+			}
 		}
 	}
 	

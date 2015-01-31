@@ -1,7 +1,0 @@
-{
-    <|php+namespace:///|,   |php+constant:///A|>,
-    <|php+namespace:///|,   |php+constant:///B|>,
-    <|php+namespace:///|,   |php+constant:///C|>,
-    <|php+namespace:///|,   |php+constant:///D|>,
-    <|php+namespace:///|,   |php+constant:///E|>
-}

@@ -1,0 +1,9 @@
+<?php
+array();
+array('a');
+array('a');
+array('a', 'b');
+array('a', &$b, 'c' => 'd', 'e' => &$f);
+array();
+array(1, 2, 3);
+array('a' => 'b');

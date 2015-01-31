@@ -29,7 +29,7 @@ data Type
 //	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
 //	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
 //	| global(list[Expr] exprs)
-//	| goto(str label)
+//	| goto(Name label)
 //	| haltCompiler(str remainingText)
 //	| \if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, OptionElse elseClause)
 //	| inlineHTML(str htmlText)

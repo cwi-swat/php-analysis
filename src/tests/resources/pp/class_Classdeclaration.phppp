@@ -1,0 +1,30 @@
+<?php
+
+class A extends B implements C, D
+{
+    const A = 'B', C = 'D';
+    public $a = 'b';
+    public $c = 'd';
+    protected $e;
+    private $f;
+
+    public function a()
+    {
+    }
+
+    static public function b()
+    {
+    }
+
+    final public function c()
+    {
+    }
+
+    protected function d()
+    {
+    }
+
+    private function e()
+    {
+    }
+}

@@ -2,13 +2,16 @@ module lang::php::util::Config
 
 import IO;
 
+public bool usePhpParserJar = false;
+
 public loc phploc = |file:///usr/bin/php|;
 
 public loc parserLoc = |file:///Users/mhills/Projects/phpsa|;
 public loc analysisLoc = |file:///...../php-analysis/|; // physical location of this project
 	
 public str parserMemLimit = "1024M";
-public loc rgenLoc = parserLoc + "PHP-Parser/lib/Rascal/AST2Rascal.php";
+public str astToRascal = "PHP-Parser/lib/Rascal/AST2Rascal.php";
+public loc rgenLoc = parserLoc + astToRascal;
 public loc rgenCwd = parserLoc + "PHP-Parser/lib/Rascal";
 
 public loc baseLoc = |home:///PHPAnalysis|;
@@ -23,3 +26,11 @@ public bool useBinaries = false;
 public bool includePhpDocs = false;
 public bool includeLocationInfo = false;
 public bool resolveNamespaces = false;
+
+// debug options
+@logLevel {
+	Log level 0 => no logging;
+	Log level 1 => main logging;
+	Log level 2 => debug logging;
+}
+public int logLevel = 2;

@@ -1,0 +1,19 @@
+<?php
+function ($a)
+{
+    $a;
+}
+
+;
+function ($a) use ($b)
+{
+
+}
+
+;
+function () use ($a, &$b)
+{
+
+}
+
+;/* this closure not supported yet by pretty printer */;/* this closure not supported yet by pretty printer */;

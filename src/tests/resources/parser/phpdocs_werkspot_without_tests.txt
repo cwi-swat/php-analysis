@@ -1,0 +1,1687 @@
+["/**
+	 * Gets the (optional) schema name to use.
+	 *
+	 * @return     string
+	 */",
+"/**
+	 * Sets the name of a database schema to use (optional).
+	 *
+	 * @param      string $dbSchema
+	 */",
+"/**
+	 * Gets the database encoding.
+	 *
+	 * @return     string
+	 */",
+"/**
+	 * Sets the database encoding.
+	 *
+	 * @param      string $v
+	 */",
+"/**
+	 * Gets the datasource name.
+	 *
+	 * @return     string
+	 */",
+"/**
+	 * Sets the datasource name.
+	 *
+	 * This will be used as the \<database name=\"\"\> value in the generated schema.xml
+	 *
+	 * @param      string $v
+	 */",
+"/**
+	 * Sets the output name for the XML file.
+	 *
+	 * @param      PhingFile $v
+	 */",
+"/**
+	 * Set whether to use the column name as phpName without any translation.
+	 *
+	 * @param      boolean $v
+	 */",
+"/**
+	 * Set whether to add vendor info to the schema.
+	 *
+	 * @param      boolean $v
+	 */",
+"/**
+	 * Sets set validator bitfield from a comma-separated list of \"validator bit\" names.
+	 *
+	 * @param      string $v The comma-separated list of which validators to add.
+	 * @return     void
+	 */",
+"/**
+	 * Checks whether to add validators of specified type or not
+	 *
+	 * @param      int $type The validator type constant.
+	 * @return     boolean
+	 */",
+"/**
+	 * Whether to use the column name as phpName without any translation.
+	 *
+	 * @return     boolean
+	 */",
+"/**
+	 * @throws     BuildException
+	 */",
+"/**
+	 * Gets the GeneratorConfig object for this task or creates it on-demand.
+	 * @return     GeneratorConfig
+	 */",
+"/**
+	 * Builds the model classes from the database schema.
+	 * @return     Database The built-out Database (with all tables, etc.)
+	 */",
+"/**
+	 * Adds any requested validators to the data model.
+	 *
+	 * We will add the following type specific validators:
+	 *
+	 *      for notNull columns: required validator
+	 *      for unique indexes: unique validator
+	 * 		for varchar types: maxLength validators (CHAR, VARCHAR, LONGVARCHAR)
+	 * 		for numeric types: maxValue validators (BIGINT, SMALLINT, TINYINT, INTEGER, FLOAT, DOUBLE, NUMERIC, DECIMAL, REAL)
+	 * 		for integer and timestamp types: notMatch validator with [^\d]+ (BIGINT, SMALLINT, TINYINT, INTEGER, TIMESTAMP)
+	 * 		for float types: notMatch validator with [^\d\.]+ (FLOAT, DOUBLE, NUMERIC, DECIMAL, REAL)
+	 *
+	 * @param      Database $database The Database model.
+	 * @return     void
+	 * @todo       find out how to evaluate the appropriate size and adjust maxValue rule values appropriate
+	 * @todo       find out if float type column values must always notMatch('[^\d\.]+'), i.e. digits and point for any db vendor, language etc.
+	 */",
+"/**
+	 * Gets validator rule for specified type (string).
+	 *
+	 * @param      Column $column The column that is being validated.
+	 * @param      string $type The type (string) for validator (e.g. 'required').
+	 * @param      mixed $value The value for the validator (if applicable)
+	 */",
+"/**
+	 * Gets the message for a specified rule.
+	 *
+	 * @param      Column $column
+	 * @param      string $type
+	 * @param      mixed $value
+	 */",
+"/**
+ * This class generates an XML schema of an existing database from
+ * the database metadata.
+ *
+ * @author     Hans Lellelid <hans@xmpl.org>
+ * @version    $Revision: 945 $
+ * @package    propel.phing
+ */",
+"/**
+	 * Gets a single validator for specified column name.
+	 * @param      Column $column
+	 * @return     Validator
+	 */",
+"/**
+	 * Gets all validators.
+	 * @return     array Validator[]
+	 */",
+"/**
+ * A helper class to store validator sets indexed by column.
+ * @package    propel.phing
+ */",
+"/**
+   * Fetch random object.
+   *
+   * @return mixed
+   * @since  2.1.19RC1
+   * @author M.Bax <marco.bax@freshheads.com>
+   * @see    page/executeMailTest
+   */",
+"/**
+ */",
+"/**
+     * {@inheritdoc}
+     */",
+"/**
+ * ChoiceValidator validates that the value is one of the expected values.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @api
+ */",
+"/**
+     * lists all database sequences
+     *
+     * @param string|null $database
+     * @return array
+     */",
+"/**
+     * lists table relations
+     *
+     * Expects an array of this format to be returned with all the relationships in it where the key is 
+     * the name of the foreign table, and the value is an array containing the local and foreign column
+     * name
+     *
+     * Array
+     */",
+"/**
+     * (
+     */",
+"/**
+     *   [groups] => Array
+     *     (
+     *        [local] => group_id
+     *        [foreign] => id
+     *     )
+     * )
+     *
+     * @param string $table     database table name
+     * @return array
+     */",
+"/**
+     * lists table constraints
+     *
+     * @param string $table     database table name
+     * @return array
+     */",
+"/**
+     * lists table constraints
+     *
+     * @param string $table     database table name
+     * @return array
+     */",
+"/**
+     * lists tables
+     *
+     * @param string|null $database
+     * @return array
+     */",
+"/**
+     * lists all triggers
+     *
+     * @return array
+     */",
+"/**
+     * lists table triggers
+     *
+     * @param string $table     database table name
+     * @return array
+     */",
+"/**
+     * lists table views
+     *
+     * @param string $table     database table name
+     * @return array
+     */",
+"/**
+     * lists database views
+     *
+     * @param string|null $database
+     * @return array
+     */",
+"/**
+ * @package     Doctrine
+ * @subpackage  Import
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @author      Konsta Vesterinen <kvesteri@cc.hut.fi>
+ * @author      Lukas Smith <smith@pooteeweet.org> (PEAR MDB2 library)
+ * @author      Frank M. Kromann <frank@kromann.info> (PEAR MDB2 Mssql driver)
+ * @author      David Coallier <davidc@php.net> (PEAR MDB2 Mssql driver)
+ * @version     $Revision: 6484 $
+ * @link        www.phpdoctrine.org
+ * @since       1.0
+ */",
+"/**
+ * BaseCategorySynonym
+ * 
+ * This class has been auto-generated by the Doctrine ORM Framework
+ * 
+ * @property integer $id
+ * @property integer $category_id
+ * @property string $name
+ * @property Category $Category
+ * 
+ * @method integer         getId()          Returns the current record's \"id\" value
+ * @method integer         getCategoryId()  Returns the current record's \"category_id\" value
+ * @method string          getName()        Returns the current record's \"name\" value
+ * @method Category        getCategory()    Returns the current record's \"Category\" value
+ * @method CategorySynonym setId()          Sets the current record's \"id\" value
+ * @method CategorySynonym setCategoryId()  Sets the current record's \"category_id\" value
+ * @method CategorySynonym setName()        Sets the current record's \"name\" value
+ * @method CategorySynonym setCategory()    Sets the current record's \"Category\" value
+ * 
+ * @package    werkspot
+ * @subpackage model
+ * @author     Werkspot
+ * @version    SVN: $Id: Builder.php 6820 2009-11-30 17:27:49Z jwage $
+ */",
+"/**
+     * __construct
+     *
+     * @param string $options 
+     * @return void
+     */",
+"/**
+     * Set the created and updated Timestampable columns when a record is inserted
+     *
+     * @param Doctrine_Event $event
+     * @return void
+     */",
+"/**
+     * Set updated Timestampable column when a record is updated
+     *
+     * @param Doctrine_Event $evet
+     * @return void
+     */",
+"/**
+     * Set the updated field for dql update queries
+     *
+     * @param Doctrine_Event $evet
+     * @return void
+     */",
+"/**
+     * Gets the timestamp in the correct format based on the way the behavior is configured
+     *
+     * @param string $type 
+     * @return void
+     */",
+"/**
+ * Listener for the Timestampable behavior which automatically sets the created
+ * and updated columns when a record is inserted and updated.
+ *
+ * @package     Doctrine
+ * @subpackage  Template
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link        www.doctrine-project.org
+ * @since       1.0
+ * @version     $Revision$
+ * @author      Konsta Vesterinen <kvesteri@cc.hut.fi>
+ */",
+"/**
+   * @see sfTask
+   */",
+"/**
+   * @see sfTask
+   */",
+"/**
+ * Update profile percentage for all craftsmen.
+ *
+ * @package    wsCorePlugin
+ * @subpackage task
+ * @author     Joost Farla <joost.farla@freshheads.com>
+ */",
+"/**
+   * Is the value a scalar (boolean, integer, double, or string)?
+   *
+   * @factory
+   */",
+"/**
+ * Tests whether the value is a scalar (boolean, integer, double, or string).
+ */",
+"/**
+   * Constructor.
+   *
+   * @param sfValidatorBase $validator  Initial validator
+   * @param integer         $count      The number of times to replicate the validator
+   * @param array           $options    An array of options
+   * @param array           $messages   An array of error messages
+   *
+   * @see sfValidatorBase
+   */",
+"/**
+   * @see sfValidatorBase
+   */",
+"/**
+ * sfValidatorSchemaForEach wraps a validator multiple times in a single validator.
+ *
+ * @package    symfony
+ * @subpackage validator
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @version    SVN: $Id: sfValidatorSchemaForEach.class.php 9048 2008-05-19 09:11:23Z FabianLange $
+ */",
+"/**
+	 * @param      PDO $dbh Optional database connection
+	 */",
+"/**
+	 * Sets the database connection.
+	 *
+	 * @param      PDO $dbh
+	 */",
+"/**
+	 * Gets the database connection.
+	 * @return     PDO
+	 */",
+"/**
+	 * Pushes a message onto the stack of warnings.
+	 *
+	 * @param      string $msg The warning message.
+	 */",
+"/**
+	 * Gets array of warning messages.
+	 *
+	 * @return     array string[]
+	 */",
+"/**
+	 * Sets the GeneratorConfig to use in the parsing.
+	 *
+	 * @param      GeneratorConfig $config
+	 */",
+"/**
+	 * Gets the GeneratorConfig option.
+	 *
+	 * @return     GeneratorConfig
+	 */",
+"/**
+	 * Gets a specific propel (renamed) property from the build.
+	 *
+	 * @param      string $name
+	 * @return     mixed
+	 */",
+"/**
+	 * Gets a type mapping from native type to Propel type.
+	 *
+	 * @return     array The mapped Propel type.
+	 */",
+"/**
+	 * Gets a mapped Propel type for specified native type.
+	 *
+	 * @param      string $nativeType
+	 * @return     string The mapped Propel type.
+	 */",
+"/**
+	 * Give a best guess at the native type.
+	 *
+	 * @param      string $propelType
+	 * @return     string The native SQL type that best matches the specified Propel type.
+	 */",
+"/**
+	 * Gets a new VendorInfo object for this platform with specified params.
+	 *
+	 * @param      array $params
+	 */",
+"/**
+ * Base class for reverse engineering a database schema.
+ *
+ * @author     Hans Lellelid <hans@xmpl.org>
+ * @version    $Revision: 1262 $
+ * @package    propel.engine.database.reverse
+ */",
+"/**
+   * Configures the current validator.
+   *
+   * Available options:
+   *
+   *  * max: The maximum value allowed
+   *  * min: The minimum value allowed
+   *
+   * Available error codes:
+   *
+   *  * max
+   *  * min
+   *
+   * @param array $options   An array of options
+   * @param array $messages  An array of error messages
+   *
+   * @see sfValidatorBase
+   */",
+"/**
+   * @see sfValidatorBase
+   */",
+"/**
+ * sfValidatorNumber validates a number (integer or float). It also converts the input value to a float.
+ *
+ * @package    symfony
+ * @subpackage validator
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @version    SVN: $Id: sfValidatorNumber.class.php 22018 2009-09-14 16:56:28Z fabien $
+ */",
+"/**
+ */",
+"/**
+     * constructor
+     *
+     * @param Doctrine_Record $record
+     */",
+"/**
+     * initNullObject
+     *
+     * @param Doctrine_Null $null
+     */",
+"/**
+     * current
+     *
+     * @return mixed
+     */",
+"/**
+ * Doctrine_Record_Iterator
+ *
+ * @package     Doctrine
+ * @subpackage  Record
+ * @author      Konsta Vesterinen <kvesteri@cc.hut.fi>
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link        www.phpdoctrine.org
+ * @since       1.0
+ * @version     $Revision: 5876 $
+ */",
+"/**
+     * Get the changes that have been added on this migration class instance
+     *
+     * @return array $changes
+     */",
+"/**
+     * Add a change to the stack of changes to execute
+     *
+     * @param string $type    The type of change
+     * @param array  $change   The array of information for the change 
+     * @return void
+     */",
+"/**
+     * Sets the default options for tables created using Doctrine_Migration_Base::createTable()
+     * 
+     * @param array $options
+     */",
+"/**
+     * Returns the default options for tables created using Doctrine_Migration_Base::createTable()
+     * 
+     * @return array
+     */",
+"/**
+     * Add a create or drop table change.
+     *
+     * @param string $upDown     Whether to add the up(create) or down(drop) table change.
+     * @param string $tableName  Name of the table
+     * @param array  $fields     Array of fields for table
+     * @param array  $options    Array of options for the table
+     * @return void
+     */",
+"/**
+     * Add a create table change.
+     *
+     * @param string $tableName  Name of the table
+     * @param array  $fields     Array of fields for table
+     * @param array  $options    Array of options for the table
+     * @return void
+     */",
+"/**
+     * Add a drop table change.
+     *
+     * @param string $tableName  Name of the table
+     * @return void
+     */",
+"/**
+     * Add a rename table change
+     *
+     * @param string $oldTableName      Name of the table to change
+     * @param string $newTableName      Name to change the table to
+     * @return void
+     */",
+"/**
+     * Add a create or drop constraint change.
+     *
+     * @param string $upDown            Whether to add the up(create) or down(drop) create change.
+     * @param string $tableName         Name of the table.
+     * @param string $constraintName    Name of the constraint.
+     * @param array  $definition        Array for the constraint definition.
+     * @return void
+     */",
+"/**
+     * Add a create constraint change.
+     *
+     * @param string $tableName         Name of the table.
+     * @param string $constraintname    Name of the constraint.
+     * @param array  $definition        Array for the constraint definition.
+     * @return void
+     */",
+"/**
+     * Add a drop constraint change.
+     *
+     * @param string $tableName         Name of the table.
+     * @param string $constraintname    Name of the constraint.
+     * @return void
+     */",
+"/**
+     * Convenience method for creating or dropping primary keys.
+     *
+     * @param string $direction 
+     * @param string $tableName     Name of the table
+     * @param string $columnNames   Array of column names and column definitions
+     * @return void
+     */",
+"/**
+     * Convenience method for creating primary keys
+     *
+     *     [php]
+     *     $columns = array(
+     *         'id' => array(
+     *             'type' => 'integer
+     *             'autoincrement' => true
+     *          )
+     *     );
+     *     $this->createPrimaryKey('my_table', $columns);
+     */",
+"/**
+     *
+     * Equivalent to doing:
+     *
+     *  * Add new columns (addColumn())
+     *  * Create primary constraint on columns (createConstraint())
+     *  * Change autoincrement = true field to be autoincrement
+     * 
+     * @param string $tableName     Name of the table
+     * @param string $columnNames   Array of column names and column definitions
+     * @return void
+     */",
+"/**
+     * Convenience method for dropping primary keys.
+     *
+     *     [php]
+     *     $columns = array(
+     *         'id' => array(
+     *             'type' => 'integer
+     *             'autoincrement' => true
+     *          )
+     *     );
+     *     $this->dropPrimaryKey('my_table', $columns);
+     *
+     * Equivalent to doing:
+     *
+     *  * Change autoincrement column so it's not (changeColumn())
+     *  * Remove primary constraint (dropConstraint())
+     *  * Removing columns (removeColumn())
+     *
+     * @param string $tableName     Name of the table
+     * @param string $columnNames   Array of column names and column definitions
+     * @return void
+     */",
+"/**
+     * Add a create or drop foreign key change.
+     *
+     * @param string $upDown        Whether to add the up(create) or down(drop) foreign key change.
+     * @param string $tableName     Name of the table.
+     * @param string $name          Name of the foreign key.
+     * @param array  $definition    Array for the foreign key definition
+     * @return void
+     */",
+"/**
+     * Add a create foreign key change.
+     *
+     * @param string $tableName     Name of the table.
+     * @param string $name          Name of the foreign key.
+     * @param array  $definition    Array for the foreign key definition
+     * @return void
+     */",
+"/**
+     * Add a drop foreign key change.
+     *
+     * @param string $tableName     Name of the table.
+     * @param string $name          Name of the foreign key.
+     * @return void
+     */",
+"/**
+     * Add a add or remove column change.
+     *
+     * @param string $upDown        Whether to add the up(add) or down(remove) column change.
+     * @param string $tableName     Name of the table
+     * @param string $columnName    Name of the column
+     * @param string $type          Type of the column
+     * @param string $length        Length of the column
+     * @param array  $options       Array of options for the column
+     * @return void
+     */",
+"/**
+     * Add a add column change.
+     *
+     * @param string $tableName     Name of the table
+     * @param string $columnName    Name of the column
+     * @param string $type          Type of the column
+     * @param string $length        Length of the column
+     * @param array  $options       Array of options for the column
+     * @return void
+     */",
+"/**
+     * Add a remove column change.
+     *
+     * @param string $tableName     Name of the table
+     * @param string $columnName    Name of the column
+     * @return void
+     */",
+"/**
+     * Add a rename column change
+     *
+     * @param string $tableName         Name of the table to rename the column on
+     * @param string $oldColumnName     The old column name
+     * @param string $newColumnName     The new column name
+     * @return void
+     */",
+"/**
+     * Add a change column change
+     *
+     * @param string $tableName     Name of the table to change the column on
+     * @param string $columnName    Name of the column to change
+     * @param string $type          New type of column
+     * @param string $length        The length of the column
+     * @param array  $options       New options for the column
+     * @return void
+     */",
+"/**
+     * Add a add or remove index change.
+     *
+     * @param string $upDown       Whether to add the up(add) or down(remove) index change.
+     * @param string $tableName    Name of the table
+     * @param string $indexName    Name of the index
+     * @param array  $definition   Array for the index definition
+     * @return void
+     */",
+"/**
+     * Add a add index change.
+     *
+     * @param string $tableName    Name of the table
+     * @param string $indexName    Name of the index
+     * @param array  $definition   Array for the index definition
+     * @return void
+     */",
+"/**
+     * Add a remove index change.
+     *
+     * @param string $tableName    Name of the table
+     * @param string $indexName    Name of the index
+     * @return void
+     */",
+"/**
+ * Base migration class. All migration classes must extend from this base class
+ *
+ * @package     Doctrine
+ * @subpackage  Migration
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link        www.phpdoctrine.org
+ * @since       1.1
+ * @version     $Revision: 1080 $
+ * @author      Jonathan H. Wage <jonwage@gmail.com>
+ */",
+"/**
+   * @see sfTask
+   */",
+"/**
+   * @param  array $arguments
+   * @param  array $options
+   * @return int|void
+   */",
+"/**
+   * Parses the databases.yml and executes a mysqldump command for outputting sql to /tmp/dump.sql
+   *
+   * @param string $env
+   * @param string $connection
+   */",
+"/**
+ * Cleans log table and generates / e-mails back-up
+ */",
+"/**
+ * Doctrine_File
+ *
+ * @package     Doctrine
+ * @subpackage  File
+ * @author      Konsta Vesterinen <kvesteri@cc.hut.fi>
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version     $Revision$
+ * @link        www.doctrine-project.org
+ * @since       1.0
+ */",
+"/**
+     * Process a created table change
+     *
+     * @param string $table Table definition
+     * @return void
+     */",
+"/**
+     * Process a dropped table change
+     *
+     * @param array $table Table definition
+     * @return void
+     */",
+"/**
+     * Process a renamed table change
+     *
+     * @param array $table Renamed table definition
+     * @return void
+     */",
+"/**
+     * Process a created column change
+     *
+     * @param array $column Column definition
+     * @return void
+     */",
+"/**
+     * Process a dropped column change
+     *
+     * @param array $column Column definition
+     * @return void
+     */",
+"/**
+     * Process a renamed column change
+     *
+     * @param array $column Column definition
+     * @return void
+     */",
+"/**
+     * Process a changed column change
+     *
+     * @param array $column Changed column definition
+     * @return void
+     */",
+"/**
+     * Process a created index change
+     *
+     * @param array $index Index definition
+     * @return void
+     */",
+"/**
+     * Process a dropped index change
+     *
+     * @param array $index Index definition
+     * @return void
+     */",
+"/**
+     * Process a created constraint change
+     *
+     * @param array $constraint Constraint definition
+     * @return void
+     */",
+"/**
+     * Process a dropped constraint change
+     *
+     * @param array $constraint Constraint definition
+     * @return void
+     */",
+"/**
+     * Process a created foreign key change
+     *
+     * @param array $foreignKey Foreign key definition
+     * @return void
+     */",
+"/**
+     * Process a dropped foreign key change
+     *
+     * @param array $foreignKey
+     * @return void
+     */",
+"/**
+ * Doctrine_Migration_Process
+ *
+ * @package     Doctrine
+ * @subpackage  Migration
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link        www.phpdoctrine.org
+ * @since       1.0
+ * @version     $Revision: 1080 $
+ * @author      Jonathan H. Wage <jwage@mac.com>
+ */",
+"/**
+ * Doctrine_Node_NestedSet_PostOrderIterator
+ *
+ * @package     Doctrine
+ * @subpackage  Node
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link        www.phpdoctrine.org
+ * @since       1.0
+ * @version     $Revision: 5798 $
+ * @author      Joe Simms <joe.simms@websites4.com>
+ */",
+"/**
+   * About WS.
+   *
+   * @param  sfWebRequest $request
+   * @return void
+   */",
+"/**
+   * Mini statistics.
+   *
+   * @param  sfWebRequest $request
+   * @return void
+   */",
+"/**
+   * Public suggestion box.
+   *
+   * @param  sfWebRequest $request
+   * @return void
+   */",
+"/**
+   * Custom secondary column.
+   *
+   * @param  sfWebRequest $request
+   * @return void
+   */",
+"/**
+ * Doctrine_Node_NestedSet_LevelOrderIterator
+ *
+ * @package     Doctrine
+ * @subpackage  Node
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link        www.phpdoctrine.org
+ * @since       1.0
+ * @version     $Revision: 5798 $
+ * @author      Joe Simms <joe.simms@websites4.com>
+ */",
+"/**
+ * Email to consumer when he accepted a craftsman
+ *
+ * @package    wsCorePlugin
+ * @subpackage message
+ * @author     Thomas vd Wiel <thomas.van.de.wiel@freshheads.com>
+ */",
+"/**
+   * Create a new DiskKeyCache with the given $stream for cloning to make
+   * InputByteStreams, and the given $path to save to.
+   * @param Swift_KeyCache_KeyCacheInputStream $stream
+   * @param string $path to save to
+   */",
+"/**
+   * Set a string into the cache under $itemKey for the namespace $nsKey.
+   * @param string $nsKey
+   * @param string $itemKey
+   * @param string $string
+   * @param int $mode
+   * @throws Swift_IoException
+   * @see MODE_WRITE, MODE_APPEND
+   */",
+"/**
+   * Set a ByteStream into the cache under $itemKey for the namespace $nsKey.
+   * @param string $nsKey
+   * @param string $itemKey
+   * @param Swift_OutputByteStream $os
+   * @param int $mode
+   * @see MODE_WRITE, MODE_APPEND
+   * @throws Swift_IoException
+   */",
+"/**
+   * Provides a ByteStream which when written to, writes data to $itemKey.
+   * NOTE: The stream will always write in append mode.
+   * @param string $nsKey
+   * @param string $itemKey
+   * @return Swift_InputByteStream
+   */",
+"/**
+   * Get data back out of the cache as a string.
+   * @param string $nsKey
+   * @param string $itemKey
+   * @return string
+   * @throws Swift_IoException
+   */",
+"/**
+   * Get data back out of the cache as a ByteStream.
+   * @param string $nsKey
+   * @param string $itemKey
+   * @param Swift_InputByteStream $is to write the data to
+   */",
+"/**
+   * Check if the given $itemKey exists in the namespace $nsKey.
+   * @param string $nsKey
+   * @param string $itemKey
+   * @return boolean
+   */",
+"/**
+   * Clear data for $itemKey in the namespace $nsKey if it exists.
+   * @param string $nsKey
+   * @param string $itemKey
+   */",
+"/**
+   * Clear all data in the namespace $nsKey if it exists.
+   * @param string $nsKey
+   */",
+"/**
+   * Initialize the namespace of $nsKey if needed.
+   * @param string $nsKey
+   * @access private
+   */",
+"/**
+   * Get a file handle on the cache item.
+   * @param string $nsKey
+   * @param string $itemKey
+   * @param int $position
+   * @return resource
+   * @access private
+   */",
+"/**
+   * Destructor.
+   */",
+"/**
+ * A KeyCache which streams to and from disk.
+ * @package Swift
+ * @subpackage KeyCache
+ * @author Chris Corbyn
+ */",
+"/**
+     * Returns first n lines of stream.
+ */",
+"/**
+     * @return the resulting stream, or -1
+ */",
+"/**
+     * if the end of the resulting stream has been reached
+     * 
+     * @exception IOException if the underlying stream throws an IOException
+     * during reading     
+     */",
+"/**
+     * Creates a new HeadFilter using the passed in
+     * Reader for instantiation.
+     *
+     * @param object A Reader object providing the underlying stream.
+     *            Must not be <code>null</code>.
+     *
+     * @return object A new filter based on this configuration, but filtering
+     *         the specified reader.
+     */",
+"/**
+     * Scans the parameters list for the \"lines\" parameter and uses
+     * it to set the number of lines to be returned in the filtered stream.
+     */",
+"/**
+     * Sets the number of lines to be returned in the filtered stream.
+     * 
+     * @param integer $lines the number of lines to be returned in the filtered stream.
+     */",
+"/**
+     * Returns the number of lines to be returned in the filtered stream.
+     * 
+     * @return integer The number of lines to be returned in the filtered stream.
+     */",
+"/**
+ * Reads the first <code>n</code> lines of a stream.
+ * (Default is first 10 lines.)
+ * <p>
+ * Example:
+ * <pre><headfilter lines=\"3\"/></pre>
+ * Or:
+ * <pre><filterreader classname=\"phing.filters.HeadFilter\">
+ *    <param name=\"lines\" value=\"3\"/>
+ * </filterreader></pre>
+ *
+ * @author    <a href=\"mailto:yl@seasonfive.com\">Yannick Lecaillez</a>
+ * @author    hans lellelid, hans@velum.net
+ * @version   $Revision: 1.6 $ $Date: 2007-12-20 16:44:58 +0100 (Thu, 20 Dec 2007) $
+ * @access    public
+ * @see       FilterReader
+ * @package   phing.filters
+ */",
+"/**
+ * Email notification to consumer: x to y tender
+ *
+ * @package    wsCorePlugin
+ * @subpackage message
+ * @author     R.Claassens <ralf.claassens@freshheads.com>
+ */",
+"/**
+ * Email to consumer when he accepted a craftsman
+ *
+ * @package    wsCorePlugin
+ * @subpackage message
+ * @author     Thomas vd Wiel <thomas.van.de.wiel@freshheads.com>
+ */",
+"/**
+ * SubscriptionService
+ * 
+ * This class has been auto-generated by the Doctrine ORM Framework
+ * 
+ * @package    werkspot
+ * @subpackage model
+ * @author     Freshheads
+ * @version    SVN: $Id: Builder.php 6820 2009-11-30 17:27:49Z jwage $
+ */",
+"/**
+     * Allows the external environment to make Zend_Oauth use a specific
+     * Client instance.
+     *
+     * @param Zend_Http_Client $httpClient
+     * @return void
+     */",
+"/**
+     * Return the singleton instance of the HTTP Client. Note that
+     * the instance is reset and cleared of previous parameters and
+     * Authorization header values.
+     *
+     * @return Zend_Http_Client
+     */",
+"/**
+     * Simple mechanism to delete the entire singleton HTTP Client instance
+     * which forces an new instantiation for subsequent requests.
+     *
+     * @return void
+     */",
+"/**
+ * @category   Zend
+ * @package    Zend_Oauth
+ * @copyright  Copyright (c) 2005-2011 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license    http://framework.zend.com/license/new-bsd     New BSD License
+ */",
+"/**
+     * Set the transacton isolation level.
+     *
+     * @param   string  standard isolation level
+     *                  READ UNCOMMITTED (allows dirty reads)
+     *                  READ COMMITTED (prevents dirty reads)
+     *                  REPEATABLE READ (prevents nonrepeatable reads)
+     *                  SERIALIZABLE (prevents phantom reads)
+     * @throws PDOException                         if something fails at the PDO level
+     * @throws Doctrine_Transaction_Exception       if using unknown isolation level
+     * @return void
+     */",
+"/**
+ *
+ * @author      Konsta Vesterinen <kvesteri@cc.hut.fi>
+ * @author      Lukas Smith <smith@pooteeweet.org> (PEAR MDB2 library)
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @package     Doctrine
+ * @subpackage  Transaction
+ * @link        www.phpdoctrine.org
+ * @since       1.0
+ * @version     $Revision: 5798 $
+ */",
+"/**
+   * Create a new SpoolTransport.
+   * @param Swift_Spool $spool
+   */",
+"/**
+   * Create a new SpoolTransport instance.
+   * @param Swift_Spool $spool
+   * @return Swift_SpoolTransport
+   */",
+"/**
+ * Stores Messages in a queue.
+ * @package Swift
+ * @author  Fabien Potencier
+ */",
+"/**
+     * checks if given value is a valid timestamp (YYYY-MM-DD HH:MM:SS)
+     *
+     * @param mixed $value
+     * @return boolean
+     */",
+"/**
+ * Doctrine_Validator_Timestamp
+ *
+ * @package     Doctrine
+ * @subpackage  Validator
+ * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link        www.phpdoctrine.org
+ * @since       1.0
+ * @version     $Revision: 3884 $
+ * @author      Mark Pearson <mark.pearson0@googlemail.com>
+ */",
+"/**
+     * Constructor.
+     *
+     * This provider will default to the write concern and read preference
+     * options set on the MongoCollection instance (or inherited from MongoDB or
+     * MongoClient). Using an unacknowledged write concern (< 1) may make the
+     * return values of delete() and save() unreliable. Reading from secondaries
+     * may make contain() and fetch() unreliable.
+     *
+     * @see http://www.php.net/manual/en/mongo.readpreferences.php
+     * @see http://www.php.net/manual/en/mongo.writeconcerns.php
+     * @param MongoCollection $collection
+     */",
+"/**
+     * {@inheritdoc}
+     */",
+"/**
+     * {@inheritdoc}
+     */",
+"/**
+     * {@inheritdoc}
+     */",
+"/**
+     * {@inheritdoc}
+     */",
+"/**
+     * {@inheritdoc}
+     */",
+"/**
+     * {@inheritdoc}
+     */",
+"/**
+     * Check if the document is expired.
+     *
+     * @param array $document
+     * @return boolean
+     */",
+"/**
+ * MongoDB cache provider.
+ *
+ * @since  1.1
+ * @author Jeremy Mikola <jmikola@gmail.com>
+ */",
+"/**
+     * {@inheritdoc}
+     */",
+"/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @api
+ */",
+"/**
+   * Include default settigs with the ability to override them
+   * @param  $options
+   */",
+"/**
+ * Simple extend of VarnishPurgeRequest the only reason for this class is to invlude default settings
+ */",
+"/**
+ * Exception thrown when a syntax error occurs during lexing or parsing of a template.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ */",
+"/**
+   * Private constructor. sfMessageSource must be initialized using
+   * the factory method.
+   */",
+"/**
+   * Factory method to instantiate a new sfMessageSource depending on the
+   * source type. The built-in source types are 'XLIFF', 'SQLite',
+   * 'MySQL', 'gettext', and 'Aggregate'.
+   * The source parameter is dependent on the source type.
+   * For 'gettext' and 'XLIFF', it should point to the directory
+   * where the messages are stored. For database types, e.g. 'SQLite' and
+   * 'MySQL', it should be a PEAR DB style DSN string.
+   *
+   * Custom message source are possible by supplying the a filename parameter
+   * in the factory method.
+   *
+   * @param string $type      the message source type.
+   * @param string $source    the location of the resource.
+   * @param string $filename  the filename of the custom message source.
+   * @return sfMessageSource a new message source of the specified type.
+   * @throws sfException
+   */",
+"/**
+   * Loads a particular message catalogue. Use read() to
+   * to get the array of messages. The catalogue loading sequence
+   * is as follows:
+   *
+   *  \# [1] Call getCatalogueList($catalogue) to get a list of variants for for the specified $catalogue.
+   *  \# [2] For each of the variants, call getSource($variant) to get the resource, could be a file or catalogue ID.
+   *  \# [3] Verify that this resource is valid by calling isValidSource($source)
+   *  \# [4] Try to get the messages from the cache
+   *  \# [5] If a cache miss, call load($source) to load the message array
+   *  \# [6] Store the messages to cache.
+   *  \# [7] Continue with the foreach loop, e.g. goto [2].
+   *
+   * @param  string  $catalogue a catalogue to load
+   * @return boolean always true
+   * @see    read()
+   */",
+"/**
+   * Gets the array of messages.
+   *
+   * @return array translation messages.
+   */",
+"/**
+   * Gets the cache handler for this source.
+   *
+   * @return sfMessageCache cache handler
+   */",
+"/**
+   * Sets the cache handler for caching the messages.
+   *
+   * @param sfCache $cache the cache handler.
+   */",
+"/**
+   * Adds a untranslated message to the source. Need to call save()
+   * to save the messages to source.
+   *
+   * @param string $message message to add
+   */",
+"/**
+   * Sets the culture for this message source.
+   *
+   * @param string $culture culture name
+   */",
+"/**
+   * Gets the culture identifier for the source.
+   *
+   * @return string culture identifier.
+   */",
+"/**
+   * Gets the last modified unix-time for this particular catalogue+variant.
+   *
+   * @param string $source catalogue+variant
+   * @return int last modified in unix-time format.
+   */",
+"/**
+   * Loads the message for a particular catalogue+variant.
+   * This methods needs to implemented by subclasses.
+   *
+   * @param string $variant catalogue+variant.
+   * @return array of translation messages.
+   */",
+"/**
+   * Gets the source, this could be a filename or database ID.
+   *
+   * @param string $variant catalogue+variant
+   * @return string the resource key
+   */",
+"/**
+   * Determines if the source is valid.
+   *
+   * @param string $source catalogue+variant
+   * @return boolean true if valid, false otherwise.
+   */",
+"/**
+   * Gets all the variants of a particular catalogue.
+   * This method must be implemented by subclasses.
+   *
+   * @param string $catalogue catalogue name
+   * @return array list of all variants for this catalogue.
+   */",
+"/**
+ * Abstract sfMessageSource class.
+ *
+ * The base class for all sfMessageSources. Message sources must be instantiated
+ * using the factory method. The default valid sources are
+ *
+ *  \# XLIFF -- using XML XLIFF format to store the translation messages.
+ *  \# SQLite -- Store the translation messages in a SQLite database.
+ *  \# MySQL -- Using a MySQL database to store the messages.
+ *  \# gettext -- Translated messages are stored in the gettext format.
+ *
+ * A custom message source can be instantiated by specifying the filename
+ * parameter to point to the custom class file. E.g.
+ * <code>
+ *   $resource = '...'; //custom message source resource
+ *   $classfile = '../sfMessageSource_MySource.php'; //custom message source
+ *   $source = sfMessageSource::factory('MySource', $resource, $classfile);
+ * </code>
+ *
+ * If you are writting your own message sources, pay attention to the
+ * loadCatalogue method. It details how the resources are loaded and cached.
+ * See also the existing message source types as examples.
+ *
+ * The following example instantiates a MySQL message source, set the culture,
+ * set the cache handler, and use the source in a message formatter.
+ * The messages are store in a database named \"messages\". The source parameter
+ * for the actory method is a PEAR DB style DSN.
+ * <code>
+ *   $dsn = 'mysql://username:password@localhost/messages';
+ *   $source = sfMessageSource::factory('MySQL', $dsn);
+ *
+ *   //set the culture and cache, store the cache in the /tmp directory.
+ *   $source->setCulture('en_AU')l
+ *   $source->setCache(new sfMessageCache(new sfFileCache(array('/tmp'))));
+ *
+ *   $formatter = new sfMessageFormat($source);
+ * </code>
+ *
+ * @author Xiang Wei Zhuo <weizhuo[at]gmail[dot]com>
+ * @version v1.0, last update on Fri Dec 24 19:55:49 EST 2004
+ * @package    symfony
+ * @subpackage i18n
+ */",
+"/**
+   * @see sfWidget
+   */",
+"/**
+   * Constructor.
+   *
+   * Available options:
+   *
+   *  * model:        The model class (required)
+   *  * add_empty:    Whether to add a first empty value or not (false by default)
+   *                  If the option is not a Boolean, the value will be used as the text value
+   *  * method:       The method to use to display object values (__toString by default)
+   *  * key_method:   The method to use to display the object keys (getPrimaryKey by default)
+   *  * order_by:     An array composed of two fields:
+   *                    * The column to order by the results (must be in the PhpName format)
+   *                    * asc or desc
+   *  * query:        A query to use when retrieving objects
+   *  * multiple:     true if the select tag must allow multiple selections
+   *  * table_method: A method to return either a query, collection or single object
+   *
+   * @see sfWidgetFormSelect
+   */",
+"/**
+   * Returns the choices associated to the model.
+   *
+   * @return array An array of choices
+   */",
+"/**
+ * sfWidgetFormDoctrineChoice represents a choice widget for a model.
+ *
+ * @package    symfony
+ * @subpackage doctrine
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @version    SVN: $Id: sfWidgetFormDoctrineChoice.class.php 29679 2010-05-30 14:46:03Z Kris.Wallsmith $
+ */",
+"/**
+     * Ensures that PEAR lib exists.
+     */",
+"/**
+     * Add a new fileset
+     * @return FileSet
+     */",
+"/**
+     * Add a new fileset.  Alias to createTarFileSet() for backwards compatibility.
+     * @return FileSet
+     * @see createTarFileSet()
+     */",
+"/**
+     * Set is the name/location of where to create the tar file.
+     * @param PhingFile $destFile The output of the tar
+     */",
+"/**
+     * This is the base directory to look in for things to tar.
+     * @param PhingFile $baseDir
+     */",
+"/**
+     * Set the include empty dirs flag.
+     * @param  boolean  Flag if empty dirs should be tarred too
+     * @return void
+     * @access public
+     */",
+"/**
+     * Set how to handle long files, those with a path&gt;100 chars.
+     * Optional, default=warn.
+     * <p>
+     * Allowable values are
+     * <ul>
+     * <li>  truncate - paths are truncated to the maximum length
+     * <li>  fail - paths greater than the maximim cause a build exception
+     * <li>  warn - paths greater than the maximum cause a warning and GNU is used
+     * <li>  gnu - GNU extensions are used for any paths greater than the maximum.
+     * <li>  omit - paths greater than the maximum are omitted from the archive
+     * </ul>
+     */",
+"/**
+     * Set compression method.
+     * Allowable values are
+     * <ul>
+     * <li>  none - no compression
+     * <li>  gzip - Gzip compression
+     * <li>  bzip2 - Bzip2 compression
+     * </ul>
+     */",
+"/**
+     * do the work
+     * @throws BuildException
+     */",
+"/**
+     * @param array $files array of filenames
+     * @param PhingFile $dir
+     * @return boolean
+     */",
+"/**
+ * Creates a tar archive using PEAR Archive_Tar.
+ *
+ * @author    Hans Lellelid <hans@xmpl.org> (Phing)
+ * @author    Stefano Mazzocchi <stefano@apache.org> (Ant)
+ * @author    Stefan Bodewig <stefan.bodewig@epost.de> (Ant)
+ * @author    Magesh Umasankar
+ * @version   $Revision: 1.10 $
+ * @package   phing.tasks.ext
+ */",
+"/**
+     *  Get a list of files and directories specified in the fileset.
+     *  @return array a list of file and directory names, relative to
+     *    the baseDir for the project.
+     */",
+"/**
+     * A 3 digit octal string, specify the user, group and 
+     * other modes in the standard Unix fashion; 
+     * optional, default=0644
+     * @param string $octalString
+     */",
+"/**
+     * The username for the tar entry 
+     * This is not the same as the UID, which is
+     * not currently set by the task.
+     */",
+"/**
+     * The groupname for the tar entry; optional, default=\"\"
+     * This is not the same as the GID, which is
+     * not currently set by the task.
+     */",
+"/**
+     * If the prefix attribute is set, all files in the fileset
+     * are prefixed with that path in the archive.
+     * optional.
+     */",
+"/**
+     * If the fullpath attribute is set, the file in the fileset
+     * is written with that path in the archive. The prefix attribute,
+     * if specified, is ignored. It is an error to have more than one file specified in
+     * such a fileset.
+     */",
+"/**
+     * Flag to indicates whether leading `/'s should
+     * be preserved in the file names.
+     * Optional, default is <code>false</code>.
+     * @return void
+     */",
+"/**
+ * This is a FileSet with the option to specify permissions.
+ * 
+ * Permissions are currently not implemented by PEAR Archive_Tar,
+ * but hopefully they will be in the future.
+ * 
+ */",
+"/**
+   * @see sfTask
+   */",
+"/**
+   * @see sfTask
+   */",
+"/**
+ * Create form classes for the current model.
+ *
+ * @package    symfony
+ * @subpackage propel
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @version    SVN: $Id: sfPropelBuildFormsTask.class.php 23927 2009-11-14 16:10:57Z fabien $
+ */",
+"/**
+   * Constructor.
+   */",
+"/**
+   * Determines if the given number belongs to a given set
+   *
+   * @param  float  $number the number to test.
+   * @param  string $set    the set, in set notation.
+   * @return boolean true if number is in the set, false otherwise.
+   */",
+"/**
+   * Parses a choice string and get a list of sets and a list of strings corresponding to the sets.
+   *
+   * @param  string $string the string containing the choices
+   * @return array array($sets, $strings)
+   */",
+"/**
+   * For the choice string, and a number, find and return the string that satisfied the set within the choices.
+   *
+   * @param  string $string   the choices string.
+   * @param  float  $number   the number to test.
+   * @return string the choosen string.
+   */",
+"/**
+ * sfChoiceFormat class.
+ * 
+ * sfChoiceFormat converts between ranges of numeric values and string 
+ * names for those ranges.
+ *
+ * A sfChoiceFormat splits the real number line -Inf to +Inf into two or 
+ * more contiguous ranges. Each range is mapped to a string. 
+ * sfChoiceFormat is generally used in a MessageFormat for displaying 
+ * grammatically correct plurals such as \"There are 2 files.\"
+ *
+ * <code>
+ *  $string = '[0] are no files |[1] is one file |(1,Inf] are {number} files';
+ *  
+ *  $formatter = new sfMessageFormat(...); //init for a source
+ *  $translated = $formatter->format($string);
+ *
+ *  $choice = new sfChoiceFormat();
+ *  echo $choice->format($translated, 0); //shows \"are no files\"
+ * </code>
+ *
+ * The message/string choices are separated by the pipe \"|\" followed
+ * by a set notation of the form
+ *  \# <t>[1,2]</t> -- accepts values between 1 and 2, inclusive.
+ *  \# <t>(1,2)</t> -- accepts values between 1 and 2, excluding 1 and 2.
+ *  \# <t>{1,2,3,4}</t> -- only values defined in the set are accepted.
+ *  \# <t>[-Inf,0)</t> -- accepts value greater or equal to negative infinity 
+ *                       and strictly less than 0
+ * Any non-empty combinations of the delimiters of square and round brackets
+ * are acceptable.
+ *
+ * @author Xiang Wei Zhuo <weizhuo[at]gmail[dot]com>
+ * @version v1.0, last update on Fri Dec 24 20:46:16 EST 2004
+ * @package    symfony
+ * @subpackage i18n
+ */",
+"/**
+ * CraftsmanExtendSuccess email message.
+ *
+ * @package    wsCorePlugin
+ * @subpackage message
+ */",
+"/**
+ * bllApi_Wizard
+ * 
+ * This class has been auto-generated by the Doctrine ORM Framework
+ * 
+ * @package    \##PACKAGE\##
+ * @subpackage \##SUBPACKAGE\##
+ * @author     \##NAME\## <\##EMAIL\##>
+ * @version    SVN: $Id: Builder.php 6820 2009-11-30 17:27:49Z jwage $
+ */",
+"/**
+ */",
+"/**
+   * @see sfTask
+   */",
+"/**
+   * Sets the current task's configuration.
+   *
+   * @param sfProjectConfiguration $configuration
+   */",
+"/**
+   * Returns the filesystem instance.
+   *
+   * @return sfFilesystem A sfFilesystem instance
+   */",
+"/**
+   * Checks if the current directory is a symfony project directory.
+   *
+   * @return true if the current directory is a symfony project directory, false otherwise
+   */",
+"/**
+   * Checks if an application exists.
+   *
+   * @param  string $app  The application name
+   *
+   * @return bool true if the application exists, false otherwise
+   */",
+"/**
+   * Checks if a module exists.
+   *
+   * @param  string $app     The application name
+   * @param  string $module  The module name
+   *
+   * @return bool true if the module exists, false otherwise
+   */",
+"/**
+   * Creates a configuration object.
+   *
+   * @param string  $application The application name
+   * @param string  $env         The environment name
+   *
+   * @return sfProjectConfiguration A sfProjectConfiguration instance
+   */",
+"/**
+   * Returns the first application in apps.
+   *
+   * @return string The Application name
+   */",
+"/**
+   * Reloads all autoloaders.
+   *
+   * This method should be called whenever a task generates new classes that
+   * are to be loaded by the symfony autoloader. It clears the autoloader
+   * cache for all applications and environments and the current execution.
+   *
+   * @see initializeAutoload()
+   */",
+"/**
+   * Initializes autoloaders.
+   *
+   * @param sfProjectConfiguration $configuration The current project or application configuration
+   * @param boolean                $reload        If true, all autoloaders will be reloaded
+   */",
+"/**
+   * Mirrors a directory structure inside the created project.
+   *
+   * @param string   $dir    The directory to mirror
+   * @param sfFinder $finder A sfFinder instance to use for the mirroring
+   */",
+"/**
+   * Replaces tokens in files contained in a given directory.
+   *
+   * If you don't pass a directory, it will replace in the config/ and lib/ directory.
+   *
+   * You can define global tokens by defining the $this->tokens property.
+   *
+   * @param array $dirs   An array of directory where to do the replacement
+   * @param array $tokens An array of tokens to use
+   */",
+"/**
+   * Reloads tasks.
+   *
+   * Useful when you install plugins with tasks and if you want to use them with the runTask() method.
+   */",
+"/**
+   * Enables a plugin in the ProjectConfiguration class.
+   *
+   * @param string $plugin The name of the plugin
+   */",
+"/**
+   * Disables a plugin in the ProjectConfiguration class.
+   *
+   * @param string $plugin The name of the plugin
+   */",
+"/**
+   * Returns a plugin manager instance.
+   *
+   * @return sfSymfonyPluginManager A sfSymfonyPluginManager instance
+   */",
+"/**
+   * @see sfCommandApplicationTask
+   */",
+"/**
+ * Base class for all symfony tasks.
+ *
+ * @package    symfony
+ * @subpackage task
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @version    SVN: $Id: sfBaseTask.class.php 24341 2009-11-24 15:01:58Z Kris.Wallsmith $
+ */",
+"/**
+   * Questionnaire question detail.
+   * Routing parameter \"step\" defines current step and must be of type INT.
+   *
+   * @param sfWebRequest $request
+   */",
+"/**
+   * User has finished the questionnaire.
+   *
+   * @param sfWebRequest $request
+   */",
+"/**
+ * BasefhQuestionnaireActions
+ *
+ * @package fhQuestionnairePlugin
+ * @author  M.Bax <marco.bax@freshheads.com>
+ * @since   2011/12/21
+ */",
+"/**
+ * Email to craftsman when consumer requested contact
+ *
+ * @package    wsCorePlugin
+ * @subpackage message
+ * @author     M.Bax <marco.bax@freshheads.com>
+ */"]

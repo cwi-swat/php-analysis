@@ -2,7 +2,7 @@ module lang::php::stats::Unfriendly
 
 import lang::php::util::Utils;
 import lang::php::stats::Stats;
-import lang::php::util::System;
+import lang::php::ast::System;
 import lang::php::util::Corpus;
 import lang::php::ast::AbstractSyntax;
 import lang::php::analysis::evaluators::ScalarEval;

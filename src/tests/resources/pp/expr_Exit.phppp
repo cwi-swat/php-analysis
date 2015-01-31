@@ -1,0 +1,7 @@
+<?php
+exit();
+exit();
+exit('Die!');
+exit();
+exit();
+exit('Exit!');

@@ -1,7 +1,7 @@
 <?php
-# source: http://nl1.php.net/interface
-
 namespace Alpha;
+
+const b = 2;
 
 interface a
 {
@@ -9,15 +9,17 @@ interface a
 }
 
 namespace Beta;
-use \Alpha\a;
+use \Alpha as a;
+use \Alpha\a as interfaceA;
 
 // Prints: Interface constant
-echo a::b;
+echo a\b;
+echo interfaceA::b;
 
 
 // This will however not work because it's not allowed to
 // override constants.
-class b implements a
+class b implements interfaceA
 {
     //const b = 'Class constant'; # not allowed!
 }

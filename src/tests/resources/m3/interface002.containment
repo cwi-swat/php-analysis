@@ -1,6 +1,0 @@
-{
-	<|php+namespace:///Alpha|,  |php+interface:///Alpha/a|>,
-	<|php+namespace:///Beta|,   |php+class:///Beta/b|>,
-
-	<|php+interface:///Alpha/a|, |php+constant:///Alpha/a/b|>
-}

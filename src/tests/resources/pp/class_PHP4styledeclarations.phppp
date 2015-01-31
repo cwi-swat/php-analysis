@@ -1,0 +1,10 @@
+<?php
+
+class A
+{
+    public $foo;
+
+    public function bar()
+    {
+    }
+}

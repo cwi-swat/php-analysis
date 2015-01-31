@@ -1,7 +1,7 @@
 module lang::php::analysis::includes::IncludesInfo
 
 import lang::php::ast::AbstractSyntax;
-import lang::php::util::System;
+import lang::php::ast::System;
 import lang::php::util::Config;
 import lang::php::analysis::evaluators::AlgebraicSimplification;
 import lang::php::analysis::evaluators::SimulateCalls;

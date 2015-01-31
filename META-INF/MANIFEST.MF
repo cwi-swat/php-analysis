@@ -2,12 +2,15 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PHPAnalysis
 Bundle-SymbolicName: PHPAnalysis
-Bundle-Version: 0.5.0
+Bundle-Version: 1.0.0
 Require-Bundle: org.eclipse.imp.pdb.values,
  rascal,
  rascal_eclipse,
  rascal_pdt_adapter
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: org.eclipse.imp.pdb.facts,
+ org.eclipse.imp.pdb.facts.type,
+ org.rascalmpl.interpreter.utils
 Export-Package: lang,
  lang.php,
  lang.php.abstractions.templates,

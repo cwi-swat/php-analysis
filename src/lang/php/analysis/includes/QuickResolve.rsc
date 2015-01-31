@@ -3,7 +3,7 @@ module lang::php::analysis::includes::QuickResolve
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Utils;
 import lang::php::util::LocUtils;
-import lang::php::util::System;
+import lang::php::ast::System;
 import lang::php::analysis::includes::IncludesInfo;
 import lang::php::analysis::includes::MatchIncludes;
 
@@ -11,12 +11,12 @@ import Set;
 import Relation;
 import String;
 
-private Expr replaceConstants(Expr e, IncludesInfo iinfo) {
+public Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 	return bottom-up visit(e) {
 		case fc:fetchConst(name(cn)) => (iinfo.constMap[cn])[@at=fc@at]
 			when cn in iinfo.constMap
 			
-		case fcc:fetchClassConst(name(name(cln)),cn) => (iinfo.classConstMap[cln][cn])[@at=fcc@at]
+		case fcc:fetchClassConst(name(name(cln)),name(cn)) => (iinfo.classConstMap[cln][cn])[@at=fcc@at]
 			when cln in iinfo.classConstMap && cn in iinfo.classConstMap[cln]
 	}
 }

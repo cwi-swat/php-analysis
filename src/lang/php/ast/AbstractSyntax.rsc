@@ -27,7 +27,7 @@ public data NameOrExpr = name(Name name) | expr(Expr expr);
 
 public data CastType = \int() | \bool() | float() | string() | array() | object() | unset();
 	
-public data ClosureUse = closureUse(str name, bool byRef);
+public data ClosureUse = closureUse(Expr varName, bool byRef); 
 
 public data IncludeType = include() | includeOnce() | require() | requireOnce();
 
@@ -38,7 +38,7 @@ public data IncludeType = include() | includeOnce() | require() | requireOnce();
 public data Expr 
 	= array(list[ArrayElement] items)
 	| fetchArrayDim(Expr var, OptionExpr dim)
-	| fetchClassConst(NameOrExpr className, str constName)
+	| fetchClassConst(NameOrExpr className, Name constantName)
 	| assign(Expr assignTo, Expr assignExpr)
 	| assignWOp(Expr assignTo, Expr assignExpr, Op operation)
 	| listAssign(list[OptionExpr] assignsTo, Expr assignExpr)
@@ -70,6 +70,7 @@ public data Expr
 	| yield(OptionExpr keyExpr, OptionExpr valueExpr)
 	| listExpr(list[OptionExpr] listExprs)
 	;
+	
 
 public data Op = bitwiseAnd() | bitwiseOr() | bitwiseXor() | concat() | div() 
 			   | minus() | \mod() | mul() | plus() | rightShift() | leftShift()
@@ -112,7 +113,7 @@ public data Stmt
 	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
 	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
 	| global(list[Expr] exprs)
-	| goto(str label)
+	| goto(Name gotoName)
 	| haltCompiler(str remainingText)
 	| \if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, OptionElse elseClause)
 	| inlineHTML(str htmlText)
@@ -137,7 +138,7 @@ public data Stmt
 
 public data Declaration = declaration(str key, Expr val);
 
-public data Catch = \catch(Name xtype, str xname, list[Stmt] body);
+public data Catch = \catch(Name xtype, Expr varName, list[Stmt] body);
 	
 public data Case = \case(OptionExpr cond, list[Stmt] body);
 
@@ -155,8 +156,8 @@ public data ClassItem
 	;
 
 public data Adaptation
-	= traitAlias(OptionName traitName, str methodName, set[Modifier] newModifiers, OptionName newName)
-	| traitPrecedence(OptionName traitName, str methodName, set[Name] insteadOf)
+	= traitAlias(OptionName traitName, Name methName, set[Modifier] newModifiers, OptionName newName)
+	| traitPrecedence(OptionName traitName, Name methName, set[Name] insteadOf)
 	;
 	
 public data Property = property(str propertyName, OptionExpr defaultValue);
@@ -207,7 +208,7 @@ public anno loc InterfaceDef@at;
 public anno loc StaticVar@at;
 public anno loc Script@at;
 
-@decl{Contains current Namespace/Class/Interace/Trait/Method/Function information.}
+public anno loc Script@decl;
 public anno loc ActualParameter@decl;
 public anno loc Const@decl;
 public anno loc ArrayElement@decl;
@@ -263,33 +264,33 @@ public anno str InterfaceDef@id;
 public anno str StaticVar@id;
 public anno str Script@id;
 
-@doc{Stores ScopeInfo information for nodes.}
-public anno node ActualParameter@scope;
-public anno node Const@scope;
-public anno node ArrayElement@scope;
-public anno node Name@scope;
-public anno node NameOrExpr@scope;
-public anno node CastType@scope;
-public anno node ClosureUse@scope;
-public anno node IncludeType@scope;
-public anno node Expr@scope;
-public anno node Op@scope;
-public anno node Param@scope;
-public anno node Scalar@scope;
-public anno node Stmt@scope;
-public anno node Declaration@scope;
-public anno node Catch@scope;
-public anno node Case@scope;
-public anno node ElseIf@scope;
-public anno node Else@scope;
-public anno node Use@scope;
-public anno node ClassItem@scope;
-public anno node Property@scope;
-public anno node Modifier@scope;
-public anno node ClassDef@scope;
-public anno node InterfaceDef@scope;
-public anno node StaticVar@scope;
-public anno node Script@scope;
+@doc{Stores scope information for nodes.}
+public anno loc ActualParameter@scope;
+public anno loc Const@scope;
+public anno loc ArrayElement@scope;
+public anno loc Name@scope;
+public anno loc NameOrExpr@scope;
+public anno loc CastType@scope;
+public anno loc ClosureUse@scope;
+public anno loc IncludeType@scope;
+public anno loc Expr@scope;
+public anno loc Op@scope;
+public anno loc Param@scope;
+public anno loc Scalar@scope;
+public anno loc Stmt@scope;
+public anno loc Declaration@scope;
+public anno loc Catch@scope;
+public anno loc Case@scope;
+public anno loc ElseIf@scope;
+public anno loc Else@scope;
+public anno loc Use@scope;
+public anno loc ClassItem@scope;
+public anno loc Property@scope;
+public anno loc Modifier@scope;
+public anno loc ClassDef@scope;
+public anno loc InterfaceDef@scope;
+public anno loc StaticVar@scope;
+public anno loc Script@scope;
 
 @doc{Stores PHPDoc for the AST nodes.}
 public anno str ActualParameter@phpdoc;
@@ -321,3 +322,11 @@ public anno str Script@phpdoc;
 
 @doc{Used to associate the actual compile-time value with magic constants.}
 public anno str Scalar@actualValue;
+
+@doc{ hack to make decls work on (all) nodes; visit does not recognize the annotations on specific nodes when visiting `node` }
+public anno loc node@at;
+public anno loc node@decl;
+public anno str node@phpdoc;
+public anno loc node@scope;
+
+alias PhpParams = lrel[loc decl, set[loc] typeHints, bool isRequired, bool byRef];

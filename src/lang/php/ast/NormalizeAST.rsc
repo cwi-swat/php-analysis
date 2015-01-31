@@ -11,6 +11,7 @@ module lang::php::ast::NormalizeAST
 import lang::php::ast::AbstractSyntax;
 import List;
 import IO;
+import Node;
 import String;
 
 data Expr = blockedVar(NameOrExpr varName);
@@ -220,7 +221,7 @@ public Script switchNamespaceSeparators(Script s) {
 public Script setDefaultUseAlias(Script s) {
 	solve(s) {
 		s = visit(s) {
-			case use(name(str un), noName()) => use(name(un),someName(name(last(split("::",un)))))
+			case use(name(str un), noName()) => use(name(un),someName(name(last(split("/",un)))))
 		}
 	}
 	return s;
@@ -241,6 +242,24 @@ public Script discardModifiers(Script s) {
 	solve(s) {
 		s = visit(s) {
 			case set[Modifier] sm => emptySM 
+		}
+	}
+	return s;
+}
+
+// dirty setAnnotations and getAnnotations to keep the annotations of the origional node on the new node.
+public Script addPublicModifierWhenNotProvided(Script s) {
+	set[Modifier] publicModifier = { \public() };
+	
+	solve(s) {
+		s = visit(s) {
+			case origNode:property(set[Modifier] mfs, prop) => 
+				setAnnotations( property(mfs + publicModifier, prop), getAnnotations(origNode))
+			when \public() notin mfs && \private() notin mfs && \protected() notin mfs
+				
+			case origNode:method(name, set[Modifier] mfs, byRef, params, body) =>
+				setAnnotations( method(name, mfs + publicModifier, byRef, params, body), getAnnotations(origNode))
+			when \public() notin mfs && \private() notin mfs && \protected() notin mfs
 		}
 	}
 	return s;

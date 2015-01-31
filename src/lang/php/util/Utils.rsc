@@ -9,7 +9,7 @@
 module lang::php::util::Utils
 
 import lang::php::util::Corpus;
-import lang::php::util::System;
+import lang::php::ast::System;
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Config;
 
@@ -24,24 +24,63 @@ import DateTime;
 import util::ShellExec;
 
 import lang::php::pp::PrettyPrinter;
-import lang::php::util::ValueUICustom;
+
+
+@javaClass{org.rascal.phpanalysis.PhpJarExtractor}
+@memo
+private java loc getPhpParserLocFromJar() throws IO(str msg);
+
+
+private str executePHP(list[str] opts, loc cwd) {
+	str phpBinLoc = usePhpParserJar ? "php" : phploc.path;
+
+  	PID pid = createProcess(phpBinLoc, opts, cwd);
+	str phcOutput = readEntireStream(pid);
+	str phcErr = readEntireErrStream(pid);
+	killProcess(pid);
+
+	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
+		return phcOutput;
+	}
+	
+	throw IO("error calling php");
+}
+
+private Script parsePHPfile(loc f, list[str] opts, Script error) {
+	loc parserLoc = usePhpParserJar ? getPhpParserLocFromJar() : lang::php::util::Config::parserLoc;
+
+	str phpOut;
+	try {
+		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", (parserLoc + astToRascal).path, "-f<f.path>"] + opts, parserLoc + libRascal);
+	}
+	catch RuntimeException:
+		return error;
+
+	if (trim(phpOut) == "")
+		res = errscript("Parser failed in unknown way");
+	else 
+		res = readTextValueString(#Script, phpOut);
+
+	return res;
+}
+
+@doc{Test if a running version php is available on the path}
+@memo
+public bool testPHPInstallation() {
+	str hello = "hello world";
+	try {
+		return hello == trim(executePHP(["-r echo \"<hello>\";"], |tmp:///|));
+	}
+	catch RuntimeException:
+	 	return false;
+}
 
 @doc{Parse an individual PHP statement using the external parser, returning the associated AST.}
 public Stmt parsePHPStatement(str s) {
 	tempFile = |file:///tmp/parseStmt.php|;
 	writeFile(tempFile, "\<?php\n<s>?\>");
-	PID pid = createProcess(phploc.path, ["-d memory_limit="+parserMemLimit, rgenLoc.path, "-f<tempFile.path>"], rgenCwd);
-	str phcOutput = readEntireStream(pid);
-	str phcErr = readEntireErrStream(pid);
-	Script res = errscript("Could not parse <s>");
-	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
-		if (trim(phcOutput) == "")
-			throw "Parser failed in unknown way";
-		else
-			res = readTextValueString(#Script, phcOutput);
-	}
+	Script res = parsePHPfile(tempFile, [], errscript("Could not parse <s>"));
 	if (errscript(_) := res) throw "Found error in PHP code to parse";
-	killProcess(pid);
 	if (script(sl) := res && size(sl) == 1) return head(sl);
 	if (script(sl) := res) return block(sl);
 	throw "Could not parse statement <s>";
@@ -72,21 +111,9 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	if (addUniqueIds) opts += "-i";
 	if (l.scheme == "home") opts += "-r";
 	if (includePhpDocs) opts += "--phpdocs";
-	if (resolveNamespaces) opts += "--resolveNames";
 	
-	PID pid = createProcess(phploc.path, ["-d memory_limit="+parserMemLimit, rgenLoc.path, "-f<l.path>"] + opts, rgenCwd);
-	str phcOutput = readEntireStream(pid);
-	str phcErr = readEntireErrStream(pid);
-	Script res = errscript("Could not parse file <l.path>: <phcErr>");
-	//writeFile(|file:///tmp/parserOutput.txt|,phcOutput);
-	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
-		if (trim(phcOutput) == "")
-			res = errscript("Parser failed in unknown way");
-		else 
-			res = readTextValueString(#Script, phcOutput);
-	}
-	if (errscript(err) := res) println("Found error in file <l.path>. Error: <err>");
-	killProcess(pid);
+	Script res = parsePHPfile(l, opts, errscript("Could not parse file <l.path>")); 
+	if (errscript(err) := res) logMessage("Found error in file <l.path>. Error: <err>", 2);
 	return res;
 }
 
@@ -117,20 +144,27 @@ private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) lo
 	list[loc] phpEntries = [ e | e <- entries, e.extension in extensions];
 
 	System phpNodes = ( );
-	logMessage("Parsing directory: <l>.", 2);
-	for (e <- phpEntries) {
-		try {
-			Script scr = loader(e, addLocationAnnotations, addUniqueIds);
-			phpNodes[e] = scr;
-		} catch IO(msg) : {
-			println("<msg>");
-		} catch Java(msg) : {
-			println("<msg>");
+	
+	increaseFolderCounter();
+	if (folderTotal == 0) setFolderTotal(l);
+	
+	if (size(phpEntries) > 0) {	
+		logMessage("<((folderCounter * 100) / folderTotal)>% [<folderCounter>/<folderTotal>] Parsing <size(phpEntries)> files in directory: <l>", 2);
+		for (e <- phpEntries) {
+			try {
+				Script scr = loader(e, addLocationAnnotations, addUniqueIds);
+				phpNodes[e] = scr;
+			} catch IO(msg) : {
+				println("<msg>");
+			} catch Java(msg) : {
+				println("<msg>");
+			}
 		}
 	}
 	
 	for (d <- dirEntries) phpNodes = phpNodes + loadPHPFiles(d, extensions, loader, addLocationAnnotations, addUniqueIds);
-	
+	resetCounters();
+		
 	return phpNodes;
 }
 
@@ -146,7 +180,9 @@ public void buildBinaries(str product, str version, loc l, bool addLocationAnnot
 	files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 	
 	loc binLoc = parsedDir + "<product>-<version>.pt";
+	logMessage("Now writing file: <binLoc>...", 2);
 	writeBinaryValueFile(binLoc, files, compression=false);
+	logMessage("... done.", 2);
 }
 
 @doc{Build the serialized ASTs for a specific system at the default location}
@@ -272,16 +308,29 @@ public map[tuple[str product, str version], map[loc l, Script scr]] getLatestTre
 	return ( <p,lv[p]> : loadBinary(p,lv[p]) | p <- lv<0> );
 }
 
-// added functions by ruudvanderweijde
+@doc{ counter helper methods }
+public int folderCounter = 0;
+public int folderTotal = 0;
+public void increaseFolderCounter() {
+	folderCounter = folderCounter + 1;
+}
+public void resetCounters() {
+	if (folderCounter == folderTotal) { 
+		folderTotal = 0;
+		folderCounter = 0;
+	}
+}
+public void setFolderTotal(loc baseDir) {
+	folderTotal = countFolders(baseDir);
+}
 
-@logLevel {
+public int countFolders(loc d) = (1 | it + countFolders(d+f) | str f <- listEntries(d), isDirectory(d+f));
+
+@doc { 
 	Log level 0 => no logging;
 	Log level 1 => main logging;
 	Log level 2 => debug logging;
 }
-private int logLevel = 2;
-
-@doc { }
 public void logMessage(str message, int level) {
 	if (level <= logLevel) {
 		str date = printDate(now(), "Y-MM-dd HH:mm:ss");
