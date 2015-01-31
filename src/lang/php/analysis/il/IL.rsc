@@ -8,14 +8,85 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::analysis::il::IL
 
-data Instruction 
-	= createArray(list[tuple[Var key, Var val, bool byRef]]);
+data Instruction;
+alias InstructionList = list[Instruction];
 
 data Var
-	= temp(int n)
-	| placeholder()
+	= normal(str vname)
+	| temp(int n)
 	;
 	
+data Instruction
+	= createArray(Var target)
+	| addArrayElement(Var arrayTarget, Var index, Var element)
+	| addReferenceArrayElement(Var arrayTarget, Var index, Var element)
+	| addArrayElementAtEnd(Var arrayTarget, Var index, Var element)
+	| computeNextIndex(Var target, Var arrayTarget)
+	| getElement(Var target, Var index)
+	| destroyArray(Var target)
+	;
+
+// Instructions to support memory reads/writes
+data Instruction
+	= readVar(Var target)
+	| writeVar(Var target, Var source)
+	;
+
+//public InstructionList buildDIL(Script scr) {
+//	InstructionList il = [ ];
+//	int freshCounter = 0;
+//		
+//	Var newTemp() { freshCounter += 1; return temp(freshCounter); }
+//	
+//	//| fetchArrayDim(Expr var, OptionExpr dim), OptionExpr is someExpr
+//	void xform(fetchArrayDim(Expr var, someExpr(Expr dim)), bool wantRef) {
+//		xform(var, true);
+//		avar = lastVar();
+//		xform(dim, false);
+//		dvar = lastVar();
+//		
+//		if (wantRef)
+//			il += arrayRefLookup(newTemp(), avar, dvar);
+//		else
+//			il += arrayItemLookup(newTemp(), avar, dvar);
+//	}
+//
+//	//| fetchArrayDim(Expr var, OptionExpr dim), OptionExpr is noExpr
+//	void xform(fetchArrayDim(Expr var, noExpr()), bool wantRef) {
+//		xform(var, true);
+//		avar = lastVar();
+//		
+//		if (wantRef)
+//			il += arrayRefLookup(newTemp(), avar, nextIndex());
+//		else
+//			il += arrayItemLookup(newTemp(), avar, nextIndex());
+//	}
+//
+//	//| fetchClassConst(NameOrExpr className, str constName)
+//	void xform(fetchClassConst(expr(Expr className), str constName), bool wantRef) {
+//		xform(className, false);
+//		cnvar = lastVar();
+//		il += assignScalarString(newTemp(), constName);
+//		il += classConstLookup(newTemp(), cnvar, lastVar()); 
+//	}
+//
+//	void xform(fetchClassConst(name(name(str className)), str constName), bool wantRef) {
+//		il += assignScalarString(newTemp(), className);
+//		cnvar = lastVar();
+//		il += assignScalarString(newTemp(), constName);
+//		il += classConstLookup(newTemp(), cnvar, lastVar()); 
+//	}
+//}
+//
+//data Var
+//	= temp(int n)
+//	| placeholder()
+//	| nextIndex()
+//	| normalVar(str v)
+//	;
+//	
+//alias VarList = list[Var];
+
 	//= array(list[ArrayElement] items)
 	//| fetchArrayDim(Expr var, OptionExpr dim)
 	//| fetchClassConst(NameOrExpr className, str constName)
@@ -46,5 +117,108 @@ data Var
 	//| ternary(Expr cond, OptionExpr ifBranch, Expr elseBranch)
 	//| staticPropertyFetch(NameOrExpr className, NameOrExpr propertyName)
 	//| scalar(Scalar scalarVal)
-	//| var(NameOrExpr varName)	
 	
+public int myfun() {
+	int x;
+	int y = 3;
+	z = y + 4;
+	return z;
+}
+
+//public Var lowerExp(Expr e) = e;
+
+
+data Var = var(str vname) | tmp(int vnum);
+
+//public data Scalar
+//	= classConstant()
+//	| dirConstant()
+//	| fileConstant()
+//	| funcConstant()
+//	| lineConstant()
+//	| methodConstant()
+//	| namespaceConstant()
+//	| traitConstant()
+//	| float(real realVal)
+//	| integer(int intVal)
+//	| string(str strVal)
+//	| encapsed(list[Expr] parts)
+//	;
+
+public Var lower(scalar(classConstant())) {
+	nt = newTemp();
+	i = lookupClassName(nt);
+	emit(i);
+	return nt;
+}
+
+public Var lower(scalar(dirConstant())) {
+	nt = newTemp();
+	i = lookupFileDir(nt);
+	emit(i);
+	return nt;
+}
+
+public Var lower(scalar(fileConstant())) {
+	nt = newTemp();
+	i = lookupFile(nt);
+	emit(i);
+	return nt;
+}
+
+public Var lower(scalar(funcConstant())) {
+	nt = newTemp();
+	i = lookupFuncName(nt);
+	emit(i);
+	return nt;
+}
+
+public Var lower(scalar(lineConstant())) {
+	nt = newTemp();
+	i = lookupFileLine(nt);
+	emit(i);
+	return nt;
+}
+
+public Var lower(scalar(methodConstant())) {
+	nt = newTemp();
+	i = lookupMethodName(nt);
+	emit(i);
+	return nt;
+}
+
+public Var lower(scalar(namespaceConstant())) {
+	nt = newTemp();
+	i = lookupNamespaceName(nt);
+	emit(i);
+	return nt;
+}
+
+public Var lower(scalar(traitConstant())) {
+	nt = newTemp();
+	i = lookupTraitName(nt);
+	emit(i);
+	return nt;
+}
+
+public Var lower(scalar(float)) {
+	nt = newTemp();
+	i = lookupClassName(nt);
+	emit(i);
+	return nt;
+}
+
+public Var lower(var(expr(Expr e))) {
+	v = lower(e);
+	nt = newTemp();
+	i = indirectLookup(nt, v);
+	emit(i);
+	return nt;
+}
+
+public Var lower(var(name(name(str s)))) {
+	nt = newTemp();
+	i = directLookup(nt, var(s));
+	emit(i);
+	return nt;
+}

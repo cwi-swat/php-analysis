@@ -12,6 +12,7 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::util::Corpus;
 import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::stats::Stats;
+import lang::php::util::System;
 import lang::php::util::Utils;
 import lang::php::analysis::includes::IncludeGraph;
 import lang::php::pp::PrettyPrinter;
@@ -28,7 +29,7 @@ data RuntimeException = CannotEval(Expr expr);
 
 anno int Expr@includeId;
 
-public map[loc fileloc, Script scr] resolveIncludes(map[loc fileloc, Script scr] scripts) {
+public System resolveIncludes(System scripts) {
 	println("Unresolved includes: <size(gatherIncludesWithVarPaths(scripts))>");
 	println("Solving scalars");
 	scripts2 = evalAllScalars(scripts);

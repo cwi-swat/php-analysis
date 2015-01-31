@@ -81,14 +81,14 @@ public map[loc,Signature] getConstantSignatures(System sys) {
 	return ( l : getScriptConstants(l,sys[l]) | l <- sys );
 }
 
-public rel[SignatureItem, loc] getAllDefinedConstants(map[loc fileloc, Script scr] scripts) {
+public rel[SignatureItem, loc] getAllDefinedConstants(System scripts) {
 	ssigs = getSystemSignatures(scripts);
 	return { < si, l > | fileSignature(l,sis) <- ssigs<1>, 
 						 si <- sis, 
 						 constSig(cn,e) := si || classConstSig(cln,cn,e) := si };
 }
 
-public rel[SignatureItem,loc] getDefinitionsForItem(map[loc fileloc, Script scr] scripts, NamePath itemName) {
+public rel[SignatureItem,loc] getDefinitionsForItem(System scripts, NamePath itemName) {
 	ssigs = getSystemSignatures(scripts);
 	return { < si, l > | fileSignature(l,sis) <- ssigs<1>, 
 						 si <- sis,

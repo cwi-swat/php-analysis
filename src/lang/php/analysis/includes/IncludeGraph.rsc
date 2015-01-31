@@ -45,7 +45,7 @@ public set[loc] getEdgeTargets(IncludeGraph igraph, IncludeGraphEdge edge) {
 	throw("WARNING: getEdgeLocs missing case for <edge.target>"); 	
 }
  
-public IncludeGraph extractIncludeGraph(map[loc fileloc, Script scr] scripts, loc productRoot, set[LibItem] libraries) {
+public IncludeGraph extractIncludeGraph(System scripts, loc productRoot, set[LibItem] libraries) {
 	int sizeToRemove = size(productRoot.path);
 	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- scripts ) + (|file:///synthesizedLoc/<lib.path>| : libNode(lib.name,lib.path) | lib <- libraries);
 	set[IncludeGraphEdge] edgeSet = { };

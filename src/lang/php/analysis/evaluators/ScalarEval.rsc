@@ -15,6 +15,7 @@ import lang::php::analysis::evaluators::SimulateCalls;
 import lang::php::analysis::evaluators::DefinedConstants;
 import lang::php::analysis::includes::IncludeGraph;
 import lang::php::analysis::signatures::Signatures;
+import lang::php::util::System;
 import Set;
 import List;
 import String;

@@ -33,21 +33,24 @@ public Script oldNamespaces(Script s) {
 	return s;
 }
 
-public Stmt createIf(elseIf(Expr cond, list[Stmt] body), OptionElse oe) {
-	return \if(cond, body, [], oe);
+public Stmt createIf(ElseIf e:elseIf(Expr cond, list[Stmt] body), OptionElse oe) {
+	return \if(cond, body, [], oe)[@at=e@at];
 }
 
 public Script normalizeIf(Script s) {
+	// NOTE: We copy the locations over. This isn't completely valid, since we are
+	// then using locations for items that don't actually appear anywhere in the
+	// source, but this at least helps to tie these back to the original code.
 	solve(s) {
 		s = bottom-up visit(s) {
-			case \if(cond,body,elseifs,els) : {
+			case i:\if(cond,body,elseifs,els) : {
 				if (size(elseifs) > 0) {
 					workingElse = els;
 					for (e <- reverse(elseifs)) {
 						newIf = createIf(e, workingElse);
-						workingElse = someElse(\else([newIf]));
+						workingElse = someElse(\else([newIf])[@at=newIf@at])[@at=newIf@at];
 					}
-					insert(\if(cond,body,[],workingElse));
+					insert(\if(cond,body,[],workingElse)[@at=i@at]);
 				}
 			}
 		}

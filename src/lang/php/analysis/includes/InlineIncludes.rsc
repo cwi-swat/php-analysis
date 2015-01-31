@@ -7,6 +7,15 @@ import Node;
 import IO;
 import List;
 
+// Add this as an additional statement constructor, which gets slotted
+// in when we remove statements (such as declarations for classes, which
+// are hoisted to the top level)
+//
+// TODO: Remove this; we should write this at the level of the IR we
+// are developing...
+data Stmt = removedStmt();
+data Expr = scriptFragment(list[Stmt] body);
+
 public Script inlineScript(Script s, System sys, loc baseLoc) {
 	list[Stmt] functionDefs = [ ];
 	list[Stmt] classDefs = [ ];

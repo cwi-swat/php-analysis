@@ -46,3 +46,9 @@ data Type
 //	| use(list[Use] uses)
 //	| \while(Expr cond, list[Stmt] body)	
 //	;
+
+public void inferTypes(Script scr) {
+	// Step 1: find all instances of "new" or of literals, these give us
+	// the base types we need to use
+	
+}

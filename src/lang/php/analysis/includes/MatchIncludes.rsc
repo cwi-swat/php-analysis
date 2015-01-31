@@ -29,7 +29,7 @@ data FNBits = lit(str s) | fnBit();
 
 // This function just calls the next function on each script in the map. The bulk of
 // what happens is done in the function below.
-public map[loc fileloc, Script scr] matchIncludes(System sys, loc baseLoc) {
+public System matchIncludes(System sys, loc baseLoc) {
 	println("MATCHING INCLUDE FILE PATTERNS");
 	sys = ( l : matchIncludes(sys<0>,sys[l],baseLoc,[]) | l <- sys );
 	println("MATCHING INCLUDE FILE PATTERNS FINISHED");
@@ -88,6 +88,10 @@ private str fnMatch(Expr e) {
 		else
 			toMatch = toMatch + "\\S*";
 	return intercalate("",toMatch);
+}
+
+public str showGeneratedRegex(str s) {
+	return fnMatch(parsePHPExpression(s));
 }
 
 // TODO: Add support for library includes. This is only an issue were we
