@@ -55,4 +55,5 @@ Export-Package: lang,
  lang.php.systems,
  lang.php.transform,
  lang.php.types,
- lang.php.util
+ lang.php.util,
+ org.rascal.phpanalysis
