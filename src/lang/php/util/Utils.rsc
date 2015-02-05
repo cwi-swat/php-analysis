@@ -52,14 +52,18 @@ private Script parsePHPfile(loc f, list[str] opts, Script error) {
 	str phpOut;
 	try {
 		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", (parserLoc + astToRascal).path, "-f<f.path>"] + opts, rgenCwd);
-	}
-	catch RuntimeException:
+	} catch RuntimeException: {
 		return error;
+	}
 
-	if (trim(phpOut) == "")
-		res = errscript("Parser failed in unknown way");
-	else 
-		res = readTextValueString(#Script, phpOut);
+	res = errscript("Parser failed in unknown way");
+	if (trim(phpOut) != "") {
+		try { 
+			res = readTextValueString(#Script, phpOut);
+		} catch e : {
+			res = errscript("Parser failed: <e>");
+		}			
+	}
 
 	return res;
 }
@@ -80,7 +84,7 @@ public Stmt parsePHPStatement(str s) {
 	tempFile = parserLoc + "tmp/parseStmt.php";
 	writeFile(tempFile, "\<?php\n<s>?\>");
 	Script res = parsePHPfile(tempFile, [], errscript("Could not parse <s>"));
-	if (errscript(_) := res) throw "Found error in PHP code to parse";
+	if (errscript(re) := res) throw "Found error in PHP code to parse: <re>";
 	if (script(sl) := res && size(sl) == 1) return head(sl);
 	if (script(sl) := res) return block(sl);
 	throw "Could not parse statement <s>";
@@ -338,5 +342,60 @@ public void logMessage(str message, int level) {
 	if (level <= logLevel) {
 		str date = printDate(now(), "Y-MM-dd HH:mm:ss");
 		println("<date> :: <message>");
+	}
+}
+
+public void checkConfiguration() {
+	bool checkParse = true;
+	
+	println("Checking the configuration to ensure it is set correctly...");
+	println("");
+	println("parserLoc should be set to the directory containing the PHP-Parser project");
+	
+	if (!exists(parserLoc)) {
+		println("Path <parserLoc> does not exist");
+		checkParse = false;
+	} else if (exists(parserLoc) && !isDirectory(parserLoc)) {
+		println("Path <parserLoc> exists, but is not a directory");
+		checkParse = false;
+	} else {
+		println("parserLoc appears to be fine");
+	}
+	
+	println("astToRascal should be the location of file AST2Rascal inside PHP-Parser");
+	
+	if (!exists(parserLoc + astToRascal)) {
+		println("Path <parserLoc+astToRascal> is not valid, file not found");
+		checkParse = false;
+	} else if (exists(parserLoc + astToRascal) && !(isFile(parserLoc + astToRascal))) {
+		println("Path <parserLoc+astToRascal> is not a file");
+		checkParse = false;
+	} else {
+		println("astToRascal appears to be fine");
+	}
+	
+	println("phploc should contain the location of the php executable");
+
+	if (!exists(phploc)) {
+		println("Path <phploc> does not exist");
+		checkParse = false;
+	} else if (exists(phploc) && !isFile(phploc)) {
+		println("Path <phploc> exists, but is not a file");
+		checkParse = false;
+	} else {
+		println("phploc appears to be fine");
+	}
+	
+	if (checkParse) {
+		try {
+			e = parsePHPExpression("1+2");
+			if (binaryOperation(scalar(integer(1)),scalar(integer(2)),plus()) := e) {
+				println("Test parse of 1+2 succeeded");
+			} else {
+				println("Test parse of 1+2 failed, got the following instead: <e>");
+			}
+		} catch re : {
+			println("Test parse of 1+2 triggered the following exception: <re>");
+		}
 	}
 }
