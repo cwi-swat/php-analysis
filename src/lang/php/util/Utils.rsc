@@ -82,6 +82,9 @@ public bool testPHPInstallation() {
 @doc{Parse an individual PHP statement using the external parser, returning the associated AST.}
 public Stmt parsePHPStatement(str s) {
 	tempFile = parserLoc + "tmp/parseStmt.php";
+	if (!exists(tempFile.parent)) {
+		mkDirectory(tempFile.parent);
+	}
 	writeFile(tempFile, "\<?php\n<s>?\>");
 	Script res = parsePHPfile(tempFile, [], errscript("Could not parse <s>"));
 	if (errscript(re) := res) throw "Found error in PHP code to parse: <re>";
