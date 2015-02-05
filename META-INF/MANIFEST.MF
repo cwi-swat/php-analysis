@@ -10,8 +10,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.eclipse.imp.pdb.facts,
  org.eclipse.imp.pdb.facts.type,
  org.rascalmpl.interpreter.utils
-Export-Package: lang,
- lang.php,
+Export-Package: 
  lang.php.abstractions.templates,
  lang.php.analysis,
  lang.php.analysis.alias,
@@ -35,7 +34,6 @@ Export-Package: lang,
  lang.php.experiments.issta2013,
  lang.php.experiments.wasdett2013,
  lang.php.experiments.wcre2014,
- lang.php.extract,
  lang.php.extract.csvs,
  lang.php.pp,
  lang.php.resolve,
