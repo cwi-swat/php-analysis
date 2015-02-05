@@ -1,33 +1,50 @@
 module lang::php::util::Config
 
-import IO;
-
+@doc{Indicates whether to use the parser contained in a distributed jar file or from the directory given below}
 public bool usePhpParserJar = false;
 
-public loc phploc = |file:///usr/bin/php|;
+@doc{The location of the PHP executable}
+public loc phploc = |file:///usr/local/php5/bin/php|;
 
-public loc parserLoc = |file:///Users/mhills/Projects/phpsa|;
-public loc analysisLoc = |file:///...../php-analysis/|; // physical location of this project
+@doc{The base install location for the PHP-Parser project}
+public loc parserLoc = |file:///Users/yourid/PHPAnalysis/PHP-Parser|;
+
+@doc{The base install location for the php-analysis project}
+public loc analysisLoc = |file:///Users/yourid/PHPAnalysis/php-analysis/|;
 	
+@doc{The memory limit for PHP when the parser is run}
 public str parserMemLimit = "1024M";
-public str astToRascal = "PHP-Parser/lib/Rascal/AST2Rascal.php";
-public loc rgenLoc = parserLoc + astToRascal;
-public loc rgenCwd = parserLoc + "PHP-Parser/lib/Rascal";
 
+@doc{The location of the AST2Rascal.php file, inside the PHP-Parser directories}
+public str astToRascal = "lib/Rascal/AST2Rascal.php";
+
+@doc{The working directory for when the parser runs}
+public loc parserWorkingDir = (parserLoc + astToRascal).parent;
+
+@doc{The base location for the corpus and any serialized files}
 public loc baseLoc = |home:///PHPAnalysis|;
+
+@doc{Where to put the binary representations of parsed systems}
 public loc parsedDir = baseLoc + "serialized/parsed";
+
+@doc{Where to put the binary representations of extracted statistics}
 public loc statsDir = baseLoc + "serialized/stats";
+
+@doc{Where the PHP sources for the corpus reside}
 public loc corpusRoot = baseLoc + "systems";
+
+@doc{Where to put extracted counts (e.g., SLOC)}
 public loc countsDir = baseLoc + "serialized/counts";
 
+@doc{This should only ever be true if we don't have source, we only have the extracted binaries for parsed systems}
 public bool useBinaries = false;
 
-// parse options
+@doc{Parser options, setting these to true can result in additional annotations on ASTs}
 public bool includePhpDocs = false;
 public bool includeLocationInfo = false;
 public bool resolveNamespaces = false;
 
-// debug options
+@doc{Debugging options}
 @logLevel {
 	Log level 0 => no logging;
 	Log level 1 => main logging;
