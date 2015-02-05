@@ -125,44 +125,95 @@ you put the repository in this location, you will get an error,
 since Eclipse will try to create a directory for the project with
 the same name as the directory you gave for the repository.
 
-Making Configuration Changes
-----------------------------
+Setting Configuration Options
+-----------------------------
 
 Once the PHP Analysis project is imported, the paths to several files
-need to be modified. This can be done in Rascal module lang::php::util::Config,
-found in the project under src/lang/php/util in file Config.rsc.
+need to be configured. This can be done in Rascal module lang::php::util::Config.
+You should create this by copying file `/src/lang/php/util/Config.rsc-dist` to
+`/src/lang/php/util/Config.rsc` and then making any needed changes.
 
 * phploc points to the location of the php binary
 * parserLoc points to the location of the PHP-Parser project
-* rgenLoc and rgenCwd then indicate the actual file and working directory used
-  to perform parsing
+* analysisLoc points to the location of the php-analysis project
+* astToRascal points to the location of file AST2Rascal.php inside PHP-Parser
+* parserWorkingDir points to the location of the working directory for when the parser runs
 * baseLoc provides the base location for a number of files created as part of
   the parsing and extraction process, including the directory where parsed
-  files are stored and the root of the corpus
+  files are stored and the root of the corpus; the remaining directories are
+  subdirectories of this
+* logLevel indicates how much debugging information will be seen, and can be set to
+  0 to turn output of this information off
 
 Given the working directory mentioned above, the configuration file
-would contain the following lines. Obviously, `/Users/mhills` should
+would contain the following lines. Obviously, `/Users/hillsma` should
 be substituted for the location of your home directory, or whichever
 other directory `PHPAnalysis` has been installed in:
     
     module lang::php::util::Config
-    
-    public loc phploc = |file:///usr/bin/php|;
-    
-    public loc parserLoc = |file:///Users/mhills/PHPAnalysis|;
-    public loc rgenLoc = parserLoc + "PHP-Parser/lib/Rascal/AST2Rascal.php";
-    public loc rgenCwd = parserLoc + "PHP-Parser/lib/Rascal";
-    
-    public loc baseLoc = |file:///Users/mhills/PHPAnalysis|;
-    public loc parsedDir = baseLoc + "parsed";
-    public loc statsDir = baseLoc + "stats";
-    public loc corpusRoot = baseLoc + "corpus-icse13";
-    public loc countsDir = baseLoc + "counts";
-    
+
+    @doc{Indicates whether to use the parser contained in a distributed jar file or from the directory given below}
+    public bool usePhpParserJar = false;
+
+    @doc{The location of the PHP executable}
+    public loc phploc = |file:///usr/local/php5/bin/php|;
+
+    @doc{The base install location for the PHP-Parser project}
+    public loc parserLoc = |file:///Users/hillsma/Projects/phpsa/PHP-Parser|;
+
+    @doc{The base install location for the php-analysis project}
+    public loc analysisLoc = |file:///Users/hillsma/Projects/phpsa/rascal/php-analysis/|;
+
+    @doc{The memory limit for PHP when the parser is run}
+    public str parserMemLimit = "1024M";
+
+    @doc{The location of the AST2Rascal.php file, inside the PHP-Parser directories}
+    public str astToRascal = "lib/Rascal/AST2Rascal.php";
+
+    @doc{The working directory for when the parser runs}
+    public loc parserWorkingDir = (parserLoc + astToRascal).parent;
+
+    @doc{The base location for the corpus and any serialized files}
+    public loc baseLoc = |home:///PHPAnalysis|;
+
+    @doc{Where to put the binary representations of parsed systems}
+    public loc parsedDir = baseLoc + "serialized/parsed";
+
+    @doc{Where to put the binary representations of extracted statistics}
+    public loc statsDir = baseLoc + "serialized/stats";
+
+    @doc{Where the PHP sources for the corpus reside}
+    public loc corpusRoot = baseLoc + "systems";
+
+    @doc{Where to put extracted counts (e.g., SLOC)}
+    public loc countsDir = baseLoc + "serialized/counts";
+
+    @doc{This should only ever be true if we don't have source, we only have the extracted binaries for parsed systems}
     public bool useBinaries = false;
-    
+
+    @doc{Parser options, setting these to true can result in additional annotations on ASTs}
+    public bool includePhpDocs = false;
+    public bool includeLocationInfo = false;
+    public bool resolveNamespaces = false;
+
+    @doc{Debugging options}
+    @logLevel {
+        Log level 0 => no logging;
+        Log level 1 => main logging;
+        Log level 2 => debug logging;
+    }
+    public int logLevel = 2;
+  
 Make sure that `useBinaries` is false; this should only be true in cases where you
 have the binaries built and no longer have the source.
+
+To check to ensure that the directories are properly set up, you can run the following:
+
+    import lang::php::util::Utils;
+    checkConfiguration();
+
+This will run several checks to make sure the directories can be found and that the parser
+can parse a simple PHP expression. 
 
 Building Binaries for Each Corpus Item
 --------------------------------------
