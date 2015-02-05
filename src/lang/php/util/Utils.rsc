@@ -51,7 +51,7 @@ private Script parsePHPfile(loc f, list[str] opts, Script error) {
 
 	str phpOut;
 	try {
-		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", (parserLoc + astToRascal).path, "-f<f.path>"] + opts, parserLoc + libRascal);
+		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", (parserLoc + astToRascal).path, "-f<f.path>"] + opts, rgenCwd);
 	}
 	catch RuntimeException:
 		return error;
@@ -77,7 +77,7 @@ public bool testPHPInstallation() {
 
 @doc{Parse an individual PHP statement using the external parser, returning the associated AST.}
 public Stmt parsePHPStatement(str s) {
-	tempFile = |file:///tmp/parseStmt.php|;
+	tempFile = parserLoc + "tmp/parseStmt.php";
 	writeFile(tempFile, "\<?php\n<s>?\>");
 	Script res = parsePHPfile(tempFile, [], errscript("Could not parse <s>"));
 	if (errscript(_) := res) throw "Found error in PHP code to parse";
@@ -181,6 +181,9 @@ public void buildBinaries(str product, str version, loc l, bool addLocationAnnot
 	
 	loc binLoc = parsedDir + "<product>-<version>.pt";
 	logMessage("Now writing file: <binLoc>...", 2);
+	if (!exists(parsedDir)) {
+		mkDirectory(parsedDir);
+	}
 	writeBinaryValueFile(binLoc, files, compression=false);
 	logMessage("... done.", 2);
 }
