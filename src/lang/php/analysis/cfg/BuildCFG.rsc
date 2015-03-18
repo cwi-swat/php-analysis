@@ -238,7 +238,7 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Cla
 	// Wire up the entry, exit, default init, and body nodes.
 	if (size(paramNodes) > 0) {
 		if (head(paramNodes) is actualNotProvided) {
-			edges += { flowEdge(cfgEntryNode@lab, i, lstate) | i <- init(head(paramNodes).expr) };
+			edges += { flowEdge(cfgEntryNode@lab, i) | i <- init(head(paramNodes).expr, lstate) };
 		} else {
 			edges += flowEdge(cfgEntryNode@lab, head(paramNodes)@lab);
 		}
