@@ -77,7 +77,7 @@ public str printCFGNode(actualNotProvided(str paramName, Expr expr, bool refAssi
 @doc{Convert the CFG into a Rascal Graph, based on flow edge information}
 public Graph[CFGNode] cfgAsGraph(CFG cfg) {
 	nodeMap = ( n@lab : n | n <- cfg.nodes );
-	return { < nodeMap[e.from], nodeMap[e.to] > | e <- cfg.edges };
+	return { < nodeMap[e.from], nodeMap[e.to] > | e <- cfg.edges, e.from in nodeMap, e.to in nodeMap };
 }
 
 @doc{Given a node, determine if it is an entry node.}
