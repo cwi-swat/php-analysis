@@ -1964,10 +1964,11 @@ public CFG collapseExpressions(CFG g) {
 	// Get the top nodes -- e.g., for (a+b)*c, we would actually have nodes for a, b, a+b, c, and
 	// (a+b)*c, and we only want to keep the last one of these.	
 	topNodes = { *getTopNodes(reverse(collapseNodes[e])) | e <- collapseNodes };
-	
+	topNodeLabels = { e@lab | e <- topNodes, (e@lab)? };
+		
 	// For each of these nodes, we remove any child nodes from the graph and move any edges that
 	// point to children of this node to instead point to the top node.
-	redirectMap = ( n@lab : tn@lab | tn <- topNodes, /Expr n := tn, (n@lab)?, n@lab != tn@lab );
+	redirectMap = ( n@lab : tn@lab | tn <- topNodes, /Expr n := tn, (n@lab)?, n@lab != tn@lab, n@lab notin topNodeLabels );
 	newNodes = { n | n <- g.nodes, n@lab notin redirectMap };
 	newEdges = { e | e <- g.edges, e.from notin redirectMap, e.to notin redirectMap } +
 			   { e[to=redirectMap[e.to]] | e <- g.edges, e.from notin redirectMap, e.to in redirectMap };
