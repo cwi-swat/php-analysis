@@ -89,7 +89,7 @@ data Instruction
 
 	//= array(list[ArrayElement] items)
 	//| fetchArrayDim(Expr var, OptionExpr dim)
-	//| fetchClassConst(NameOrExpr className, Name constName)
+	//| fetchClassConst(NameOrExpr className, str constName)
 	//| assign(Expr assignTo, Expr assignExpr)
 	//| assignWOp(Expr assignTo, Expr assignExpr, Op operation)
 	//| listAssign(list[OptionExpr] assignsTo, Expr assignExpr)

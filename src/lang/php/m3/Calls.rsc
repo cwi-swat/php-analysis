@@ -31,7 +31,7 @@ public M3 gatherFieldAccesses(M3 m3, ast)
 {
 	visit(ast)
 	{*/
-		case f:fetchClassConst(name(classNameNode), name(c)):
+		case f:fetchClassConst(name(classNameNode), str c):
 			m3@accesses += { <f@scope, appendName(c, "classConst", cn)> | cn <- m3@uses[classNameNode@at] };
 			
 		case p:propertyFetch(_, name(name(q))):

@@ -74,8 +74,8 @@ public str pp(Expr::array(list[ArrayElement] items)) = "array(<intercalate(",",[
 public str pp(fetchArrayDim(Expr var, someExpr(Expr dim))) = "<pp(var)>[<pp(dim)>]";
 public str pp(fetchArrayDim(Expr var, noExpr())) = "<pp(var)>[]";
 
-//	| fetchClassConst(NameOrExpr className, Name constName)
-public str pp(fetchClassConst(NameOrExpr className, Name constName)) = "<pp(className)>::<pp(constName)>";
+//	| fetchClassConst(NameOrExpr className, str constName)
+public str pp(fetchClassConst(NameOrExpr className, str constName)) = "<pp(className)>::<pp(constName)>";
 
 //	| assign(Expr assignTo, Expr assignExpr)
 public str pp(assign(Expr assignTo, Expr assignExpr)) = "<pp(assignTo)> = <pp(assignExpr)>";

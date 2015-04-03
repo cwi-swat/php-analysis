@@ -50,7 +50,7 @@ private Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 		case fc:fetchConst(name(cn)) => (iinfo.constMap[cn])[@at=fc@at]
 			when cn in iinfo.constMap
 			
-		case fcc:fetchClassConst(name(name(cln)),name(cn)) => (iinfo.classConstMap[cln][cn])[@at=fcc@at]
+		case fcc:fetchClassConst(name(name(cln)),str cn) => (iinfo.classConstMap[cln][cn])[@at=fcc@at]
 			when cln in iinfo.classConstMap && cn in iinfo.classConstMap[cln]
 	}
 }
@@ -163,7 +163,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	Expr resolveConstExpr(Expr resolveExpr, loc constLoc) {
 		// Get the constants used inside resolveExpr
 		usedConstants = { normalConst(cn) | /fetchConst(name(cn)) := resolveExpr } +
-						{ classConst(cln,cn) | /fetchClassConst(name(name(cln)),name(cn)) := resolveExpr };
+						{ classConst(cln,cn) | /fetchClassConst(name(name(cln)),str cn) := resolveExpr };
 
 		// Find any of these that are uniquely defined (e.g., defined once or always defined as the
 		// same literal expression)
@@ -203,7 +203,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 		resolvedExpr = bottom-up visit(resolveExpr) {
 			case fetchConst(name(cn)) => solvedConstants[normalConst(cn)] when normalConst(cn) in solvedConstants
 			
-			case fetchClassConst(name(name(cln)),name(cn)) => solvedConstants[classConst(cln,cn)] when classConst(cln,cn) in solvedConstants
+			case fetchClassConst(name(name(cln)),str cn) => solvedConstants[classConst(cln,cn)] when classConst(cln,cn) in solvedConstants
 		}
 		
 		// Finally, perform our standard simplifications on the expression, performing

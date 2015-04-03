@@ -38,7 +38,7 @@ public data IncludeType = include() | includeOnce() | require() | requireOnce();
 public data Expr 
 	= array(list[ArrayElement] items)
 	| fetchArrayDim(Expr var, OptionExpr dim)
-	| fetchClassConst(NameOrExpr className, Name constantName)
+	| fetchClassConst(NameOrExpr className, str constantName)
 	| assign(Expr assignTo, Expr assignExpr)
 	| assignWOp(Expr assignTo, Expr assignExpr, Op operation)
 	| listAssign(list[OptionExpr] assignsTo, Expr assignExpr)

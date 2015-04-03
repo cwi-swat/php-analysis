@@ -202,7 +202,7 @@ public M3 calculateUsesAfterTypes(M3 m3, Script script)
         case c:fetchClassConst(className, constName):	
 		{
 			m3 = addUseClass(m3, className);		
-			m3 = addUseClassItem(m3, className, constName, c@at, "classConstant");		
+			m3 = addUseClassItem(m3, className, name(constName), c@at, "classConstant");		
 		}
         
          // static references

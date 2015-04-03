@@ -765,7 +765,7 @@ private void addConstraints(Expr e, M3 m3)
 			// todo: params
 		}
 	
-	//| fetchClassConst(NameOrExpr className, Name constantName)
+	//| fetchClassConst(NameOrExpr className, str constantName)
 	
 	//| propertyFetch(Expr target, NameOrExpr propertyName)
 	//| staticPropertyFetch(NameOrExpr className, NameOrExpr propertyName)

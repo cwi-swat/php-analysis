@@ -1594,7 +1594,7 @@ private tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges += makeEdges(final(var, lstate), finalLabels);
 		}
 		
-		case fetchClassConst(expr(Expr className), name(str constName)) : {
+		case fetchClassConst(expr(Expr className), str constName) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
 			edges += makeEdges(final(className, lstate), finalLabels);
 		}

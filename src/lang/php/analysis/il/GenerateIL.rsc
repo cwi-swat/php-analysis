@@ -44,8 +44,8 @@ public GenResult generateIL(GenState gs, array(list[ArrayElement] items)) {
 public GenResult generateIL(GenState gs, fetchArrayDim(Expr var, OptionExpr dim)) {
 
 }
-//	| fetchClassConst(NameOrExpr className, Name constName)
-public GenResult generateIL(GenState gs, fetchClassConst(NameOrExpr className, name(str constName))) {
+//	| fetchClassConst(NameOrExpr className, str constName)
+public GenResult generateIL(GenState gs, fetchClassConst(NameOrExpr className, str constName)) {
 
 }
 //	| assign(Expr assignTo, Expr assignExpr)
