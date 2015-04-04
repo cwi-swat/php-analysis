@@ -182,34 +182,38 @@ public System loadProduct(str product, str version, bool addLocationAnnotations 
 }
 
 @doc{Build the serialized ASTs for a specific system at a specific location}
-public void buildBinaries(str product, str version, loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) {
-	logMessage("Parsing <product>-<version>. \>\> Location: <l>.", 1);
-	files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
-	
+public void buildBinaries(str product, str version, loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
 	loc binLoc = parsedDir + "<product>-<version>.pt";
-	logMessage("Now writing file: <binLoc>...", 2);
-	if (!exists(parsedDir)) {
-		mkDirectory(parsedDir);
+	if (!overwrite || !exists(binLoc)) {
+		logMessage("Parsing <product>-<version>. \>\> Location: <l>.", 1);
+		files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+		
+		logMessage("Now writing file: <binLoc>...", 2);
+		if (!exists(parsedDir)) {
+			mkDirectory(parsedDir);
+		}
+		writeBinaryValueFile(binLoc, files, compression=false);
+		logMessage("... done.", 2);
+	} else {
+		logMessage("Parsed representation for <product>-<version> already exists, skipping...");
 	}
-	writeBinaryValueFile(binLoc, files, compression=false);
-	logMessage("... done.", 2);
 }
 
 @doc{Build the serialized ASTs for a specific system at the default location}
-public void buildBinaries(str product, str version, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) {
-	buildBinaries(product, version, getCorpusItem(product,version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+public void buildBinaries(str product, str version, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
+	buildBinaries(product, version, getCorpusItem(product,version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
 }
 
 @doc{Build the serialized ASTs for all versions of a specific product (e.g., WordPress)}
-public void buildBinaries(str product, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) {
+public void buildBinaries(str product, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
 	for (version <- getVersions(product))
-		buildBinaries(product, version, getCorpusItem(product, version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+		buildBinaries(product, version, getCorpusItem(product, version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
 }
 
 @doc{Build the serialized ASTs for all product/version combos in the corpus}
-public void buildBinaries(bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) {
+public void buildBinaries(bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
 	for (product <- getProducts(), version <- getVersions(product))
-		buildBinaries(product, version, getCorpusItem(product,version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+		buildBinaries(product, version, getCorpusItem(product,version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
 }
 
 @doc{Build the serialized ASTs for a specific system if they have not been built already}
@@ -310,7 +314,7 @@ public list[tuple[str p, str v, int count, int fileCount]] getSortedCounts() {
 public void writeSortedCounts() {
 	sc = getSortedCounts();
 	scLines = [ "Product,Version,LoC,Files" ] + [ "<i.p>,<i.v>,<i.count>,<i.fileCount>" | i <- sc ];
-	writeFile(|rascal://src/lang/php/extract/csvs/linesOfCode.csv|, intercalate("\n",scLines));
+	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|, intercalate("\n",scLines));
 }
 
 public map[tuple[str product, str version], map[loc l, Script scr]] getLatestTrees() {
@@ -343,8 +347,9 @@ public int countFolders(loc d) = (1 | it + countFolders(d+f) | str f <- listEntr
 }
 public void logMessage(str message, int level) {
 	if (level <= logLevel) {
-		str date = printDate(now(), "Y-MM-dd HH:mm:ss");
-		println("<date> :: <message>");
+		//str date = printDate(now(), "Y-MM-dd HH:mm:ss");
+		//println("<date> :: <message>");
+		println("<now()> :: <message>");
 	}
 }
 
