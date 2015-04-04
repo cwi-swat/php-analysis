@@ -21,78 +21,78 @@ public bool containsVV(Expr e) = size({ v | /v:var(expr(Expr ev)) := e }) > 0;
 public bool containsVV(someExpr(Expr e)) = size({ v | /v:var(expr(Expr ev)) := e }) > 0;
 public bool containsVV(noExpr()) = false;
 
-public list[tuple[loc fileloc, Expr call]] gatherExprStats(System scripts, list[Expr](Script) f) {
+public lrel[loc fileloc, Expr call] gatherExprStats(System scripts, list[Expr](Script) f) {
 	return [ < e@at, e > | l <- scripts<0>, e <- f(scripts[l]) ];
 }
 
 @doc{Gather information on uses of class constants where the class name is given using a variable-variable}
 public list[Expr] fetchClassConstUses(Script scr) = [ f | /f:fetchClassConst(_,_) := scr ];
 public list[Expr] fetchClassConstUsesVVTarget(Script scr) = [ f | f:fetchClassConst(expr(_),_) <- fetchClassConstUses(scr) ];
-public list[tuple[loc fileloc, Expr call]] gatherVVClassConsts(System scripts) = gatherExprStats(scripts, fetchClassConstUsesVVTarget);
+public lrel[loc fileloc, Expr call] gatherVVClassConsts(System scripts) = gatherExprStats(scripts, fetchClassConstUsesVVTarget);
 
 @doc{Gather information on assignments where the assignment target contains a variable-variable}
 public list[Expr] fetchAssignUses(Script scr) = [ a | /a:assign(_,_) := scr ];
 public list[Expr] fetchAssignUsesVVTarget(Script scr) = [ a | a:assign(Expr t,_) <- fetchAssignUses(scr), containsVV(t) ];
-public list[tuple[loc fileloc, Expr call]] gatherVVAssigns(System scripts) = gatherExprStats(scripts, fetchAssignUsesVVTarget);
+public lrel[loc fileloc, Expr call] gatherVVAssigns(System scripts) = gatherExprStats(scripts, fetchAssignUsesVVTarget);
 
 @doc{Gather information on assignment/op combos where the assignment target contains a variable-variable}
 public list[Expr] fetchAssignWOpUses(Script scr) = [ a | /a:assignWOp(_,_,_) := scr ];
 public list[Expr] fetchAssignWOpUsesVVTarget(Script scr) = [ a | a:assignWOp(Expr t,_,_) <- fetchAssignWOpUses(scr), containsVV(t) ];
-public list[tuple[loc fileloc, Expr call]] gatherVVAssignWOps(System scripts) = gatherExprStats(scripts, fetchAssignWOpUsesVVTarget);
+public lrel[loc fileloc, Expr call] gatherVVAssignWOps(System scripts) = gatherExprStats(scripts, fetchAssignWOpUsesVVTarget);
 
 @doc{Gather information on list assignments where the assignment target contains a variable-variable}
 public list[Expr] fetchListAssignUses(Script scr) = [ a | /a:listAssign(_,_) := scr ];
 public list[Expr] fetchListAssignUsesVVTarget(Script scr) = [ a | a:listAssign(ll,_) <- fetchListAssignUses(scr), true in { containsVV(t) | t <- ll } ];
-public list[tuple[loc fileloc, Expr call]] gatherVVListAssigns(System scripts) = gatherExprStats(scripts, fetchListAssignUsesVVTarget);
+public lrel[loc fileloc, Expr call] gatherVVListAssigns(System scripts) = gatherExprStats(scripts, fetchListAssignUsesVVTarget);
 
 @doc{Gather information on reference assignments where the assignment target contains a variable-variable}
 public list[Expr] fetchRefAssignUses(Script scr) = [ a | /a:refAssign(_,_) := scr ];
 public list[Expr] fetchRefAssignUsesVVTarget(Script scr) = [ a | a:refAssign(Expr t,_) <- fetchRefAssignUses(scr), containsVV(t) ];
-public list[tuple[loc fileloc, Expr call]] gatherVVRefAssigns(System scripts) = gatherExprStats(scripts, fetchRefAssignUsesVVTarget);
+public lrel[loc fileloc, Expr call] gatherVVRefAssigns(System scripts) = gatherExprStats(scripts, fetchRefAssignUsesVVTarget);
  
 @doc{Gather information on object creations with variable class names}
 public list[Expr] fetchNewUses(Script scr) = [ f | /f:new(_,_) := scr ];
 public list[Expr] fetchNewUsesVVClass(Script scr) = [ f | f:new(expr(_),_) <- fetchNewUses(scr) ];
-public list[tuple[loc fileloc, Expr call]] gatherVVNews(System scripts) = gatherExprStats(scripts, fetchNewUsesVVClass);
+public lrel[loc fileloc, Expr call] gatherVVNews(System scripts) = gatherExprStats(scripts, fetchNewUsesVVClass);
 
 @doc{Gather information on calls where the function to call is given through a variable-variable}
 public list[Expr] fetchCallUses(Script scr) = [ c | /c:call(_,_) := scr ];
 public list[Expr] fetchCallUsesVVName(Script scr) = [ c | c:call(expr(_),_) <- fetchCallUses(scr) ];
-public list[tuple[loc fileloc, Expr call]] gatherVVCalls(System scripts) = gatherExprStats(scripts, fetchCallUsesVVName);
+public lrel[loc fileloc, Expr call] gatherVVCalls(System scripts) = gatherExprStats(scripts, fetchCallUsesVVName);
 
 @doc{Gather information on method calls where the method to call is given through a variable-variable}
 public list[Expr] fetchMethodCallUses(Script scr) = [ m | /m:methodCall(_,_,_) := scr ];
 public list[Expr] fetchMethodCallUsesVVTarget(Script scr) = [ m | m:methodCall(_,expr(_),_) <- fetchMethodCallUses(scr) ];
-public list[tuple[loc fileloc, Expr call]] gatherMethodVVCalls(System scripts) = gatherExprStats(scripts, fetchMethodCallUsesVVTarget);
+public lrel[loc fileloc, Expr call] gatherMethodVVCalls(System scripts) = gatherExprStats(scripts, fetchMethodCallUsesVVTarget);
 
 @doc{Gather information on static calls where the static class and/or the static method is given as a variable-variable}
 public list[Expr] fetchStaticCallUses(Script scr) = [ m | /m:staticCall(_,_,_) := scr ];
 public list[Expr] fetchStaticCallUsesVVMethod(Script scr) = [ m | m:staticCall(_,expr(_),_) <- fetchStaticCallUses(scr) ];
 public list[Expr] fetchStaticCallUsesVVTarget(Script scr) = [ m | m:staticCall(expr(_),_,_) <- fetchStaticCallUses(scr) ];
-public list[tuple[loc fileloc, Expr call]] gatherStaticVVCalls(System scripts) = gatherExprStats(scripts, fetchStaticCallUsesVVMethod);
-public list[tuple[loc fileloc, Expr call]] gatherStaticVVTargets(System scripts) = gatherExprStats(scripts, fetchStaticCallUsesVVTarget);
+public lrel[loc fileloc, Expr call] gatherStaticVVCalls(System scripts) = gatherExprStats(scripts, fetchStaticCallUsesVVMethod);
+public lrel[loc fileloc, Expr call] gatherStaticVVTargets(System scripts) = gatherExprStats(scripts, fetchStaticCallUsesVVTarget);
 
 @doc{Gather information on includes with paths based on expressions}
 public list[Expr] fetchIncludeUses(Script scr) = [ i | /i:include(_,_) := scr ];
 public list[Expr] fetchIncludeUsesVarPaths(Script scr) = [ i | i:include(Expr e,_) <- fetchIncludeUses(scr), scalar(string(_)) !:= e ];
-public list[tuple[loc fileloc, Expr call]] gatherIncludesWithVarPaths(System scripts) = gatherExprStats(scripts, fetchIncludeUsesVarPaths);
+public lrel[loc fileloc, Expr call] gatherIncludesWithVarPaths(System scripts) = gatherExprStats(scripts, fetchIncludeUsesVarPaths);
 
 @doc{Gather information on property fetch expressions with the property name given as a variable-variable}
 public list[Expr] fetchPropertyFetchUses(Script scr) = [ f | /f:propertyFetch(_,_) := scr ];
 public list[Expr] fetchPropertyFetchVVNames(Script scr) = [ f | f:propertyFetch(_,expr(_)) <- fetchPropertyFetchUses(scr) ];
-public list[tuple[loc fileloc, Expr call]] gatherPropertyFetchesWithVarNames(System scripts) = gatherExprStats(scripts, fetchPropertyFetchVVNames);
+public lrel[loc fileloc, Expr call] gatherPropertyFetchesWithVarNames(System scripts) = gatherExprStats(scripts, fetchPropertyFetchVVNames);
 
 @doc{Gather information on static property fetches where the static class and/or the static property name is given as a variable-variable}
 public list[Expr] staticPropertyFetchUses(Script scr) = [ m | /m:staticPropertyFetch(_,_) := scr ];
 public list[Expr] staticPropertyFetchVVName(Script scr) = [ m | m:staticPropertyFetch(_,expr(_)) <- staticPropertyFetchUses(scr) ];
 public list[Expr] staticPropertyFetchVVTarget(Script scr) = [ m | m:staticPropertyFetch(expr(_),_) <- staticPropertyFetchUses(scr) ];
-public list[tuple[loc fileloc, Expr call]] gatherStaticPropertyVVNames(System scripts) = gatherExprStats(scripts, staticPropertyFetchVVName);
-public list[tuple[loc fileloc, Expr call]] gatherStaticPropertyVVTargets(System scripts) = gatherExprStats(scripts, staticPropertyFetchVVTarget);
+public lrel[loc fileloc, Expr call] gatherStaticPropertyVVNames(System scripts) = gatherExprStats(scripts, staticPropertyFetchVVName);
+public lrel[loc fileloc, Expr call] gatherStaticPropertyVVTargets(System scripts) = gatherExprStats(scripts, staticPropertyFetchVVTarget);
 
 @doc{Gather variable-variable uses}
 public list[Expr] fetchVarUses(Script scr) = [ v | /v:var(_) := scr ];
 public list[Expr] fetchVarUsesVV(Script scr) = [ v | v:var(expr(_)) <- fetchVarUses(scr) ];
-public list[tuple[loc fileloc, Expr call]] gatherVarVarUses(System scripts) = gatherExprStats(scripts, fetchVarUsesVV);
+public lrel[loc fileloc, Expr call] gatherVarVarUses(System scripts) = gatherExprStats(scripts, fetchVarUsesVV);
 
 @doc{Magic methods that implement overloads}
 public list[ClassItem] fetchOverloadedSet(System scripts) = [ x | l <- scripts<0>, /x:method("__set",_,_,_,_) := scripts[l] ];
@@ -104,7 +104,7 @@ public list[ClassItem] fetchOverloadedCallStatic(System scripts) = [ x | l <- sc
 
 @doc{Support for var-args functions}
 public list[Expr] fetchVACalls(Script scr) = [ v | /v:call(name(name(fn)),_) := scr, fn in {"func_get_args","func_get_arg","func_num_args"} ];
-public list[tuple[loc fileloc, Expr call]] getVACallUses(System scripts) = gatherExprStats(scripts, fetchVACalls);
+public lrel[loc fileloc, Expr call] getVACallUses(System scripts) = gatherExprStats(scripts, fetchVACalls);
 
 @doc{Break/continue with non-literal arguments}
 public list[Stmt] fetchVarBreak(System scripts) = [ x | l <- scripts<0>, /x:\break(someExpr(e)) := scripts[l], scalar(_) !:= e ];
@@ -112,7 +112,7 @@ public list[Stmt] fetchVarContinue(System scripts) = [ x | l <- scripts<0>, /x:\
 
 @doc{Uses of eval}
 public list[Expr] fetchEvalUses(Script scr) = [ e | /e:eval(_) := scr ];
-public list[tuple[loc fileloc, Expr call]] gatherEvals(System scripts) = gatherExprStats(scripts, fetchEvalUses);
+public lrel[loc fileloc, Expr call] gatherEvals(System scripts) = gatherExprStats(scripts, fetchEvalUses);
 
 public map[str,int] featureCounts(System scripts) {
 	map[str,int] counts = ( );
@@ -516,7 +516,7 @@ public rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Co
 }
 
 public rel[str Product,str Version,int Count,int FileCount] loadCountsCSV() {
-	rel[str Product,str Version,int Count,int FileCount] res = readCSV(#rel[str Product,str Version,int Count,int fileCount],|rascal://src/lang/php/extract/csvs/linesOfCode.csv|);
+	rel[str Product,str Version,int Count,int FileCount] res = readCSV(#rel[str Product,str Version,int Count,int fileCount],|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|);
 	return res;
 }
 
