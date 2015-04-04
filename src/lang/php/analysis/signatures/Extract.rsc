@@ -207,39 +207,43 @@ public set[Summary] extractFunctionSummary(str bookname, str functionName, loc f
 
 public set[Summary] extractConstantSummary(str bookname, loc constantLoc) {
 	println("Extracting constants for library <bookname> from path <constantLoc.path>");
-	node ctxt = readHTMLFile(constantLoc);
 	set[Summary] summaries = { };
 	set[str] alreadyFound = { };
-	
-	for (/str s(list[node] cl) := ctxt,
-		 s in {"td","span" }, 
-	     ["strong"(["code"(["text"(str cn)])]),"text"(str t1),node sn:"span"(list[node] sl),"text"(str t2)] := cl,
-	     contains(t1,"("), 
-	     contains(t2,")"), 
-	     "class" in getAnnotations(sn), 
-	     getAnnotations(sn)["class"] == "type", 
-	     ["a"(["text"(str tn)])] := sl ) {
-	 
-	 	summaries += constantSummary([library(bookname),const(cn)], tn);
-	 	alreadyFound += cn;   
-	}
 
-	for (/node n:"tr"(["td"(list[node] cl)]) := ctxt,
-	     "id" in getAnnotations(n), 
-	     str nId := getAnnotations(n)["id"],
-	     /constant\./ := nId, 
-	     ["strong"(["code"(["text"(str cn)])])] := cl,
-	     cn notin alreadyFound ) {
-	 
-	 	summaries += constantSummary([library(bookname),const(cn)], "");
-	 	alreadyFound += cn;    
-	}
-
-	if (size(summaries) == 0) {
-		println("WARNING: No summaries extracted for constants at path <constantLoc.path>");
-		summaries += emptySummary([library(bookname)], constantLoc);
-	}
+	try {
+		node ctxt = readHTMLFile(constantLoc);
+		
+		for (/str s(list[node] cl) := ctxt,
+			 s in {"td","span" }, 
+		     ["strong"(["code"(["text"(str cn)])]),"text"(str t1),node sn:"span"(list[node] sl),"text"(str t2)] := cl,
+		     contains(t1,"("), 
+		     contains(t2,")"), 
+		     "class" in getAnnotations(sn), 
+		     getAnnotations(sn)["class"] == "type", 
+		     ["a"(["text"(str tn)])] := sl ) {
+		 
+		 	summaries += constantSummary([library(bookname),const(cn)], tn);
+		 	alreadyFound += cn;   
+		}
 	
+		for (/node n:"tr"(["td"(list[node] cl)]) := ctxt,
+		     "id" in getAnnotations(n), 
+		     str nId := getAnnotations(n)["id"],
+		     /constant\./ := nId, 
+		     ["strong"(["code"(["text"(str cn)])])] := cl,
+		     cn notin alreadyFound ) {
+		 
+		 	summaries += constantSummary([library(bookname),const(cn)], "");
+		 	alreadyFound += cn;    
+		}
+	
+		if (size(summaries) == 0) {
+			println("WARNING: No summaries extracted for constants at path <constantLoc.path>");
+			summaries += emptySummary([library(bookname)], constantLoc);
+		}
+	} catch v : {
+		println("Warning, could not extract constrants from <bookname>: <v>");
+	}
 	return summaries;
 }
 
