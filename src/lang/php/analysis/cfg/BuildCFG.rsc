@@ -1176,7 +1176,7 @@ private tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			< edges, lstate > = addExpSeqEdges(edges, lstate, exprs);
 		}
 
-		case goto(name(str gotoLabel)) : {
+		case goto(str gotoLabel) : {
 			if (gotoLabel in lstate.gotoNodes)
 				edges += { jumpEdge(fl, lstate.gotoNodes[gotoLabel]) | fl <- finalLabels };
 			else
@@ -1376,7 +1376,7 @@ private tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				if (size(caseGuards) > 0) {
 					edges += { conditionFalseFlowEdge(el,bl,binaryOperation(cond,last(caseGuards),equal())) | el <- final(last(caseGuards), lstate), bl <- defaultLabels };
 				} else {
-					edges += { flowEdge(el,bl) | el <- final(cond), bl <- defaultLabels };
+					edges += { flowEdge(el,bl) | el <- final(cond, lstate), bl <- defaultLabels };
 				}
 			}
 						
