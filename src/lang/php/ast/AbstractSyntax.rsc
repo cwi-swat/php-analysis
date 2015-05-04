@@ -113,7 +113,7 @@ public data Stmt
 	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
 	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
 	| global(list[Expr] exprs)
-	| goto(Name gotoName)
+	| goto(str label)
 	| haltCompiler(str remainingText)
 	| \if(Expr cond, list[Stmt] body, list[ElseIf] elseIfs, OptionElse elseClause)
 	| inlineHTML(str htmlText)
@@ -128,7 +128,6 @@ public data Stmt
 	| \throw(Expr expr)
 	| tryCatch(list[Stmt] body, list[Catch] catches)
 	| tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
-
 	| unset(list[Expr] unsetVars)
 	| use(list[Use] uses)
 	| \while(Expr cond, list[Stmt] body)
@@ -138,7 +137,7 @@ public data Stmt
 
 public data Declaration = declaration(str key, Expr val);
 
-public data Catch = \catch(Name xtype, Expr varName, list[Stmt] body);
+public data Catch = \catch(Name xtype, str varName, list[Stmt] body);
 	
 public data Case = \case(OptionExpr cond, list[Stmt] body);
 
@@ -156,8 +155,8 @@ public data ClassItem
 	;
 
 public data Adaptation
-	= traitAlias(OptionName traitName, Name methName, set[Modifier] newModifiers, OptionName newName)
-	| traitPrecedence(OptionName traitName, Name methName, set[Name] insteadOf)
+	= traitAlias(OptionName traitName, str methName, set[Modifier] newModifiers, OptionName newName)
+	| traitPrecedence(OptionName traitName, str methName, set[Name] insteadOf)
 	;
 	
 public data Property = property(str propertyName, OptionExpr defaultValue);

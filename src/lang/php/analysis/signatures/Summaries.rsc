@@ -39,7 +39,7 @@ public anno loc Summary@from;
 data NamePart = libraryConstants();
 
 public set[Summary] loadFunctionSummaries() {
-	return readBinaryValueFile(#set[Summary], |rascal://src/lang/php/analysis/signatures/phpFunctions.bin|);
+	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpFunctions.bin|);
 }
 
 public void saveFunctionSummaries(set[Summary] summaries) {

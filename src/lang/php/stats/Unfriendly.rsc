@@ -150,6 +150,31 @@ public list[tuple[str p, str v, QueryResult qr]] getVVStaticPropTargetsAsList(Co
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVStaticPropTargets(p,corpus[p]) ];
 }
 
+data VVInfo = vvInfo(
+			lrel[str p, str v, QueryResult qr] vvuses, 
+			lrel[str p, str v, QueryResult qr] vvcalls,
+			lrel[str p, str v, QueryResult qr] vvmcalls,
+			lrel[str p, str v, QueryResult qr] vvnews,
+			lrel[str p, str v, QueryResult qr] vvprops,
+			lrel[str p, str v, QueryResult qr] vvcconsts,
+			lrel[str p, str v, QueryResult qr] vvscalls,
+			lrel[str p, str v, QueryResult qr] vvstargets,
+			lrel[str p, str v, QueryResult qr] vvsprops,
+			lrel[str p, str v, QueryResult qr] vvsptargets);
+
+public VVInfo toVVInfo(tuple[list[tuple[str p, str v, QueryResult qr]] vvuses, 
+			 list[tuple[str p, str v, QueryResult qr]] vvcalls,
+			 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
+			 list[tuple[str p, str v, QueryResult qr]] vvnews,
+			 list[tuple[str p, str v, QueryResult qr]] vvprops,
+			 list[tuple[str p, str v, QueryResult qr]] vvcconsts,
+			 list[tuple[str p, str v, QueryResult qr]] vvscalls,
+			 list[tuple[str p, str v, QueryResult qr]] vvstargets,
+			 list[tuple[str p, str v, QueryResult qr]] vvsprops,
+			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] input) {
+	return vvInfo(input.vvuses, input.vvcalls, input.vvmcalls, input.vvnews, input.vvprops, input.vvcconsts, input.vvscalls, input.vvstargets, input.vvsprops, input.vvsptargets);			 
+}
+			 
 public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses, 
 			 list[tuple[str p, str v, QueryResult qr]] vvcalls,
 			 list[tuple[str p, str v, QueryResult qr]] vvmcalls,

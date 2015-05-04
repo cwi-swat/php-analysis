@@ -369,8 +369,8 @@ public str pp(function(str name, false, list[Param] params, list[Stmt] body)) =
 //	| global(list[Expr] exprs)
 public str pp(global(list[Expr] exprs)) = "global <intercalate(",",[pp(e)|e<-exprs])>;";
 
-//	| goto(Name label)
-public str pp(goto(Name label)) = "goto <pp(label)>;";
+//	| goto(str label)
+public str pp(goto(str label)) = "goto <label>;";
 
 //	| haltCompiler(str remainingText)
 public str pp(haltCompiler(str remainingText)) = "__halt_compiler(); <remainingText>";
@@ -482,9 +482,9 @@ public str pp(block(list[Stmt] body)) =
 //public data Declaration = declaration(str key, Expr val);
 public str pp(declaration(str key, Expr val)) = "<key>=<pp(val)>";
 
-//public data Catch = \catch(Name xtype, Expr xname, list[Stmt] body);
-public str pp(\catch(Name xt, Expr xn, list[Stmt] body)) =
-	"catch (<pp(xt)> <pp(xn)>) {
+//public data Catch = \catch(Name xtype, str xname, list[Stmt] body);
+public str pp(\catch(Name xt, str xn, list[Stmt] body)) =
+	"catch (<pp(xt)> <xn>) {
 	'	<for (b <- body) {><pp(b)><}> }";
 	
 //public data Case = \case(OptionExpr cond, list[Stmt] body);
@@ -560,20 +560,20 @@ public str pp(traitUse(list[Name] traits, list[Adaptation] adaptations)) =
 	'}";
 	
 // Adaptation::traitAlias(OptionName traitName, Name methName, set[Modifier] newModifiers, OptionName newName)
-public str pp(traitAlias(noName(), Name methName, set[Modifier] newModifiers, noName())) =
-	"<pp(methName)> as <intercalate(" ", [pp(m)|m<-newModifiers])>;";
-public str pp(traitAlias(noName(), Name methName, set[Modifier] newModifiers, someName(newName))) =
-	"<pp(methName)> as <intercalate(" ", [pp(m)|m<-newModifiers])> <pp(newName)>;";
-public str pp(traitAlias(someName(traitName), Name methName, set[Modifier] newModifiers, noName())) =
-	"<pp(traitName)>::<pp(methName)> as <intercalate(" ", [pp(m)|m<-newModifiers])>;";
-public str pp(traitAlias(someName(traitName), Name methName, set[Modifier] newModifiers, someName(newName))) =
-	"<pp(traitName)>::<pp(methName)> as <intercalate(" ", [pp(m)|m<-newModifiers])> <pp(newName)>;";
+public str pp(traitAlias(noName(), str methName, set[Modifier] newModifiers, noName())) =
+	"<methName> as <intercalate(" ", [pp(m)|m<-newModifiers])>;";
+public str pp(traitAlias(noName(), str methName, set[Modifier] newModifiers, someName(newName))) =
+	"<methName> as <intercalate(" ", [pp(m)|m<-newModifiers])> <pp(newName)>;";
+public str pp(traitAlias(someName(traitName), str methName, set[Modifier] newModifiers, noName())) =
+	"<pp(traitName)>::<methName> as <intercalate(" ", [pp(m)|m<-newModifiers])>;";
+public str pp(traitAlias(someName(traitName), str methName, set[Modifier] newModifiers, someName(newName))) =
+	"<pp(traitName)>::<methName> as <intercalate(" ", [pp(m)|m<-newModifiers])> <pp(newName)>;";
 	
 // Apaptation::traitPrecedence(OptionName traitName, Name methName, set[Name] insteadOf)
-public str pp(traitPrecedence(noName(), Name methName, set[Name] insteadOf)) =
-	"<pp(methName)> insteadof <intercalate(",", [pp(i)|i<-insteadOf])>;";
-public str pp(traitPrecedence(someName(traitName), Name methName, set[Name] insteadOf)) =
-	"<pp(traitName)>::<pp(methName)> insteadof <intercalate(",", [pp(i)|i<-insteadOf])>;";
+public str pp(traitPrecedence(noName(), str methName, set[Name] insteadOf)) =
+	"<methName> insteadof <intercalate(",", [pp(i)|i<-insteadOf])>;";
+public str pp(traitPrecedence(someName(traitName), str methName, set[Name] insteadOf)) =
+	"<pp(traitName)>::<methName> insteadof <intercalate(",", [pp(i)|i<-insteadOf])>;";
 
 //public data Property = property(str propertyName, OptionExpr defaultValue);
 public str pp(Property::property(str propertyName, someExpr(Expr defaultValue))) = "$<propertyName> = <pp(defaultValue)>";

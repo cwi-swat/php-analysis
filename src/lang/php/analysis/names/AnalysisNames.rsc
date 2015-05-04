@@ -28,14 +28,24 @@ public set[AnalysisName] knownNames(AnalysisName an) {
 	}
 	return { an };
 }  
+
+@doc{
+	Compute the 
+}
 public AnalysisName computeName(NameOrExpr e) {
 	if (name(name(s)) := e) {
 		return varName(s);
 	} else if (expr(ie) := e) {
+		// TODO: Do we need another layer here?
 		return computeName(ie);
 	}
 }
 
+@doc{
+	Compute the name represented by an expression. This can be a var name for simple
+	cases, like $x, but can also be compound names if we have more complex expressions,
+	like $x.y or $x.y.z.	
+}
 public AnalysisName computeName(Expr e) {
 	switch(e) {
 		case var(name(name(s))) : {
