@@ -13,11 +13,15 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::ast::System;
 import List;
 
+data ParamInfo = paramInfo(str paramName, bool isRef) | paramInfo(str paramName, str givenType, bool isRef);
+
 data SignatureItem
 	= functionSig(NamePath namepath, int parameterCount)
+	| functionSig(NamePath namepath, list[ParamInfo] parameterInfo) 
 	| constSig(NamePath namepath, Expr e)
 	| classSig(NamePath namepath)
 	| methodSig(NamePath namepath, int parameterCount)
+	| methodSig(NamePath namepath, list[ParamInfo] parameterInfo)
 	| classConstSig(NamePath namepath, Expr e)
 	;
 
@@ -27,7 +31,7 @@ data Signature
 	= fileSignature(loc fileloc, set[SignatureItem] items)
 	;
 		
-public Signature getFileSignature(loc fileloc, Script scr) {
+public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false) {
 	set[SignatureItem] items = { };
 	
 	// First, pull out all class definitions
@@ -35,10 +39,19 @@ public Signature getFileSignature(loc fileloc, Script scr) {
 	for (class(cn,_,_,_,cis) <- classDefs) {
 		items += classSig(classPath(cn));
 		for (mt:method(mn,_,_,mps,_) <- cis) {
-			if ( (mt@at)? )
-				items += methodSig(methodPath(cn, mn), size(mps))[@at=mt@at];
-			else
-				items += methodSig(methodPath(cn, mn), size(mps));
+			if (buildInfo) {
+				if ( (mt@at)? ) {
+					items += methodSig(methodPath(cn, mn), [ paramInfo(mp.paramName, mp.byRef) | mp <- mps ])[@at=mt@at];
+				} else {
+					items += methodSig(methodPath(cn, mn), [ paramInfo(mp.paramName, mp.byRef) | mp <- mps ]);
+				}
+			} else {
+				if ( (mt@at)? ) {
+					items += methodSig(methodPath(cn, mn), size(mps))[@at=mt@at];
+				} else {
+					items += methodSig(methodPath(cn, mn), size(mps));
+				}
+			}
 		}
 		for(constCI(consts) <- cis, const(name,ce) <- consts) {
 			items += classConstSig(classConstPath(cn, name), ce);
@@ -47,10 +60,18 @@ public Signature getFileSignature(loc fileloc, Script scr) {
 	
 	// Second, get all top-level functions
 	for (/f:function(fn,_,fps,_) := scr) {
-		if ( (f@at)? ) {
-			items += functionSig(functionPath(fn),size(fps))[@at=f@at];
+		if (buildInfo) {
+			if ( (f@at)? ) {
+				items += functionSig(functionPath(fn), [ paramInfo(fp.paramName, fp.byRef) | fp <- fps ])[@at=f@at];
+			} else {
+				items += functionSig(functionPath(fn), [ paramInfo(fp.paramName, fp.byRef) | fp <- fps ]);
+			}
 		} else {
-			items += functionSig(functionPath(fn),size(fps));
+			if ( (f@at)? ) {
+				items += functionSig(functionPath(fn), size(fps))[@at=f@at];
+			} else {
+				items += functionSig(functionPath(fn), size(fps));
+			}
 		}
 	}
 
