@@ -21,6 +21,8 @@ import Node;
 public data CFG 
 	= cfg(NamePath item, set[CFGNode] nodes, FlowEdges edges)
 	| cfg(NamePath item, set[CFGNode] nodes, FlowEdges edges, CFGNode entryNode, CFGNode exitNode)
+	| cfg(NamePath item, set[CFGNode] nodes, FlowEdges edges, loc at)
+	| cfg(NamePath item, set[CFGNode] nodes, FlowEdges edges, loc at, CFGNode entryNode, CFGNode exitNode)
 	;
 
 @doc{Control flow graph nodes}

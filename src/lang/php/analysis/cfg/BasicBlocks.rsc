@@ -106,5 +106,9 @@ public CFG createBasicBlocks(CFG g) {
 		//throw "Error in conversion to basic blocks, expected <size(g.nodes)> nodes but only found <size(blockNodes)> nodes";
 	}
 		
-	return cfg(g.item, basicBlocks, blockEdges, blockEntryNode(), blockExitNode());
+	if (g has at) {
+		return cfg(g.item, basicBlocks, blockEdges, g.at, blockEntryNode(), blockExitNode());
+	} else {
+		return cfg(g.item, basicBlocks, blockEdges, blockEntryNode(), blockExitNode());
+	}
 }

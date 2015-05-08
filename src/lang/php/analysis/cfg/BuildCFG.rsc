@@ -261,7 +261,7 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Cla
 	edges = removeUnrealizablePaths(edges); 
 	lstate = shrink(lstate);
 
- 	return < cfg(np, nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
+ 	return < cfg(np, nodes, edges, m@at, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
 // TODO: The code for functions and methods is very similar, so refactor to remove
@@ -334,7 +334,7 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np,
 	edges = removeUnrealizablePaths(edges); 
 	lstate = shrink(lstate);
 
- 	return < cfg(np, nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
+ 	return < cfg(np, nodes, edges, f@at, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
 // Find the initial label for each statement. We return a set since, in some cases,
