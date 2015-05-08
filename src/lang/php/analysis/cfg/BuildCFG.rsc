@@ -1722,6 +1722,7 @@ private tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 				edges += makeEdges(final(target, lstate),init(mn, lstate));
 				if (size(parameters) > 0) {
 					edges += makeEdges(final(mn, lstate),init(head(parameters).expr, lstate));
+					edges += makeEdges(final(last(parameters).expr, lstate), finalLabels);
 				} else {
 					edges += makeEdges(final(mn, lstate), finalLabels);
 				}
