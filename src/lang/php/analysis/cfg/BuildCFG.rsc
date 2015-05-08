@@ -1847,7 +1847,7 @@ private tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 				   { flowEdge(fe, footernode) | fe <- final(elseBranch, lstate) };
 
 			for (il <- initLabels) edges += flowEdge(headernode, il);
-			for (il <- (initLabels+s@lab), il notin lstate.headerNodes) lstate.headerNodes[il] = headernode;
+			for (il <- (initLabels+e@lab), il notin lstate.headerNodes) lstate.headerNodes[il] = headernode;
 			for (fl <- (finalLabels+e@lab), fl notin lstate.footerNodes) lstate.footerNodes[fl] = footernode;
 		}
 
