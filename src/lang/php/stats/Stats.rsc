@@ -506,11 +506,11 @@ public list[tuple[str p, str v, int count, int fileCount]] getSortedCounts() {
 public void writeSortedCounts() {
 	sc = getSortedCounts();
 	scLines = [ "Product,Version,LoC,Files" ] + [ "<i.p>,<i.v>,<i.count>,<i.fileCount>" | i <- sc ];
-	writeFile(|rascal://src/lang/php/extract/csvs/linesOfCode.csv|, intercalate("\n",scLines));
+	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|, intercalate("\n",scLines));
 }
 
 public rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Comments] loadVersionsCSV() {
-	rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Comments] res = readCSV(#rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Comments],|rascal://src/lang/php/extract/csvs/Versions.csv|);
+	rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Comments] res = readCSV(#rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Comments],|project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv|);
 	return res;
 	//return { <r.Product,r.Version,parseDate(r.ReleaseDate,"yyyy-MM-dd"),r.RequiredPHPVersion,r.Comments> | r <-res };  
 }
@@ -568,7 +568,7 @@ public str getReleaseDate(str product, str version) {
 }
 
 public rel[str Product,str PlainText,str Description] loadProductInfoCSV() {
-	rel[str Product,str PlainText,str Description] res = readCSV(#rel[str Product,str PlainText,str Description],|rascal://src/lang/php/extract/csvs/ProductInfo.csv|);
+	rel[str Product,str PlainText,str Description] res = readCSV(#rel[str Product,str PlainText,str Description],|project://PHPAnalysis/src/lang/php/extract/csvs/ProductInfo.csv|);
 	return res;
 }
 
