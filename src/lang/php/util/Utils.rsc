@@ -22,19 +22,20 @@ import List;
 import Exception;
 import DateTime;
 import util::ShellExec;
+import util::Resources;
 
 import lang::php::pp::PrettyPrinter;
 
 
-@javaClass{org.rascal.phpanalysis.PhpJarExtractor}
-@memo
-private java loc getPhpParserLocFromJar() throws IO(str msg);
+//@javaClass{org.rascal.phpanalysis.PhpJarExtractor}
+//@memo
+//private java loc getPhpParserLocFromJar() throws IO(str msg);
 
 
 private str executePHP(list[str] opts, loc cwd) {
 	str phpBinLoc = usePhpParserJar ? "php" : phploc.path;
 
-  	PID pid = createProcess(phpBinLoc, opts, cwd);
+  	PID pid = createProcess(phpBinLoc, args=opts, workingDir=cwd);
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
 	killProcess(pid);
@@ -47,8 +48,8 @@ private str executePHP(list[str] opts, loc cwd) {
 }
 
 private Script parsePHPfile(loc f, list[str] opts, Script error) {
-	loc parserLoc = usePhpParserJar ? getPhpParserLocFromJar() : lang::php::util::Config::parserLoc;
-
+	//loc parserLoc = usePhpParserJar ? getPhpParserLocFromJar() : lang::php::util::Config::parserLoc;
+	loc parserLoc = lang::php::util::Config::parserLoc;
 	str phpOut;
 	try {
 		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", (parserLoc + astToRascal).path, "-f<f.path>"] + opts, parserWorkingDir);
@@ -107,7 +108,7 @@ public Script loadPHPFile(loc l) throws AssertionFailed {
 @doc{Load a single PHP file, with options for location annotations and unique node ids.}
 public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds) throws AssertionFailed {
 	if (!exists(l)) return errscript("Location <l> does not exist");
-	if (l.scheme notin {"file","home"}) return errscript("Only file and home locations are supported");
+	if (l.scheme notin {"file","home","project"}) return errscript("Only file, home, and project locations are supported");
 	if (!isFile(l)) return errscript("Location <l> must be a file");
 
 	logMessage("Loading file <l>", 2);
@@ -117,6 +118,10 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	if (includeLocationInfo) opts += "--addDecl";
 	if (addUniqueIds) opts += "-i";
 	if (l.scheme == "home") opts += "-r";
+	if (l.scheme == "project") {
+		opts += "-n<l.authority>";
+		opts += "-d<location(|project://<l.authority>|).path>";
+	}
 	if (includePhpDocs) opts += "--phpdocs";
 	
 	Script res = parsePHPfile(l, opts, errscript("Could not parse file <l.path>")); 
@@ -184,7 +189,7 @@ public System loadProduct(str product, str version, bool addLocationAnnotations 
 @doc{Build the serialized ASTs for a specific system at a specific location}
 public void buildBinaries(str product, str version, loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
 	loc binLoc = parsedDir + "<product>-<version>.pt";
-	if (!overwrite || !exists(binLoc)) {
+	if (overwrite || (!overwrite && !exists(binLoc))) {
 		logMessage("Parsing <product>-<version>. \>\> Location: <l>.", 1);
 		files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 		
@@ -195,7 +200,7 @@ public void buildBinaries(str product, str version, loc l, bool addLocationAnnot
 		writeBinaryValueFile(binLoc, files, compression=false);
 		logMessage("... done.", 2);
 	} else {
-		logMessage("Parsed representation for <product>-<version> already exists, skipping...");
+		logMessage("Parsed representation for <product>-<version> already exists, skipping...", 1);
 	}
 }
 
