@@ -339,7 +339,7 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np,
 
 // Find the initial label for each statement. We return a set since, in some cases,
 // there may be no initial label available.
-private set[Lab] init(Stmt s, LabelState lstate) {
+public set[Lab] init(Stmt s, LabelState lstate) {
 	if (s@lab in lstate.headerNodes) return { lstate.headerNodes[s@lab] };
 	
 	switch(s) {
@@ -428,7 +428,11 @@ private set[Lab] init(Stmt s, LabelState lstate) {
 		// have no initializers, than the statement itself provides the label.
 		case static(list[StaticVar] vars) : {
 			initializers = [ e | staticVar(str name, someExpr(Expr e)) <- vars ];
-			if (! isEmpty(initializers)) return init(head(initializers), lstate);
+			if (! isEmpty(initializers)) {
+				return init(head(initializers), lstate);
+			} else {
+				return { s@lab };
+			}
 		}
 
 		// In a switch statement, the condition provides the first label.
@@ -743,7 +747,11 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 		// In a static declaration, the final initializer provides the final label.
 		case static(list[StaticVar] vars) : {
 			initializers = [ e | staticVar(str name, someExpr(Expr e)) <- vars ];
-			if (! isEmpty(initializers)) return final(last(initializers), lstate);
+			if (! isEmpty(initializers)) {
+				return final(last(initializers), lstate);
+			} else {
+				return { s@lab };
+			}
 		}
 
 		// The switch statement has such complicated logic, and always uses a join
@@ -861,7 +869,7 @@ private tuple[FlowEdges, LabelState] addExpSeqEdges(FlowEdges edges, LabelState 
 // Note: Currently, we always have the statements in the body linked one to
 // the next. This will be patched elsewhere -- if we have a return, we should
 // not have an edge going to the next statement, since it is no longer reachable.
-private tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
+public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
 		return lab(lstate.counter); 
@@ -1539,7 +1547,7 @@ private tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 
 // Compute all the internal flow edges for an expression. We pass around the label
 // state in case we need to construct new labels.
-private tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
+public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
 		return lab(lstate.counter); 
@@ -1869,6 +1877,9 @@ private tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		}
 		
 		case scalar(encapsed(parts)) : {
+			for (part <- parts) {
+				< edges, lstate> = addExpEdges(edges, lstate, part);
+			}
 			< edges, lstate > = addExpSeqEdges(edges, lstate, parts);
 			edges += makeEdges(final(last(parts), lstate), finalLabels);
 		}
