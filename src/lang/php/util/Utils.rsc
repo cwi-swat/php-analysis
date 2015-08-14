@@ -32,7 +32,7 @@ import lang::php::pp::PrettyPrinter;
 //private java loc getPhpParserLocFromJar() throws IO(str msg);
 
 
-private str executePHP(list[str] opts, loc cwd) {
+public str executePHP(list[str] opts, loc cwd) {
 	str phpBinLoc = usePhpParserJar ? "php" : phploc.path;
 
   	PID pid = createProcess(phpBinLoc, args=opts, workingDir=cwd);
@@ -129,23 +129,13 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	return res;
 }
 
-@doc{Load all PHP files at a given directory location, with options for location annotations and unique node ids.}
+@doc{Load all PHP files at a given directory location using the default loader.}
 public System loadPHPFiles(loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) throws AssertionFailed {
-	return loadPHPFiles(l, extensions, loadPHPFile, addLocationAnnotations, addUniqueIds);
-}
-
-@doc{Load all PHP files at a given directory location, with options for which loader to use, location annotations and unique node ids.}
-public System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocationAnnotations = true, bool addUniqueIds = false) throws AssertionFailed {
-	return loadPHPFiles(l, {"php", "inc"}, loader, addLocationAnnotations, addUniqueIds);
+	return loadPHPFiles(l, loadPHPFile, addLocationAnnotations = addLocationAnnotations, addUniqueIds = addUniqueIds, extensions = extensions);
 }
 
 @doc{Load all PHP files at a given directory location, with options for which extensions are PHP files, which loader to use, location annotations and unique node ids.}
-public System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) loader, bool addLocationAnnotations = true, bool addUniqueIds = false) throws AssertionFailed {
-	return loadPHPFiles(l, extensions, loader, addLocationAnnotations, addUniqueIds);
-}
-
-@doc{Load all PHP files at a given directory location, with options for which extensions are PHP files, which loader to use, location annotations and unique node ids.}
-private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) loader, bool addLocationAnnotations, bool addUniqueIds) throws AssertionFailed {
+private System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) throws AssertionFailed {
 
 	if ((l.scheme == "file" || l.scheme == "home") && !exists(l)) throw AssertionFailed("Location <l> does not exist");
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
@@ -174,7 +164,7 @@ private System loadPHPFiles(loc l, set[str] extensions, Script(loc,bool,bool) lo
 		}
 	}
 	
-	for (d <- dirEntries) phpNodes = phpNodes + loadPHPFiles(d, extensions, loader, addLocationAnnotations, addUniqueIds);
+	for (d <- dirEntries) phpNodes = phpNodes + loadPHPFiles(d, loader, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 	resetCounters();
 		
 	return phpNodes;
@@ -191,7 +181,7 @@ public void buildBinaries(str product, str version, loc l, bool addLocationAnnot
 	loc binLoc = parsedDir + "<product>-<version>.pt";
 	if (overwrite || (!overwrite && !exists(binLoc))) {
 		logMessage("Parsing <product>-<version>. \>\> Location: <l>.", 1);
-		files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+		System files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 		
 		logMessage("Now writing file: <binLoc>...", 2);
 		if (!exists(parsedDir)) {
