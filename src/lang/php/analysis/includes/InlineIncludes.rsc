@@ -27,8 +27,8 @@ public Script inlineScript(Script s, System sys, loc baseLoc) {
 		inlined = visit(inlined) {
 			case i:include(scalar(string(str ipath)),itype) : {
 				pathAsLoc = (startsWith(ipath, baseLoc.path)) ? (|file:///|+ipath) : (baseLoc+ipath);
-				if (pathAsLoc in sys) {
-					Script toInline = sys[pathAsLoc];
+				if (pathAsLoc in sys.files) {
+					Script toInline = sys.files[pathAsLoc];
 					
 					// pull all the functions, classes, traits, and interfaces up to the top level
 					pruned = bottom-up visit(toInline) {

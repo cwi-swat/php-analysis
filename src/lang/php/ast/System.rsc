@@ -3,19 +3,19 @@ module lang::php::ast::System
 import lang::php::ast::AbstractSyntax;
 import lang::php::ast::NormalizeAST;
 
-alias System = map[loc fileloc, Script scr];
+data System = system(map[loc fileloc, Script scr] files);
 
 
 public System normalizeSystem(System s) {
 	s = discardErrorScripts(s);
 	
-	for (l <- s) {
-		s[l] = oldNamespaces(s[l]);
-		s[l] = normalizeIf(s[l]);
-		s[l] = flattenBlocks(s[l]);
-		s[l] = discardEmpties(s[l]);
-		s[l] = useBuiltins(s[l]);
-		s[l] = discardHTML(s[l]);
+	for (l <- s.files) {
+		s.files[l] = oldNamespaces(s.files[l]);
+		s.files[l] = normalizeIf(s.files[l]);
+		s.files[l] = flattenBlocks(s.files[l]);
+		s.files[l] = discardEmpties(s.files[l]);
+		s.files[l] = useBuiltins(s.files[l]);
+		s.files[l] = discardHTML(s.files[l]);
 	}
 	
 	return s;
@@ -24,16 +24,22 @@ public System normalizeSystem(System s) {
 
 @doc { filter a system to only contain script(_), and therefore discard errscript }
 public System discardErrorScripts(System s) {
-	return (l : s[l] | l <- s, script(_) := s[l]);
+	s.files = (l : s.files[l] | l <- s.files, script(_) := s.files[l]);
+	return s;
 }
 
-// TODO: We want to switch the concept of a system to be something
-// more than an alias later, this will allow us to tag it with more
-// information...
-//data System = system(map[loc fileloc, Script scr] files);
+public System createEmptySystem() = system( () );
 
-//public System emptySystem() = system( () );
-//
+public System convertSystem(value v) {
+	if (map[loc fileloc, Script scr] files := v) {
+		return system(files);
+	} else if (System s := v) {
+		return s;
+	} else {
+		throw "Unexpected input";
+	}
+}
+
 //public System addFile(System sys, loc l, Script s) {
 //	sys.files[l] = s;
 //	return sys;

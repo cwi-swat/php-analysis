@@ -6,7 +6,7 @@ import lang::php::ast::AbstractSyntax;
 public set[loc] identifyEntryPoints(System sys, set[loc] initialEntries) {
 	set[loc] res = { };
 	for (ie <- initialEntries) {
-		ieScript = sys[ie];
+		ieScript = sys.files[ie];
 		// Identify all the <a> tags to find the links
 		
 		;	

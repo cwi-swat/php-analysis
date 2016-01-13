@@ -99,10 +99,10 @@ public void buildESECBinariesWithIncludes(SysMap smap) {
 }
 
 @doc{Load a binary, with resolved includes, for the extension system}
-public map[loc,Script] loadESECBinaryWithIncludes(str product) {
+public System loadESECBinaryWithIncludes(str product) {
 	parsedItem = parsedDir + "<product>-HEAD-icp.pt";
 	println("Loading binary: <parsedItem>");
-	return readBinaryValueFile(#map[loc,Script],parsedItem);
+	return readBinaryValueFile(#System,parsedItem);
 }
 
 @doc{Get back all the dynamic includes in the extension, organized by system}
@@ -168,7 +168,7 @@ public rel[str p, str v, loc fileloc, Expr call] allIncludes() {
 	rel[str p, str v, loc fileloc, Expr call] res = { };
 	for (s <- c) {
 		sys = loadBinary(s, c[s]);
-		res += { < s, c[s], i@at, i > | /i:include(_,_) := sys };
+		res += { < s, c[s], i@at, i > | /i:include(_,_) := sys.files };
 	}
 	return res;
 }
@@ -278,7 +278,7 @@ public rel[loc l, Expr call] setIncludePathCalls() {
 	for (s <- c) {
 		println("Loading system for <s>-<c[s]>");
 		sys = readBinaryValueFile(#System, |home:///PHPAnalysis/serialized/includes/<s>-<c[s]>-inlined.pt|);
-		res = res + { < cl@at, cl > | /cl:call(name(name("set_include_path")),_) := sys }; 
+		res = res + { < cl@at, cl > | /cl:call(name(name("set_include_path")),_) := sys.files }; 
 	}
 	return res;
 }

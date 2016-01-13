@@ -18,16 +18,16 @@ import lang::php::ast::System;
 
 import Set;
 
-private System modifiedSystem = ();
+private System modifiedSystem = createEmptySystem();
 public System getModifiedSystem() = modifiedSystem;
-public void resetModifiedSystem() { modifiedSystem = (); } // used in tests
+public void resetModifiedSystem() { modifiedSystem = createEmptySystem(); } // used in tests
 
 private bool useCacheDefault = false;
 // get a system for a specific location
 public System getSystem(loc l) = getSystem(l, useCacheDefault);
 public System getSystem(loc l, bool useCache) = isCacheUsed(l, useCache) ? readSystemFromCache(l) : loadSystem(l, useCache);
 
-public M3Collection getM3CollectionForSystem(System system, loc l) = (filename:createM3forScript(filename, system[filename]) | filename <- system);
+public M3Collection getM3CollectionForSystem(System system, loc l) = (filename:createM3forScript(filename, system.files[filename]) | filename <- system.files);
 
 public M3 getM3ForSystem(System system, loc l)
 { 
@@ -56,7 +56,7 @@ public M3 createM3forScript(loc filename, Script script)
 		script = addPublicModifierWhenNotProvided(script); // set Modifiers when they are not provided, like function => public function
    		m3 = fillDeclarations(m3, script); // fill @declarations and @names	
 	   	script = propagateDeclToScope(script); // propagate @decl to @scope
-	   	modifiedSystem[filename] = script; // a dirty hack to reuse this modified script...
+	   	modifiedSystem.files[filename] = script; // a dirty hack to reuse this modified script...
 
 		m3 = fillContainment(m3, script); // fill containment with declarations
 		m3 = fillModifiers(m3, script); // fill modifiers for classes, class fields and class methods 
@@ -92,13 +92,13 @@ public M3 calculateAfterM3Creation(M3 m3, System system)
 	m3 = addPredefinedDeclarations(m3);
 
 	int counter = 0;
-	int total = size(system);	
+	int total = size(system.files);	
 	println("calculateUsesAfterTypes for <total> files");
-	for (l <- system) {
+	for (l <- system.files) {
 		counter += 1;
 		//logMessage("running file: <l>", 1);
 		if (counter%10==0) logMessage("<counter> (<(100*counter)/total>)%.. ", 1);	
-		m3 = calculateUsesAfterTypes(m3, system[l]);
+		m3 = calculateUsesAfterTypes(m3, system.files[l]);
 	}
 	
 	// todo enable this!

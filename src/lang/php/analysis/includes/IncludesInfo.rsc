@@ -34,7 +34,7 @@ public void buildIncludesInfo(System sys, str p, str v, loc baseloc) {
 	if (!exists(infoLoc)) mkDirectory(infoLoc);
 	if (exists(infoLoc + "<p>-<v>-l2c.bin")) return;
 	
-	map[loc,set[ConstItemExp]] loc2consts = ( l : { cdef[e=normalizeExpr(cdef.e, baseloc)]  | cdef <- getScriptConstDefs(sys[l]) } | l <- sys);
+	map[loc,set[ConstItemExp]] loc2consts = ( l : { cdef[e=normalizeExpr(cdef.e, baseloc)]  | cdef <- getScriptConstDefs(sys.files[l]) } | l <- sys.files);
 	rel[ConstItem,loc,Expr] constrel = { < (classConst(cln,cn,ce) := ci) ? classConst(cln,cn) : normalConst(ci.constName), l, ci.e > | l <- loc2consts, ci <- loc2consts[l] };
 
 	map[str, Expr] constMap = ( cn : ce | ci:normalConst(cn) <- constrel<0>, csub := constrel[ci,_], size(csub) == 1, ce:scalar(sv) := getOneFrom(csub), encapsed(_) !:= sv );  

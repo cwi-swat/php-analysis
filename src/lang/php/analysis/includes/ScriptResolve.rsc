@@ -75,7 +75,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	clearLookupCache();
 	
 	// First find all the includes in the script. If we don't have any, we are already done.
-	includeMap = ( i@at : i | /i:include(_,_) := sys[toResolve] );
+	includeMap = ( i@at : i | /i:include(_,_) := sys.files[toResolve] );
 	timings += < "Starting number of includes:<size(includeMap)>", now() >;
 	if (size(includeMap) == 0) return < {}, timings >;
 		
@@ -97,7 +97,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	set[loc] worklist = { qri | qri <- quickResolved<2>, qri.scheme != "php+lib" } - worked;
 	while (! isEmpty(worklist) ) {
 		next = getOneFrom(worklist); worklist -= next; worked += next;
-		includeMap += ( i@at : i | /i:include(_,_) := sys[next] );
+		includeMap += ( i@at : i | /i:include(_,_) := sys.files[next] );
 		nextResolved = (size(quickResolveInfo) > 0) ? ( (next in quickResolveInfo) ? quickResolveInfo[next] : { } ) : quickResolveExpr(sys, iinfo, next, baseLoc, libs=libs);
 		quickResolved += nextResolved;
 		worklist += ({ qri | qri <- nextResolved<2>, qri.scheme != "php+lib" } - worked);
@@ -126,7 +126,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 		} else if (size(possibleTargets) == 1 && < ie,tn > := getOneFrom(possibleTargets)) {
 			// This means we have exactly one file included, so we consider this to be resolved.
 			edgeSet += igEdge(nodeMap[l.top], nodeMap[tn], ie);
-		} else if (size(possibleTargets) >= size(sys<0>)) {
+		} else if (size(possibleTargets) >= size(sys.files<0>)) {
 			// This means that every possible file could be included. TODO: Alter this to better represent
 			// the result of using libraries.
 			edgeSet += igEdge(nodeMap[l.top], anyNode(), getOneFrom(possibleTargets<0>));
@@ -144,9 +144,9 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// could be a dynamic call to these functions, using variable functions or dynamic invocations, that is not detected here. This
 	// could happen, but seemingly would be done with the intent to obfuscate the changing of the path. TODO: it would be good to do
 	// a string analysis to rule this out, though, if possible.	
-	set[loc] setsIncludePath = { l | l <- worked, l.scheme != "php+lib", /call(name(name("set_include_path")),_) := sys[l] } +
-							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("chdir")),_) := sys[l] } + 
-							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("ini_set")),[actualParameter(pe,_)]) := sys[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
+	set[loc] setsIncludePath = { l | l <- worked, l.scheme != "php+lib", /call(name(name("set_include_path")),_) := sys.files[l] } +
+							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("chdir")),_) := sys.files[l] } + 
+							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("ini_set")),[actualParameter(pe,_)]) := sys.files[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
 	timings += < "Found <size(setsIncludePath)> locations that set the include path", now() >;
 
 	// Decorate the nodes in the include graph with info on constants and behaviors.

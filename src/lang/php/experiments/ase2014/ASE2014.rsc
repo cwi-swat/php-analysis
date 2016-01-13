@@ -170,13 +170,13 @@ public rel[loc,loc,Expr,loc] loadQuickResolveExprInfo(str p, str v) {
 }
 
 public set[loc] getAnyIncludes(System sys, rel[loc,loc,loc] qrinfo) {
-	cutoff = size(sys<0>) * .9;
+	cutoff = size(sys.files<0>) * .9;
 	nofile = qrinfo<1,2>;
 	return {l | l <- nofile<0>, size(nofile[l]) > cutoff };
 }
 
 public set[loc] getOtherIncludes(System sys, rel[loc,loc,loc] qrinfo) {
-	cutoff = size(sys<0>) * .9;
+	cutoff = size(sys.files<0>) * .9;
 	nofile = qrinfo<1,2>;
 	return {l | l <- nofile<0>, fls := nofile[l], !(size(fls) < 2 || size(nofile[l]) > cutoff) };
 }
@@ -405,7 +405,7 @@ public map[int n, tuple[int before, int after] counts] computeSystemImpact(str p
 	
 	map[int n, tuple[int before, int after] counts] res = ( );
 	
-	for (l <- sys, l in rm.rmap) {
+	for (l <- sys.files, l in rm.rmap) {
 		rinf = loadResolveInfo(rm.rmap[l]);
 		ba = beforeAndAfter(rinf, qrinfo<1,2>);
 		lcounts = computeImpact(ba);

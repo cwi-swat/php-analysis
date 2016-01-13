@@ -29,7 +29,7 @@ public rel[loc,loc] quickResolve(System sys, str p, str v, loc toResolve, loc ba
 public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc toResolve, loc baseLoc, set[loc] libs = { }, bool checkFS=false) {
 	rel[loc,Expr,loc] resolved = { };
 
-	Script scr = sys[toResolve];
+	Script scr = sys.files[toResolve];
 	includes = { < i@at, i > | /i:include(_,_) := scr };
 	if (size(includes) == 0) return resolved;
 		
@@ -45,7 +45,7 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	unresolved = includes;
 	for (iitem:< _, i > <- includes, scalar(string(s)) := i.expr, size(s) > 0, s[0] in { "\\", "/"}) {
 		try {
-			iloc = calculateLoc(sys<0>,toResolve,baseLoc,s,checkFS=checkFS);
+			iloc = calculateLoc(sys.files<0>,toResolve,baseLoc,s,checkFS=checkFS);
 			resolved = resolved + <i@at, i, iloc >;
 			unresolved = domainX(unresolved, {i@at});  
 		} catch UnavailableLoc(_) : {

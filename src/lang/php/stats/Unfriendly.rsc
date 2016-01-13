@@ -531,7 +531,6 @@ public ICLists includesAnalysisFromBinaries(Corpus corpus) {
 	for (product <- corpus) {
 		sys = loadBinary(product,corpus[product]);
 		initial = gatherIncludesWithVarPaths(sys);
-		sys = ( );
 		
 		sys = loadBinaryWithIncludes(product,corpus[product]);
 		unresolved = gatherIncludesWithVarPaths(sys);
@@ -598,7 +597,7 @@ public map[tuple[str p, str v], int] includeCounts(Corpus corpus) {
 	map[tuple[str p, str v], int] res = ( );
 	for (p <- corpus) {
 		sys = loadBinary(p,corpus[p]);
-		totalIncludes = size([ i | /i:include(iexp,_) := sys ]);
+		totalIncludes = size([ i | /i:include(iexp,_) := sys.files ]);
 		res[<p,corpus[p]>] = totalIncludes;
 	}
 	return res;
@@ -1572,10 +1571,10 @@ public void writeIncludeBinariesExperimental(Corpus corpus) {
 	}
 }
 
-public map[loc,Script] loadBinaryWithIncludes(str product, str version) {
+public System loadBinaryWithIncludes(str product, str version) {
 	parsedItem = parsedDir + "<product>-<version>-icp.pt";
 	println("Loading binary: <parsedItem>");
-	return readBinaryValueFile(#map[loc,Script],parsedItem);
+	return readBinaryValueFile(#System,parsedItem);
 }
 
 public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, map[int,set[str]] coverageMap) {
@@ -1758,7 +1757,7 @@ alias FunctionUses = rel[str product, str version, loc fileloc, Expr call];
 public FunctionUses systemFunctionUses(str product, str version, System sys) {
 	rel[str product, str version, loc fileloc, Expr call] res = { };
 	funsToFind = { "create_function", "call_user_func", "call_user_func_array", "call_user_method", "call_user_method_array", "func_get_args", "func_num_args", "func_get_arg" };
-	evals = [ < e@at, e > | /e:call(name(name(str fn)),_) := sys, fn in funsToFind ];
+	evals = [ < e@at, e > | /e:call(name(name(str fn)),_) := sys.files, fn in funsToFind ];
 	for (<l,e> <- evals) res += < product, version, l, e >;
 	return res;
 }
@@ -1857,12 +1856,12 @@ public set[Def] varargsFunctionsAndMethods(System sys) {
 	set[Def] res = { };
 	funsToFind = { "func_get_args", "func_num_args", "func_get_arg" };
 	
-	for (/f:function(fname, _, _, body) := sys) {
+	for (/f:function(fname, _, _, body) := sys.files) {
 		if (/e:call(name(name(str fn)),_) := body, fn in funsToFind) {
 			res += functionDef(fname, f, f@at);   
 		}
 	}
-	for (/c:class(cname, _, _, _, members) := sys) {
+	for (/c:class(cname, _, _, _, members) := sys.files) {
 		for (m:method(name, modifiers, byRef, params, body) <- members) {
 			if (/e:call(name(name(str fn)),_) := body, fn in funsToFind) {
 				res += methodDef(cname, name, m, m@at);   
@@ -1903,7 +1902,7 @@ public rel[loc,Expr,bool] varargsCalls(System sys) {
 	// Now, find calls to the varargs functions and methods. We can have standard
 	// function calls, standard method calls, and calls to static methods.
 	rel[loc,Expr,bool] vaCalls = { };
-	visit(sys) {
+	visit(sys.files) {
 		case e:call(name(name(str fn)),args) : {
 			if (fn in functionNames)
 				vaCalls = vaCalls + < e@at, e, fn in systemFunctionNames >;
@@ -1934,9 +1933,9 @@ public rel[str,str,loc,Expr,bool] varargsCalls(Corpus corpus) {
 }
 
 public rel[loc,Expr] allCalls(System sys) {
-	return { < e@at, e > | /e:call(name(name(str fn)),args) := sys } + 
-		   { < e@at, e > | /e:methodCall(_,name(name(str fn)),args) := sys } +
-		   { < e@at, e > | /e:staticCall(_,name(name(str fn)),args) := sys };
+	return { < e@at, e > | /e:call(name(name(str fn)),args) := sys.files } + 
+		   { < e@at, e > | /e:methodCall(_,name(name(str fn)),args) := sys.files } +
+		   { < e@at, e > | /e:staticCall(_,name(name(str fn)),args) := sys.files };
 }
 
 public rel[str,str,loc,Expr] allCalls(Corpus corpus) {
@@ -1969,8 +1968,8 @@ public map[str product,tuple[int classes, int interfaces] ciCount] classAndInter
 	map[str product,tuple[int classes, int interfaces] ciCount] res = ( );
 	for (p <- corpus) {
 		sys = loadBinary(p,corpus[p]);
-		classCount = size({ c | /c:class(_,_,_,_,_) := sys });
-		interfaceCount = size({ i | /i:interface(_,_,_) := sys });
+		classCount = size({ c | /c:class(_,_,_,_,_) := sys.files });
+		interfaceCount = size({ i | /i:interface(_,_,_) := sys.files });
 		res[p] = < classCount, interfaceCount >;
 	}
 	return res;
@@ -1980,8 +1979,8 @@ public rel[str product, str path] classAndInterfaceFiles(Corpus corpus) {
 	rel[str product, str path] res = { };
 	for (p <- corpus) {
 		sys = loadBinary(p,corpus[p]);
-		classPaths = { c@at.path | /c:class(_,_,_,_,_) := sys };
-		interfacePaths = { i@at.path | /i:interface(_,_,_) := sys };
+		classPaths = { c@at.path | /c:class(_,_,_,_,_) := sys.files };
+		interfacePaths = { i@at.path | /i:interface(_,_,_) := sys.files };
 		res += { < p, pth > | pth <- (classPaths + interfacePaths) };
 	}
 	return res;

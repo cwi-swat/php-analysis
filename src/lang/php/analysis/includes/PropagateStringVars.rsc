@@ -27,7 +27,7 @@ data StringVal = unknown() | moreThanOne() | unique(str sval);
 data Strings = var2String(map[str,StringVal] mappings);
 
 public System evalStringVars(System sys) {
-	return ( l : evalStringVars(sys[l]) | l <- sys );
+	return ( l : evalStringVars(sys.files[l]) | l <- sys.files );
 }
  
 public Script evalStringVars(Script scr) {
@@ -168,7 +168,7 @@ public set[NamePath] kills(Expr e) {
 }
 
 public void simpleStringFlow(System sys, loc fileLoc, IncludeGraph igraph) {
-	< lscr, cfgs > = buildCFGsAndScript(sys[fileLoc]);
+	< lscr, cfgs > = buildCFGsAndScript(sys.files[fileLoc]);
 	edgesToResolve = { e | e <- igraph.edges, igraph.nodes[fileLoc] == e.source, !(e.target is igNode) };
 	locsToResolve= { e.includeExpr@at | e <- edgesToResolve };
 	

@@ -22,7 +22,7 @@ public bool containsVV(someExpr(Expr e)) = size({ v | /v:var(expr(Expr ev)) := e
 public bool containsVV(noExpr()) = false;
 
 public lrel[loc fileloc, Expr call] gatherExprStats(System scripts, list[Expr](Script) f) {
-	return [ < e@at, e > | l <- scripts<0>, e <- f(scripts[l]) ];
+	return [ < e@at, e > | l <- scripts.files<0>, e <- f(scripts.files[l]) ];
 }
 
 @doc{Gather information on uses of class constants where the class name is given using a variable-variable}
@@ -95,20 +95,20 @@ public list[Expr] fetchVarUsesVV(Script scr) = [ v | v:var(expr(_)) <- fetchVarU
 public lrel[loc fileloc, Expr call] gatherVarVarUses(System scripts) = gatherExprStats(scripts, fetchVarUsesVV);
 
 @doc{Magic methods that implement overloads}
-public list[ClassItem] fetchOverloadedSet(System scripts) = [ x | l <- scripts<0>, /x:method("__set",_,_,_,_) := scripts[l] ];
-public list[ClassItem] fetchOverloadedGet(System scripts) = [ x | l <- scripts<0>, /x:method("__get",_,_,_,_) := scripts[l] ];
-public list[ClassItem] fetchOverloadedIsSet(System scripts) = [ x | l <- scripts<0>, /x:method("__isset",_,_,_,_) := scripts[l] ];
-public list[ClassItem] fetchOverloadedUnset(System scripts) = [ x | l <- scripts<0>, /x:method("__unset",_,_,_,_) := scripts[l] ];
-public list[ClassItem] fetchOverloadedCall(System scripts) = [ x | l <- scripts<0>, /x:method("__call",_,_,_,_) := scripts[l] ];
-public list[ClassItem] fetchOverloadedCallStatic(System scripts) = [ x | l <- scripts<0>, /x:method("__callStatic",_,_,_,_) := scripts[l] ];
+public list[ClassItem] fetchOverloadedSet(System scripts) = [ x | l <- scripts.files<0>, /x:method("__set",_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedGet(System scripts) = [ x | l <- scripts.files<0>, /x:method("__get",_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedIsSet(System scripts) = [ x | l <- scripts.files<0>, /x:method("__isset",_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedUnset(System scripts) = [ x | l <- scripts.files<0>, /x:method("__unset",_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedCall(System scripts) = [ x | l <- scripts.files<0>, /x:method("__call",_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedCallStatic(System scripts) = [ x | l <- scripts.files<0>, /x:method("__callStatic",_,_,_,_) := scripts.files[l] ];
 
 @doc{Support for var-args functions}
 public list[Expr] fetchVACalls(Script scr) = [ v | /v:call(name(name(fn)),_) := scr, fn in {"func_get_args","func_get_arg","func_num_args"} ];
 public lrel[loc fileloc, Expr call] getVACallUses(System scripts) = gatherExprStats(scripts, fetchVACalls);
 
 @doc{Break/continue with non-literal arguments}
-public list[Stmt] fetchVarBreak(System scripts) = [ x | l <- scripts<0>, /x:\break(someExpr(e)) := scripts[l], scalar(_) !:= e ];
-public list[Stmt] fetchVarContinue(System scripts) = [ x | l <- scripts<0>, /x:\continue(someExpr(e)) := scripts[l], scalar(_) !:= e ];
+public list[Stmt] fetchVarBreak(System scripts) = [ x | l <- scripts.files<0>, /x:\break(someExpr(e)) := scripts.files[l], scalar(_) !:= e ];
+public list[Stmt] fetchVarContinue(System scripts) = [ x | l <- scripts.files<0>, /x:\continue(someExpr(e)) := scripts.files[l], scalar(_) !:= e ];
 
 @doc{Uses of eval}
 public list[Expr] fetchEvalUses(Script scr) = [ e | /e:eval(_) := scr ];
@@ -150,7 +150,7 @@ public map[str,int] featureCounts(System scripts) {
 @doc{Gather statement counts}
 public map[str,int] stmtCounts(System scripts) {
 	map[str,int] counts = ( );
-	for (l <- scripts<0>, s <- scripts[l]) {
+	for (l <- scripts.files<0>, s <- scripts.files[l]) {
 		visit(s) {
 			case Stmt stmt : {
 				stmtKey = getStmtKey(stmt);
@@ -166,7 +166,7 @@ public map[str,int] stmtCounts(System scripts) {
 
 public map[str file, map[str feature, int count] counts] stmtAndExprCountsByFile(System scripts) {
 	map[str file, map[str feature, int count] counts] fileCounts = ( );
-	for (l <- scripts<0>, s <- scripts[l]) {
+	for (l <- scripts.files<0>, s <- scripts.files[l]) {
 		map[str feature, int count] counts = ( );
 		visit(s) {
 			case Stmt stmt : {
@@ -199,7 +199,7 @@ public map[str file, map[str feature, int count] counts] stmtAndExprCountsByFile
 @doc{Gather expression counts}
 public map[str,int] exprCounts(System scripts) {
 	map[str,int] counts = ( );
-	for (l <- scripts<0>, s <- scripts[l]) {
+	for (l <- scripts.files<0>, s <- scripts.files[l]) {
 		visit(s) {
 			case Expr expr : {
 				exprKey = getExprKey(expr);

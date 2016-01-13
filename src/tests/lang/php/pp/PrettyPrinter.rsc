@@ -26,9 +26,9 @@ public void createPrettyPrintFiles()
 	}
 	
 	System system = loadPHPFiles(outputFolder);
-	for (fileLoc <- system) {
+	for (fileLoc <- system.files) {
 		loc prettyPrintedFile = phpFileToPp(fileLoc); 
-		str prettyPrintedCode = pp(system[fileLoc]);
+		str prettyPrintedCode = pp(system.files[fileLoc]);
 		
 		writeFile(prettyPrintedFile, prettyPrintedCode);	
 	}
