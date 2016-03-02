@@ -246,6 +246,8 @@ public System loadBinary(str product, str version) {
 	return readBinaryValueFile(#System,parsedItem);
 }
 
+public bool binaryExists(str product, str version) = exists(parsedDir + "<product>-<version>.pt");
+
 public void writeFeatureCounts(str product, str version, map[str,int] fc) {
 	println("Writing counts for <product>-<version>");
 	loc fcLoc = statsDir + "<product>-<version>.fc";
