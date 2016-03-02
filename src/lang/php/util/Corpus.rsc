@@ -122,10 +122,16 @@ public bool compareVersion(str v1, str v2) {
 	v1a = 0; v1b = 0; v1c = 0;
 	v2a = 0; v2b = 0; v2c = 0;
 	
-	if(/<a1:\d+>[.]<b1:\d+>[.]<c1:\d+>/ := v1) {
+	if(/0*<a1:\d+>[.]0*<b1:\d+>[.]0*<c1:\d+>/ := v1) {
 		v1a = toInt(a1); v1b = toInt(b1); v1c = toInt(c1);
-	} else if(/<a1:\d+>[.]<b1:\d+>/ := v1) {
-		v1a = toInt(a1); v1b = toInt(b1);
+	} else if(/0*<a1:\d+>[.]0*<b1:\d+>/ := v1) {
+		v1a = toInt(a1); 
+		try {
+			v1b = toInt(b1);
+		} catch v : {
+			println("Error, cannot convert <b1> to an int");
+			throw "AAAAAAAAAAAAAAAA";
+		}
 	}
 	
 	if(/<a1:\d+>[.]<b1:\d+>[.]<c1:\d+>/ := v2) {
