@@ -98,7 +98,7 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 }
 
 public System inlineMagicConstants(System sys, loc baseloc) {
-	return ( l : inlineMagicConstants(sys[l],l,baseloc) | l <- sys );
+	return ( l : inlineMagicConstants(sys.files[l],l,baseloc) | l <- sys.files );
 }
 
 public Expr inlineMagicConstants(Expr e, loc baseloc) {

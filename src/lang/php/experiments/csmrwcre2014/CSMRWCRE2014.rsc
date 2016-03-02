@@ -53,7 +53,7 @@ private Color calculateBoxColor(int featureCount, int totalCount) {
 
 @doc{Calculate the number of occurrences in a given file}
 private map[str file, int count] calculateFeatureCounts(System s, lrel[loc fileloc, Expr e] occurrences) {
-	map[str file, int count] res = ( l.path : 0 | l <- s );
+	map[str file, int count] res = ( l.path : 0 | l <- s.files );
 	for (<l,_> <- occurrences,l.path in res) res[l.path] += 1;
 	return res;
 }
@@ -87,7 +87,7 @@ public Figure createFeatureViz(System sys, loc baseLoc, lrel[loc fileloc, Expr e
 	totalCount = size(featureOccurrences);
 	
 	maxCount = 0;
-	loclist = reverse(sort(toList(sys<0>), bool(loc l1, loc l2) { return fcounts[l1.path] < fcounts[l2.path]; })); 
+	loclist = reverse(sort(toList(sys.files<0>), bool(loc l1, loc l2) { return fcounts[l1.path] < fcounts[l2.path]; })); 
 	for (l <- fcounts, fcounts[l] > maxCount) maxCount = fcounts[l];
 	boxes = [ createBox(ri, ri.path[size(baseLoc.path)..], fsizes[ri.path], fcounts[ri.path], totalCount) | ri <- loclist ];
 	return hvcat(boxes, gap(10));

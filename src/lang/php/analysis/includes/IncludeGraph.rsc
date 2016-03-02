@@ -47,18 +47,18 @@ public set[loc] getEdgeTargets(IncludeGraph igraph, IncludeGraphEdge edge) {
  
 public IncludeGraph extractIncludeGraph(System scripts, loc productRoot, set[LibItem] libraries) {
 	int sizeToRemove = size(productRoot.path);
-	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- scripts ) + (|file:///synthesizedLoc/<lib.path>| : libNode(lib.name,lib.path) | lib <- libraries);
+	map[loc,IncludeGraphNode] nodeMap = ( l:igNode(substring(l.path,sizeToRemove),l) | l <- scripts.files ) + (|file:///synthesizedLoc/<lib.path>| : libNode(lib.name,lib.path) | lib <- libraries);
 	set[IncludeGraphEdge] edgeSet = { };
 	
-	for (l <- scripts) {
-		includes = fetchIncludeUses(scripts[l]);
+	for (l <- scripts.files) {
+		includes = fetchIncludeUses(scripts.files[l]);
 		for (iexp:include(e,itype) <- includes) {
 			solve(e) {
 				e = algebraicSimplification(simulateCalls(e));
 			}
 			if (scalar(string(sp)) := e) {
 				try {
-					iloc = calculateLoc(scripts<0>,l,productRoot,sp,true,[]);
+					iloc = calculateLoc(scripts.files<0>,l,productRoot,sp,true,[]);
 					edgeSet += igEdge(nodeMap[l],nodeMap[iloc],iexp[expr=e]);					
 				} catch UnavailableLoc(_) : {
 					edgeSet += igEdge(nodeMap[l],unknownNode(),iexp[expr=e]);

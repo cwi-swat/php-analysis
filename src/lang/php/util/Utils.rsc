@@ -145,7 +145,7 @@ private System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocatio
 	list[loc] dirEntries = [ e | e <- entries, isDirectory(e)];
 	list[loc] phpEntries = [ e | e <- entries, e.extension in extensions];
 
-	System phpNodes = ( );
+	System phpNodes = createEmptySystem();
 	
 	increaseFolderCounter();
 	if (folderTotal == 0) setFolderTotal(l);
@@ -155,7 +155,7 @@ private System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocatio
 		for (e <- phpEntries) {
 			try {
 				Script scr = loader(e, addLocationAnnotations, addUniqueIds);
-				phpNodes[e] = scr;
+				phpNodes.files[e] = scr;
 			} catch IO(msg) : {
 				println("<msg>");
 			} catch Java(msg) : {
@@ -164,7 +164,11 @@ private System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocatio
 		}
 	}
 	
-	for (d <- dirEntries) phpNodes = phpNodes + loadPHPFiles(d, loader, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+	for (d <- dirEntries) {
+		newNodes = loadPHPFiles(d, loader, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+		phpNodes.files = phpNodes.files + newNodes.files;
+	}
+	
 	resetCounters();
 		
 	return phpNodes;
@@ -314,7 +318,7 @@ public void writeSortedCounts() {
 	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|, intercalate("\n",scLines));
 }
 
-public map[tuple[str product, str version], map[loc l, Script scr]] getLatestTrees() {
+public map[tuple[str product, str version], System] getLatestTrees() {
 	lv = getLatestVersions();
 	return ( <p,lv[p]> : loadBinary(p,lv[p]) | p <- lv<0> );
 }

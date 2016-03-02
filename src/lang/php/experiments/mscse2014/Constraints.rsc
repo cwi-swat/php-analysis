@@ -29,13 +29,13 @@ public set[Constraint] getConstraints(System system, M3 m3)
 	// reset the constraints of previous runs
 	constraints = {};
 	
-	int counter = 0, total = size(system);
+	int counter = 0, total = size(system.files);
 	logMessage("Get constraints for system (<total> files)", 1);
 	
-	for(s <- system) {
+	for(s <- system.files) {
 		counter+=1; 
 		if (total > 20 && counter%(total/20) == 0) logMessage("<counter> items are done... (<(counter*total)/100>%", 1);
-		addConstraints(system[s], m3);
+		addConstraints(system.files[s], m3);
 	}	
 	
 	logMessage("Yay. You have <size(constraints)> constraints collected! (<m3.id>)", 1);
@@ -1098,7 +1098,7 @@ public rel[TypeSymbol, TypeSymbol] getSubTypes(M3 m3, System system)
 		// use the extends relation from M3
 		+ { < classType(c), classType(e) > | <c,e> <- m3@extends }
 		// add subtype of object for all classes which do not extends a class
-		+ { < classType(c@decl), objectType() > | l <- system, /c:class(n,_,noName(),_,_) <- system[l] };
+		+ { < classType(c@decl), objectType() > | l.files <- system, /c:class(n,_,noName(),_,_) <- system.files[l] };
 		
 	// compute reflexive transitive closure and return the result 
 	subtypes = subtypes*;

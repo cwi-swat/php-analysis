@@ -18,8 +18,8 @@ public set[Constraint] getConstraints(M3 m3, System system)
 	set[Constraint] constraints =  {};
 	//set[Constraint] constraints = getConstraintsForSystem(m3, system);
 	
-	for (f <- system)
-		constraints += getConstraintsForScript(m3, system[f]);
+	for (f <- system.files)
+		constraints += getConstraintsForScript(m3, system.files[f]);
 		
 	return constraints; 
 }

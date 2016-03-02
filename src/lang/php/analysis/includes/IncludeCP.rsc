@@ -45,7 +45,7 @@ public System resolveIncludes(System scripts) {
 
 
 
-public IncludeGraph computeGraph(map[loc fileloc, Script scr] prod, loc l) {
+public IncludeGraph computeGraph(System prod, loc l) {
 	println("Solving scalars");
 	prod2 = evalAllScalars(prod);
 	println("Resolving includes using path pattern matching");

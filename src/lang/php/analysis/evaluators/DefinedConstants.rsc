@@ -159,7 +159,7 @@ public ConstInfo getConstInfo(System sys) {
 					 constMap, classConstMap); 	
 }
 	
-public map[loc,set[ConstItem]] getSystemConstUses(System sys) = ( l : getScriptConsts(sys[l]) | l <- sys);
+public map[loc,set[ConstItem]] getSystemConstUses(System sys) = ( l : getScriptConsts(sys.files[l]) | l <- sys.files);
 
 public map[str constName, set[loc] useLocs] getConstUseLocs(map[loc,set[ConstItem]] constUses) {
 	map[str constName, set[loc] useLocs] res = ( );

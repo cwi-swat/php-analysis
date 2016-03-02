@@ -95,11 +95,11 @@ public Signature getScriptConstants(loc fileloc, Script scr) {
 }
 		
 public map[loc,Signature] getSystemSignatures(System sys) {
-	return ( l : getFileSignature(l,sys[l]) | l <- sys );
+	return ( l : getFileSignature(l,sys.files[l]) | l <- sys.files );
 }
 
 public map[loc,Signature] getConstantSignatures(System sys) {
-	return ( l : getScriptConstants(l,sys[l]) | l <- sys );
+	return ( l : getScriptConstants(l,sys.files[l]) | l <- sys.files );
 }
 
 public rel[SignatureItem, loc] getAllDefinedConstants(System scripts) {

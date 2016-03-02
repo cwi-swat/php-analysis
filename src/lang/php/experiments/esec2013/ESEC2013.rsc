@@ -74,10 +74,10 @@ public void buildESECBinariesWithIncludes(SysMap smap) {
 }
 
 @doc{Load a binary, with resolved includes, for the extension system}
-public map[loc,Script] loadESECBinaryWithIncludes(str product) {
+public System loadESECBinaryWithIncludes(str product) {
 	parsedItem = parsedDir + "<product>-HEAD-icp.pt";
 	println("Loading binary: <parsedItem>");
-	return readBinaryValueFile(#map[loc,Script],parsedItem);
+	return readBinaryValueFile(#System,parsedItem);
 }
 
 @doc{Get back all the dynamic includes in the extension, organized by system}

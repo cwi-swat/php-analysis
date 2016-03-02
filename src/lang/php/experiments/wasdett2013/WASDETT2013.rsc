@@ -36,25 +36,25 @@ private Color calculateBoxColor(int featureCount, int totalCount) {
 
 @doc{Count the number of times each file in included in another file.}
 private map[str file, int count] calculateIncludedCounts(System s) {
-	map[str file, int count] res = ( l.path : 0 | l <- s );
+	map[str file, int count] res = ( l.path : 0 | l <- s.files );
 	// NOTE: This disregards includes we cannot resolve
-	allIncludes = { < ipath, l.path > | l <- s, /i:include(scalar(string(ipath)),_) := s[l],  ipath in res};
+	allIncludes = { < ipath, l.path > | l <- s.files, /i:include(scalar(string(ipath)),_) := s.files[l],  ipath in res};
 	for (< ipath, _ > <- allIncludes) res[ipath] += 1;
 	return res;
 }
 
 @doc{Count the number of times each file in included in another file, directly or indirectly.}
 private map[str file, int count] calculateIncludedCountsTrans(System s) {
-	map[str file, int count] res = ( l.path : 0 | l <- s );
+	map[str file, int count] res = ( l.path : 0 | l <- s.files );
 	// NOTE: This disregards includes we cannot resolve
-	allIncludes = { < ipath, l.path > | l <- s, /i:include(scalar(string(ipath)),_) := s[l],  ipath in res};
+	allIncludes = { < ipath, l.path > | l <- s.files, /i:include(scalar(string(ipath)),_) := s.files[l],  ipath in res};
 	for (< ipath, _ > <- allIncludes+) res[ipath] += 1;
 	return res;
 }
 
 @doc{Calculate the number of occurrences in a given file}
 private map[str file, int count] calculateFeatureCounts(System s, lrel[loc fileloc, Expr e] occurrences) {
-	map[str file, int count] res = ( l.path : 0 | l <- s );
+	map[str file, int count] res = ( l.path : 0 | l <- s.files );
 	for (<l,_> <- occurrences,l.path in res) res[l.path] += 1;
 	return res;
 }
@@ -90,7 +90,7 @@ private Figure createBox(str filename, int includeCount, int featureCount, int t
 public Figure createFeatureViz(System r, lrel[loc fileloc, Expr e] featureOccurrences) {
 	icounts = calculateIncludedCounts(r);
 	fcounts = calculateFeatureCounts(r, featureOccurrences);
-	boxes = [ createBox(ri.path, icounts[ri.path], fcounts[ri.path]) | ri <- r ];
+	boxes = [ createBox(ri.path, icounts[ri.path], fcounts[ri.path]) | ri <- r.files ];
 	return hvcat(boxes, gap(5));
 }
 
@@ -98,7 +98,7 @@ public Figure createFeatureViz(System r, lrel[loc fileloc, Expr e] featureOccurr
 public Figure createFeatureVizTrans(System r, lrel[loc fileloc, Expr e] featureOccurrences) {
 	icounts = calculateIncludedCountsTrans(r);
 	fcounts = calculateFeatureCounts(r, featureOccurrences);
-	boxes = [ createBox(ri.path, icounts[ri.path], fcounts[ri.path]) | ri <- r ];
+	boxes = [ createBox(ri.path, icounts[ri.path], fcounts[ri.path]) | ri <- r.files ];
 	return hvcat(boxes, gap(5));
 }
 
@@ -108,7 +108,7 @@ public Figure createFeatureVizRelColors(System r, lrel[loc fileloc, Expr e] feat
 	fcounts = calculateFeatureCounts(r, featureOccurrences);
 	maxCount = 0;
 	for (l <- fcounts, fcounts[l] > maxCount) maxCount = fcounts[l];
-	boxes = [ createBox(ri.path, icounts[ri.path], fcounts[ri.path], maxCount) | ri <- r ];
+	boxes = [ createBox(ri.path, icounts[ri.path], fcounts[ri.path], maxCount) | ri <- r.files ];
 	return hvcat(boxes, gap(5));
 }
 
@@ -118,7 +118,7 @@ public Figure createFeatureVizTransRelColors(System r, lrel[loc fileloc, Expr e]
 	fcounts = calculateFeatureCounts(r, featureOccurrences);
 	maxCount = 0;
 	for (l <- fcounts, fcounts[l] > maxCount) maxCount = fcounts[l];
-	boxes = [ createBox(ri.path, icounts[ri.path], fcounts[ri.path], maxCount) | ri <- r ];
+	boxes = [ createBox(ri.path, icounts[ri.path], fcounts[ri.path], maxCount) | ri <- r.files ];
 	return hvcat(boxes, gap(5));
 }
 

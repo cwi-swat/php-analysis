@@ -109,7 +109,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 	
 	// Inlining magic constants requires context (e.g., the method the __METHOD__
 	// appears in), so we need to do this step before extracting the graph
-	timings += < "Total number of includes:<size([i|/i:include(_,_) := sys])>", now() >;
+	timings += < "Total number of includes:<size([i|/i:include(_,_) := sys.files])>", now() >;
 	timings += < "Initial number of dynamic includes: <size(gatherIncludesWithVarPaths(sys))>", now() >;
 	sys = inlineMagicConstants(sys, baseLoc);
 	
@@ -123,13 +123,13 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 	timings += < "After initial matching: <size(unsolvedEdges)>", now() >;
 	
 	if (size(unsolvedEdges) > 0) {
-		set[loc] setsIncludePath = { l | l <- sys, /call(name(name("set_include_path")),_) := sys[l] } + 
-								   { l | l <- sys, /call(name(name("ini_set")),[actualParameter(pe,_)]) := sys[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
+		set[loc] setsIncludePath = { l | l <- sys.files, /call(name(name("set_include_path")),_) := sys.files[l] } + 
+								   { l | l <- sys.files, /call(name(name("ini_set")),[actualParameter(pe,_)]) := sys.files[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
 		timings += < "Found <size(setsIncludePath)> locations that set the include path", now() >;
 		
 		// Decorate the include graph with information on constants
 		timings += < "Decorating nodes with constant definition information", now() >;
-		map[loc,set[ConstItemExp]] loc2consts = ( l : { cdef[e=normalizeConstCase(algebraicSimplification(simulateCalls(cdef.e)))]  | cdef <- getScriptConstDefs(sys[l]) } | l <- sys);
+		map[loc,set[ConstItemExp]] loc2consts = ( l : { cdef[e=normalizeConstCase(algebraicSimplification(simulateCalls(cdef.e)))]  | cdef <- getScriptConstDefs(sys.files[l]) } | l <- sys.files);
 		igraph.nodes = ( l : decorateNode(igraph.nodes[l],loc2consts, l in setsIncludePath) | l <- igraph.nodes, igraph.nodes[l] is igNode );
 		
 		// Find uniquely defined constants; we require these to be defined with the same scalar expression,
@@ -215,7 +215,7 @@ public tuple[System,IncludeGraph,lrel[str,datetime]] resolve(System sys, loc bas
 			for (e <- basicMatched) {
 				if (iexp:include(scalar(string(sp)),_) := e.includeExpr) {
 					try {
-						iloc = calculateLoc(sys<0>,e.source.fileLoc,baseLoc,sp,size(reachable(igraph,e.source.fileLoc) & setsIncludePath) > 0,ipath);
+						iloc = calculateLoc(sys.files<0>,e.source.fileLoc,baseLoc,sp,size(reachable(igraph,e.source.fileLoc) & setsIncludePath) > 0,ipath);
 						solvingEdges = solvingEdges + e[target=igraph.nodes[iloc]];
 					} catch UnavailableLoc(_) : {
 						solvingEdges = solvingEdges + e;

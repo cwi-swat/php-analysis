@@ -16,7 +16,6 @@ import lang::php::analysis::evaluators::SimulateCalls;
 import lang::php::analysis::evaluators::DefinedConstants;
 import lang::php::analysis::includes::IncludeGraph;
 import lang::php::analysis::signatures::Signatures;
-import lang::php::util::System;
 import Set;
 import List;
 import String;
@@ -27,7 +26,7 @@ import IO;
 public System evalAllScalars(System scripts) {
 	solve(scripts) {
 		println("APPLYING SIMPLIFICATIONS");
-		scripts = ( l : algebraicSimplification(simulateCalls(scripts[l])) | l <- scripts );
+		scripts.files = ( l : algebraicSimplification(simulateCalls(scripts.files[l])) | l <- scripts.files );
 		println("APPLYING SIMPLIFICATIONS FINISHED");
 	}			
 
@@ -38,7 +37,7 @@ public System evalAllScalars(System scripts) {
 public System evalAllScalarsAndInline(System scripts, loc baseLoc) {
 	solve(scripts) {
 		println("APPLYING SIMPLIFICATIONS");
-		scripts = ( l : algebraicSimplification(simulateCalls(scripts[l])) | l <- scripts );
+		scripts.files = ( l : algebraicSimplification(simulateCalls(scripts.files[l])) | l <- scripts.files );
 		println("APPLYING SIMPLIFICATIONS FINISHED");
 
 		// Calculate the includes graph. We do this inside the solve since the information on
@@ -64,7 +63,7 @@ public System evalAllScalarsAndInline(System scripts, loc baseLoc) {
 
 		// Now, actually do the constant replacement for each script in the system.
 		println("INLINING SCALAR REACHABLE CONSTANTS");
-		scripts = ( l : evalConsts(scripts[l],constMap,igTrans[node4l],sigs) | l <- scripts, node4l := nodeForLoc(igraph, l) );
+		scripts.files = ( l : evalConsts(scripts.files[l],constMap,igTrans[node4l],sigs) | l <- scripts.files, node4l := nodeForLoc(igraph, l) );
 		println("INLINING SCALAR REACHABLE CONSTANTS FINISHED");
 	}			
 
@@ -75,7 +74,7 @@ public System evalAllScalarsAndInline(System scripts, loc baseLoc) {
 public System evalAllScalarsAndInlineUniques(System scripts, loc baseLoc) {
 	solve(scripts) {
 		println("APPLYING SIMPLIFICATIONS");
-		scripts = ( l : algebraicSimplification(simulateCalls(scripts[l])) | l <- scripts );
+		scripts.files = ( l : algebraicSimplification(simulateCalls(scripts.files[l])) | l <- scripts.files );
 		println("APPLYING SIMPLIFICATIONS FINISHED");
 
 		// Calculate the includes graph. We do this inside the solve since the information on
@@ -125,7 +124,7 @@ public System evalAllScalarsAndInlineUniques(System scripts, loc baseLoc) {
 		
 		// Now, actually do the constant replacement for each script in the system.
 		println("INLINING SCALAR REACHABLE CONSTANTS PLUS UNIQUES");
-		scripts = ( l : evalConsts(scripts[l],constMap,classConstMap,igTrans[node4l],sigs) | l <- scripts, node4l := nodeForLoc(igraph, l) );
+		scripts = ( l : evalConsts(scripts.files[l],constMap,classConstMap,igTrans[node4l],sigs) | l <- scripts.files, node4l := nodeForLoc(igraph, l) );
 		println("INLINING SCALAR REACHABLE CONSTANTS PLUS UNIQUES FINISHED");
 	}		
 

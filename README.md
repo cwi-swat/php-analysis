@@ -4,19 +4,32 @@ Introduction
 This repository contains our ongoing work on PHP Analysis in Rascal
 (PHP AiR).
 
+An Important Note
+-----------------
+
+To date, the definition of a `System` has been just a map from file locations
+to ASTs for that file. This means that a `System` knows nothing about itself,
+e.g., it doesn't know that it represents WordPress version 4.3.1. We just
+updated the definition of a `System` so that it is a datatype with constructors
+to allow this kind of information to be stored. This does mean that, wherever
+you currently iterate over a system, you should update that code to instead
+iterate over the `files` field, e.g., `for (l <- sys) { ... }`, which would
+iterate over the locations in the system, should be `for (l <- sys.files) { ... }`
+and `sys[l]` should then be `sys.files[l]`.
+
 Running Our Software
 --------------------
 
 The main prerequisites to running the PHP, Java, and Rascal code
 used to implement our analysis are:
 
-* Java JDK version 1.7, available from the [Java download][java]
+* Java JDK version 1.8, available from the [Java download][java]
 * Eclipse, available on the [Eclipse download][eclipse] page
 * PHP, available from the [PHP download][php] page in source format
   or as part of the Mac Xcode toolset
   
-Eclipse versions 3.7, 4.2 (Juno), and 4.3 (Kepler) should both work
-fine. The latest version of PHP should also work -- we use PHP to
+Eclipse versions 4.5 (Mars) is required to use the newest version of
+Rascal. The latest version of PHP should also work -- we use PHP to
 parse PHP files, but otherwise just pick the version you need to
 run the PHP software you plan to use (variants of 5.3 or greater
 should all work).

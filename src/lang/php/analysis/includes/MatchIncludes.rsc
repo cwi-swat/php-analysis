@@ -31,7 +31,7 @@ data FNBits = lit(str s) | fnBit();
 // what happens is done in the function below.
 public System matchIncludes(System sys, loc baseLoc) {
 	println("MATCHING INCLUDE FILE PATTERNS");
-	sys = ( l : matchIncludes(sys<0>,sys[l],baseLoc,[]) | l <- sys );
+	sys.files = ( l : matchIncludes(sys.files<0>,sys.files[l],baseLoc,[]) | l <- sys.files );
 	println("MATCHING INCLUDE FILE PATTERNS FINISHED");
 	return sys;	
 }
@@ -131,7 +131,7 @@ public set[loc] matchIncludes(System sys, Expr includeExpr, loc baseLoc, set[loc
 	str re = "^\\S*" + fnMatch(includeExpr.expr) + "$";
 
 	// Filter the includes to just return those that match the regular expression
-	set[loc] filteredIncludes = { l | l <- (sys<0> + libs), rexpMatch(l.path,re) }; 
+	set[loc] filteredIncludes = { l | l <- (sys.files<0> + libs), rexpMatch(l.path,re) }; 
 
 	// Just return the result of applying the regexp match, we may want to do
 	// some caching, etc here in the future	

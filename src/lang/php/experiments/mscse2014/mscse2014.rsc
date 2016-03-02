@@ -252,7 +252,7 @@ public rel[loc,loc] getPropagatedImplementations(M3 m3)
 //		// use the extends relation from M3
 //		+ { < classType(c), classType(e) > | <c,e> <- m3@extends }
 //		// add subtype of object for all classes which do not extends a class
-//		+ { < classType(c@decl), objectType() > | l <- system, /c:class(n,_,noName(),_,_) <- system[l] };
+//		+ { < classType(c@decl), objectType() > | l <- system.files, /c:class(n,_,noName(),_,_) <- system.files[l] };
 //		
 //	// compute reflexive transitive closure and return the result 
 //	return subtypes*;
@@ -304,9 +304,9 @@ public void printIncludeScopeInfo() {
 	System system = readBinaryValueFile(#System, getModifiedSystemCacheFile());	
 	
 	rel[loc, loc, IncludeType] includeInScope = {};
-	for (s <- system) {
+	for (s <- system.files) {
 		println(s);
-		visit(system[s]) {
+		visit(system.files[s]) {
 			case i:include(_,t): 
 				includeInScope += { <i@at, i@scope, t> };
 		}
