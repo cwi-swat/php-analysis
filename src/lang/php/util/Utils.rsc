@@ -186,7 +186,7 @@ public void buildBinaries(str product, str version, loc l, bool addLocationAnnot
 	if (overwrite || (!overwrite && !exists(binLoc))) {
 		logMessage("Parsing <product>-<version>. \>\> Location: <l>.", 1);
 		System files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
-		
+		files = namedVersionedSystem(product, version, l, files.files);
 		logMessage("Now writing file: <binLoc>...", 2);
 		if (!exists(parsedDir)) {
 			mkDirectory(parsedDir);
@@ -205,14 +205,16 @@ public void buildBinaries(str product, str version, bool addLocationAnnotations 
 
 @doc{Build the serialized ASTs for all versions of a specific product (e.g., WordPress)}
 public void buildBinaries(str product, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
-	for (version <- getVersions(product))
+	for (version <- getVersions(product)) {
 		buildBinaries(product, version, getCorpusItem(product, version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
+	}
 }
 
 @doc{Build the serialized ASTs for all product/version combos in the corpus}
 public void buildBinaries(bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
-	for (product <- getProducts(), version <- getVersions(product))
+	for (product <- getProducts(), version <- getVersions(product)) {
 		buildBinaries(product, version, getCorpusItem(product,version), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
+	}
 }
 
 @doc{Build the serialized ASTs for a specific system if they have not been built already}
@@ -406,5 +408,28 @@ public void checkConfiguration() {
 		} catch re : {
 			println("Test parse of 1+2 triggered the following exception: <re>");
 		}
+	}
+}
+
+public void convertCorpusItemToNamedSystem(str product, str version) {
+	parsedItem = parsedDir + "<product>-<version>.pt";
+	logMessage("Converting binary: <parsedItem>", 1);
+	if (exists(parsedItem)) {
+		try {
+			ptAsValue = readBinaryValueFile(#value, parsedItem);
+			if (map[loc fileloc, Script scr] pt := ptAsValue) {
+				corpusItemLoc = getCorpusItem(product,version);
+				System sys = namedVersionedSystem(product, version, corpusItemLoc, pt);
+				writeBinaryValueFile(parsedItem, sys, compression=false);
+			}
+		} catch v : {
+			logMessage("Could not convert system: <v>", 1);
+		}
+	}
+}
+
+public void convertCorpusToNamedSystems() {
+	for (product <- getProducts(), version <- getVersions(product)) {
+		convertCorpusItemToNamedSystem(product, version);
 	}
 }

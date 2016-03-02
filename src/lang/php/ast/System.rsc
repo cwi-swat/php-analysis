@@ -3,8 +3,10 @@ module lang::php::ast::System
 import lang::php::ast::AbstractSyntax;
 import lang::php::ast::NormalizeAST;
 
-data System = system(map[loc fileloc, Script scr] files);
-
+data System 
+	= system(map[loc fileloc, Script scr] files)
+	| namedVersionedSystem(str name, str version, loc baseLoc, map[loc fileloc, Script scr] files)
+	;
 
 public System normalizeSystem(System s) {
 	s = discardErrorScripts(s);
