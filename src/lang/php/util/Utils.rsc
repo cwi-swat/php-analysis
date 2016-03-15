@@ -246,8 +246,11 @@ public void buildNewestBinaries(bool addLocationAnnotations = true, bool addUniq
 }
 
 @doc{Load the serialized ASTs for a specific system in the corpus.}
-public System loadBinary(str product, str version) {
-	parsedItem = parsedDir + "<product>-<version>.pt";
+public System loadBinary(str product, str version) = loadBinary("<product>-<version>");
+
+@doc{Load the serialized ASTs for the named system in the corpus.}
+public System loadBinary(str name) {
+	parsedItem = parsedDir + "<name>.pt";
 	logMessage("Loading binary: <parsedItem>", 1);
 	return readBinaryValueFile(#System,parsedItem);
 }
