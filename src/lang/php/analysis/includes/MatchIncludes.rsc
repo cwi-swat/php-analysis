@@ -131,7 +131,12 @@ public set[loc] matchIncludes(System sys, Expr includeExpr, loc baseLoc, set[loc
 	str re = "^\\S*" + fnMatch(includeExpr.expr) + "$";
 
 	// Filter the includes to just return those that match the regular expression
-	set[loc] filteredIncludes = { l | l <- (sys.files<0> + libs), rexpMatch(l.path,re) }; 
+	set[loc] filteredIncludes = { };
+	try {
+		filteredIncludes = { l | l <- (sys.files<0> + libs), rexpMatch(l.path,re) };
+	} catch _ : {
+		println("Error with regular expression");
+	} 
 
 	// Just return the result of applying the regexp match, we may want to do
 	// some caching, etc here in the future	

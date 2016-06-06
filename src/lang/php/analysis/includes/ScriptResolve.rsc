@@ -20,6 +20,7 @@ import lang::php::analysis::evaluators::DefinedConstants;
 import lang::php::analysis::includes::NormalizeConstCase;
 import lang::php::analysis::evaluators::AlgebraicSimplification;
 import lang::php::analysis::evaluators::SimulateCalls;
+import lang::php::analysis::evaluators::Simplify;
 
 import Set;
 import Relation;
@@ -208,7 +209,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 		
 		// Finally, perform our standard simplifications on the expression, performing
 		// concatenations, etc.
-		resolvedExpr = normalizeExpr(resolvedExpr, baseLoc);
+		resolvedExpr = simplifyExpr(resolvedExpr, baseLoc);
 		return resolvedExpr;
 	}						 			
 	

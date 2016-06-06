@@ -6,6 +6,7 @@ import lang::php::util::LocUtils;
 import lang::php::ast::System;
 import lang::php::analysis::includes::IncludesInfo;
 import lang::php::analysis::includes::MatchIncludes;
+import lang::php::analysis::evaluators::Simplify;
 
 import Set;
 import Relation;
@@ -36,7 +37,7 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	// Step 1: simplify the include expression using a variety of techniques,
 	// such as simulating function calls, replacing magic constants, and
 	// performing string concatenations
-	includes = { < l, normalizeExpr(replaceConstants(i,iinfo), baseLoc) > | < l, i > <- includes };
+	includes = { < l, simplifyExpr(replaceConstants(i,iinfo), baseLoc) > | < l, i > <- includes };
 	
 	// Step 2: if we have a scalar expression that is an absolute path, meaning
 	// it starts with \ or /, then see if we can match it to a file, it should
