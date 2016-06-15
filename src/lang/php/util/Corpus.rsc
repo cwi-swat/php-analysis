@@ -60,6 +60,20 @@ private set[str] versions(str p) {
 //								"1.15.1", "1.15.2", "1.15.3", "1.15.4", "1.15.5", "1.16.0", "1.16.1", "1.16.2", "1.16.3", "1.16.4", "1.16.5",
 //								"1.17.0", "1.17.1", "1.17.2", "1.17.3", "1.18.0", "1.18.1", "1.6.12", "1.18.2"};
 
+public bool corpusItemExists(str product, str version) {
+	if (product in products()) {
+		if (version in versions(product)) {
+			loc productRoot = corpusRoot + product + "<toLowerCase(product)>-<version>";
+			if (exists(productRoot)) return true;
+			productRoot = corpusRoot + product + "<toLowerCase(product)>_<version>";
+			if (exists(productRoot)) return true;
+			return false;
+		}
+		return false;
+	}
+	return false;
+}
+
 public loc getCorpusItem(str product, str version) {
 	if (product in products()) {
 		if (version in versions(product)) {
@@ -145,3 +159,8 @@ public bool compareVersion(str v1, str v2) {
 	if (v1a == v2a && v1b == v2b && v1c < v2c) return true;
 	return false;
 }
+
+public map[str,str] missingCorpusItems(map[str,str] corpus) {
+	return ( p : v | p <- corpus, v := corpus[p], !corpusItemExists(p,v) ); 
+}
+

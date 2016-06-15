@@ -931,14 +931,17 @@ public void featureCountsPerFile(Corpus corpus) {
 
 alias FMap = map[str file,tuple[int \break,int \classDef,int \const,int \continue,int \declare,int \do,int \echo,int \expressionStatementChainRule,int \for,int \foreach,int \functionDef,int \global,int \goto,int \haltCompiler,int \if,int \inlineHTML,int \interfaceDef,int \traitDef,int \label,int \namespace,int \return,int \static,int \switch,int \throw,int \tryCatch,int \unset,int \use,int \while,int \array,int \fetchArrayDim,int \fetchClassConst,int \assign,int \assignWithOperationBitwiseAnd,int \assignWithOperationBitwiseOr,int \assignWithOperationBitwiseXor,int \assignWithOperationConcat,int \assignWithOperationDiv,int \assignWithOperationMinus,int \assignWithOperationMod,int \assignWithOperationMul,int \assignWithOperationPlus,int \assignWithOperationRightShift,int \assignWithOperationLeftShift,int \listAssign,int \refAssign,int \binaryOperationBitwiseAnd,int \binaryOperationBitwiseOr,int \binaryOperationBitwiseXor,int \binaryOperationConcat,int \binaryOperationDiv,int \binaryOperationMinus,int \binaryOperationMod,int \binaryOperationMul,int \binaryOperationPlus,int \binaryOperationRightShift,int \binaryOperationLeftShift,int \binaryOperationBooleanAnd,int \binaryOperationBooleanOr,int \binaryOperationGt,int \binaryOperationGeq,int \binaryOperationLogicalAnd,int \binaryOperationLogicalOr,int \binaryOperationLogicalXor,int \binaryOperationNotEqual,int \binaryOperationNotIdentical,int \binaryOperationLt,int \binaryOperationLeq,int \binaryOperationEqual,int \binaryOperationIdentical,int \unaryOperationBooleanNot,int \unaryOperationBitwiseNot,int \unaryOperationPostDec,int \unaryOperationPreDec,int \unaryOperationPostInc,int \unaryOperationPreInc,int \unaryOperationUnaryPlus,int \unaryOperationUnaryMinus,int \new,int \castToInt,int \castToBool,int \castToFloat,int \castToString,int \castToArray,int \castToObject,int \castToUnset,int \clone,int \closure,int \fetchConst,int \empty,int \suppress,int \eval,int \exit,int \call,int \methodCall,int \staticCall,int \include,int \instanceOf,int \isSet,int \print,int \propertyFetch,int \shellExec,int \ternary,int \fetchStaticProperty,int \scalar,int \var,int \list,int \propertyDef,int \classConstDef,int \methodDef,int \traitUse] counts];
 
-public void writeFeatsMap(FMap m) {
-  writeBinaryValueFile(|rascal://src/lang/php/serialized/featsmap.bin|, m);
+private loc featsMapLoc = baseLoc + "serialized/features/featsmap.bin";
+
+public void saveFeatsMap(FMap m) {
+    writeBinaryValueFile(featsMapLoc, m);
 }
 
-public FMap readFeatsMap() {
-  return readBinaryValueFile(#FMap, |rascal://src/lang/php/serialized/featsmap.bin|);
+public FMap loadFeatsMap() {
+    return readBinaryValueFile(#FMap, featsMapLoc);
 }
 
+public bool featsMapExists() = exists(featsMapLoc);
 
 public map[str,list[str]] getFeatureGroups() {
  labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
@@ -1310,7 +1313,9 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	return < solution, solutionLabels, found >;
 }
 
-public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice) {
+alias CoverageMap = map[int,set[str]];
+
+public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice) {
 	// The features in the system 
 	features = toSet(tail(tail(tail(getRelFieldNames((#getFeatsType).symbol)))));
 	
@@ -1327,7 +1332,7 @@ public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice la
 	set[str] remainingFeatures = features;
 	
 	// solutions -- map from percent (as int) to labels that cover it
-	map[int,set[str]] res = ( );
+	CoverageMap res = ( );
 	
 	// covered so far (percent-wise)
 	int coveredSoFar = 0;
@@ -1343,7 +1348,7 @@ public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice la
 	map[int,int] featureFileCount = ( n : size({l|l<-fmap<0>,fmap[l][n]>0}) | n <- index(fieldNames) );
 	map[int,real] featureFilePercent = ( n : featureFileCount[n]*100.0/totalFileCount | n <- featureFileCount ); 
 	map[int,set[int]] neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..101] ); 
-	map[int,set[str]] neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor ); 
+	CoverageMap neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor ); 
 	
 	// seed the solution with all the features we need to achieve 1% coverage
 	solution = neededForLabels[1];
@@ -1396,39 +1401,47 @@ public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice la
 	return res;
 }
 
-public map[int,set[str]] featuresForPercents(FMap fmap, FeatureLattice lattice, list[int] percents) {
+public CoverageMap featuresForPercents(FMap fmap, FeatureLattice lattice, list[int] percents) {
 	return ( p : features | p <- percents, < nodes, features, files > := minimumFeaturesForPercent(fmap,lattice,p) );
 }
 
-public map[int,set[str]] featuresForAllPercents(FMap fmap, FeatureLattice lattice) {
+public CoverageMap featuresForAllPercents(FMap fmap, FeatureLattice lattice) {
 	return featuresForPercents(fmap, lattice, [1..101]);
 }
 
-public map[int,set[str]] featuresForPercents2(FMap fmap, FeatureLattice lattice, list[int] percents) {
+public CoverageMap featuresForPercents2(FMap fmap, FeatureLattice lattice, list[int] percents) {
 	return ( p : minimumFeaturesForPercent2(fmap,lattice,p) | p <- percents );
 }
 
-public map[int,set[str]] featuresForAllPercents2(FMap fmap, FeatureLattice lattice) {
+public CoverageMap featuresForAllPercents2(FMap fmap, FeatureLattice lattice) {
 	return featuresForPercents2(fmap, lattice, [1..101]);
 }
 
-public void saveCoverageMap(map[int,set[str]] coverageMap) {
-	writeBinaryValueFile(|rascal://src/lang/php/serialized/coverageMap.bin|, coverageMap);
+private loc coverageMapLoc = baseLoc + "serialized/features/coverageMap.bin";
+
+public void saveCoverageMap(CoverageMap coverageMap) {
+	writeBinaryValueFile(coverageMapLoc, coverageMap);
 }
 
-public map[int,set[str]] loadCoverageMap() {
-	return readBinaryValueFile(#map[int,set[str]], |rascal://src/lang/php/serialized/coverageMap.bin|);
+public CoverageMap loadCoverageMap() {
+	return readBinaryValueFile(#CoverageMap, coverageMapLoc);
 }
+
+public bool coverageMapExists() = exists(coverageMapLoc);
+
+private loc featureLatticeLoc = baseLoc + "serialized/features/featureLattice.bin";
 
 public void saveFeatureLattice(FeatureLattice fl) {
-	writeBinaryValueFile(|rascal://src/lang/php/serialized/featureLattice.bin|, fl);
+	writeBinaryValueFile(featureLatticeLoc, fl);
 }
 
 public FeatureLattice loadFeatureLattice() {
-	return readBinaryValueFile(#FeatureLattice, |rascal://src/lang/php/serialized/featureLattice.bin|);
+	return readBinaryValueFile(#FeatureLattice, featureLatticeLoc);
 }
 
-public str coverageGraph(map[int,set[str]] coverageMap) {
+public bool featureLatticeExists() = exists(featureLatticeLoc);
+
+public str coverageGraph(CoverageMap coverageMap) {
   
   angles = ( n : 90 | n <- coverageMap<0> ); angles[95] = 0; angles[100] = 90;
   position = ( n : "right" | n <- coverageMap<0> ); position[95] = "left"; position[100] = "left";
@@ -1577,7 +1590,7 @@ public System loadBinaryWithIncludes(str product, str version) {
 	return readBinaryValueFile(#System,parsedItem);
 }
 
-public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, map[int,set[str]] coverageMap) {
+public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, CoverageMap coverageMap) {
 	fieldNames = toSet(tail(tail(tail(getRelFieldNames((#getFeatsType).symbol)))));
 	
 	in80 = coverageMap[80];
@@ -1589,7 +1602,7 @@ public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, m
 	map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] res = ( );
 	for (product <- corpus) {
 		pt = loadBinary(product,corpus[product]);
-		res[product] = < {l.path|l<-pt<0>} - in80Files, {l.path|l<-pt<0>} - in90Files >;
+		res[product] = < {l.path|l<-pt.files<0>} - in80Files, {l.path|l<-pt.files<0>} - in90Files >;
 	}
 	
 	return res;

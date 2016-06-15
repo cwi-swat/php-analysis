@@ -22,6 +22,13 @@ public Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 	}
 }
 
+public rel[loc,loc] quickResolve(System sys, loc toResolve, set[loc] libs = { }, bool checkFS=false) {
+	if (sys has name && sys has version && sys has baseLoc) {
+		return quickResolve(sys, sys.name, sys.version, toResolve, sys.baseLoc, libs=libs, checkFS=checkFS);
+	}
+	throw "Provided system must have name, version, and baseLoc fields set";
+}
+
 public rel[loc,loc] quickResolve(System sys, str p, str v, loc toResolve, loc baseLoc, set[loc] libs = { }, bool checkFS=false) {
 	IncludesInfo iinfo = loadIncludesInfo(p, v);
 	return quickResolve(sys, iinfo, toResolve, baseLoc, libs=libs, checkFS=checkFS);
