@@ -164,3 +164,12 @@ public map[str,str] missingCorpusItems(map[str,str] corpus) {
 	return ( p : v | p <- corpus, v := corpus[p], !corpusItemExists(p,v) ); 
 }
 
+public str bundleCorpusItems(map[str,str] corpus, str corpusName) {
+	list[str] corpusPaths = [ ];
+	for (p <- corpus, v := corpus[p]) {
+		itemPath = getCorpusItem(p,v);
+		sysAndVersion = itemPath.path[size(corpusRoot.path)+1..];
+		corpusPaths = corpusPaths + sysAndVersion;
+	}
+	return "zip -r <corpusName>.zip " + intercalate(" ", corpusPaths);
+}
