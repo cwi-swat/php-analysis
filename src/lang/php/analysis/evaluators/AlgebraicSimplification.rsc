@@ -93,7 +93,12 @@ public Expr algebraicSimplification(Expr expr) {
 			scalarParts = [ e | e <- el, scalar(sp) := e, string(_) := sp || integer(_) := sp || float(_) := sp ];
 			if (size(el) == size(scalarParts)) {
 				res = ( string("") | concatScalars(it,sc) | scalar(sc) <- el );
-				insert(scalar(res[@at=head(el)@at])[@at=s@at]);
+				headElement = head(el);
+				if ( (headElement@at)? ) {
+					insert(scalar(res[@at=headElement@at])[@at=s@at]);
+				} else {
+					insert(scalar(res)[@at=s@at]);
+				}
 			}
 		}
 	}
