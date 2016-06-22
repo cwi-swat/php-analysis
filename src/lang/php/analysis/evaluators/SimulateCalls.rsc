@@ -70,7 +70,31 @@ public Expr simulateCall(Expr e) {
 				} 
 			}
 		}
-	} 
+	} else if (Expr c:call(name(name("sprintf")),[actualParameter(scalar(string(s1)),false), ps*]) := e) {
+		markers = findAll(s1,"%");
+		doReplacement = [ false | i <- markers ];
+		for (i <- index(markers), size(s1) >= (markers[i]+1), s1[markers[i]+1] == "s", size(ps) >= i, scalar(string(_)) := ps[i].expr) {
+			doReplacement[i] = true;		
+		}
+		
+		doReplacement = reverse(doReplacement);
+		markers = reverse(markers);
+		
+		for (i <- index(markers), doReplacement[i], scalar(string(rs)) := ps[i].expr) {
+			s1 = s1[..markers[i]] + rs + s1[markers[i]+2..];
+		}
+		
+		doReplacement = [false] + reverse(doReplacement);
+		toRemove = reverse([ i | i <- index(doReplacement), doReplacement[i] ]);
+		for (i <- toRemove) c.parameters = remove(c.parameters,i);
+		
+		c.parameters[0].expr.scalarVal.strVal = s1;
+		
+		if (size(findAll(s1,"%")) == 0) {
+			return scalar(string(s1))[@at=c@at];
+		}
+		return c;
+	}
 
 	return e;
 }

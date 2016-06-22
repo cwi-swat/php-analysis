@@ -17,6 +17,12 @@ iterate over the `files` field, e.g., `for (l <- sys) { ... }`, which would
 iterate over the locations in the system, should be `for (l <- sys.files) { ... }`
 and `sys[l]` should then be `sys.files[l]`.
 
+If you have binaries built for an existing corpus of PHP systems, you don't
+need to rebuild all these. Instead, run the `convertCorpusToNamedSystems`
+function in `lang::php::util::Utils`, which will convert all the existing
+binaries for you, or run `convertCorpusItemToNamedSystem` to convert a
+single binary, given the name of the system and the version.
+
 Running Our Software
 --------------------
 

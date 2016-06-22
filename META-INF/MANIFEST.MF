@@ -3,13 +3,10 @@ Bundle-ManifestVersion: 2
 Bundle-Name: PHPAnalysis
 Bundle-SymbolicName: PHPAnalysis
 Bundle-Version: 1.0.0
-Require-Bundle: org.eclipse.imp.pdb.values,
- rascal,
+Require-Bundle: rascal,
  rascal_eclipse
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.eclipse.imp.pdb.facts,
- org.eclipse.imp.pdb.facts.type,
- org.rascalmpl.interpreter.utils
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.rascalmpl.interpreter.utils
 Export-Package: 
  lang.php.abstractions.templates,
  lang.php.analysis,
@@ -31,7 +28,6 @@ Export-Package:
  lang.php.ese.extractors.git,
  lang.php.experiments.esec2013,
  lang.php.experiments.icse2013,
- lang.php.experiments.issta2013,
  lang.php.experiments.wasdett2013,
  lang.php.experiments.wcre2014,
  lang.php.extract.csvs,
@@ -52,5 +48,4 @@ Export-Package:
  lang.php.systems,
  lang.php.transform,
  lang.php.types,
- lang.php.util,
- org.rascal.phpanalysis
+ lang.php.util

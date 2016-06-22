@@ -8,13 +8,16 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::stats::Stats
 
-import Set;
-import String;
-import List;
 import lang::php::util::Utils;
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Corpus;
 import lang::php::ast::System;
+import lang::php::util::Config;
+
+import Set;
+import String;
+import List;
+import IO;
 import lang::csv::IO;
 
 public bool containsVV(Expr e) = size({ v | /v:var(expr(Expr ev)) := e }) > 0;

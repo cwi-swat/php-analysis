@@ -6,6 +6,7 @@ import lang::php::util::LocUtils;
 import lang::php::ast::System;
 import lang::php::analysis::includes::IncludesInfo;
 import lang::php::analysis::includes::MatchIncludes;
+import lang::php::analysis::evaluators::Simplify;
 
 import Set;
 import Relation;
@@ -19,6 +20,13 @@ public Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 		case fcc:fetchClassConst(name(name(cln)),str cn) => (iinfo.classConstMap[cln][cn])[@at=fcc@at]
 			when cln in iinfo.classConstMap && cn in iinfo.classConstMap[cln]
 	}
+}
+
+public rel[loc,loc] quickResolve(System sys, loc toResolve, set[loc] libs = { }, bool checkFS=false) {
+	if (sys has name && sys has version && sys has baseLoc) {
+		return quickResolve(sys, sys.name, sys.version, toResolve, sys.baseLoc, libs=libs, checkFS=checkFS);
+	}
+	throw "Provided system must have name, version, and baseLoc fields set";
 }
 
 public rel[loc,loc] quickResolve(System sys, str p, str v, loc toResolve, loc baseLoc, set[loc] libs = { }, bool checkFS=false) {
@@ -36,7 +44,7 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	// Step 1: simplify the include expression using a variety of techniques,
 	// such as simulating function calls, replacing magic constants, and
 	// performing string concatenations
-	includes = { < l, normalizeExpr(replaceConstants(i,iinfo), baseLoc) > | < l, i > <- includes };
+	includes = { < l, simplifyExpr(replaceConstants(i,iinfo), baseLoc) > | < l, i > <- includes };
 	
 	// Step 2: if we have a scalar expression that is an absolute path, meaning
 	// it starts with \ or /, then see if we can match it to a file, it should

@@ -352,7 +352,7 @@ public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses,
 							 list[tuple[str p, str v, QueryResult qr]] vvnews,
 							 list[tuple[str p, str v, QueryResult qr]] vvprops,
 							 list[tuple[str p, str v, QueryResult qr]] vvall,
-							 map[str,set[str]] transitiveUses, Corpus corpus) {
+							 map[str,set[loc]] transitiveUses, Corpus corpus) {
 							 
 	ci = loadCountsCSV();
 	hasGini = ( p : (size({qr|<p,_,qr> <- vvall}) > 1) ? true : false | p <- corpus );
@@ -505,92 +505,123 @@ public map[str p, real gc] resultsToGini(list[tuple[str p, str v, QueryResult qr
 	return gcmap;
 }
 
-alias ICLists = map[tuple[str product, str version] sysinfo, tuple[lrel[loc fileloc, Expr call] initial, lrel[loc fileloc, Expr call] unresolved] hits];
-
-public ICLists includesAnalysis() {
-	corpus = getLatestVersions();
-	return includesAnalysis(corpus);
-}
-
-public ICLists includesAnalysis(Corpus corpus) {
-	res = ( );
-	for (product <- corpus) {
-		sys = loadBinary(product,corpus[product]);
-		initial = gatherIncludesWithVarPaths(sys);
-		
-		sysResolved = resolveIncludes(sys, getCorpusItem(product,corpus[product]));
-		unresolved = gatherIncludesWithVarPaths(sysResolved);
-		
-		res[<product,corpus[product]>] = < initial, unresolved >;		
-	}
-	return res;
-}
-
-public ICLists includesAnalysisFromBinaries(Corpus corpus) {
-	res = ( );
-	for (product <- corpus) {
-		sys = loadBinary(product,corpus[product]);
-		initial = gatherIncludesWithVarPaths(sys);
-		
-		sys = loadBinaryWithIncludes(product,corpus[product]);
-		unresolved = gatherIncludesWithVarPaths(sys);
-		
-		res[<product,corpus[product]>] = < initial, unresolved >;		
-	}
-	return res;
-}
-
-public void saveForLater(ICLists res) {
-	writeBinaryValueFile(|rascal://src/lang/php/serialized/includes.bin|, res);
-}
-
-public ICLists reload() {
-	return readBinaryValueFile(#ICLists, |rascal://src/lang/php/serialized/includes.bin|); 
-}
+//alias ICLists = map[tuple[str product, str version] sysinfo, tuple[lrel[loc fileloc, Expr call] initial, lrel[loc fileloc, Expr call] unresolved] hits];
+//
+//public ICLists includesAnalysis() {
+//	corpus = getLatestVersions();
+//	return includesAnalysis(corpus);
+//}
+//
+//public ICLists includesAnalysis(Corpus corpus) {
+//	res = ( );
+//	for (product <- corpus) {
+//		sys = loadBinary(product,corpus[product]);
+//		initial = gatherIncludesWithVarPaths(sys);
+//		
+//		sysResolved = resolveIncludes(sys, getCorpusItem(product,corpus[product]));
+//		unresolved = gatherIncludesWithVarPaths(sysResolved);
+//		
+//		res[<product,corpus[product]>] = < initial, unresolved >;		
+//	}
+//	return res;
+//}
+//
+//public ICLists includesAnalysisFromBinaries(Corpus corpus) {
+//	res = ( );
+//	for (product <- corpus) {
+//		sys = loadBinary(product,corpus[product]);
+//		initial = gatherIncludesWithVarPaths(sys);
+//		
+//		sys = loadBinaryWithIncludes(product,corpus[product]);
+//		unresolved = gatherIncludesWithVarPaths(sys);
+//		
+//		res[<product,corpus[product]>] = < initial, unresolved >;		
+//	}
+//	return res;
+//}
+//
+//public void saveForLater(ICLists res) {
+//	writeBinaryValueFile(|rascal://src/lang/php/serialized/includes.bin|, res);
+//}
+//
+//public ICLists reload() {
+//	return readBinaryValueFile(#ICLists, |rascal://src/lang/php/serialized/includes.bin|); 
+//}
 
 // NOTE: Technically, field resolved holds info on the number of unresolved includes
 // left after all resolution attempts are made.
-alias ICResult = map[tuple[str product, str version] sysinfo, tuple[tuple[int hc,int fc,real gc] initial, tuple[int hc,int fc,real gc] unresolved] counts];
+alias IncludesCountTuple = tuple[int includeCount, int fileCount, real giniCoefficient];
+alias IncludesCountBeforeAfterTuple = tuple[IncludesCountTuple initial, IncludesCountTuple unresolved];
+alias ICResult = map[tuple[str product, str version] sysinfo, IncludesCountBeforeAfterTuple counts];
 
-public ICResult calculateIncludeCounts(ICLists res) {
-	counts = ( );
-	
-	tuple[int hc, int fc, real gc] calc(list[tuple[loc fileloc, Expr call]] hits) {
-		hc = size(hits);
-		fc = size({ l.path | <l,_> <- hits });
-		map[str,int] hitmap = ( );
-		for (<l,e> <- hits)
-			if (l.path in hitmap)
-				hitmap[l.path] += 1;
-			else
-				hitmap[l.path] = 1;
-		//hitmap = ( l.path : size([i|i:<l,_> <- hits]) | l <- {l | <l,_> <- hits} );
-		//distmap = ( );
-		//for (l <- hitmap) if (hitmap[l] in distmap) distmap[hitmap[l]] += 1; else distmap[hitmap[l]] = 1;
-		distlist = [ hitmap[l] | l <- hitmap ];
+public IncludesCountBeforeAfterTuple calculateSystemIncludesCounts(System sys, rel[loc,loc,loc] resolved) {
 
-		giniC = (size(distlist) > 1) ? mygini(distlist) : 0;
+	IncludesCountTuple calcInitial(lrel[loc fileloc, Expr call] computedIncludes) {
+		computedIncludesCount = size(computedIncludes);
+		computedIncludesFilesCount = size({ l.path | <l,_> <- computedIncludes });
+		map[str,int] fileDistMap = ( );
+		for (<l,e> <- computedIncludes) {
+			if (l.path in fileDistMap) {
+				fileDistMap[l.path] += 1;
+			} else {
+				fileDistMap[l.path] = 1;
+			}
+		}
+		distList = [ fileDistMap[l] | l <- fileDistMap ];
+		giniC = (size(distList) > 1) ? mygini(distList) : 0;
 		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
 
-		//gc = round(mygini(distlist)*10000.0)/10000.0;
-		return < hc, fc, giniToPrint >;
+		return < computedIncludesCount, computedIncludesFilesCount, giniToPrint >;
+	}
+
+	IncludesCountTuple calcResolved() {
+		map[loc,int] exprLocCounts = ( );
+		for ( < fileLoc, exprLoc, targetLoc > <- resolved ) {
+			if (exprLoc in exprLocCounts) {
+				exprLocCounts[exprLoc] += 1;
+			} else {
+				exprLocCounts[exprLoc] = 1;
+			}
+		}
+		nonUniqueIncludes = { < fileLoc, exprLoc, targetLoc > | < fileLoc, exprLoc, targetLoc > <- resolved, exprLocCounts[exprLoc] > 1 };
+		nonUniqueSourcesCount = size(nonUniqueIncludes<0,1>);
+		nonUniqueFilesCount = size(nonUniqueIncludes<0>);
+		map[str,int] fileDistMap = ( );
+		for (< fileLoc, exprLoc > <- nonUniqueIncludes<0,1>) {
+			if ( fileLoc.path in fileDistMap ) {
+				fileDistMap[fileLoc.path] += 1;
+			} else {
+				fileDistMap[fileLoc.path] = 1;
+			}
+		}
+		
+		distList = [ fileDistMap[l] | l <- fileDistMap ];
+		giniC = (size(distList) > 1) ? mygini(distList) : 0;
+		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
+		
+		return < nonUniqueSourcesCount, nonUniqueFilesCount, giniToPrint >;
 	}
 	
-	for (<p,v> <- res) {
-		l1 = res[<p,v>].initial;
-		l2 = res[<p,v>].unresolved;
-		counts[<p,v>] = < calc(l1), calc(l2) >;
-	}
+	// First, get all the computed includes, these provide a rough proxy for dynamic includes
+	lrel[loc fileloc, Expr call] varIncludes = gatherIncludesWithVarPaths(sys);
+	initialCounts = calcInitial(varIncludes);
 	
-	return counts;
+	// Second, get counts based on the resolved includes	
+	unresolvedCounts = calcResolved();
+		
+	return < initialCounts, unresolvedCounts >;
 }
 
-public void saveIncludeCountsForLater(ICResult res) {
-	writeBinaryValueFile(|rascal://src/lang/php/serialized/includeCounts.bin|, res);
+private loc includesCountsLoc = baseLoc + "serialized/features/includeCounts.bin";
+
+public bool includesCountsExists() = exists(includesCountsLoc);
+
+public void saveIncludesCounts(ICResult res) {
+	writeBinaryValueFile(includesCountsLoc, res);
 }
 
-public ICResult reloadIncludeCounts() {
-	return readBinaryValueFile(#ICResult, |rascal://src/lang/php/serialized/includeCounts.bin|); 
+public ICResult loadIncludesCounts() {
+	return readBinaryValueFile(#ICResult, includesCountsLoc); 
 }
 
 public map[tuple[str p, str v], int] includeCounts(Corpus corpus) {
@@ -618,10 +649,10 @@ public str generateIncludeCountsTable(ICResult counts, map[tuple[str p, str v], 
 	str productLine(str p) {
 		v = lv[p];
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
-		giniC = counts[<p,v>].unresolved.gc;
+		giniC = counts[<p,v>].unresolved.giniCoefficient;
 		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
 
-		return "<p> & \\numprint{<totalIncludes[<p,v>]>} & \\numprint{<counts[<p,v>].initial.hc>}  & \\numprint{<counts[<p,v>].initial.hc-counts[<p,v>].unresolved.hc>} & \\numprint{<fileCount>}(\\numprint{<counts[<p,v>].unresolved.fc>}) & \\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround \\\\";
+		return "<p> & \\numprint{<totalIncludes[<p,v>]>} & \\numprint{<counts[<p,v>].initial.includeCount>}  & \\numprint{<counts[<p,v>].initial.includeCount-counts[<p,v>].unresolved.includeCount>} & \\numprint{<fileCount>}(\\numprint{<counts[<p,v>].unresolved.fileCount>}) & \\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround \\\\";
 	}
 		
 	res = "\\npaddmissingzero
@@ -653,15 +684,15 @@ public str generateIncludeCountsTable(ICResult counts, map[tuple[str p, str v], 
 	str productLine(str p) {
 		v = lv[p];
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
-		giniC = counts[<p,v>].unresolved.gc;
+		giniC = counts[<p,v>].unresolved.giniCoefficient;
 		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;
 		percentToPrint = 0.00;
 		hasPercent = false;
-		if ((counts[<p,v>].initial.hc) > 0) {
-			percentToPrint = ((counts[<p,v>].initial.hc-counts[<p,v>].unresolved.hc) * 100.00) / (counts[<p,v>].initial.hc);
+		if ((counts[<p,v>].initial.includeCount) > 0) {
+			percentToPrint = ((counts[<p,v>].initial.includeCount-counts[<p,v>].unresolved.includeCount) * 100.00) / (counts[<p,v>].initial.includeCount);
 			hasPercent = true;
 		}
-		return "<p> & \\numprint{<totalIncludes[<p,v>]>} & \\numprint{<counts[<p,v>].initial.hc>}  & \\numprint{<counts[<p,v>].initial.hc-counts[<p,v>].unresolved.hc>} & & \\numprint{<fileCount>} & \\numprint{<counts[<p,v>].unresolved.fc>} & & <hasPercent ? "\\nprounddigits{2} \\numprint{<percentToPrint>}" : "N/A"> & \\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround \\\\";
+		return "<p> & \\numprint{<totalIncludes[<p,v>]>} & \\numprint{<counts[<p,v>].initial.includeCount>}  & \\numprint{<counts[<p,v>].initial.includeCount-counts[<p,v>].unresolved.includeCount>} & & \\numprint{<fileCount>} & \\numprint{<counts[<p,v>].unresolved.fileCount>} & & <hasPercent ? "\\nprounddigits{2} \\numprint{<percentToPrint>}" : "N/A"> & \\nprounddigits{2} \\numprint{<giniToPrint>} \\npnoround \\\\";
 	}
 		
 	res = "\\npaddmissingzero
@@ -707,7 +738,7 @@ public MMResult magicMethodUses(Corpus corpus) {
 	return res;
 }
 
-public str magicMethodCounts(Corpus corpus, MMResult res, map[str,set[str]] transitiveUses) {
+public str magicMethodCounts(Corpus corpus, MMResult res, map[str,set[loc]] transitiveUses) {
 	ci = loadCountsCSV();
 	
 	str productLine(str p) {
@@ -931,14 +962,17 @@ public void featureCountsPerFile(Corpus corpus) {
 
 alias FMap = map[str file,tuple[int \break,int \classDef,int \const,int \continue,int \declare,int \do,int \echo,int \expressionStatementChainRule,int \for,int \foreach,int \functionDef,int \global,int \goto,int \haltCompiler,int \if,int \inlineHTML,int \interfaceDef,int \traitDef,int \label,int \namespace,int \return,int \static,int \switch,int \throw,int \tryCatch,int \unset,int \use,int \while,int \array,int \fetchArrayDim,int \fetchClassConst,int \assign,int \assignWithOperationBitwiseAnd,int \assignWithOperationBitwiseOr,int \assignWithOperationBitwiseXor,int \assignWithOperationConcat,int \assignWithOperationDiv,int \assignWithOperationMinus,int \assignWithOperationMod,int \assignWithOperationMul,int \assignWithOperationPlus,int \assignWithOperationRightShift,int \assignWithOperationLeftShift,int \listAssign,int \refAssign,int \binaryOperationBitwiseAnd,int \binaryOperationBitwiseOr,int \binaryOperationBitwiseXor,int \binaryOperationConcat,int \binaryOperationDiv,int \binaryOperationMinus,int \binaryOperationMod,int \binaryOperationMul,int \binaryOperationPlus,int \binaryOperationRightShift,int \binaryOperationLeftShift,int \binaryOperationBooleanAnd,int \binaryOperationBooleanOr,int \binaryOperationGt,int \binaryOperationGeq,int \binaryOperationLogicalAnd,int \binaryOperationLogicalOr,int \binaryOperationLogicalXor,int \binaryOperationNotEqual,int \binaryOperationNotIdentical,int \binaryOperationLt,int \binaryOperationLeq,int \binaryOperationEqual,int \binaryOperationIdentical,int \unaryOperationBooleanNot,int \unaryOperationBitwiseNot,int \unaryOperationPostDec,int \unaryOperationPreDec,int \unaryOperationPostInc,int \unaryOperationPreInc,int \unaryOperationUnaryPlus,int \unaryOperationUnaryMinus,int \new,int \castToInt,int \castToBool,int \castToFloat,int \castToString,int \castToArray,int \castToObject,int \castToUnset,int \clone,int \closure,int \fetchConst,int \empty,int \suppress,int \eval,int \exit,int \call,int \methodCall,int \staticCall,int \include,int \instanceOf,int \isSet,int \print,int \propertyFetch,int \shellExec,int \ternary,int \fetchStaticProperty,int \scalar,int \var,int \list,int \propertyDef,int \classConstDef,int \methodDef,int \traitUse] counts];
 
-public void writeFeatsMap(FMap m) {
-  writeBinaryValueFile(|rascal://src/lang/php/serialized/featsmap.bin|, m);
+private loc featsMapLoc = baseLoc + "serialized/features/featsmap.bin";
+
+public void saveFeatsMap(FMap m) {
+    writeBinaryValueFile(featsMapLoc, m);
 }
 
-public FMap readFeatsMap() {
-  return readBinaryValueFile(#FMap, |rascal://src/lang/php/serialized/featsmap.bin|);
+public FMap loadFeatsMap() {
+    return readBinaryValueFile(#FMap, featsMapLoc);
 }
 
+public bool featsMapExists() = exists(featsMapLoc);
 
 public map[str,list[str]] getFeatureGroups() {
  labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
@@ -1310,7 +1344,9 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	return < solution, solutionLabels, found >;
 }
 
-public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice) {
+alias CoverageMap = map[int,set[str]];
+
+public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice) {
 	// The features in the system 
 	features = toSet(tail(tail(tail(getRelFieldNames((#getFeatsType).symbol)))));
 	
@@ -1327,7 +1363,7 @@ public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice la
 	set[str] remainingFeatures = features;
 	
 	// solutions -- map from percent (as int) to labels that cover it
-	map[int,set[str]] res = ( );
+	CoverageMap res = ( );
 	
 	// covered so far (percent-wise)
 	int coveredSoFar = 0;
@@ -1343,7 +1379,7 @@ public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice la
 	map[int,int] featureFileCount = ( n : size({l|l<-fmap<0>,fmap[l][n]>0}) | n <- index(fieldNames) );
 	map[int,real] featureFilePercent = ( n : featureFileCount[n]*100.0/totalFileCount | n <- featureFileCount ); 
 	map[int,set[int]] neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..101] ); 
-	map[int,set[str]] neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor ); 
+	CoverageMap neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor ); 
 	
 	// seed the solution with all the features we need to achieve 1% coverage
 	solution = neededForLabels[1];
@@ -1396,39 +1432,47 @@ public map[int,set[str]] minimumFeaturesForPercent2(FMap fmap, FeatureLattice la
 	return res;
 }
 
-public map[int,set[str]] featuresForPercents(FMap fmap, FeatureLattice lattice, list[int] percents) {
+public CoverageMap featuresForPercents(FMap fmap, FeatureLattice lattice, list[int] percents) {
 	return ( p : features | p <- percents, < nodes, features, files > := minimumFeaturesForPercent(fmap,lattice,p) );
 }
 
-public map[int,set[str]] featuresForAllPercents(FMap fmap, FeatureLattice lattice) {
+public CoverageMap featuresForAllPercents(FMap fmap, FeatureLattice lattice) {
 	return featuresForPercents(fmap, lattice, [1..101]);
 }
 
-public map[int,set[str]] featuresForPercents2(FMap fmap, FeatureLattice lattice, list[int] percents) {
+public CoverageMap featuresForPercents2(FMap fmap, FeatureLattice lattice, list[int] percents) {
 	return ( p : minimumFeaturesForPercent2(fmap,lattice,p) | p <- percents );
 }
 
-public map[int,set[str]] featuresForAllPercents2(FMap fmap, FeatureLattice lattice) {
+public CoverageMap featuresForAllPercents2(FMap fmap, FeatureLattice lattice) {
 	return featuresForPercents2(fmap, lattice, [1..101]);
 }
 
-public void saveCoverageMap(map[int,set[str]] coverageMap) {
-	writeBinaryValueFile(|rascal://src/lang/php/serialized/coverageMap.bin|, coverageMap);
+private loc coverageMapLoc = baseLoc + "serialized/features/coverageMap.bin";
+
+public void saveCoverageMap(CoverageMap coverageMap) {
+	writeBinaryValueFile(coverageMapLoc, coverageMap);
 }
 
-public map[int,set[str]] loadCoverageMap() {
-	return readBinaryValueFile(#map[int,set[str]], |rascal://src/lang/php/serialized/coverageMap.bin|);
+public CoverageMap loadCoverageMap() {
+	return readBinaryValueFile(#CoverageMap, coverageMapLoc);
 }
+
+public bool coverageMapExists() = exists(coverageMapLoc);
+
+private loc featureLatticeLoc = baseLoc + "serialized/features/featureLattice.bin";
 
 public void saveFeatureLattice(FeatureLattice fl) {
-	writeBinaryValueFile(|rascal://src/lang/php/serialized/featureLattice.bin|, fl);
+	writeBinaryValueFile(featureLatticeLoc, fl);
 }
 
 public FeatureLattice loadFeatureLattice() {
-	return readBinaryValueFile(#FeatureLattice, |rascal://src/lang/php/serialized/featureLattice.bin|);
+	return readBinaryValueFile(#FeatureLattice, featureLatticeLoc);
 }
 
-public str coverageGraph(map[int,set[str]] coverageMap) {
+public bool featureLatticeExists() = exists(featureLatticeLoc);
+
+public str coverageGraph(CoverageMap coverageMap) {
   
   angles = ( n : 90 | n <- coverageMap<0> ); angles[95] = 0; angles[100] = 90;
   position = ( n : "right" | n <- coverageMap<0> ); position[95] = "left"; position[100] = "left";
@@ -1491,18 +1535,16 @@ public set[loc] getVVLocs(list[tuple[str p, str v, QueryResult qr]] vv) = { qr.l
 public set[loc] getVVLocs(str p, str v, list[tuple[str p, str v, QueryResult qr]] vv) = { qr.l | <p,v,qr> <- vv };
 
 @doc{Given an includes graph and a set of files, return these files plus the files that (transitively) import them.}
-public set[str] calculateFeatureTrans(IncludeGraph ig, set[loc] featureLocs, str prefix) {
-	featureFiles = { substring(l.path,size(prefix)) | l <- featureLocs };
-	igCollapsed = collapseToGraph(ig);
-	
-	igFlipped = invert(igCollapsed);
-	igTrans = igFlipped+;
-	
-	importers = igTrans[featureFiles];
+public set[loc] calculateFeatureTrans(rel[loc,loc,loc] includes, set[loc] featureLocs) {
+	sourceFileToTarget = includes<0,2>;
+	targetToSourceFile = invert(sourceFileToTarget);
+	targetToSourceFileTrans = targetToSourceFile+;
+	featureFiles = { l.top | l <- featureLocs };
+	importers = targetToSourceFileTrans[featureFiles];
 	return importers + featureFiles;
 }
 
-public map[str,set[str]] calculateVVTransIncludes(
+public map[str,set[loc]] calculateVVTransIncludes(
 	list[tuple[str p, str v, QueryResult qr]] vvuses, 
 	list[tuple[str p, str v, QueryResult qr]] vvcalls,
 	list[tuple[str p, str v, QueryResult qr]] vvmcalls,
@@ -1513,17 +1555,15 @@ public map[str,set[str]] calculateVVTransIncludes(
 	list[tuple[str p, str v, QueryResult qr]] vvstargets,
 	list[tuple[str p, str v, QueryResult qr]] vvsprops,
 	list[tuple[str p, str v, QueryResult qr]] vvsptargets,
-	Corpus corpus)
+	Corpus corpus,
+	map[tuple[str p, str v], rel[loc,loc,loc]] includes)
 {
-	map[str,set[str]] transitiveFiles = ( );
+	map[str,set[loc]] transitiveFiles = ( );
 	
 	for (product <- corpus) {
 		version = corpus[product];
-		pt = loadBinaryWithIncludes(product,version);
-		corpusItemLoc = getCorpusItem(product,version);
-		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
 		vvLocs = { qr.l | <product,version,qr> <- (vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets) };
-		transFiles = calculateFeatureTrans(ig, vvLocs, corpusItemLoc.path);
+		transFiles = calculateFeatureTrans(includes[<product,version>], vvLocs);
 		transitiveFiles[product] = transFiles;
 	}
 	
@@ -1532,17 +1572,14 @@ public map[str,set[str]] calculateVVTransIncludes(
 
 //alias MMResult = map[tuple[str p, str v], tuple[list[ClassItem] sets, list[ClassItem] gets, list[ClassItem] isSets, list[ClassItem] unsets, list[ClassItem] calls, list[ClassItem] staticCalls]];
 
-public map[str,set[str]] calculateMMTransIncludes(Corpus corpus, MMResult mmr)
+public map[str,set[loc]] calculateMMTransIncludes(Corpus corpus, MMResult mmr, map[tuple[str p, str v], rel[loc,loc,loc]] includes)
 {
-	map[str,set[str]] transitiveFiles = ( );
+	map[str,set[loc]] transitiveFiles = ( );
 	
 	for (product <- corpus) {
 		version = corpus[product];
-		pt = loadBinaryWithIncludes(product,version);
-		corpusItemLoc = getCorpusItem(product,version);
-		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
 		mmrLocs = { mm@at | mm <- (mmr[<product,version>].sets + mmr[<product,version>].gets + mmr[<product,version>].isSets + mmr[<product,version>].unsets + mmr[<product,version>].calls + mmr[<product,version>].staticCalls) };
-		transFiles = calculateFeatureTrans(ig, mmrLocs, corpusItemLoc.path);
+		transFiles = calculateFeatureTrans(includes[<product,version>], mmrLocs);
 		transitiveFiles[product] = transFiles;
 	}
 	
@@ -1577,7 +1614,7 @@ public System loadBinaryWithIncludes(str product, str version) {
 	return readBinaryValueFile(#System,parsedItem);
 }
 
-public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, map[int,set[str]] coverageMap) {
+public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, CoverageMap coverageMap) {
 	fieldNames = toSet(tail(tail(tail(getRelFieldNames((#getFeatsType).symbol)))));
 	
 	in80 = coverageMap[80];
@@ -1589,7 +1626,7 @@ public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, m
 	map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] res = ( );
 	for (product <- corpus) {
 		pt = loadBinary(product,corpus[product]);
-		res[product] = < {l.path|l<-pt<0>} - in80Files, {l.path|l<-pt<0>} - in90Files >;
+		res[product] = < {l.path|l<-pt.files<0>} - in80Files, {l.path|l<-pt.files<0>} - in90Files >;
 	}
 	
 	return res;
@@ -1659,34 +1696,28 @@ public EvalUses loadEvalUses() {
 	return readBinaryValueFile(#EvalUses, |rascal://src/lang/php/serialized/evalUses.bin|);
 }
 
-public map[str,set[str]] calculateEvalTransIncludes(Corpus corpus, EvalUses evalUses)
+public map[str,set[loc]] calculateEvalTransIncludes(Corpus corpus, EvalUses evalUses, map[tuple[str p, str v], rel[loc,loc,loc]] includes)
 {
-	map[str,set[str]] transitiveFiles = ( );
+	map[str,set[loc]] transitiveFiles = ( );
 	
 	for (product <- corpus) {
 		version = corpus[product];
-		pt = loadBinaryWithIncludes(product,version);
-		corpusItemLoc = getCorpusItem(product,version);
-		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
 		evalLocs = { l | l <- evalUses[product, version]<0>  };
-		transFiles = calculateFeatureTrans(ig, evalLocs, corpusItemLoc.path);
+		transFiles = calculateFeatureTrans(includes[<product,version>], evalLocs);
 		transitiveFiles[product] = transFiles;
 	}
 	
 	return transitiveFiles;
 } 
 
-public map[str,set[str]] calculateFunctionTransIncludes(Corpus corpus, FunctionUses fuses)
+public map[str,set[loc]] calculateFunctionTransIncludes(Corpus corpus, FunctionUses fuses, map[tuple[str p, str v], rel[loc,loc,loc]] includes)
 {
-	map[str,set[str]] transitiveFiles = ( );
+	map[str,set[loc]] transitiveFiles = ( );
 	
 	for (product <- corpus) {
 		version = corpus[product];
-		pt = loadBinaryWithIncludes(product,version);
-		corpusItemLoc = getCorpusItem(product,version);
-		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
 		fuseLocs = { l | l <- fuses[product, version]<0>  };
-		transFiles = calculateFeatureTrans(ig, fuseLocs, corpusItemLoc.path);
+		transFiles = calculateFeatureTrans(includes[<product,version>], fuseLocs);
 		transitiveFiles[product] = transFiles;
 	}
 	
@@ -1709,7 +1740,7 @@ public map[str,set[str]] calculateTransIncludes(Corpus corpus, set[loc] locset)
 	return transitiveFiles;
 } 
 
-public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses, map[str,set[str]] transEvals, map[str,set[str]] transFuses) {
+public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses, map[str,set[loc]] transEvals, map[str,set[loc]] transFuses) {
 	ci = loadCountsCSV();
 	fuses = createFunctionUses(fuses);
 	
@@ -1986,7 +2017,7 @@ public rel[str product, str path] classAndInterfaceFiles(Corpus corpus) {
 	return res;
 }
 
-public str showVarArgsUses(Corpus corpus, rel[str p, str v, Def d] vaDefs, rel[str,str,loc,Expr,bool] vaCalls, rel[str,str,int] allCallsCounts, map[str,set[str]] vatrans) {
+public str showVarArgsUses(Corpus corpus, rel[str p, str v, Def d] vaDefs, rel[str,str,loc,Expr,bool] vaCalls, rel[str,str,int] allCallsCounts, map[str,set[loc]] vatrans) {
 	ci = loadCountsCSV();
 	
 	str productLine(str p) {
@@ -2035,7 +2066,7 @@ public str showVarArgsUses(Corpus corpus, rel[str p, str v, Def d] vaDefs, rel[s
 	return tbl;		
 }
 
-public str invokeFunctionUsesCounts(Corpus corpus, FunctionUses functionUses, map[str,set[str]] transInvokes) {
+public str invokeFunctionUsesCounts(Corpus corpus, FunctionUses functionUses, map[str,set[loc]] transInvokes) {
 	ci = loadCountsCSV();
 	
 	str productLine(str p) {

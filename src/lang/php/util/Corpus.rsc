@@ -60,6 +60,20 @@ private set[str] versions(str p) {
 //								"1.15.1", "1.15.2", "1.15.3", "1.15.4", "1.15.5", "1.16.0", "1.16.1", "1.16.2", "1.16.3", "1.16.4", "1.16.5",
 //								"1.17.0", "1.17.1", "1.17.2", "1.17.3", "1.18.0", "1.18.1", "1.6.12", "1.18.2"};
 
+public bool corpusItemExists(str product, str version) {
+	if (product in products()) {
+		if (version in versions(product)) {
+			loc productRoot = corpusRoot + product + "<toLowerCase(product)>-<version>";
+			if (exists(productRoot)) return true;
+			productRoot = corpusRoot + product + "<toLowerCase(product)>_<version>";
+			if (exists(productRoot)) return true;
+			return false;
+		}
+		return false;
+	}
+	return false;
+}
+
 public loc getCorpusItem(str product, str version) {
 	if (product in products()) {
 		if (version in versions(product)) {
@@ -122,10 +136,16 @@ public bool compareVersion(str v1, str v2) {
 	v1a = 0; v1b = 0; v1c = 0;
 	v2a = 0; v2b = 0; v2c = 0;
 	
-	if(/<a1:\d+>[.]<b1:\d+>[.]<c1:\d+>/ := v1) {
+	if(/0*<a1:\d+>[.]0*<b1:\d+>[.]0*<c1:\d+>/ := v1) {
 		v1a = toInt(a1); v1b = toInt(b1); v1c = toInt(c1);
-	} else if(/<a1:\d+>[.]<b1:\d+>/ := v1) {
-		v1a = toInt(a1); v1b = toInt(b1);
+	} else if(/0*<a1:\d+>[.]0*<b1:\d+>/ := v1) {
+		v1a = toInt(a1); 
+		try {
+			v1b = toInt(b1);
+		} catch v : {
+			println("Error, cannot convert <b1> to an int");
+			throw "AAAAAAAAAAAAAAAA";
+		}
 	}
 	
 	if(/<a1:\d+>[.]<b1:\d+>[.]<c1:\d+>/ := v2) {
@@ -138,4 +158,18 @@ public bool compareVersion(str v1, str v2) {
 	if (v1a == v2a && v1b < v2b) return true;
 	if (v1a == v2a && v1b == v2b && v1c < v2c) return true;
 	return false;
+}
+
+public map[str,str] missingCorpusItems(map[str,str] corpus) {
+	return ( p : v | p <- corpus, v := corpus[p], !corpusItemExists(p,v) ); 
+}
+
+public str bundleCorpusItems(map[str,str] corpus, str corpusName) {
+	list[str] corpusPaths = [ ];
+	for (p <- corpus, v := corpus[p]) {
+		itemPath = getCorpusItem(p,v);
+		sysAndVersion = itemPath.path[size(corpusRoot.path)+1..];
+		corpusPaths = corpusPaths + sysAndVersion;
+	}
+	return "zip -r <corpusName>.zip " + intercalate(" ", corpusPaths);
 }

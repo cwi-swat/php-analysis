@@ -3,8 +3,12 @@ module lang::php::ast::System
 import lang::php::ast::AbstractSyntax;
 import lang::php::ast::NormalizeAST;
 
-data System = system(map[loc fileloc, Script scr] files);
-
+data System 
+	= system(map[loc fileloc, Script scr] files)
+	| namedVersionedSystem(str name, str version, loc baseLoc, map[loc fileloc, Script scr] files)
+	| namedSystem(str name, loc baseLoc, map[loc fileloc, Script scr] files)
+	| locatedSystem(loc baseLoc, map[loc fileloc, Script scr] files)
+	;
 
 public System normalizeSystem(System s) {
 	s = discardErrorScripts(s);
@@ -29,10 +33,21 @@ public System discardErrorScripts(System s) {
 }
 
 public System createEmptySystem() = system( () );
+public System createEmptySystem(loc l) = locatedSystem(l, ( ) );
 
 public System convertSystem(value v) {
 	if (map[loc fileloc, Script scr] files := v) {
 		return system(files);
+	} else if (System s := v) {
+		return s;
+	} else {
+		throw "Unexpected input";
+	}
+}
+
+public System convertSystem(value v, loc l) {
+	if (map[loc fileloc, Script scr] files := v) {
+		return locatedSystem(l, files);
 	} else if (System s := v) {
 		return s;
 	} else {

@@ -264,3 +264,5 @@ public Script addPublicModifierWhenNotProvided(Script s) {
 	}
 	return s;
 }
+
+public Script discardAnnotations(Script s) = delAnnotationsRec(s);
