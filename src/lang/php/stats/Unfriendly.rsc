@@ -617,6 +617,7 @@ private loc includesCountsLoc = baseLoc + "serialized/features/includeCounts.bin
 public bool includesCountsExists() = exists(includesCountsLoc);
 
 public void saveIncludesCounts(ICResult res) {
+	if (!exists(baseLoc + "serialized/features")) mkDirectory(baseLoc + "serialized/features");
 	writeBinaryValueFile(includesCountsLoc, res);
 }
 
@@ -965,6 +966,7 @@ alias FMap = map[str file,tuple[int \break,int \classDef,int \const,int \continu
 private loc featsMapLoc = baseLoc + "serialized/features/featsmap.bin";
 
 public void saveFeatsMap(FMap m) {
+	if (!exists(baseLoc + "serialized/features")) mkDirectory(baseLoc + "serialized/features");
     writeBinaryValueFile(featsMapLoc, m);
 }
 
@@ -1451,6 +1453,7 @@ public CoverageMap featuresForAllPercents2(FMap fmap, FeatureLattice lattice) {
 private loc coverageMapLoc = baseLoc + "serialized/features/coverageMap.bin";
 
 public void saveCoverageMap(CoverageMap coverageMap) {
+	if (!exists(baseLoc + "serialized/features")) mkDirectory(baseLoc + "serialized/features");
 	writeBinaryValueFile(coverageMapLoc, coverageMap);
 }
 
@@ -1463,6 +1466,7 @@ public bool coverageMapExists() = exists(coverageMapLoc);
 private loc featureLatticeLoc = baseLoc + "serialized/features/featureLattice.bin";
 
 public void saveFeatureLattice(FeatureLattice fl) {
+	if (!exists(baseLoc + "serialized/features")) mkDirectory(baseLoc + "serialized/features");
 	writeBinaryValueFile(featureLatticeLoc, fl);
 }
 
