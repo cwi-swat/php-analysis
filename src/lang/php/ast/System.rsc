@@ -55,6 +55,8 @@ public System convertSystem(value v, loc l) {
 	}
 }
 
+public set[loc] errorScripts(System s) = { l | l <- s.files, s.files[l] is errscript };
+
 //public System addFile(System sys, loc l, Script s) {
 //	sys.files[l] = s;
 //	return sys;

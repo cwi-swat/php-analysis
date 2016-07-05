@@ -190,17 +190,13 @@ public str pp(yield(noExpr(), noExpr())) = "yield";
 public str pp(yield(noExpr(), someExpr(Expr v))) = "yield <pp(v)>";
 public str pp(yield(someExpr(Expr k), someExpr(Expr v))) = "yield <pp(k)> =\> <pp(v)>";
 public str pp(yield(someExpr(Expr k), noExpr())) { throw "Yielding a key with no value makes no sense."; }
-	
+
+//  | yieldFrom(Expr fromExpr)	
+public str pp(yieldFrom(Expr f)) = "yield from <pp(f)>";
+
 //  | listExpr(list[OptionExpr] listExprs)
 public str pp(listExpr(list[OptionExpr] listExprs)) = "list(<intercalate(", ", [ pp(oe) | oe <- listExprs ])>)";
 
-//public data Op = bitwiseAnd() | bitwiseOr() | bitwiseXor() | concat() | div() 
-//			   | minus() | \mod() | mul() | plus() | rightShift() | leftShift()
-//			   | booleanAnd() | booleanOr() | booleanNot() | bitwiseNot()
-//			   | gt() | geq() | logicalAnd() | logicalOr() | logicalXor()
-//			   | notEqual() | notIdentical() | postDec() | preDec() | postInc()
-//			   | preInc() | lt() | leq() | unaryPlus() | unaryMinus() 
-//			   | equal() | identical() ;
 public str pp(bitwiseAnd()) = "&";
 public str pp(bitwiseOr()) = "|";
 public str pp(bitwiseXor()) = "^";
@@ -233,6 +229,9 @@ public str pp(unaryPlus()) = "+";
 public str pp(unaryMinus()) = "-";
 public str pp(equal()) = "==";
 public str pp(identical()) = "===";
+public str pp(pow()) = "**";
+public str pp(coalesce()) = "??";
+public str pp(spaceship()) = "\<==\>";
 
 public bool isUnary(booleanNot()) = true;
 public bool isUnary(bitwiseNot()) = true;

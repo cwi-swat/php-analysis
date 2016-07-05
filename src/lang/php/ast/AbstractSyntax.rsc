@@ -68,6 +68,7 @@ public data Expr
 	| scalar(Scalar scalarVal)
 	| var(NameOrExpr varName)	
 	| yield(OptionExpr keyExpr, OptionExpr valueExpr)
+	| yieldFrom(Expr fromExpr)
 	| listExpr(list[OptionExpr] listExprs)
 	;
 	
@@ -78,7 +79,7 @@ public data Op = bitwiseAnd() | bitwiseOr() | bitwiseXor() | concat() | div()
 			   | gt() | geq() | logicalAnd() | logicalOr() | logicalXor()
 			   | notEqual() | notIdentical() | postDec() | preDec() | postInc()
 			   | preInc() | lt() | leq() | unaryPlus() | unaryMinus() 
-			   | equal() | identical() ;
+			   | equal() | identical() | pow() | coalesce() | spaceship() ;
 
 public data Param = param(str paramName, 
 						  OptionExpr paramDefault, 
