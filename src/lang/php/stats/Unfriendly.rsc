@@ -644,7 +644,7 @@ public map[tuple[str p, str v], int] loadTotalIncludes() {
 }
 
 public str generateIncludeCountsTable(ICResult counts, map[tuple[str p, str v], int] totalIncludes) {
-	lv = ( p : v | <p,v> <- counts<0> );
+	lv = ( p : v | <p,v> <- totalIncludes<0> );
 	ci = loadCountsCSV();
 		
 	str productLine(str p) {

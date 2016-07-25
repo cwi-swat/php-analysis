@@ -493,10 +493,11 @@ public tuple[int lineCount, int fileCount] loadCounts(str product, str version) 
 	if (!exists(countItem))
 		countItem = countsDir + "<toLowerCase(product)>_<version>";
 	if (!exists(countItem))
-		throw "Could not find counts file for <product>-<version>";
+		throw "Could not find counts file for <toLowerCase(product)>-<version>";
 	lines = readFileLines(countItem);
 	if(l <- lines, /PHP\s+<phpfiles:\d+>\s+\d+\s+\d+\s+<phploc:\d+>/ := l) return < toInt(phploc), toInt(phpfiles) >; 
-	throw "Could not find PHP LOC counts for <product>-<version>";
+	println("Could not find PHP LOC counts for <product>-<version>");
+	return < 0, 0 >;
 }
 
 public int loadCount(str product, str version) = loadCounts(product,version).lineCount;
