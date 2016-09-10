@@ -12,7 +12,6 @@ import lang::rascal::types::AbstractType;
 import lang::php::util::Config;
 import lang::php::analysis::signatures::Summaries;
 import lang::php::analysis::includes::ResolveIncludes;
-import lang::php::analysis::NamePaths;
 
 import List;
 import String;
