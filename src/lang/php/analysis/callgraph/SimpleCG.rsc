@@ -28,11 +28,11 @@ public System computeSystemCallGraph(System s) {
 	rel[str functionName, Callee callees] functionCallees = { };
 	rel[str methodName, Callee callees] methodCallees = { };
 	for (fileSignature(fileloc, items) <- sysSignatures<1>) {
-		for (fs:functionSig([global(),function(fname)], _) <- items) {
-			functionCallees += < fname, functionCallee(fname, fs@at) >;
+		for (fs:functionSig(path, _) <- items) {
+			functionCallees += < path.file, functionCallee(path.file, fs@at) >;
 		}
-		for (ms:methodSig([class(cname),method(mname)], _) <- items) {
-			methodCallees += < mname, methodCallee(cname, mname, ms@at) >;
+		for (ms:methodSig(path, _) <- items) {
+			methodCallees += < path.file, methodCallee(path.parent.file, path.file, ms@at) >;
 		}
 	}
 		 

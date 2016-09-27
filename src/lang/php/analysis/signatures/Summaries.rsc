@@ -9,7 +9,10 @@
 module lang::php::analysis::signatures::Summaries
 
 import ValueIO;
+import lang::php::util::Config;
 import lang::php::analysis::NamePaths;
+
+private loc summariesDir = baseLoc + "serialized/summaries";
 
 data SummaryParam
 	= standardParam(str paramType, str paramName)
@@ -36,38 +39,36 @@ data Summary
 	
 public anno loc Summary@from;
 
-data NamePart = libraryConstants();
-
 public set[Summary] loadFunctionSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpFunctions.bin|);
+	return readBinaryValueFile(#set[Summary], summariesDir + "phpFunctions.bin");
 }
 
 public void saveFunctionSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpFunctions.bin|, summaries);
+	writeBinaryValueFile(summariesDir + "phpFunctions.bin", summaries);
 }
 
 public set[Summary] loadConstantSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpConstants.bin|);
+	return readBinaryValueFile(#set[Summary], summariesDir + "phpConstants.bin");
 }
 
 public void saveConstantSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpConstants.bin|, summaries);
+	writeBinaryValueFile(summariesDir + "phpConstants.bin", summaries);
 }
 
 public set[Summary] loadClassSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpClasses.bin|);
+	return readBinaryValueFile(#set[Summary], summariesDir + "phpClasses.bin");
 }
 
 public void saveClassSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpClasses.bin|, summaries);
+	writeBinaryValueFile(summariesDir + "phpClasses.bin", summaries);
 }
 
 public set[Summary] loadMethodSummaries() {
-	return readBinaryValueFile(#set[Summary], |project://PHPAnalysis/src/lang/php/analysis/signatures/phpMethods.bin|);
+	return readBinaryValueFile(#set[Summary], summariesDir + "phpMethods.bin");
 }
 
 public void saveMethodSummaries(set[Summary] summaries) {
-	writeBinaryValueFile(|project://PHPAnalysis/src/lang/php/analysis/signatures/phpMethods.bin|, summaries);
+	writeBinaryValueFile(summariesDir + "phpMethods.bin", summaries);
 }
 
 public set[Summary] loadSummaries() {
