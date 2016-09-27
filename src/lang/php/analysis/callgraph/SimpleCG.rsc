@@ -22,7 +22,7 @@ public System computeSystemCallGraph(System s) {
 	
 	// Second, generate signatures for each of the scripts, so we know
 	// what functions and methods are available
-	map[loc,Signature] sysSignatures = ( l : getFileSignature(l,s[l]) | l <- s );
+	map[loc,Signature] sysSignatures = ( l : getFileSignature(l,s.files[l]) | l <- s.files );
 	
 	// Third, change these into a specific format that is easier to match against
 	rel[str functionName, Callee callees] functionCallees = { };
@@ -55,7 +55,7 @@ public System computeSystemCallGraph(System s) {
 	}
 	
 	// Now, annotate all calls with callee information
-	s = ( l : computeScriptCallGraph(s[l], functionCalleesMap, methodCalleesMap) | l <- s );
+	s.files = ( l : computeScriptCallGraph(s.files[l], functionCalleesMap, methodCalleesMap) | l <- s.files );
 	
 	return s;
 }
