@@ -60,17 +60,17 @@ public tuple[Script scr, map[NamePath,CFG] cfgs] buildCFGsAndScript(Script scr, 
 
 	println("Creating CFG for top-level script");
 	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
-	res[[global()]] = scriptCFG;
+	res[functionPath("@scriptPseudoMain")] = scriptCFG;
 		
 	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,params,body) <- mbrs) {
-		methodNamePath = [class(cname),method(mname)];
+		methodNamePath = methodPath(cname,mname);
 		println("Creating CFG for <cname>::<mname>");
 		< methodCFG, lstate > = createMethodCFG(methodNamePath, m, lstate);
 		res[methodNamePath] = methodCFG;
 	}
 
 	for (/f:function(fname,_,params,body) := scrLabeled) {
-		functionNamePath = [global(),function(fname)];
+		functionNamePath = functionPath(fname);
 		println("Creating CFG for <fname>");
 		< functionCFG, lstate > = createFunctionCFG(functionNamePath, f, lstate);
 		res[functionNamePath] = functionCFG;
@@ -104,7 +104,7 @@ private map[NamePath, ClassItem] getScriptMethods(Script scr) =
 
 @doc{Retrieve all function declarations from a script. Note: this assumes that definitions are unique.}
 private map[NamePath, Stmt] getScriptFunctions(Script scr) =
-	( [global(),function(fname)] : f | /f:function(fname,_,_,_) := scr );
+	( functionPath(fname) : f | /f:function(fname,_,_,_) := scr );
 
 private tuple[set[CFGNode] nodes, set[FlowEdge] edges] cleanUpGraph(LabelState lstate, set[FlowEdge] edges) {
 	allTargets = { e.to | e <- edges };
@@ -139,7 +139,7 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
 	if (script(list[Stmt] b) !:= scr)
-		return < cfg([global()], lstate.nodes, { }, cfgEntryNode, cfgExitNode), lstate >;
+		return < cfg(functionPath("@scriptPseudoMain"), lstate.nodes, { }, cfgEntryNode, cfgExitNode), lstate >;
 	
 	scriptBody = scr.body;
 	sbReduced = visit(scriptBody) {
@@ -182,7 +182,7 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 	labels = { e.from, e.to | e <- edges };
 	nodes = { n | n <- nodes, n@lab in labels } + { cfgEntryNode, cfgExitNode };
 	
- 	return < cfg([global()], nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
+ 	return < cfg(functionPath("@scriptPseudoMain"), nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
 // TODO: The code for functions and methods is very similar, so refactor to remove
@@ -193,8 +193,8 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Cla
 		return lab(lstate.counter); 
 	}
 
-	cfgEntryNode = methodEntry(np[0].className, np[1].methodName)[@lab=incLabel()];
-	cfgExitNode = methodExit(np[0].className, np[1].methodName)[@lab=incLabel()];
+	cfgEntryNode = methodEntry(np.parent.file, np.file)[@lab=incLabel()];
+	cfgExitNode = methodExit(np.parent.file, np.file)[@lab=incLabel()];
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
     methodBody = m.body;
@@ -272,8 +272,8 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np,
 		return lab(lstate.counter); 
 	}
 
-	cfgEntryNode = functionEntry(np[1].functionName)[@lab=incLabel()];
-	cfgExitNode = functionExit(np[1].functionName)[@lab=incLabel()];
+	cfgEntryNode = functionEntry(np.file)[@lab=incLabel()];
+	cfgExitNode = functionExit(np.file)[@lab=incLabel()];
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
     functionBody = f.body;
@@ -904,7 +904,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				if (hasBreakLabel(bl, lstate)) {
 					edges += { jumpEdge(fl, getBreakLabel(bl, lstate)) | fl <- finalLabels };
 				} else {
-					println("WARNING: This program breaks beyond the visible break nesting.");
+					println("WARNING: This program breaks beyond the visible break nesting: <e@at>");
 					edges += { escapingBreakEdge(fl, getExitNodeLabel(lstate), someExpr(e)) | fl <- finalLabels };
 				}
 			} else {
@@ -921,7 +921,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			if (hasBreakLabel(1, lstate)) {
 				edges += { jumpEdge(fl, getBreakLabel(1, lstate)) | fl <- finalLabels };
 			} else {
-				println("WARNING: This program breaks beyond the visible break nesting.");
+				println("WARNING: This program breaks beyond the visible break nesting: <s@at>");
 				edges += { escapingBreakEdge(fl, getExitNodeLabel(lstate), noExpr()) | fl <- finalLabels };
 			}
 		}
@@ -948,7 +948,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				if (hasContinueLabel(bl, lstate)) {
 					edges += { jumpEdge(fl, getContinueLabel(bl, lstate)) | fl <- finalLabels };
 				} else {
-					println("WARNING: This program continues beyond the visible continue nesting.");
+					println("WARNING: This program continues beyond the visible continue nesting: <s@at>");
 					edges += { escapingContinueEdge(fl, getExitNodeLabel(lstate), someExpr(e)) | fl <- finalLabels };
 				}
 			} else {
@@ -965,7 +965,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			if (hasContinueLabel(1, lstate)) {
 				edges += { jumpEdge(fl, getContinueLabel(1, lstate)) | fl <- finalLabels };
 			} else {
-				println("WARNING: This program continues beyond the visible continue nesting.");
+				println("WARNING: This program continues beyond the visible continue nesting: <s@at>");
 				edges += { escapingContinueEdge(fl, getExitNodeLabel(lstate), noExpr()) | fl <- finalLabels };
 			}
 		}

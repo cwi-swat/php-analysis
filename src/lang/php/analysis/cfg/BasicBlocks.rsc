@@ -74,7 +74,7 @@ public CFG createBasicBlocks(CFG g) {
 		edges = { e | e <- g.edges, n1Exit@lab == e.from, n2Entry@lab == e.to };
 		if (size(edges) > 1) {
 			for (e <- edges)
-				println("In <printNamePath(g.item)>, found flow edge <e>"); 
+				println("In <g.item>, found flow edge <e>"); 
 			throw "We should not have multiple edges between the same nodes";
 		}
 		e = getOneFrom(edges);
@@ -90,7 +90,7 @@ public CFG createBasicBlocks(CFG g) {
 	CFGNode blockExitNode() {
 		exitNodes = { n | n <- basicBlocks, isExitNode(last(n.nodes)) };
 		if (size(exitNodes) == 1) return getOneFrom(exitNodes);
-		println("In <printNamePath(g.item)>, found <size(exitNodes)> exit nodes out of a total of <size(g.nodes)> nodes with <size(basicBlocks)> blocks");
+		println("In <g.item>, found <size(exitNodes)> exit nodes out of a total of <size(g.nodes)> nodes with <size(basicBlocks)> blocks");
 		throw "blocksSoFar"(g.nodes,basicBlocks); //"Error, found multiple exit nodes";
 	}
 	
@@ -101,7 +101,7 @@ public CFG createBasicBlocks(CFG g) {
 		blockNodes = {n | b <- basicBlocks, n <- b.nodes };
 		missingNodes = g.nodes - blockNodes;
 		for (n <- missingNodes)
-			println("Missing node for <printNamePath(g.item)>: <printCFGNode(n)>");
+			println("Missing node for <g.item>: <printCFGNode(n)>");
 		// NOTE: no longer throwing, this can happen when we have code that isn't actually reachable
 		//throw "Error in conversion to basic blocks, expected <size(g.nodes)> nodes but only found <size(blockNodes)> nodes";
 	}
