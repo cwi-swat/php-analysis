@@ -101,7 +101,7 @@ public CFG createBasicBlocks(CFG g) {
 		blockNodes = {n | b <- basicBlocks, n <- b.nodes };
 		missingNodes = g.nodes - blockNodes;
 		for (n <- missingNodes)
-			println("Missing node for <g.item>: <printCFGNode(n)>");
+			println("Missing node for <g.item>: <n>");
 		// NOTE: no longer throwing, this can happen when we have code that isn't actually reachable
 		//throw "Error in conversion to basic blocks, expected <size(g.nodes)> nodes but only found <size(blockNodes)> nodes";
 	}

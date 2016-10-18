@@ -60,7 +60,7 @@ public tuple[Script scr, map[NamePath,CFG] cfgs] buildCFGsAndScript(Script scr, 
 
 	println("Creating CFG for top-level script");
 	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
-	res[functionPath("@scriptPseudoMain")] = scriptCFG;
+	res[scriptPath()] = scriptCFG;
 		
 	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,params,body) <- mbrs) {
 		methodNamePath = methodPath(cname,mname);
@@ -139,7 +139,7 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
 	if (script(list[Stmt] b) !:= scr)
-		return < cfg(functionPath("@scriptPseudoMain"), lstate.nodes, { }, cfgEntryNode, cfgExitNode), lstate >;
+		return < cfg(scriptPath(), lstate.nodes, { }, cfgEntryNode, cfgExitNode), lstate >;
 	
 	scriptBody = scr.body;
 	sbReduced = visit(scriptBody) {
@@ -182,7 +182,7 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 	labels = { e.from, e.to | e <- edges };
 	nodes = { n | n <- nodes, n@lab in labels } + { cfgEntryNode, cfgExitNode };
 	
- 	return < cfg(functionPath("@scriptPseudoMain"), nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
+ 	return < cfg(scriptPath(), nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
 // TODO: The code for functions and methods is very similar, so refactor to remove
@@ -224,7 +224,11 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Cla
 		lstate.nodes = lstate.nodes + newNode;
 
 		if (size(paramNodes) > 0) {
-			edges += flowEdge(last(paramNodes)@lab, newNode@lab);
+			if (someExpr(e) := oe) {
+				edges += { flowEdge(last(paramNodes)@lab, i) | i <- init(e, lstate) };  
+			} else {
+				edges += flowEdge(last(paramNodes)@lab, newNode@lab);
+			}
 		}
 
 		paramNodes = paramNodes + newNode; 
@@ -298,7 +302,11 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np,
 		lstate.nodes = lstate.nodes + newNode;
 
 		if (size(paramNodes) > 0) {
-			edges += flowEdge(last(paramNodes)@lab, newNode@lab);
+			if (someExpr(e) := oe) {
+				edges += { flowEdge(last(paramNodes)@lab, i) | i <- init(e, lstate) };  
+			} else {
+				edges += flowEdge(last(paramNodes)@lab, newNode@lab);
+			}
 		}
 
 		paramNodes = paramNodes + newNode; 
@@ -981,7 +989,6 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				edges += { flowEdge(fe, i) | fe <- final(v, lstate), i <- init(b, lstate), fe != i };
 		}
 
-
 		// For do/while loops, the flow is through the body, then to the condition
 		// then to both the statement label and the top of the body (backedge).
 		case do(Expr cond, list[Stmt] body) : {
@@ -1393,7 +1400,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// we will not add the edge, otherwise we do. Note: we could have a break or
 			// continue in the middle, with the code after being dead, but we are not checking
 			// for that here; this means the CFG could have paths that are not achievable in
-			// the program, but this is the case anyway.
+			// the program, but this is the case anyway. This can be cleaned up later since we
+			// will have a path not reachable in a standard forward traversal.
 			set[Lab] fallThruLabels = { };
 			for (\case(_,b) <- cases, size(b) > 0) {
 				if (size(fallThruLabels) > 0) {

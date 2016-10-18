@@ -78,3 +78,10 @@ public NamePath classConstPath(str cname, str constName, str library="", str nam
 	addLibrary(|php+constant:///<cleanString(cname)>/<cleanString(constName)>|,library) when size(trim(namespace)) == 0;
 public NamePath classConstPath(str cname, str constName, str library="", str namespace="") = 
 	addLibrary(|php+constant:///<cleanString(namespace)>/<cleanString(cname)>/<cleanString(constName)>|,library) when size(trim(namespace)) > 0;
+	
+@doc{Create name paths for a script, with or without an explicit namespace}
+public NamePath scriptPath(str library="", str namespace="") = 
+	addLibrary(|php+script:///|,library) when size(trim(namespace)) == 0;
+public NamePath scriptPath(str library="", str namespace="") = 
+	addLibrary(|php+script:///|,library) when size(trim(namespace)) > 0;
+	

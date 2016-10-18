@@ -41,7 +41,7 @@ public list[Lab] getBreakLabels(LabelState lstate) = lstate.breakLabels;
 public Lab getBreakLabel(int n, LabelState lstate) = lstate.breakLabels[n-1]; 
 
 @doc{Check to see if the given break target is available; it may not be if this code is included and breaks into surrounding code.}
-public bool hasBreakLabel(int n, LabelState lstate) = size(lstate.breakLabels) <= n && size(lstate.breakLabels) > 0;
+public bool hasBreakLabel(int n, LabelState lstate) = n >= 0 && size(lstate.breakLabels) >= n;
 
 @doc{Push a new break label onto the stack}
 public LabelState pushBreakLabel(Lab l, LabelState lstate) {
@@ -62,7 +62,7 @@ public list[Lab] getContinueLabels(LabelState lstate) = lstate.continueLabels;
 public Lab getContinueLabel(int n, LabelState lstate) = lstate.continueLabels[n-1]; 
 
 @doc{Check to see if the given continue target is available; it may not be if this code is included and continues into surrounding code.}
-public bool hasContinueLabel(int n, LabelState lstate) = size(lstate.continueLabels) <= n && size(lstate.continueLabels) > 0;
+public bool hasContinueLabel(int n, LabelState lstate) = n >= 0 && size(lstate.breakLabels) >= n;
 
 @doc{Push a new continue label onto the stack}
 public LabelState pushContinueLabel(Lab l, LabelState lstate) {
