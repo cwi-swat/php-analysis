@@ -73,3 +73,16 @@ public CFGNode findNodeForStmt(CFG cfg, loc l) {
 		throw "Unexpected error: no matching statements found";
 	}
 }
+
+@doc{Given a starting node and the graph, see if the predicate is true on any successor nodes.}
+public bool trueOnAReachedPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred) {
+	for (n <- g+[startNode], pred(n)) {
+		return true;
+	}
+	return false;
+}
+
+@doc{Given a starting node and the graph, see if the predicate is true on any predecessor nodes.}
+public bool trueOnAReachingPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred) {
+	return trueOnAReachedPath(invert(g), startNode, pred);
+}
