@@ -4,6 +4,7 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::analysis::cfg::CFG;
 import lang::php::analysis::cfg::FlowEdge;
 import lang::php::analysis::cfg::BasicBlocks;
+import lang::php::analysis::NamePaths;
 import analysis::graphs::Graph;
 import Relation;
 import Set;
@@ -85,4 +86,20 @@ public bool trueOnAReachedPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode
 @doc{Given a starting node and the graph, see if the predicate is true on any predecessor nodes.}
 public bool trueOnAReachingPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred) {
 	return trueOnAReachedPath(invert(g), startNode, pred);
+}
+
+@doc{Return the CFG for the node at the given location}
+public CFG findContainingCFG(Script s, map[NamePath,CFG] cfgs, loc l) {
+	
+	for (/c:class(cname,_,_,_,mbrs) := s) {
+		for (m:method(mname,_,_,params,body) <- mbrs, l < m@at) {
+			return cfgs[methodPath(cname,mname)];
+		}
+	}
+	
+	for (/f:function(fname,_,params,body) := s, l < f@at) {
+		return cfgs[functionPath(fname)];
+	}
+	
+	return cfgs[scriptPath()];
 }
