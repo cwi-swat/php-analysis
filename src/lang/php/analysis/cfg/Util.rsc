@@ -75,9 +75,21 @@ public CFGNode findNodeForStmt(CFG cfg, loc l) {
 	}
 }
 
+@doc{Given the location, find the node at this location}
+public CFGNode findNodeForLocation(CFG cfg, loc l) {
+	possibleMatches = { n | n <- cfg.nodes, (n has stmt && (n.stmt@at)? && n.stmt@at == l) || (n has expr && (n.expr@at)? && n.expr@at == l) };
+	if (size(possibleMatches) == 1) {
+		return getOneFrom(possibleMatches);
+	} else if (size(possibleMatches) > 1) {
+		throw "Unexpected error: multiple matching nodes found";
+	} else {
+		throw "Unexpected error: no matching nodes found";
+	}
+}
+
 @doc{Given a starting node and the graph, see if the predicate is true on any successor nodes.}
 public bool trueOnAReachedPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred) {
-	for (n <- g+[startNode], pred(n)) {
+	for (n <- (g+)[startNode], pred(n)) {
 		return true;
 	}
 	return false;
@@ -102,4 +114,43 @@ public CFG findContainingCFG(Script s, map[NamePath,CFG] cfgs, loc l) {
 	}
 	
 	return cfgs[scriptPath()];
+}
+
+@doc{Check to see if the predicate can be satisfied on all paths from the start node.}
+public bool trueOnAllReachedPaths(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool includeStartNode = false) {
+	set[CFGNode] seenBefore = { };
+	
+	bool traverser(CFGNode currentNode) {
+		// If we get this far, we are at the end of the path and haven't satisfied the predicate.
+		// So, we will return false (we assume the predicate isn't looking for entry or exit nodes.
+		if (isEntryNode(currentNode) || isExitNode(currentNode)) {
+			return false;
+		}
+		
+		// Assuming this is a normal node, check the predicate. If it is true, we return.
+		if (pred(currentNode)) {
+			return true;
+		}
+		
+		// Get the nodes that we need to check
+		nodesToCheck = { n | n <- currentNode, n notin seenBefore };
+		seenBefore = seenBefore + nodesToCheck;
+		
+		// Traverse all the paths through the reachable nodes
+		traversalResult = { traverser(n) | n <- nodesToCheck };
+		
+		// If any of the paths returned false, return false, else return true;
+		return false notin traversalResult;		
+	}
+	
+	if (includeStartNode) {
+		return traverser(startNode);
+	} else {
+		return false notin { traverser(n) | n <- g[startNode] };
+	}
+}
+
+@doc{Check to see if the predicate can be satisfied on all paths that reach the start node.}
+public bool trueOnAllReachingPaths(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool includeStartNode = false) {
+	return trueOnAllReachedPaths(invert(g), startNode, pred, includeStartNode = includeStartNode);
 }
