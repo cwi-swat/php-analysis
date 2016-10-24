@@ -29,19 +29,19 @@ public set[CFGNode] reaches(Graph[CFGNode] g, CFGNode n) = (invert(g)+)[n];
 
 @doc{Given an existing expression, find the node that represents this expression}
 public CFGNode findNodeForExpr(CFG cfg, Expr expr) {
-	possibleMatches = { n | n:exprNode(e) <- cfg.nodes, e == expr, (e@at)?, (expr@at)?, e@at == expr@at };
+	possibleMatches = { n | n:exprNode(e,_) <- cfg.nodes, e == expr, (e@at)?, (expr@at)?, e@at == expr@at };
 	if (size(possibleMatches) == 1) {
 		return getOneFrom(possibleMatches);
 	} else if (size(possibleMatches) > 1) {
 		throw "Unexpected error: multiple matching expressions found";
 	} else {
-		throw "Unexpected error: no matching expressions found";
+		throw "Unexpected error: no matching expressions found, <expr@at>";
 	}
 }
 
 @doc{Given a location, find the node that represents the expression at this location}
 public CFGNode findNodeForExpr(CFG cfg, loc l) {
-	possibleMatches = { n | n:exprNode(e) <- cfg.nodes, (e@at)?, e@at == l };
+	possibleMatches = { n | n:exprNode(e,_) <- cfg.nodes, (e@at)?, e@at == l };
 	if (size(possibleMatches) == 1) {
 		return getOneFrom(possibleMatches);
 	} else if (size(possibleMatches) > 1) {
@@ -53,7 +53,7 @@ public CFGNode findNodeForExpr(CFG cfg, loc l) {
 
 @doc{Given an existing statement, find the node that represents this statement}
 public CFGNode findNodeForStmt(CFG cfg, Stmt stmt) {
-	possibleMatches = { n | n:stmtNode(s) <- cfg.nodes, s == stmt, (s@at)?, (stmt@at)?, s@at == stmt@at };	
+	possibleMatches = { n | n:stmtNode(s,_) <- cfg.nodes, s == stmt, (s@at)?, (stmt@at)?, s@at == stmt@at };	
 	if (size(possibleMatches) == 1) {
 		return getOneFrom(possibleMatches);
 	} else if (size(possibleMatches) > 1) {
@@ -65,7 +65,7 @@ public CFGNode findNodeForStmt(CFG cfg, Stmt stmt) {
 
 @doc{Given a location, find the node that represents the statement at this location}
 public CFGNode findNodeForStmt(CFG cfg, loc l) {
-	possibleMatches = { n | n:stmtNode(s) <- cfg.nodes, (s@at)?, s@at == l };	
+	possibleMatches = { n | n:stmtNode(s,_) <- cfg.nodes, (s@at)?, s@at == l };	
 	if (size(possibleMatches) == 1) {
 		return getOneFrom(possibleMatches);
 	} else if (size(possibleMatches) > 1) {
@@ -133,13 +133,13 @@ public bool trueOnAllReachedPaths(Graph[CFGNode] g, CFGNode startNode, bool(CFGN
 		}
 		
 		// Get the nodes that we need to check
-		nodesToCheck = { n | n <- currentNode, n notin seenBefore };
+		nodesToCheck = { n | n <- g[currentNode], n notin seenBefore };
 		seenBefore = seenBefore + nodesToCheck;
 		
 		// Traverse all the paths through the reachable nodes
 		traversalResult = { traverser(n) | n <- nodesToCheck };
 		
-		// If any of the paths returned false, return false, else return true;
+		// If any of the paths returned false, return false, else return true
 		return false notin traversalResult;		
 	}
 	
@@ -153,4 +153,51 @@ public bool trueOnAllReachedPaths(Graph[CFGNode] g, CFGNode startNode, bool(CFGN
 @doc{Check to see if the predicate can be satisfied on all paths that reach the start node.}
 public bool trueOnAllReachingPaths(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool includeStartNode = false) {
 	return trueOnAllReachedPaths(invert(g), startNode, pred, includeStartNode = includeStartNode);
+}
+
+alias GatherResult[&T] = tuple[bool trueOnAllPaths, set[&T] results];
+
+public GatherResult[&T] gatherOnAllReachedPaths(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool(CFGNode cn) stop, &T (CFGNode cn) gather, bool includeStartNode = false) {
+	set[CFGNode] seenBefore = { };
+	
+	GatherResult[&T] traverser(CFGNode currentNode) {
+		// If we get this far, we are at the end of the path and haven't satisfied the predicate.
+		// So, we will return false (we assume the predicate isn't looking for entry or exit nodes.
+		if (isEntryNode(currentNode) || isExitNode(currentNode)) {
+			return < false, {} >;
+		}
+		
+		// Assuming this is a normal node, check the predicate. If it is true, we return.
+		if (pred(currentNode)) {
+			return < true, { gather(currentNode) } >;
+		}
+		
+		if (stop(currentNode)) {
+			return < false, { } >;
+		}
+		
+		// Get the nodes that we need to check
+		nodesToCheck = { n | n <- g[currentNode], n notin seenBefore };
+		seenBefore = seenBefore + nodesToCheck;
+		
+		// Traverse all the paths through the reachable nodes
+		traversalResult = { traverser(n) | n <- nodesToCheck };
+
+		// If any of the paths returned false, return false, else return true with the gathered results
+		gr = < false notin { gr.trueOnAllPaths | gr <- traversalResult }, { *gr.results | gr <- traversalResult } >;
+		return gr;		
+	}
+	
+	if (includeStartNode) {
+		return traverser(startNode);
+	} else {
+		traversalResult = { traverser(n) | n <- g[startNode] };
+		gr = < false notin { gr.trueOnAllPaths | gr <- traversalResult }, { *gr.results | gr <- traversalResult } >;
+		return gr;		
+	}
+}
+
+@doc{Check to see if the predicate can be satisfied on all paths that reach the start node.}
+public GatherResult[&T] gatherOnAllReachingPaths(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool(CFGNode cn) stop, &T (CFGNode cn) gather, bool includeStartNode = false) {
+	return gatherOnAllReachedPaths(invert(g), startNode, pred, stop, gather, includeStartNode = includeStartNode);
 }
