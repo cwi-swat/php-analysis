@@ -58,20 +58,20 @@ public tuple[Script scr, map[NamePath,CFG] cfgs] buildCFGsAndScript(Script scr, 
 	
 	map[NamePath,CFG] res = ( );
 
-	println("Creating CFG for top-level script");
+	//println("Creating CFG for top-level script");
 	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
 	res[scriptPath()] = scriptCFG;
 		
 	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,params,body) <- mbrs) {
 		methodNamePath = methodPath(cname,mname);
-		println("Creating CFG for <cname>::<mname>");
+		//println("Creating CFG for <cname>::<mname>");
 		< methodCFG, lstate > = createMethodCFG(methodNamePath, m, lstate);
 		res[methodNamePath] = methodCFG;
 	}
 
 	for (/f:function(fname,_,params,body) := scrLabeled) {
 		functionNamePath = functionPath(fname);
-		println("Creating CFG for <fname>");
+		//println("Creating CFG for <fname>");
 		< functionCFG, lstate > = createFunctionCFG(functionNamePath, f, lstate);
 		res[functionNamePath] = functionCFG;
 	}
