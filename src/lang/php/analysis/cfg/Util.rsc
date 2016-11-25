@@ -201,3 +201,32 @@ public GatherResult[&T] gatherOnAllReachedPaths(Graph[CFGNode] g, CFGNode startN
 public GatherResult[&T] gatherOnAllReachingPaths(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool(CFGNode cn) stop, &T (CFGNode cn) gather, bool includeStartNode = false) {
 	return gatherOnAllReachedPaths(invert(g), startNode, pred, stop, gather, includeStartNode = includeStartNode);
 }
+
+@doc{Find all matching cases on all reached paths.}
+public set[&T] findAllReachedUntil(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool(CFGNode cn) stop, &T (CFGNode cn) gather, bool includeStartNode = false) {
+	set[CFGNode] seenBefore = { };
+	
+	set[&T] traverser(CFGNode currentNode) {
+		if (isEntryNode(currentNode) || isExitNode(currentNode) || stop(currentNode)) {
+			return {};
+		}
+		
+		// Get the nodes that we need to check
+		nodesToCheck = { n | n <- g[currentNode], n notin seenBefore };
+		seenBefore = seenBefore + nodesToCheck;
+		
+		// Traverse all the paths through the reachable nodes
+		return (pred(currentNode) ? { gather(currentNode) } : { } ) + { *traverser(n) | n <- nodesToCheck };
+	}
+	
+	if (includeStartNode) {
+		return traverser(startNode);
+	} else {
+		return { *traverser(n) | n <- g[startNode] };
+	}
+}
+
+@doc{Find all matched cases on all reaching paths.}
+public set[&T] findAllReachingUntil(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool(CFGNode cn) stop, &T (CFGNode cn) gather, bool includeStartNode = false) {
+	return findAllReachedUntil(invert(g), startNode, pred, stop, gather, includeStartNode = includeStartNode);
+}
