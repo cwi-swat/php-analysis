@@ -52,7 +52,11 @@ private Script parsePHPfile(loc f, list[str] opts, Script error) {
 	loc parserLoc = lang::php::util::Config::parserLoc;
 	str phpOut;
 	try {
-		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", (parserLoc + astToRascal).path, "-f<f.path>"] + opts, parserWorkingDir);
+		str filePath = f.path;
+		if (f.authority != "") {
+			filePath = f.authority + "/" + filePath;
+		}
+		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", (parserLoc + astToRascal).path, "-f<filePath>"] + opts, parserWorkingDir);
 	} catch RuntimeException: {
 		return error;
 	}
