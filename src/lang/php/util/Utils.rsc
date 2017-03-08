@@ -321,6 +321,12 @@ public list[tuple[str p, str v, int count, int fileCount]] getSortedCounts() {
 	return [ <p,v,lc,fc> | p <- sort(toList(getProducts())), v <- sort(toList(getVersions(p)),compareVersion), <lc,fc> := loadCounts(p,v) ];	
 }
 
+public list[tuple[str p, str v, int count, int fileCount]] getSortedCountsCaseInsensitive() {
+	pForSort = [ < toUpperCase(p), p > | p <- getProducts() ];
+	pForSort = sort(pForSort, bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[0] < t2[0]; });
+	return [ <p,v,lc,fc> | <p2,p> <- pForSort, v <- sort(toList(getVersions(p)),compareVersion), <lc,fc> := loadCounts(p,v) ];	
+}
+
 public void writeSortedCounts() {
 	sc = getSortedCounts();
 	scLines = [ "Product,Version,LoC,Files" ] + [ "<i.p>,<i.v>,<i.count>,<i.fileCount>" | i <- sc ];
