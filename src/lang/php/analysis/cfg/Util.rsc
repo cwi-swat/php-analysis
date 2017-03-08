@@ -158,42 +158,69 @@ public bool trueOnAllReachingPaths(Graph[CFGNode] g, CFGNode startNode, bool(CFG
 alias GatherResult[&T] = tuple[bool trueOnAllPaths, set[&T] results];
 
 public GatherResult[&T] gatherOnAllReachedPaths(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool(CFGNode cn) stop, &T (CFGNode cn) gather, bool includeStartNode = false) {
-	set[CFGNode] seenBefore = { };
+	GatherResult[&T] traverser(CFGNode currentNode) = traverser({currentNode});
 	
-	GatherResult[&T] traverser(CFGNode currentNode) {
-		// If we get this far, we are at the end of the path and haven't satisfied the predicate.
-		// So, we will return false (we assume the predicate isn't looking for entry or exit nodes.
-		if (isEntryNode(currentNode) || isExitNode(currentNode)) {
-			return < false, {} >;
+	GatherResult[&T] traverser(set[CFGNode] currentNodes) {
+		GatherResult[&T] res = < true, { } >;
+		set[CFGNode] seenBefore = currentNodes;
+		set[CFGNode] frontier = currentNodes;
+		
+		solve(res, frontier) {
+			workingFrontier = frontier;
+			// For any nodes on the frontier that meet the predicate, gather the info from those nodes
+			for (n <- frontier) {
+				if (isEntryNode(n) || isExitNode(n)) {
+					return < false, { } >;
+				} else if (pred(n)) {
+					res.results = res.results + gather(n);
+					// If this node satisfied the pred, we don't want to traverse through it
+					workingFrontier = workingFrontier - n;
+				} else if (stop(n)) {
+					// TODO: See if we can merge this with check above...
+					return < false, { } >;
+				}
+			}
+			// Find the new frontier, which is the nodes reachable from the current frontier that we haven't seen before
+			frontier = g[workingFrontier] - seenBefore;
+			// Add the new frontier into the set of nodes we've already seen 
+			seenBefore += frontier;
 		}
 		
-		// Assuming this is a normal node, check the predicate. If it is true, we return.
-		if (pred(currentNode)) {
-			return < true, { gather(currentNode) } >;
-		}
-		
-		if (stop(currentNode)) {
-			return < false, { } >;
-		}
-		
-		// Get the nodes that we need to check
-		nodesToCheck = { n | n <- g[currentNode], n notin seenBefore };
-		seenBefore = seenBefore + nodesToCheck;
-		
-		// Traverse all the paths through the reachable nodes
-		traversalResult = { traverser(n) | n <- nodesToCheck };
-
-		// If any of the paths returned false, return false, else return true with the gathered results
-		gr = < false notin { gr.trueOnAllPaths | gr <- traversalResult }, { *gr.results | gr <- traversalResult } >;
-		return gr;		
+		return res;
 	}
+
+//	GatherResult[&T] traverser(CFGNode currentNode) {
+//		// If we get this far, we are at the end of the path and haven't satisfied the predicate.
+//		// So, we will return false (we assume the predicate isn't looking for entry or exit nodes.
+//		if (isEntryNode(currentNode) || isExitNode(currentNode)) {
+//			return < false, {} >;
+//		}
+//		
+//		// Assuming this is a normal node, check the predicate. If it is true, we return.
+//		if (pred(currentNode)) {
+//			return < true, { gather(currentNode) } >;
+//		}
+//		
+//		if (stop(currentNode)) {
+//			return < false, { } >;
+//		}
+//		
+//		// Get the nodes that we need to check
+//		nodesToCheck = { n | n <- g[currentNode], n notin seenBefore };
+//		seenBefore = seenBefore + nodesToCheck;
+//		
+//		// Traverse all the paths through the reachable nodes
+//		traversalResult = { traverser(n) | n <- nodesToCheck };
+//
+//		// If any of the paths returned false, return false, else return true with the gathered results
+//		gr = < false notin { gr.trueOnAllPaths | gr <- traversalResult }, { *gr.results | gr <- traversalResult } >;
+//		return gr;		
+//	}
 	
 	if (includeStartNode) {
 		return traverser(startNode);
 	} else {
-		traversalResult = { traverser(n) | n <- g[startNode] };
-		gr = < false notin { gr.trueOnAllPaths | gr <- traversalResult }, { *gr.results | gr <- traversalResult } >;
-		return gr;		
+		return traverser(g[startNode]);
 	}
 }
 
@@ -204,25 +231,31 @@ public GatherResult[&T] gatherOnAllReachingPaths(Graph[CFGNode] g, CFGNode start
 
 @doc{Find all matching cases on all reached paths.}
 public set[&T] findAllReachedUntil(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool(CFGNode cn) stop, &T (CFGNode cn) gather, bool includeStartNode = false) {
-	set[CFGNode] seenBefore = { };
+	set[&T] traverser(CFGNode currentNode) = traverser({currentNode});
 	
-	set[&T] traverser(CFGNode currentNode) {
-		if (isEntryNode(currentNode) || isExitNode(currentNode) || stop(currentNode)) {
-			return {};
+	set[&T] traverser(set[CFGNode] currentNodes) {
+		set[&T] res = { };
+		set[CFGNode] seenBefore = currentNodes;
+		set[CFGNode] frontier = currentNodes;
+		
+		solve(res, frontier) {
+			// For any nodes on the frontier that meet the predicate, gather the info from those nodes
+			for (n <- frontier, pred(n)) res = res + gather(n);
+			// Narrow the frontier down to only those nodes that we can traverse through
+			frontier = { n | n <- frontier, !isEntryNode(n), !isExitNode(n), !stop(n) };
+			// Find the new frontier, which is the nodes reachable from the current frontier that we haven't seen before
+			frontier = g[frontier] - seenBefore;
+			// Add the new frontier into the set of nodes we've already seen 
+			seenBefore += frontier;
 		}
 		
-		// Get the nodes that we need to check
-		nodesToCheck = { n | n <- g[currentNode], n notin seenBefore };
-		seenBefore = seenBefore + nodesToCheck;
-		
-		// Traverse all the paths through the reachable nodes
-		return (pred(currentNode) ? { gather(currentNode) } : { } ) + { *traverser(n) | n <- nodesToCheck };
+		return res;
 	}
 	
 	if (includeStartNode) {
 		return traverser(startNode);
 	} else {
-		return { *traverser(n) | n <- g[startNode] };
+		return traverser(g[startNode]);
 	}
 }
 
