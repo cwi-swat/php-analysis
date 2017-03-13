@@ -27,12 +27,12 @@ public data CFG
 
 @doc{Control flow graph nodes}
 data CFGNode
-	= functionEntry(str functionName)
-	| functionExit(str functionName)
-	| methodEntry(str className, str methodName)
-	| methodExit(str className, str methodName)
-	| scriptEntry()
-	| scriptExit()
+	= functionEntry(str functionName, Lab l)
+	| functionExit(str functionName, Lab l)
+	| methodEntry(str className, str methodName, Lab l)
+	| methodExit(str className, str methodName, Lab l)
+	| scriptEntry(Lab l)
+	| scriptExit(Lab l)
 	| stmtNode(Stmt stmt, Lab l)
 	| exprNode(Expr expr, Lab l)
 	| foreachTest(Expr expr, Lab l)
@@ -42,8 +42,8 @@ data CFGNode
 	| headerNode(Expr expr, Lab footer, Lab l)
 	| footerNode(Stmt stmt, Lab header, Lab l)
 	| footerNode(Expr expr, Lab header, Lab l)
-	| actualProvided(str paramName, bool refAssign)
-	| actualNotProvided(str paramName, Expr expr, bool refAssign)
+	| actualProvided(str paramName, bool refAssign, Lab l)
+	| actualNotProvided(str paramName, Expr expr, bool refAssign, Lab l)
 	;
 
 @doc{Unique ids on control flow graph nodes.}
@@ -52,12 +52,12 @@ public anno Lab CFGNode@lab;
 public alias CFGNodes = set[CFGNode];
 
 @doc{Pretty-print CFG nodes}
-public str printCFGNode(functionEntry(str fn)) = "Entry: <fn>";
-public str printCFGNode(functionExit(str fn)) = "Exit: <fn>";
-public str printCFGNode(methodEntry(str cn, str mn)) = "Entry: <cn>::<mn>";
-public str printCFGNode(methodExit(str cn, str mn)) = "Exit: <cn>::<mn>";
-public str printCFGNode(scriptEntry()) = "Entry";
-public str printCFGNode(scriptExit()) = "Exit";
+public str printCFGNode(functionEntry(str fn ,_)) = "Entry: <fn>";
+public str printCFGNode(functionExit(str fn, _)) = "Exit: <fn>";
+public str printCFGNode(methodEntry(str cn, str mn, _)) = "Entry: <cn>::<mn>";
+public str printCFGNode(methodExit(str cn, str mn, _)) = "Exit: <cn>::<mn>";
+public str printCFGNode(scriptEntry(_)) = "Entry";
+public str printCFGNode(scriptExit(_)) = "Exit";
 public str printCFGNode(foreachTest(Expr expr, Lab l)) = "Iteration Test";
 public str printCFGNode(foreachAssignKey(Expr expr, Lab l)) = "Assign Foreach Key <pp(expr)>";
 public str printCFGNode(foreachAssignValue(Expr expr, Lab l)) = "Assign Foreach Value <pp(expr)>";
@@ -73,8 +73,8 @@ public str printCFGNode(stmtNode(Stmt s, Lab l)) {
 	}
 }
 public str printCFGNode(exprNode(Expr e, Lab l)) = pp(e);
-public str printCFGNode(actualProvided(str paramName, bool refAssign)) = "Arbitrary Value <paramName> <refAssign ? "?" : "">= unknown";
-public str printCFGNode(actualNotProvided(str paramName, Expr expr, bool refAssign)) = "Default Value <paramName> <refAssign ? "?" : "">= <pp(expr)>";
+public str printCFGNode(actualProvided(str paramName, bool refAssign, Lab l)) = "Arbitrary Value <paramName> <refAssign ? "?" : "">= unknown";
+public str printCFGNode(actualNotProvided(str paramName, Expr expr, bool refAssign, Lab l)) = "Default Value <paramName> <refAssign ? "?" : "">= <pp(expr)>";
 
 @doc{Convert the CFG into a Rascal Graph, based on flow edge information}
 public Graph[CFGNode] cfgAsGraph(CFG cfg) {

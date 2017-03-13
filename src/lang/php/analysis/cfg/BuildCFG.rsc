@@ -134,8 +134,9 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 		return lab(lstate.counter); 
 	}
 
-	cfgEntryNode = scriptEntry()[@lab=incLabel()];
-	cfgExitNode = scriptExit()[@lab=incLabel()];
+	entryLabel = incLabel(); exitLabel = incLabel();
+	cfgEntryNode = scriptEntry(entryLabel)[@lab=entryLabel];
+	cfgExitNode = scriptExit(exitLabel)[@lab=exitLabel];
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
 	if (script(list[Stmt] b) !:= scr)
@@ -193,8 +194,9 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Cla
 		return lab(lstate.counter); 
 	}
 
-	cfgEntryNode = methodEntry(np.parent.file, np.file)[@lab=incLabel()];
-	cfgExitNode = methodExit(np.parent.file, np.file)[@lab=incLabel()];
+	entryLabel = incLabel(); exitLabel = incLabel();
+	cfgEntryNode = methodEntry(np.parent.file, np.file, entryLabel)[@lab=entryLabel];
+	cfgExitNode = methodExit(np.parent.file, np.file, exitLabel)[@lab=exitLabel];
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
     methodBody = m.body;
@@ -209,7 +211,7 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Cla
 	
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
-	notProvided = [ actualNotProvided(pn, e, br)[@lab=incLabel()] | param(pn,someExpr(e),_,br) <- m.params ];
+	notProvided = [ actualNotProvided(pn, e, br, newLabel)[@lab=newLabel] | param(pn,someExpr(e),_,br) <- m.params, newLabel := incLabel() ];
 	lstate.nodes += toSet(notProvided);
 
 	set[FlowEdge] edges = { };
@@ -220,7 +222,8 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Cla
 	// plus add flow edges between these default initializers
 	paramNodes = [ ];
 	for (param(pn,oe,ot,br) <- m.params) {
-		newNode = (someExpr(e) := oe) ? actualNotProvided(pn, e, br)[@lab=incLabel()] : actualProvided(pn, br)[@lab=incLabel()];
+		newLabel = incLabel();
+		newNode = (someExpr(e) := oe) ? actualNotProvided(pn, e, br, newLabel)[@lab=newLabel] : actualProvided(pn, br, newLabel)[@lab=newLabel];
 		lstate.nodes = lstate.nodes + newNode;
 
 		if (size(paramNodes) > 0) {
@@ -276,8 +279,9 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np,
 		return lab(lstate.counter); 
 	}
 
-	cfgEntryNode = functionEntry(np.file)[@lab=incLabel()];
-	cfgExitNode = functionExit(np.file)[@lab=incLabel()];
+	entryLabel = incLabel(); exitLabel = incLabel();
+	cfgEntryNode = functionEntry(np.file, entryLabel)[@lab=entryLabel];
+	cfgExitNode = functionExit(np.file, exitLabel)[@lab=exitLabel];
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
     functionBody = f.body;
@@ -290,6 +294,11 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np,
 	// Add any initializer expressions from the parameters as CFG nodes
 	lstate.nodes += { exprNode(e, e@lab)[@lab=e@lab] | /Expr e := f.params };
 	
+	// Add initial nodes to represent initializing parameters with default values,
+	// plus add flow edges between these default initializers
+	notProvided = [ actualNotProvided(pn, e, br, newLabel)[@lab=newLabel] | param(pn,someExpr(e),_,br) <- f.params, newLabel := incLabel() ];
+	lstate.nodes += toSet(notProvided);
+
 	set[FlowEdge] edges = { };
 	for (b <- functionBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
 	< edges, lstate > = addBodyEdges(edges, lstate, functionBody);
@@ -298,7 +307,8 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np,
 	// plus add flow edges between these default initializers
 	paramNodes = [ ];
 	for (param(pn,oe,ot,br) <- f.params) {
-		newNode = (someExpr(e) := oe) ? actualNotProvided(pn, e, br)[@lab=incLabel()] : actualProvided(pn, br)[@lab=incLabel()];
+		newLabel = incLabel();
+		newNode = (someExpr(e) := oe) ? actualNotProvided(pn, e, br, newLabel)[@lab=newLabel] : actualProvided(pn, br, newLabel)[@lab=newLabel];
 		lstate.nodes = lstate.nodes + newNode;
 
 		if (size(paramNodes) > 0) {
