@@ -6,15 +6,18 @@ import lang::php::analysis::signatures::Summaries;
 import lang::php::analysis::signatures::Signatures;
 import lang::php::ast::System;
 
-data Callee
-	= functionCallee(str functionName, loc definedAt)
-	| methodCallee(str className, str methodName, loc definedAt)
-	| unknownCallee(str functionOrMethodName)
+data CallTarget
+	= functionTarget(str functionName, loc definedAt)
+	| methodTarget(str className, str methodName, loc definedAt)
+	| unknownTarget(str functionOrMethodName)
 	;
 
-public anno set[Callee] Expr@callees;
- 
-public System computeSystemCallGraph(System s) {
+alias CallGraph = rel[loc callSource, CallTarget callTarget];
+alias InvertedCallGraph = rel[CallTarget callTarget, loc callSource];
+
+public CallGraph computeSystemCallGraph(System s) {
+	CallGraph res = { };
+
 	// First, get back all the library functions and methods so we can add
 	// nodes in the call graph for those that are (or may be) used
 	fsum = loadFunctionSummaries();
@@ -25,44 +28,46 @@ public System computeSystemCallGraph(System s) {
 	map[loc,Signature] sysSignatures = ( l : getFileSignature(l,s.files[l]) | l <- s.files );
 	
 	// Third, change these into a specific format that is easier to match against
-	rel[str functionName, Callee callees] functionCallees = { };
-	rel[str methodName, Callee callees] methodCallees = { };
+	rel[str functionName, CallTarget callTargets] functionTargets = { };
+	rel[str methodName, CallTarget callTargets] methodTargets = { };
 	for (fileSignature(fileloc, items) <- sysSignatures<1>) {
 		for (fs:functionSig(path, _) <- items) {
-			functionCallees += < path.file, functionCallee(path.file, fs@at) >;
+			functionTargets += < path.file, functionTarget(path.file, fs@at) >;
 		}
 		for (ms:methodSig(path, _) <- items) {
-			methodCallees += < path.file, methodCallee(path.parent.file, path.file, ms@at) >;
+			methodTargets += < path.file, methodTarget(path.parent.file, path.file, ms@at) >;
 		}
 	}
 		 
 	// Fourth, turn these into maps, which are faster
-	map[str functionName, set[Callee] callees] functionCalleesMap = ( );
-	map[str methodName, set[Callee] callees] methodCalleesMap = ( );
+	map[str functionName, set[CallTarget] callTargets] functionTargetsMap = ( );
+	map[str methodName, set[CallTarget] callTargets] methodTargetsMap = ( );
 	
-	for (<fn,c> <- functionCallees) {
-		if (fn in functionCalleesMap)
-			functionCalleesMap[fn] = functionCalleesMap[fn] + c;
+	for (<fn,c> <- functionTargets) {
+		if (fn in functionTargetsMap)
+			functionTargetsMap[fn] = functionTargetsMap[fn] + c;
 		else
-			functionCalleesMap[fn] = { c };
+			functionTargetsMap[fn] = { c };
 	}
 	
-	for (<mn,c> <- methodCallees) {
-		if (mn in methodCalleesMap)
-			methodCalleesMap[mn] = methodCalleesMap[mn] + c;
+	for (<mn,c> <- methodTargets) {
+		if (mn in methodTargetsMap)
+			methodTargetsMap[mn] = methodTargetsMap[mn] + c;
 		else
-			methodCalleesMap[mn] = { c };
+			methodTargetsMap[mn] = { c };
 	}
 	
-	// Now, annotate all calls with callee information
-	s.files = ( l : computeScriptCallGraph(s.files[l], functionCalleesMap, methodCalleesMap) | l <- s.files );
+	// Now, compute the call graph
+	res = { *computeScriptCallGraph(s.files[l], functionTargetsMap, methodTargetsMap) | l <- s.files };
 	
-	return s;
+	return res;
 }
 
-public Script computeScriptCallGraph(Script s, map[str functionName, set[Callee] callees] functionCalleesMap, map[str methodName, set[Callee] callees] methodCalleesMap) {
-	set[Callee] allFunctions = { *fc | fc <- functionCalleesMap<1> };
-	set[Callee] allMethods = { *mc | mc <- methodCalleesMap<1> };
+public CallGraph computeScriptCallGraph(Script s, map[str functionName, set[CallTarget] callTargets] functionTargetsMap, map[str methodName, set[CallTarget] callTargets] methodTargetsMap) {
+	set[CallTarget] allFunctions = { *fc | fc <- functionTargetsMap<1> };
+	set[CallTarget] allMethods = { *mc | mc <- methodTargetsMap<1> };
+	
+	CallGraph res = { };
 	
 	s = visit(s) {
 		case c:call(name(name(fn)),ps) : {
@@ -75,59 +80,59 @@ public Script computeScriptCallGraph(Script s, map[str functionName, set[Callee]
 				// the system. NOTE: We don't create an edge to either call_user_func or
 				// call_user_func_array, even though we could create those edges as well.
 				if ([scalar(string(fn2))] := ps) {
-					if (fn in functionCalleesMap) {
-						insert(c[@callees=functionCalleesMap[fn]]); 
+					if (fn in functionTargetsMap) {
+						res = res + ( { c@at } join functionTargetsMap[fn] ); 
 					} else {
-						insert(c[@callees={ unknownCallee(fn) }]);
+						res = res + < c@at, unknownTarget(fn) >;
 					}
 				} else {
-					insert(c[@callees = allFunctions]);
+					res = res + ( { c@at} join allFunctions );
 				}
-			} else if (fn in functionCalleesMap) {
-				insert(c[@callees=functionCalleesMap[fn]]);
+			} else if (fn in functionTargetsMap) {
+				res = res + ( { c@at } join functionTargetsMap[fn] );
 			} else {
-				insert(c[@callees={ unknownCallee(fn) }]);
+				res = res + < c@at, unknownTarget(fn) >;
 			}
 		}
 
 		case mc:methodCall(_,name(name(mn)),_) : {
-			if (mn in methodCalleesMap) {
-				insert(mc[@callees=methodCalleesMap[mn]]);
+			if (mn in methodTargetsMap) {
+				res = res + ( { mc@at } join methodTargetsMap[mn] );
 			} else {
-				insert(mc[@callees={ unknownCallee(mn) }]);
+				res = res + < mc@at, unknownTarget(mn) >;
 			}
 		}
 
 		case sc:staticCall(name(name(cn)),name(name(mn)),_) : {
-			if (mn in methodCalleesMap && {_*,mc:methodCallee(cn,mn,_)} := methodCalleesMap[mn]) {
-				insert(sc[@callees={ mc }]);
+			if (mn in methodTargetsMap && {_*,mc:methodTarget(cn,mn,_)} := methodTargetsMap[mn]) {
+				res = res + < sc@at, mc >;
 			} else {
-				insert(sc[@callees={ unknownCallee("<cn>::<mn>") }]);
+				res = res + < sc@at, unknownTarget("<cn>::<mn>") >;
 			}
 		}
 
 		case sc:staticCall(_,name(name(mn)),_) : {
-			if (mn in methodCalleesMap) {
+			if (mn in methodTargetsMap) {
 				// NOTE: To be more accurate, we should filter these to just be static methods.
-				insert(sc[@callees=methodCalleesMap[mn]]);
+				res = res + ( { sc@at } join methodTargetsMap[mn] );
 			} else {
-				insert(sc[@callees={ unknownCallee("?::<mn>") }]);
+				res = res + < sc@at, unknownTarget("?::<mn>") >;
 			}
 		}
 		
 		case c:call(_,_) : {
-			insert(c[@callees=allFunctions]);
+			res = res + ( { c@at} join allFunctions );
 		}
 
 		case mc:methodCall(_,_,_) : {
-			insert(mc[@callees=allMethods]);
+			res = res + ( { mc@at} join allMethods );
 		}
 
 		case sc:staticMethodCall(_,_,_) : {
 			// NOTE: To be more accurate, we should filter these to just be static methods.
-			insert(sc[@callees=allMethods]);
+			res = res + ( { sc@at} join allMethods );
 		}
 	}
 	
-	return s;
+	return res;
 }
