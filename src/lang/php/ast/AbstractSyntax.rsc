@@ -41,7 +41,7 @@ public data Expr
 	| fetchClassConst(NameOrExpr className, str constantName)
 	| assign(Expr assignTo, Expr assignExpr)
 	| assignWOp(Expr assignTo, Expr assignExpr, Op operation)
-	| listAssign(list[OptionExpr] assignsTo, Expr assignExpr)
+	| listAssign(list[OptionExpr] assignsTo, Expr assignExpr) // NOTE: deprecated, no longer appears in ASTs
 	| refAssign(Expr assignTo, Expr assignExpr)
 	| binaryOperation(Expr left, Expr right, Op operation)
 	| unaryOperation(Expr operand, Op operation)
