@@ -105,3 +105,10 @@ public CFGNode getExitNode(CFG g) {
 		return getOneFrom(exitNodes);
 	throw "Could not find a unique exit node";
 }
+
+@doc{Get a map from labels to locations.}
+rel[Lab label, loc at] getLabelLocationRel(CFG g) {
+	exprs = { < n.l, n.expr@at > | n <- g.nodes, n is exprNode, (n.expr@at)? };
+	stmts = { < n.l, n.stmt@at > | n <- g.nodes, n is stmtNode, (n.stmt@at)? };
+	return exprs + stmts;
+}
