@@ -1626,14 +1626,14 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		}
 		
 		case assign(Expr assignTo, Expr assignExpr) : { 
-			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
 			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
+			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
 			edges = edges + makeEdges(final(assignExpr, lstate), init(assignTo, lstate)) + makeEdges(final(assignTo, lstate), finalLabels);
 		}
 		
 		case assignWOp(Expr assignTo, Expr assignExpr, Op operation) : {
-			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
 			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
+			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
 			edges = edges + makeEdges(final(assignExpr, lstate), init(assignTo, lstate)) + makeEdges(final(assignTo, lstate), finalLabels);
 		}
 		
@@ -1651,8 +1651,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		}
 		
 		case refAssign(Expr assignTo, Expr assignExpr) : {
-			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
 			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
+			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
 			edges = edges + makeEdges(final(assignExpr, lstate), init(assignTo, lstate)) + makeEdges(final(assignTo, lstate), finalLabels);
 		}
 		
