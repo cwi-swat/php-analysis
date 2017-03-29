@@ -107,9 +107,9 @@ public set[Name] getNestedNames(CFGNode n, set[loc] locsToFilter) {
 	int beforeFilteringSize = size(res);
 	res = { < rn, rl > | < rn, rl > <- res, rl notin locsToFilter };
 	int afterFilteringSize = size(res);
-	if (beforeFilteringSize != afterFilteringSize) {
-		println("<n.l>:Before/after filtering: <beforeFilteringSize>/<afterFilteringSize> elements");
-	}
+	//if (beforeFilteringSize != afterFilteringSize) {
+	//	println("<n.l>:Before/after filtering: <beforeFilteringSize>/<afterFilteringSize> elements");
+	//}
 		
 	return res<0>;
 }
