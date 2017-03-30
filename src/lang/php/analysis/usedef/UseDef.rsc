@@ -21,7 +21,9 @@ data Name
 	| computedStaticPropertyName(Expr computedClassName, Expr computedPropertyName)
 	;
 	
-alias Defs = rel[Lab current, Name name, Expr definedAs, Lab definedAt];
+data DefExpr = defExpr(Expr e) | unknownInit();
+
+alias Defs = rel[Lab current, Name name, DefExpr definedAs, Lab definedAt];
 
 alias Uses = rel[Lab current, Name name, Lab definedAt];
 
@@ -119,21 +121,27 @@ public rel[Name name, Expr definedAs, Lab definedAt] getDefInfo(CFGNode n) {
 	switch (n) {
 		case exprNode(assign(Expr e1, Expr e2),_) : {
 			names = getNames(e1);
-			res = res + { < ni, e2, n.l > | ni <- names };
+			res = res + { < ni, defExpr(e2), n.l > | ni <- names };
 		}
 
 		case exprNode(assignWOp(Expr e1, Expr e2, _),_) : {
 			names = getNames(e1);
-			res = res + { < ni, e2, n.l > | ni <- names };
+			res = res + { < ni, defExpr(e2), n.l > | ni <- names };
 		}
 
 		case exprNode(refAssign(Expr e1, Expr e2),_) : {
 			names = getNames(e1);
-			res = res + { < ni, e2, n.l > | ni <- names };
+			res = res + { < ni, defExpr(e2), n.l > | ni <- names };
+		}
+		
+		case stmtNode(global(el,_),_) : {
+			res = res + { < ni, unknownInit(), n.l > | ei <- el, ni <- getNames(ei) };
 		}
 	}
 	return res;
 }
+
+private set[str] superGlobalNames = { "GLOBALS", "_SERVER", "_REQUEST", "_POST", "_GET", "_FILES", "_ENV", "_COOKIE", "_SESSION" };
 
 // TODO: This does not properly handle computed names, such as variable variables.
 // TODO: For properties, we should kill all properties of the same name when one is
@@ -144,7 +152,10 @@ public Defs definitions(CFG cfgFull) {
 	gInverted = invert(g);
 	Defs res = { };
 	
-	set[CFGNode] seenBefore = { getEntryNode(cfgFull) };
+	entry = getEntryNode(cfgFull);
+	res = res + { < entry.l, varName(sgn), unknownInit(), entry.l > };
+	  
+	set[CFGNode] seenBefore = { entry };
 	set[CFGNode] frontier = seenBefore;
 	
 	solve(res, frontier) {

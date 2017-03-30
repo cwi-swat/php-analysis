@@ -1195,10 +1195,19 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 		}
 
 		case global(list[Expr] exprs) : {
+			headernode = incLabel();
+			footernode = incLabel();
+			lstate.nodes = lstate.nodes + headerNode(s, footernode, headernode)[@lab=headernode];
+			lstate.nodes = lstate.nodes + footerNode(s, headernode, footernode)[@lab=footernode];
+			
 			// Add edges for each expression in the list, plus add edges between
 			// each adjacent expression.
 			for (e <- exprs) < edges, lstate > = addExpEdges(edges, lstate, e);
 			< edges, lstate > = addExpSeqEdges(edges, lstate, exprs);
+			
+			for (il <- initLabels) edges += flowEdge(headernode, il);
+			for (il <- (initLabels+s@lab), il notin lstate.headerNodes) lstate.headerNodes[il] = headernode;
+			for (fl <- (finalLabels+s@lab), fl notin lstate.footerNodes) lstate.footerNodes[fl] = footernode;
 		}
 
 		case goto(str gotoLabel) : {
