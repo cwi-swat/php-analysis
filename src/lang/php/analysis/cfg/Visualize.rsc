@@ -30,11 +30,7 @@ public str escapeForDot(str s) {
 	return escape(s, ("\n" : "\\n", "\"" : "\\\""));
 }
 
-public void renderCFGAsDot(CFG c, loc writeTo) {
-	renderCFGAsDot(c, writeTo, "");
-}
-
-public void renderCFGAsDot(CFG c, loc writeTo, str title) {
+public void renderCFGAsDot(CFG c, loc writeTo, str title = "") {
 	str getID(CFGNode n) = "<n@lab>";
 	c = visit(c) { case inlineHTML(_) => inlineHTML("HTMLCode") }
 	

@@ -6,6 +6,8 @@ import lang::php::analysis::cfg::CFG;
 import lang::php::analysis::cfg::Label;
 import lang::php::analysis::cfg::FlowEdge;
 import lang::php::analysis::usedef::UseDef;
+import lang::php::analysis::cfg::Util;
+import lang::php::analysis::cfg::Visualize;
 
 import Relation;
 import IO;
@@ -63,17 +65,29 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names) {
 	// TODO: Add switch, which also means adding the related case...
 	// TODO: Add try/catch and try/catch/finally
 	ternaryNodes = { < ni, e > | ni:exprNode(e:ternary(_,_,_),_) <- inputCFG.nodes };
-	predStmtNodes = ifNodes + doNodes + whileNodes + forNodes + forEachNodes;
-	predExprNodes = ternaryNodes;
 	
-	headersForStmts = { < s, ni > | ni:headerNode(s,_,_) <- inputCFG.nodes, s in predStmtNodes<1> };
-	footersForStmts = { < s, ni > | ni:footerNode(s,_,_) <- inputCFG.nodes, s in predStmtNodes<1> };
-	headersForExprs = { < e, ni > | ni:headerNode(e,_,_) <- inputCFG.nodes, s in predExprNodes<1> };
-	footersForExprs = { < e, ni > | ni:footerNode(e,_,_) <- inputCFG.nodes, s in predExprNodes<1> };
+	headersForStmts = { < ni, s > | ni:headerNode(Stmt s,_,_) <- inputCFG.nodes };
+	footersForStmts = { < ni, s > | ni:footerNode(Stmt s,_,_) <- inputCFG.nodes };
+	headersForExprs = { < ni, e > | ni:headerNode(Expr e,_,_) <- inputCFG.nodes };
+	footersForExprs = { < ni, e > | ni:footerNode(Expr e,_,_) <- inputCFG.nodes };
+
+	predStmtNodes = ifNodes + doNodes + whileNodes + forNodes + forEachNodes + headersForStmts;
+	predExprNodes = ternaryNodes + headersForExprs;
 	
 	containedLocations = { gn.expr@at | gn <- definingNodes, gn is exprNode, (gn.expr@at)? } +
 						 { gn.stmt@at | gn <- definingNodes, gn is stmtNode, (gn.stmt@at)? };
-
+	if (n is exprNode && (n.expr@at)?) {
+		containedLocations = containedLocations + n.expr@at;
+	} else if (n is stmtNode && (n.stmt@at)?) {
+		containedLocations = containedLocations + n.stmt@at;
+	}
+	
+	for (< ni, s > <- predStmtNodes) {
+		println("Stmt: <s@at>");
+	}
+	
+	println(containedLocations);
+	 
 	containingStmts = { };
 	for (< ni, s > <- predStmtNodes) {
 		if (size({ l | l <- containedLocations, l < s@at }) > 0) {
@@ -91,20 +105,29 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names) {
 	println("Found <size(containingStmts)> containing pred statements");
 	println("Found <size(containingExprs)> containing pred exprs");
 
-	resultingCFG = inputCFG;
-	// TODO: Add start and end nodes!
-	resultingCFG.nodes = definingNodes + containingStmts<0> + containingExprs<0> + headersForStmts[containingStmts<1>] + footersForStmts[containingStmts<1>] + headersForExprs[containingExprs<1>] + footersForExprs[containingExprs<1>];
-	labels = { n.l | n <- resultingCFG.nodes };
-	edges = resultingCFG.edges;
-	solve(newEdges) {
-		edges = { };
-		for (e <- newEdges) {
-			if (e.from == e.to && e.from in labels) {
-				edges = edges + e;
-			} else {
-				; // Add code for other cases...
-			} 
-		}
+	nodesToKeep = n + definingNodes + getEntryNode(inputCFG) + getExitNode(inputCFG);
+	if (size(containingStmts) > 0) {
+		nodesToKeep = nodesToKeep + 
+			containingStmts<0> + 
+			invert(headersForStmts)[containingStmts<1>] +
+			invert(footersForStmts)[containingStmts<1>];
 	}
+	if (size(containingExprs) > 0) {
+		nodesToKeep = nodesToKeep +
+			 containingExprs<0> +
+			 invert(headersForExprs)[containingExprs<1>] + 
+			 invert(footersForExprs)[containingExprs<1>];
+	}
+			
+	nodesToRemove = inputCFG.nodes - nodesToKeep;
+
+	for (n2r <- nodesToRemove) {
+		inputCFG = removeNode(inputCFG, n2r);
+	}
+		
 	return inputCFG;
+}
+
+public void visualizeSlice(CFG slicedCFG, loc l) {
+	renderCFGAsDot(slicedCFG, l, title="Sliced CFG");
 }

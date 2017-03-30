@@ -263,3 +263,22 @@ public set[&T] findAllReachedUntil(Graph[CFGNode] g, CFGNode startNode, bool(CFG
 public set[&T] findAllReachingUntil(Graph[CFGNode] g, CFGNode startNode, bool(CFGNode cn) pred, bool(CFGNode cn) stop, &T (CFGNode cn) gather, bool includeStartNode = false) {
 	return findAllReachedUntil(invert(g), startNode, pred, stop, gather, includeStartNode = includeStartNode);
 }
+
+public CFG removeNode(CFG inputCFG, CFGNode n) {
+	// Get the edges into this node
+	edgesInto = { e | e <- inputCFG.edges, e.to == n.l };
+	
+	// Get the edges from this node
+	edgesFrom = { e | e <- inputCFG.edges, e.from == n.l };
+	
+	// Now, link up the nodes at each endpoint
+	newEdges = { mergeEdges(e1,e2) | e1 <- edgesInto, e2 <- edgesFrom };
+	
+	return inputCFG[edges=inputCFG.edges - edgesInto - edgesFrom + newEdges ][nodes = inputCFG.nodes - n];
+}
+
+public FlowEdge mergeEdges(FlowEdge e1, FlowEdge e2) {
+	// TODO: This just returns a normal edge, but we may want to return other edges
+	// if one or both input edge are jump edges, conditionalEdges, etc
+	return flowEdge(e1.from, e2.to);
+}

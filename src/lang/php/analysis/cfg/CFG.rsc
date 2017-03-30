@@ -69,10 +69,10 @@ public str printCFGNode(stmtNode(Stmt s, Lab l)) {
 	switch(s) {
 		case classDef(ClassDef cd) : return "Class <cd.className>";
 		case function(fn,_,_,_) : return "Function <fn>";
-		default: return pp(s);
+		default: return "Stmt: <pp(s)>";
 	}
 }
-public str printCFGNode(exprNode(Expr e, Lab l)) = pp(e);
+public str printCFGNode(exprNode(Expr e, Lab l)) = "Expr: <pp(e)>";
 public str printCFGNode(actualProvided(str paramName, bool refAssign, Lab l)) = "Arbitrary Value <paramName> <refAssign ? "?" : "">= unknown";
 public str printCFGNode(actualNotProvided(str paramName, Expr expr, bool refAssign, Lab l)) = "Default Value <paramName> <refAssign ? "?" : "">= <pp(expr)>";
 
