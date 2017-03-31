@@ -211,8 +211,8 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Cla
 	
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
-	notProvided = [ actualNotProvided(pn, e, br, newLabel)[@lab=newLabel] | param(pn,someExpr(e),_,br) <- m.params, newLabel := incLabel() ];
-	lstate.nodes += toSet(notProvided);
+	//notProvided = [ actualNotProvided(pn, e, br, newLabel)[@lab=newLabel] | param(pn,someExpr(e),_,br) <- m.params, newLabel := incLabel() ];
+	//lstate.nodes += toSet(notProvided);
 
 	set[FlowEdge] edges = { };
 	for (b <- methodBody) < edges, lstate > = addStmtEdges(edges, lstate, b);
@@ -296,8 +296,8 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np,
 	
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
-	notProvided = [ actualNotProvided(pn, e, br, newLabel)[@lab=newLabel] | param(pn,someExpr(e),_,br) <- f.params, newLabel := incLabel() ];
-	lstate.nodes += toSet(notProvided);
+	//notProvided = [ actualNotProvided(pn, e, br, newLabel)[@lab=newLabel] | param(pn,someExpr(e),_,br) <- f.params, newLabel := incLabel() ];
+	//lstate.nodes += toSet(notProvided);
 
 	set[FlowEdge] edges = { };
 	for (b <- functionBody) < edges, lstate > = addStmtEdges(edges, lstate, b);

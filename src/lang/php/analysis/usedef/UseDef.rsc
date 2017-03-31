@@ -116,8 +116,8 @@ public set[Name] getNestedNames(CFGNode n, set[loc] locsToFilter) {
 	return res<0>;
 }
 
-public rel[Name name, Expr definedAs, Lab definedAt] getDefInfo(CFGNode n) {
-	rel[Name name, Expr definedAs, Lab definedAt] res = { };
+public rel[Name name, DefExpr definedAs, Lab definedAt] getDefInfo(CFGNode n) {
+	rel[Name name, DefExpr definedAs, Lab definedAt] res = { };
 	switch (n) {
 		case exprNode(assign(Expr e1, Expr e2),_) : {
 			names = getNames(e1);
@@ -153,7 +153,27 @@ public Defs definitions(CFG cfgFull) {
 	Defs res = { };
 	
 	entry = getEntryNode(cfgFull);
-	res = res + { < entry.l, varName(sgn), unknownInit(), entry.l > };
+	usedSuperGlobalNames = { sgn | sgn <- superGlobalNames, /var(name(name(sgn))) := cfgFull.nodes };
+	res = res + { < entry.l, varName(sgn), unknownInit(), entry.l >  | sgn <- usedSuperGlobalNames };
+	
+	// Introduce the names for the parameters
+	if (entry is functionEntry || entry is methodEntry) {
+		// Grab out all the parameter nodes
+		actualProvidedNodes = { n | n <- cfgFull.nodes, n is actualProvided };
+		actualNotProvidedNodes = { n | n <- cfgFull.nodes, n is actualNotProvided };
+		
+		// The actualNotProvided nodes represent formal parameters with no defaults, for these we have the
+		// names but unknown defining expressions.
+		for (n <- actualNotProvidedNodes) {
+			res = res + { < entry.l, varName(n.paramName), unknownInit(), entry.l > };
+		}
+
+		// The actualProvided nodes represent formal parameters with defaults, we could have to different
+		// definitions here, an unknown def and the default def
+		for (n <- actualProvidedNodes) {
+			res = res + { < entry.l, varName(n.paramName), unknownInit(), entry.l >, < entry.l, varName(n.paramName), defExpr(n.expr), entry.l > };
+		}
+	}
 	  
 	set[CFGNode] seenBefore = { entry };
 	set[CFGNode] frontier = seenBefore;
@@ -161,8 +181,8 @@ public Defs definitions(CFG cfgFull) {
 	solve(res, frontier) {
 		workingFrontier = frontier;
 		for (n <- frontier) {
-			rel[Name name, Expr definedAs, Lab definedAt] inbound = res[{ni.l | ni <- gInverted[n]}];
-			rel[Name name, Expr definedAs, Lab definedAt] kills = { };
+			rel[Name name, DefExpr definedAs, Lab definedAt] inbound = res[{ni.l | ni <- gInverted[n]}];
+			rel[Name name, DefExpr definedAs, Lab definedAt] kills = { };
 			if (isDefNode(n)) {
 				kills = getDefInfo(n);
 			}
@@ -203,7 +223,7 @@ public Uses uses(CFG cfgFull, Defs defs) {
 	for (n <- cfgFull.nodes) {
 		// Grab back the definitions that reach this node (this doesn't include any that are
 		// created by this node)
-		rel[Name name, Expr definedAs, Lab definedAt] inbound = defs[{ni.l | ni <- gInverted[n]}];
+		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = defs[{ni.l | ni <- gInverted[n]}];
 		names = getNestedNames(n,locsToFilter);
 		res = res + { < n.l, name, definedAt > | name <- names, < name, _, definedAt > <- inbound };
 	}
