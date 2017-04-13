@@ -13,6 +13,26 @@ import lang::php::ast::AbstractSyntax;
 import IO;
 import Set;
 
+public set[ClassDef] getClasses(Script scr) {
+	return { c | script(body) := scr, classDef(c) <- body };
+}
+
+public set[InterfaceDef] getInterfaces(Script scr) {
+	return { i | script(body) := scr, interfaceDef(i) <- body };
+}
+
+public set[TraitDef] getTraits(Script scr) {
+	return { t | script(body) := scr, traitDef(t) <- body };
+}
+
+public list[Stmt] getMainBody(Script scr) {
+	return [ s | script(body) := scr, s <- body, ! (s is classDef || s is interfaceDef || s is traitDef) ];
+}
+
+public set[ClassItem] getMethods(ClassDef cd) {
+	return { ci | ci <- cd.members, ci is method };
+}
+
 @doc{The items we split the script into. This includes functions, methods, and the various
      statements that sit at the top level and form the global scope.}
 public data SplitItem
@@ -23,7 +43,7 @@ public data SplitItem
 	
 @doc{The representation of the script, after splitting. This is a map from names to the item that
      actually defines that name.}
-public alias SplitScript = map[NamePath,SplitItem];
+public alias SplitScript = map[loc,SplitItem];
 
 @doc{Split the script into it's component parts.}
 public SplitScript splitScript(Script scr) {

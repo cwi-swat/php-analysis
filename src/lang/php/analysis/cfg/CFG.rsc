@@ -19,10 +19,10 @@ import Node;
 
 @doc{Representations of the control flow graph}
 public data CFG 
-	= cfg(NamePath item, set[CFGNode] nodes, FlowEdges edges)
-	| cfg(NamePath item, set[CFGNode] nodes, FlowEdges edges, CFGNode entryNode, CFGNode exitNode)
-	| cfg(NamePath item, set[CFGNode] nodes, FlowEdges edges, loc at)
-	| cfg(NamePath item, set[CFGNode] nodes, FlowEdges edges, loc at, CFGNode entryNode, CFGNode exitNode)
+	= cfg(loc item, set[CFGNode] nodes, FlowEdges edges)
+	| cfg(loc item, set[CFGNode] nodes, FlowEdges edges, CFGNode entryNode, CFGNode exitNode)
+	| cfg(loc item, set[CFGNode] nodes, FlowEdges edges, loc at)
+	| cfg(loc item, set[CFGNode] nodes, FlowEdges edges, loc at, CFGNode entryNode, CFGNode exitNode)
 	;
 
 @doc{Control flow graph nodes}

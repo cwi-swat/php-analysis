@@ -47,16 +47,16 @@ import Exception;
 //   convert these to exceptions have been added.
 //
 @doc{Build the CFGs for a single PHP file, given as a location}
-public map[NamePath,CFG] buildCFGs(loc l, bool buildBasicBlocks=true) {
+public map[loc,CFG] buildCFGs(loc l, bool buildBasicBlocks=true) {
 	return buildCFGs(loadPHPFile(l), buildBasicBlocks=buildBasicBlocks);
 }
 
 @doc{Build the CFGs for a PHP script, returning both the CFGs and the labeled script.}
-public tuple[Script scr, map[NamePath,CFG] cfgs] buildCFGsAndScript(Script scr, bool buildBasicBlocks=true) {
+public tuple[Script scr, map[loc,CFG] cfgs] buildCFGsAndScript(Script scr, bool buildBasicBlocks=true) {
 	lstate = newLabelState();
 	< scrLabeled, lstate > = labelScript(scr, lstate);
 	
-	map[NamePath,CFG] res = ( );
+	map[loc,CFG] res = ( );
 
 	//println("Creating CFG for top-level script");
 	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
@@ -84,7 +84,7 @@ public tuple[Script scr, map[NamePath,CFG] cfgs] buildCFGsAndScript(Script scr, 
 }
 
 @doc{Build just the CFGs for a PHP script}
-public map[NamePath,CFG] buildCFGs(Script scr, bool buildBasicBlocks=true) = buildCFGsAndScript(scr, buildBasicBlocks=buildBasicBlocks).cfgs;
+public map[loc,CFG] buildCFGs(Script scr, bool buildBasicBlocks=true) = buildCFGsAndScript(scr, buildBasicBlocks=buildBasicBlocks).cfgs;
 
 @doc{Strip the label annotations off of the nodes in the script.}
 public Script stripLabels(Script scr) {
@@ -96,14 +96,14 @@ public Script stripLabels(Script scr) {
 }
 
 @doc{Retrieve all method declarations from a script.}
-private map[NamePath, ClassItem] getScriptMethods(Script scr) =
+private map[loc, ClassItem] getScriptMethods(Script scr) =
 	( [class(cname),method(mname)] : m | /class(cname,_,_,_,mbrs) := scr, m:method(mname,_,_,params,body) <- mbrs );
 
 // TODO: It is possible in PHP to have non-unique or conditional declarations. We may need a way to represent
 // that here, assuming we ever run across it.
 
 @doc{Retrieve all function declarations from a script. Note: this assumes that definitions are unique.}
-private map[NamePath, Stmt] getScriptFunctions(Script scr) =
+private map[loc, Stmt] getScriptFunctions(Script scr) =
 	( functionPath(fname) : f | /f:function(fname,_,_,_) := scr );
 
 private tuple[set[CFGNode] nodes, set[FlowEdge] edges] cleanUpGraph(LabelState lstate, set[FlowEdge] edges) {
@@ -188,7 +188,7 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 
 // TODO: The code for functions and methods is very similar, so refactor to remove
 // this duplication...
-private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, ClassItem m, LabelState lstate) {
+private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(loc np, ClassItem m, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
 		return lab(lstate.counter); 
@@ -273,7 +273,7 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(NamePath np, Cla
 
 // TODO: The code for functions and methods is very similar, so refactor to remove
 // this duplication...
-private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(NamePath np, Stmt f, LabelState lstate) {
+private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(loc np, Stmt f, LabelState lstate) {
 	Lab incLabel() { 
 		lstate.counter += 1; 
 		return lab(lstate.counter); 

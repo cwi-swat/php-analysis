@@ -16,13 +16,13 @@ import List;
 data ParamInfo = paramInfo(str paramName, bool isRef) | paramInfo(str paramName, str givenType, bool isRef);
 
 data SignatureItem
-	= functionSig(NamePath namepath, int parameterCount)
-	| functionSig(NamePath namepath, list[ParamInfo] parameterInfo) 
-	| constSig(NamePath namepath, Expr e)
-	| classSig(NamePath namepath)
-	| methodSig(NamePath namepath, int parameterCount)
-	| methodSig(NamePath namepath, list[ParamInfo] parameterInfo)
-	| classConstSig(NamePath namepath, Expr e)
+	= functionSig(loc namepath, int parameterCount)
+	| functionSig(loc namepath, list[ParamInfo] parameterInfo) 
+	| constSig(loc namepath, Expr e)
+	| classSig(loc namepath)
+	| methodSig(loc namepath, int parameterCount)
+	| methodSig(loc namepath, list[ParamInfo] parameterInfo)
+	| classConstSig(loc namepath, Expr e)
 	;
 
 public anno loc SignatureItem@at;
@@ -109,7 +109,7 @@ public rel[SignatureItem, loc] getAllDefinedConstants(System scripts) {
 						 constSig(cn,e) := si || classConstSig(cln,cn,e) := si };
 }
 
-public rel[SignatureItem,loc] getDefinitionsForItem(System scripts, NamePath itemName) {
+public rel[SignatureItem,loc] getDefinitionsForItem(System scripts, loc itemName) {
 	ssigs = getSystemSignatures(scripts);
 	return { < si, l > | fileSignature(l,sis) <- ssigs<1>, 
 						 si <- sis,

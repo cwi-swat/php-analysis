@@ -27,14 +27,14 @@ data SummaryParam
 	;
 
 data Summary 
-	= functionSummary(NamePath name, list[SummaryParam] params, bool returnsRef, str returnType, bool mayAlterGlobals, set[str] throwsTypes)
-	| methodSummary(NamePath name, set[str] modifiers, list[SummaryParam] params, bool returnsRef, str returnType, bool mayAlterGlobals, set[str] throwsTypes)
-	| constructorSummary(NamePath name, set[str] modifiers, list[SummaryParam] params, bool mayAlterGlobals, set[str] throwsTypes)
-	| constantSummary(NamePath name, str constType)
-	| classSummary(NamePath name, set[str] extends, set[str] implements)
-	| fieldSummary(NamePath name, str fieldType, set[str] modifiers, str initializer)
-	| invalidSummary(NamePath name, str reason)
-	| emptySummary(NamePath name, loc path)
+	= functionSummary(loc name, list[SummaryParam] params, bool returnsRef, str returnType, bool mayAlterGlobals, set[str] throwsTypes)
+	| methodSummary(loc name, set[str] modifiers, list[SummaryParam] params, bool returnsRef, str returnType, bool mayAlterGlobals, set[str] throwsTypes)
+	| constructorSummary(loc name, set[str] modifiers, list[SummaryParam] params, bool mayAlterGlobals, set[str] throwsTypes)
+	| constantSummary(loc name, str constType)
+	| classSummary(loc name, set[str] extends, set[str] implements)
+	| fieldSummary(loc name, str fieldType, set[str] modifiers, str initializer)
+	| invalidSummary(loc name, str reason)
+	| emptySummary(loc name, loc path)
 	;
 	
 public anno loc Summary@from;

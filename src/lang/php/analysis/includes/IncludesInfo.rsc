@@ -18,35 +18,35 @@ import ValueIO;
 private loc infoLoc = baseLoc + "serialized/includeInfo";
 
 
-public void buildIncludesInfo(str p, str v, loc baseloc) {
-	return buildIncludesInfo("<p>-<v>", baseloc);
+public void buildIncludesInfo(str p, str v, loc baseloc, bool forceBuild=false) {
+	return buildIncludesInfo("<p>-<v>", baseloc, forceBuild=forceBuild);
 }
 
-public void buildIncludesInfo(str name, loc baseloc) {
-	if (exists(infoLoc + "<name>-l2c.bin")) return;
+public void buildIncludesInfo(str name, loc baseloc, bool forceBuild=false) {
+	if (exists(infoLoc + "<name>-l2c.bin") && !forceBuild) return;
 	sys = loadBinary(name);
-	buildIncludesInfo(sys, name, baseloc);
+	buildIncludesInfo(sys, name, baseloc, forceBuild=forceBuild);
 }
 
-public void buildIncludesInfo(System sys, str p, str v, loc baseloc) {
-	buildIncludesInfo(sys, "<p>-<v>", baseloc);
+public void buildIncludesInfo(System sys, str p, str v, loc baseloc, bool forceBuild=false) {
+	buildIncludesInfo(sys, "<p>-<v>", baseloc, forceBuild=forceBuild);
 }
 
-public void buildIncludesInfo(System sys, str overrideName = "") {
+public void buildIncludesInfo(System sys, str overrideName = "", bool forceBuild=false) {
 	if (overrideName != "") {
-		buildIncludesInfo(sys, overrideName, sys.baseLoc);
+		buildIncludesInfo(sys, overrideName, sys.baseLoc, forceBuild=forceBuild);
 	} else if (sys has name && sys has version && sys has baseLoc) {
-		buildIncludesInfo(sys, "<sys.name>-<sys.version>", sys.baseLoc);
+		buildIncludesInfo(sys, "<sys.name>-<sys.version>", sys.baseLoc, forceBuild=forceBuild);
 	} else if (sys has name && sys has baseLoc) {
-		buildIncludesInfo(sys, sys.name, sys.baseLoc);
+		buildIncludesInfo(sys, sys.name, sys.baseLoc, forceBuild=forceBuild);
 	} else {
 		throw "Cannot build includes for this system, name and baseLoc are both needed";
 	}
 }
 
-public void buildIncludesInfo(System sys, str name, loc baseloc) {
+public void buildIncludesInfo(System sys, str name, loc baseloc, bool forceBuild=false) {
 	if (!exists(infoLoc)) mkDirectory(infoLoc);
-	if (exists(infoLoc + "<name>-l2c.bin")) return;
+	if (exists(infoLoc + "<name>-l2c.bin") && !forceBuild) return;
 	
 	map[loc,set[ConstItemExp]] loc2consts = ( l : { cdef[e=simplifyExpr(cdef.e, baseloc)]  | cdef <- getScriptConstDefs(sys.files[l]) } | l <- sys.files);
 	rel[ConstItem,loc,Expr] constrel = { < (classConst(cln,cn,ce) := ci) ? classConst(cln,cn) : normalConst(ci.constName), l, ci.e > | l <- loc2consts, ci <- loc2consts[l] };

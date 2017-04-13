@@ -162,15 +162,15 @@ public Defs definitions(CFG cfgFull) {
 		actualProvidedNodes = { n | n <- cfgFull.nodes, n is actualProvided };
 		actualNotProvidedNodes = { n | n <- cfgFull.nodes, n is actualNotProvided };
 		
-		// The actualNotProvided nodes represent formal parameters with no defaults, for these we have the
-		// names but unknown defining expressions.
-		for (n <- actualNotProvidedNodes) {
+		// The actualProvided nodes represent formal parameters with no defaults, so the actual must
+		// be provided to the program (and we don't know what that is)
+		for (n <- actualProvidedNodes) {
 			res = res + { < entry.l, varName(n.paramName), unknownInit(), entry.l > };
 		}
 
-		// The actualProvided nodes represent formal parameters with defaults, we could have to different
-		// definitions here, an unknown def and the default def
-		for (n <- actualProvidedNodes) {
+		// The actualNotProvided nodes represent formal parameters with defaults, allowing cases
+		// where an actual is not provided explicitly.
+		for (n <- actualNotProvidedNodes) {
 			res = res + { < entry.l, varName(n.paramName), unknownInit(), entry.l >, < entry.l, varName(n.paramName), defExpr(n.expr), entry.l > };
 		}
 	}

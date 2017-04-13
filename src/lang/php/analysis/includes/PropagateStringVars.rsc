@@ -163,7 +163,7 @@ public Script evalStringVars(Script scr) {
 	return stripLabels(lscr);
 }
 
-public set[NamePath] kills(Expr e) {
+public set[loc] kills(Expr e) {
 	return { };
 }
 

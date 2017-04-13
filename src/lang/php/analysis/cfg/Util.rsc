@@ -101,7 +101,7 @@ public bool trueOnAReachingPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNod
 }
 
 @doc{Return the CFG for the node at the given location}
-public CFG findContainingCFG(Script s, map[NamePath,CFG] cfgs, loc l) {
+public CFG findContainingCFG(Script s, map[loc,CFG] cfgs, loc l) {
 	
 	for (/c:class(cname,_,_,_,mbrs) := s) {
 		for (m:method(mname,_,_,params,body) <- mbrs, l < m@at) {

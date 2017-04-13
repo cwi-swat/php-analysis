@@ -404,7 +404,7 @@ public set[Summary] extractMethodSummary(str bookname, str className, str method
 					if (ooMode && /<className>::<onlymn:.+>$/ := methodName)
 						methodName = onlymn;
 						
-					NamePath mpath = ooMode ? methodPath(className,methodName,library=bookname) : functionPath(methodName,library=bookname);
+					loc mpath = ooMode ? methodPath(className,methodName,library=bookname) : functionPath(methodName,library=bookname);
 
 					if ((size(rtypes) == 1 && !paramProblems) || "__construct" == methodName) {
 						if (ooMode) {
