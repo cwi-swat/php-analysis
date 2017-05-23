@@ -5,6 +5,7 @@ import lang::php::ast::System;
 import lang::php::analysis::cfg::CFG;
 import lang::php::analysis::cfg::Label;
 import lang::php::analysis::cfg::FlowEdge;
+import lang::php::pp::PrettyPrinter;
 
 import Relation;
 import IO;
@@ -20,8 +21,17 @@ data Name
 	| computedStaticPropertyName(str className, Expr computedPropertyName)
 	| computedStaticPropertyName(Expr computedClassName, Expr computedPropertyName)
 	;
-	
-data DefExpr = defExpr(Expr e) | unknownInit();
+
+public str printName(varName(str varName)) = "$<varName>";
+public str printName(computedName(Expr computedName)) = "{<pp(computedName)>}";
+public str printName(propertyName(Expr targetObject, str propertyName)) = "{<pp(targetObject)>}.<propertyName>";
+public str printName(computedPropertyName(Expr targetObject, Expr computedPropertyName)) = "{<pp(targetObject)>}.{<pp(computedPropertyName)>}";
+public str printName(staticPropertyName(str className, str propertyName)) = "<className>::<propertyName>";
+public str printName(computedStaticPropertyName(Expr computedClassName, str propertyName)) = "{<pp(computedClassName)>}::<propertyName>";
+public str printName(computedStaticPropertyName(str className, Expr computedPropertyName)) = "<className>::{<pp(computedPropertyName)>}";
+public str printName(computedStaticPropertyName(Expr computedClassName, Expr computedPropertyName)) = "{<pp(computedClassName)>}::{<pp(computedPropertyName)>}";
+
+data DefExpr = defExpr(Expr e) | inputParamDef(Name paramName) | globalDef(Name globalName);
 
 alias Defs = rel[Lab current, Name name, DefExpr definedAs, Lab definedAt];
 
@@ -135,7 +145,7 @@ public rel[Name name, DefExpr definedAs, Lab definedAt] getDefInfo(CFGNode n) {
 		}
 		
 		case stmtNode(global(el,_),_) : {
-			res = res + { < ni, unknownInit(), n.l > | ei <- el, ni <- getNames(ei) };
+			res = res + { < ni, globalDef(ni), n.l > | ei <- el, ni <- getNames(ei) };
 		}
 	}
 	return res;
@@ -154,7 +164,7 @@ public Defs definitions(CFG cfgFull) {
 	
 	entry = getEntryNode(cfgFull);
 	usedSuperGlobalNames = { sgn | sgn <- superGlobalNames, /var(name(name(sgn))) := cfgFull.nodes };
-	res = res + { < entry.l, varName(sgn), unknownInit(), entry.l >  | sgn <- usedSuperGlobalNames };
+	res = res + { < entry.l, varName(sgn), globalDef(varName(sgn)), entry.l >  | sgn <- usedSuperGlobalNames };
 	
 	// Introduce the names for the parameters
 	if (entry is functionEntry || entry is methodEntry) {
@@ -165,13 +175,13 @@ public Defs definitions(CFG cfgFull) {
 		// The actualProvided nodes represent formal parameters with no defaults, so the actual must
 		// be provided to the program (and we don't know what that is)
 		for (n <- actualProvidedNodes) {
-			res = res + { < entry.l, varName(n.paramName), unknownInit(), entry.l > };
+			res = res + { < entry.l, varName(n.paramName), inputParamDef(varName(n.paramName)), entry.l > };
 		}
 
 		// The actualNotProvided nodes represent formal parameters with defaults, allowing cases
 		// where an actual is not provided explicitly.
 		for (n <- actualNotProvidedNodes) {
-			res = res + { < entry.l, varName(n.paramName), unknownInit(), entry.l >, < entry.l, varName(n.paramName), defExpr(n.expr), entry.l > };
+			res = res + { < entry.l, varName(n.paramName), inputParamDef(varName(n.paramName)), entry.l >, < entry.l, varName(n.paramName), defExpr(n.expr), entry.l > };
 		}
 	}
 	  
