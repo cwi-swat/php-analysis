@@ -31,7 +31,7 @@ public str printName(computedStaticPropertyName(Expr computedClassName, str prop
 public str printName(computedStaticPropertyName(str className, Expr computedPropertyName)) = "<className>::{<pp(computedPropertyName)>}";
 public str printName(computedStaticPropertyName(Expr computedClassName, Expr computedPropertyName)) = "{<pp(computedClassName)>}::{<pp(computedPropertyName)>}";
 
-data DefExpr = defExpr(Expr e) | inputParamDef(Name paramName) | globalDef(Name globalName);
+data DefExpr = defExpr(Expr e) | defExprWOp(Name usedName, Expr e, Op usedOp) | inputParamDef(Name paramName) | globalDef(Name globalName);
 
 alias Defs = rel[Lab current, Name name, DefExpr definedAs, Lab definedAt];
 
@@ -134,9 +134,9 @@ public rel[Name name, DefExpr definedAs, Lab definedAt] getDefInfo(CFGNode n) {
 			res = res + { < ni, defExpr(e2), n.l > | ni <- names };
 		}
 
-		case exprNode(assignWOp(Expr e1, Expr e2, _),_) : {
+		case exprNode(assignWOp(Expr e1, Expr e2, op),_) : {
 			names = getNames(e1);
-			res = res + { < ni, defExpr(e2), n.l > | ni <- names };
+			res = res + { < ni, defExprWOp(ni, e2, op), n.l > | ni <- names };
 		}
 
 		case exprNode(refAssign(Expr e1, Expr e2),_) : {
@@ -217,10 +217,6 @@ public Uses uses(CFG cfgFull, Defs defs) {
 	set[loc] locsToFilter = { };
 	visit (cfgFull.nodes) {
 		case assign(ni:Expr e1, _) : {
-			locsToFilter = locsToFilter + ni@at;
-		}
-
-		case assignWOp(ni:Expr e1, _, _) : {
 			locsToFilter = locsToFilter + ni@at;
 		}
 
