@@ -40,6 +40,7 @@ alias Uses = rel[Lab current, Name name, Lab definedAt];
 public bool isDefNode(exprNode(assign(_,_),_)) = true;
 public bool isDefNode(exprNode(assignWOp(_,_,_),_)) = true;
 public bool isDefNode(exprNode(refAssign(_,_),_)) = true;
+public bool isDefNode(headerNode(global(_),_,_)) = true;
 public default bool isDefNode(_) = false;
 
 public list[Name] getNames(Expr n) {
@@ -144,7 +145,7 @@ public rel[Name name, DefExpr definedAs, Lab definedAt] getDefInfo(CFGNode n) {
 			res = res + { < ni, defExpr(e2), n.l > | ni <- names };
 		}
 		
-		case stmtNode(global(el,_),_) : {
+		case headerNode(global(el),_,_) : {
 			res = res + { < ni, globalDef(ni), n.l > | ei <- el, ni <- getNames(ei) };
 		}
 	}
@@ -185,12 +186,10 @@ public Defs definitions(CFG cfgFull) {
 		}
 	}
 	  
-	set[CFGNode] seenBefore = { entry };
-	set[CFGNode] frontier = seenBefore;
-	
-	solve(res, frontier) {
-		workingFrontier = frontier;
-		for (n <- frontier) {
+	// TODO: This is a slower algorithm but it won't miss cases, should look at ordering
+	// the nodes to speed up the flow analysis
+	solve(res) {
+		for (n <- cfgFull.nodes) {
 			rel[Name name, DefExpr definedAs, Lab definedAt] inbound = res[{ni.l | ni <- gInverted[n]}];
 			rel[Name name, DefExpr definedAs, Lab definedAt] kills = { };
 			if (isDefNode(n)) {
@@ -199,8 +198,6 @@ public Defs definitions(CFG cfgFull) {
 			res = res + { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- inbound, ni.name notin kills.name } 
 				      + { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- kills };
 		}
-		frontier = g[workingFrontier] - seenBefore;
-		seenBefore += frontier;
 	}
 	
 	return res;	
