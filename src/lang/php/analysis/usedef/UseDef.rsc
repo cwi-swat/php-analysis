@@ -6,10 +6,12 @@ import lang::php::analysis::cfg::CFG;
 import lang::php::analysis::cfg::Label;
 import lang::php::analysis::cfg::FlowEdge;
 import lang::php::pp::PrettyPrinter;
+import lang::php::analysis::cfg::Util;
 
 import Relation;
 import IO;
 import Set;
+import List;
 
 data Name 
 	= varName(str varName) 
@@ -161,11 +163,11 @@ private set[str] superGlobalNames = { "GLOBALS", "_SERVER", "_REQUEST", "_POST",
 public Defs definitions(CFG cfgFull) {
 	g = cfgAsGraph(cfgFull);
 	gInverted = invert(g);
-	Defs res = { };
-	
+	map[Lab, rel[Name name, DefExpr definedAs, Lab definedAt]] resMap = ( );
+		
 	entry = getEntryNode(cfgFull);
 	usedSuperGlobalNames = { sgn | sgn <- superGlobalNames, /var(name(name(sgn))) := cfgFull.nodes };
-	res = res + { < entry.l, varName(sgn), globalDef(varName(sgn)), entry.l >  | sgn <- usedSuperGlobalNames };
+	resMap[entry.l] = { < varName(sgn), globalDef(varName(sgn)), entry.l >  | sgn <- usedSuperGlobalNames };
 	
 	// Introduce the names for the parameters
 	if (entry is functionEntry || entry is methodEntry) {
@@ -176,31 +178,55 @@ public Defs definitions(CFG cfgFull) {
 		// The actualProvided nodes represent formal parameters with no defaults, so the actual must
 		// be provided to the program (and we don't know what that is)
 		for (n <- actualProvidedNodes) {
-			res = res + { < entry.l, varName(n.paramName), inputParamDef(varName(n.paramName)), entry.l > };
+			resMap[entry.l] = resMap[entry.l] + { < varName(n.paramName), inputParamDef(varName(n.paramName)), entry.l > };
 		}
 
 		// The actualNotProvided nodes represent formal parameters with defaults, allowing cases
 		// where an actual is not provided explicitly.
 		for (n <- actualNotProvidedNodes) {
-			res = res + { < entry.l, varName(n.paramName), inputParamDef(varName(n.paramName)), entry.l >, < entry.l, varName(n.paramName), defExpr(n.expr), entry.l > };
+			resMap[entry.l] = resMap[entry.l] + { < varName(n.paramName), inputParamDef(varName(n.paramName)), entry.l >, < varName(n.paramName), defExpr(n.expr), entry.l > };
 		}
 	}
 	  
 	// TODO: This is a slower algorithm but it won't miss cases, should look at ordering
 	// the nodes to speed up the flow analysis
-	solve(res) {
-		for (n <- cfgFull.nodes) {
-			rel[Name name, DefExpr definedAs, Lab definedAt] inbound = res[{ni.l | ni <- gInverted[n]}];
-			rel[Name name, DefExpr definedAs, Lab definedAt] kills = { };
-			if (isDefNode(n)) {
-				kills = getDefInfo(n);
-			}
-			res = res + { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- inbound, ni.name notin kills.name } 
-				      + { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- kills };
+	list[CFGNode] worklist = buildForwardWorklist(cfgFull);
+	workset = toSet(worklist);
+	//println("Starting with worklist size <size(worklist)>");
+	int i = 0;
+	while (!isEmpty(worklist)) {
+		i += 1;
+		//if (i % 100 == 0) println("Remaining worklist size: <size(worklist)>");
+		n = worklist[0];
+		worklist = worklist[1..];
+		workset = workset - n;
+		resStart = resMap[n.l] ? {};
+		
+		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = { *(resMap[ni.l]? {}) | ni <- gInverted[n]};
+		rel[Name name, DefExpr definedAs, Lab definedAt] kills = { };
+		
+		if (isDefNode(n)) {
+			kills = getDefInfo(n);
+		}
+		
+		
+		tempRel = { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- inbound, ni.name notin kills.name } 
+			    + { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- kills };
+			    
+		for (l <- tempRel<0>) {
+			resMap[l] = (resMap[l] ? {}) + tempRel[l];
+		}
+		
+		resEnd = resMap[n.l] ? {};
+		
+		if (resStart != resEnd) {
+			newElements = [ gi | gi <- g[n], gi notin workset ];
+			worklist = newElements + worklist;
+			workset = workset + toSet(newElements);
 		}
 	}
 	
-	return res;	
+	return { < l, n, de, dl > | l <- resMap, < n, de, dl > <- resMap[l] };	
 }
 
 // TODO: This needs to better handle cases where the names are computed. These could, in theory,
