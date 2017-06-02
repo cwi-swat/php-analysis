@@ -8,6 +8,7 @@ import lang::php::analysis::NamePaths;
 import analysis::graphs::Graph;
 import Relation;
 import Set;
+import List;
 
 public set[CFGNode] pred(CFG cfg, CFGNode n) {
 	predlabels = { e.from | e <- cfg.edges, e.to == n@lab };
@@ -281,4 +282,19 @@ public FlowEdge mergeEdges(FlowEdge e1, FlowEdge e2) {
 	// TODO: This just returns a normal edge, but we may want to return other edges
 	// if one or both input edge are jump edges, conditionalEdges, etc
 	return flowEdge(e1.from, e2.to);
+}
+
+// TODO: This uses a heuristic to optimize this, but does not take into
+// account numbers of incoming edges, etc, just a forward layered flow through
+// the CFG.
+public list[CFGNode] buildForwardWorklist(CFG inputCFG) {
+	startingNode = getEntryNode(inputCFG);
+	list[CFGNode] res = [ startingNode ];
+	g = cfgAsGraph(inputCFG);
+	nextLayer = g[startingNode];
+	while (!isEmpty(nextLayer)) {
+		res = res + toList(nextLayer);
+		nextLayer = g[nextLayer] - toSet(res);
+	}
+	return res; 
 }
