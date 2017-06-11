@@ -15,7 +15,7 @@ public data OptionName = someName(Name name) | noName();
 
 public data OptionElse = someElse(Else e) | noElse();
 
-public data ActualParameter = actualParameter(Expr expr, bool byRef);
+public data ActualParameter = actualParameter(Expr expr, bool byRef, bool isPacked);
 	
 public data Const = const(str name, Expr constValue);
 
@@ -25,18 +25,22 @@ public data Name = name(str name);
 
 public data NameOrExpr = name(Name name) | expr(Expr expr);
 
+public data ClassName = explicitName(Name name) | computedName(Expr expr) | anonymousClass(Stmt stmt);
+
 public data CastType = \int() | \bool() | float() | string() | array() | object() | unset();
 	
 public data ClosureUse = closureUse(Expr varName, bool byRef); 
 
 public data IncludeType = include() | includeOnce() | require() | requireOnce();
 
+public data PHPType = nullableType(str typeName) | regularType(str typeName) | noType();
+
 // NOTE: In PHP, yield is a statement, but it can also be used as an expression.
 // To handle this, we just treat it as an expression. The parser does this as well.
 // TODO: listAssign is deprecated and will be removed in the future, this is now
 // given as an assignment into a listExpr
 public data Expr 
-	= array(list[ArrayElement] items)
+	= array(list[ArrayElement] items, bool usesBracketNotation)
 	| fetchArrayDim(Expr var, OptionExpr dim)
 	| fetchClassConst(NameOrExpr className, str constantName)
 	| assign(Expr assignTo, Expr assignExpr)
@@ -45,15 +49,15 @@ public data Expr
 	| refAssign(Expr assignTo, Expr assignExpr)
 	| binaryOperation(Expr left, Expr right, Op operation)
 	| unaryOperation(Expr operand, Op operation)
-	| new(NameOrExpr className, list[ActualParameter] parameters)
+	| new(ClassName className, list[ActualParameter] parameters)
 	| cast(CastType castType, Expr expr)
 	| clone(Expr expr)
-	| closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static)
+	| closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static, PHPType returnType)
 	| fetchConst(Name name)
 	| empty(Expr expr)
 	| suppress(Expr expr)
 	| eval(Expr expr)
-	| exit(OptionExpr exitExpr)
+	| exit(OptionExpr exitExpr, bool isExit)
 	| call(NameOrExpr funName, list[ActualParameter] parameters)
 	| methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters)
 	| staticCall(NameOrExpr staticTarget, NameOrExpr methodName, list[ActualParameter] parameters)
@@ -82,9 +86,10 @@ public data Op = bitwiseAnd() | bitwiseOr() | bitwiseXor() | concat() | div()
 			   | equal() | identical() | pow() | coalesce() | spaceship() ;
 
 public data Param = param(str paramName, 
-						  OptionExpr paramDefault, 
-						  OptionName paramType,
-						  bool byRef);
+						  OptionExpr paramDefault,
+						  bool byRef,
+						  bool isVariadic, 
+						  PHPType paramType);
 						  
 public data Scalar
 	= classConstant()
@@ -112,7 +117,7 @@ public data Stmt
 	| exprstmt(Expr expr)
 	| \for(list[Expr] inits, list[Expr] conds, list[Expr] exprs, list[Stmt] body)
 	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
-	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
+	| function(str name, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType)
 	| global(list[Expr] exprs)
 	| goto(str label)
 	| haltCompiler(str remainingText)
@@ -130,15 +135,16 @@ public data Stmt
 	| tryCatch(list[Stmt] body, list[Catch] catches)
 	| tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
 	| unset(list[Expr] unsetVars)
-	| use(list[Use] uses)
+	| use(list[Use] uses, OptionName prefix, UseType useType)
 	| \while(Expr cond, list[Stmt] body)
 	| emptyStmt()
 	| block(list[Stmt] body)
 	;
 
+public data UseType = useTypeUnknown() | useTypeNormal() | useTypeFunction() | useTypeConst();
 public data Declaration = declaration(str key, Expr val);
 
-public data Catch = \catch(Name xtype, str varName, list[Stmt] body);
+public data Catch = \catch(list[Name] xtypes, str varName, list[Stmt] body);
 	
 public data Case = \case(OptionExpr cond, list[Stmt] body);
 
@@ -146,12 +152,12 @@ public data ElseIf = elseIf(Expr cond, list[Stmt] body);
 
 public data Else = \else(list[Stmt] body);
 
-public data Use = use(Name importName, OptionName asName);
+public data Use = use(Name importName, OptionName asName, UseType useType);
 
 public data ClassItem 
 	= property(set[Modifier] modifiers, list[Property] prop)
-	| constCI(list[Const] consts)
-	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body)
+	| constCI(list[Const] consts, set[Modifier] modifiers)
+	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType)
 	| traitUse(list[Name] traits, list[Adaptation] adaptations)
 	;
 
