@@ -101,20 +101,25 @@ public bool trueOnAReachingPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNod
 	return trueOnAReachedPath(invert(g), startNode, pred);
 }
 
-@doc{Return the CFG for the node at the given location}
-public CFG findContainingCFG(Script s, map[loc,CFG] cfgs, loc l) {
+@doc{Return the location/path of the CFG for the node at the given location}
+public loc findContainingCFGLoc(Script s, map[loc,CFG] cfgs, loc l) {
 	
 	for (/c:class(cname,_,_,_,mbrs) := s) {
 		for (m:method(mname,_,_,params,body) <- mbrs, l < m@at) {
-			return cfgs[methodPath(cname,mname)];
+			return methodPath(cname,mname);
 		}
 	}
 	
 	for (/f:function(fname,_,params,body) := s, l < f@at) {
-		return cfgs[functionPath(fname)];
+		return functionPath(fname);
 	}
 	
-	return cfgs[scriptPath()];
+	return scriptPath();
+}
+
+@doc{Return the CFG for the node at the given location}
+public CFG findContainingCFG(Script s, map[loc,CFG] cfgs, loc l) {
+	return cfgs[findContainingCFGLoc(s, cfgs, l)];
 }
 
 @doc{Check to see if the predicate can be satisfied on all paths from the start node.}
