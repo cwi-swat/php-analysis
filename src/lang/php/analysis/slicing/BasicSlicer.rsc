@@ -14,15 +14,19 @@ import Relation;
 import IO;
 import Set;
 
-public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names) {
+public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Uses u = { }) {
 	// This performs a basic slice, just using the CFG. A more precise slice,
 	// using an SDG, should replace this at some point.
 	
 	// Get all definitions for the graph
-	d = definitions(inputCFG);
+	if (isEmpty(d)) {
+		d = definitions(inputCFG);
+	}
 	
 	// And, get all uses
-	u = uses(inputCFG, d);
+	if (isEmpty(u)) {
+		u = uses(inputCFG, d);
+	}
 	
 	// Convert the CFG into a standard graph (binary relation). We invert
 	// it since we are taking a backwards slice.
