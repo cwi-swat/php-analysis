@@ -8,20 +8,25 @@ import lang::php::analysis::cfg::FlowEdge;
 import lang::php::analysis::usedef::UseDef;
 import lang::php::analysis::cfg::Util;
 import lang::php::analysis::cfg::Visualize;
+import lang::php::util::Utils;
 
 import Relation;
 import IO;
 import Set;
 
-public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names) {
+public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Uses u = { }) {
 	// This performs a basic slice, just using the CFG. A more precise slice,
 	// using an SDG, should replace this at some point.
 	
 	// Get all definitions for the graph
-	d = definitions(inputCFG);
+	if (isEmpty(d)) {
+		d = definitions(inputCFG);
+	}
 	
 	// And, get all uses
-	u = uses(inputCFG, d);
+	if (isEmpty(u)) {
+		u = uses(inputCFG, d);
+	}
 	
 	// Convert the CFG into a standard graph (binary relation). We invert
 	// it since we are taking a backwards slice.
@@ -35,13 +40,13 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names) {
 	// where we start the slice and the names we are interested in; we take uses of those
 	// names, which indicate the definitions that are important to the slice. 
 	rel[Name name, Lab definedAt] importantUses = { ui | tuple[Name name, Lab definedAt] ui <- u[n.l], ui.name in names };
-	//println("Found <size(importantUses)> important uses:\n<importantUses>");
+	logMessage("Found <size(importantUses)> important uses:\n<importantUses>", 2);
 	solve(importantUses) {
 		// Now, we compute a fixpoint, extending the set with the uses which contributed to the
 		// uses we already know about. When this terminates, we will have the uses, indicating
 		// the important definitions, for all the names that contribute to the query. 
 		importantUses = importantUses + { ui | l <- importantUses.definedAt, tuple[Name name, Lab definedAt] ui <- u[l] };
-		//println("Found <size(importantUses)> important uses:\n<importantUses>");
+		logMessage("Found <size(importantUses)> important uses:\n<importantUses>", 2);
 	}
 	
 	// The important uses indicate the labels of the nodes that define each use. We need to keep each of these
@@ -49,12 +54,12 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names) {
 	// predicates/conditionals that contain these nodes (step 3).
 	definingLabels = importantUses.definedAt;
 	definingNodes = { gn | gn <- reachableFromN, gn.l in definingLabels };
-	//println("Found <size(definingNodes)> nodes based on needed definitions");
+	logMessage("Found <size(definingNodes)> nodes based on needed definitions", 2);
 	
 	llr = getLabelLocationRel(inputCFG);
-	//for (l <- llr[{gn.l | gn <- definingNodes}]) {
-	//	println(l);
-	//}
+	for (l <- llr[{gn.l | gn <- definingNodes}]) {
+		logMessage("<l>", 2);
+	}
 	
 	// Find all containing predicate nodes.
 	ifNodes = { < ni, s > | ni:stmtNode(s:\if(_,_,_,_),_) <- inputCFG.nodes };
@@ -82,11 +87,11 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names) {
 		containedLocations = containedLocations + n.stmt@at;
 	}
 	
-	//for (< ni, s > <- predStmtNodes) {
-	//	println("Stmt: <s@at>");
-	//}
+	for (< ni, s > <- predStmtNodes) {
+		logMessage("Stmt: <s@at>", 2);
+	}
 	
-	//println(containedLocations);
+	logMessage("<containedLocations>", 2);
 	 
 	containingStmts = { };
 	for (< ni, s > <- predStmtNodes) {
@@ -102,8 +107,8 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names) {
 		}
 	}
 	
-	//println("Found <size(containingStmts)> containing pred statements");
-	//println("Found <size(containingExprs)> containing pred exprs");
+	logMessage("Found <size(containingStmts)> containing pred statements", 2);
+	logMessage("Found <size(containingExprs)> containing pred exprs", 2);
 
 	nodesToKeep = n + definingNodes + getEntryNode(inputCFG) + getExitNode(inputCFG);
 	if (size(containingStmts) > 0) {

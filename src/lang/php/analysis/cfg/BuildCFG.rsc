@@ -1206,6 +1206,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			< edges, lstate > = addExpSeqEdges(edges, lstate, exprs);
 			
 			for (il <- initLabels) edges += flowEdge(headernode, il);
+			for (fl <- finalLabels) edges += flowEdge(fl, footernode);
 			for (il <- (initLabels+s@lab), il notin lstate.headerNodes) lstate.headerNodes[il] = headernode;
 			for (fl <- (finalLabels+s@lab), fl notin lstate.footerNodes) lstate.footerNodes[fl] = footernode;
 		}

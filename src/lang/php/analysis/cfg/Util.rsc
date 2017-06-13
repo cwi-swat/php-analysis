@@ -8,6 +8,7 @@ import lang::php::analysis::NamePaths;
 import analysis::graphs::Graph;
 import Relation;
 import Set;
+import List;
 
 public set[CFGNode] pred(CFG cfg, CFGNode n) {
 	predlabels = { e.from | e <- cfg.edges, e.to == n@lab };
@@ -100,20 +101,25 @@ public bool trueOnAReachingPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNod
 	return trueOnAReachedPath(invert(g), startNode, pred);
 }
 
-@doc{Return the CFG for the node at the given location}
-public CFG findContainingCFG(Script s, map[loc,CFG] cfgs, loc l) {
+@doc{Return the location/path of the CFG for the node at the given location}
+public loc findContainingCFGLoc(Script s, map[loc,CFG] cfgs, loc l) {
 	
 	for (/c:class(cname,_,_,_,mbrs) := s) {
 		for (m:method(mname,_,_,params,body) <- mbrs, l < m@at) {
-			return cfgs[methodPath(cname,mname)];
+			return methodPath(cname,mname);
 		}
 	}
 	
 	for (/f:function(fname,_,params,body) := s, l < f@at) {
-		return cfgs[functionPath(fname)];
+		return functionPath(fname);
 	}
 	
-	return cfgs[scriptPath()];
+	return scriptPath();
+}
+
+@doc{Return the CFG for the node at the given location}
+public CFG findContainingCFG(Script s, map[loc,CFG] cfgs, loc l) {
+	return cfgs[findContainingCFGLoc(s, cfgs, l)];
 }
 
 @doc{Check to see if the predicate can be satisfied on all paths from the start node.}
@@ -281,4 +287,19 @@ public FlowEdge mergeEdges(FlowEdge e1, FlowEdge e2) {
 	// TODO: This just returns a normal edge, but we may want to return other edges
 	// if one or both input edge are jump edges, conditionalEdges, etc
 	return flowEdge(e1.from, e2.to);
+}
+
+// TODO: This uses a heuristic to optimize this, but does not take into
+// account numbers of incoming edges, etc, just a forward layered flow through
+// the CFG.
+public list[CFGNode] buildForwardWorklist(CFG inputCFG) {
+	startingNode = getEntryNode(inputCFG);
+	list[CFGNode] res = [ startingNode ];
+	g = cfgAsGraph(inputCFG);
+	nextLayer = g[startingNode];
+	while (!isEmpty(nextLayer)) {
+		res = res + toList(nextLayer);
+		nextLayer = g[nextLayer] - toSet(res);
+	}
+	return res; 
 }
