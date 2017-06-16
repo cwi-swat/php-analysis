@@ -40,7 +40,7 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	// where we start the slice and the names we are interested in; we take uses of those
 	// names, which indicate the definitions that are important to the slice. 
 	rel[Name name, Lab definedAt] importantUses = { ui | tuple[Name name, Lab definedAt] ui <- u[n.l], ui.name in names };
-	//logMessage("Found <size(importantUses)> important uses:\n<importantUses>", 2);
+	logMessage("Found <size(importantUses)> important uses:\n<importantUses>", 2);
 	solve(importantUses) {
 		// Now, we compute a fixpoint, extending the set with the uses which contributed to the
 		// uses we already know about. When this terminates, we will have the uses, indicating

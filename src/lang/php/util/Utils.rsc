@@ -23,6 +23,7 @@ import Exception;
 import DateTime;
 import util::ShellExec;
 import util::Resources;
+import Map;
 
 import lang::php::pp::PrettyPrinter;
 
@@ -147,7 +148,7 @@ private System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocatio
 	// regex filter exlucdes test/	
 	list[loc] entries = [ l + e | e <- listEntries(l)];
 	list[loc] dirEntries = [ e | e <- entries, isDirectory(e)];
-	list[loc] phpEntries = [ e | e <- entries, e.extension in extensions];
+	list[loc] phpEntries = [ e | e <- entries, e.extension in extensions, isFile(e)];
 
 	System phpNodes = createEmptySystem();
 	
@@ -197,6 +198,35 @@ public void buildBinaries(str product, str version, loc l, bool addLocationAnnot
 		}
 		writeBinaryValueFile(binLoc, files, compression=false);
 		logMessage("... done.", 2);
+	} else {
+		logMessage("Parsed representation for <product>-<version> already exists, skipping...", 1);
+	}
+}
+
+@doc{Build the serialized ASTs for a specific system at a specific location}
+public void buildAndCheckBinaries(str product, str version, loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
+	loc binLoc = parsedDir + "<product>-<version>.pt";
+	if (overwrite || (!overwrite && !exists(binLoc))) {
+		logMessage("Parsing <product>-<version>. \>\> Location: <l>.", 1);
+		System files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+		files = namedVersionedSystem(product, version, l, files.files);
+		logMessage("Now writing file: <binLoc>...", 2);
+		if (!exists(parsedDir)) {
+			mkDirectory(parsedDir);
+		}
+		writeBinaryValueFile(binLoc, files, compression=false);
+		logMessage("... done.", 2);
+		logMessage("Checking individual files", 2);
+		for (li <- files.files) {
+			logMessage("Writing file: <li> to /tmp/test.bin",2);
+			writeBinaryValueFile(|file:///tmp/test.bin|, files.files[li], compression=false);
+			logMessage("Attempting to read back in file: <li> from /tmp/test.bin",2);
+			readBinaryValueFile(#Script, |file:///tmp/test.bin|);
+			logMessage("Read complete",2);
+		}
+		logMessage("Checking entire system",2);
+		readBinaryValueFile(#System, binLoc);
+		logMessage("Check complete",2);
 	} else {
 		logMessage("Parsed representation for <product>-<version> already exists, skipping...", 1);
 	}
@@ -444,5 +474,45 @@ public void convertCorpusItemToNamedSystem(str product, str version) {
 public void convertCorpusToNamedSystems() {
 	for (product <- getProducts(), version <- getVersions(product)) {
 		convertCorpusItemToNamedSystem(product, version);
+	}
+}
+
+public rel[str systemName, str systemVersion, loc fileLoc] unparsedFiles() {
+	rel[str systemName, str systemVersion, loc fileLoc] res = { };
+	
+	for (systemName <- getProducts(), systemVersion <- getVersions(systemName)) {
+		pt = loadBinary(systemName, systemVersion);
+		for (l <- pt.files, pt.files[l] is errscript) {
+			res = res + < systemName, systemVersion, l >;		
+		}
+	}
+	
+	return res;
+}
+
+public void reparseLocations(str systemName, str systemVersion, set[loc] locs) {
+	pt = loadBinary(systemName, systemVersion);
+
+	for (l <- locs) {
+		logMessage("Reparsing file at location <l>",2);
+		Script reparsedScript = loadPHPFile(l);
+		pt.files[l] = reparsedScript;
+	}
+
+	loc binLoc = parsedDir + "<systemName>-<systemVersion>.pt";
+	logMessage("Writing binary for <systemName>, version <systemVersion>",2);
+	writeBinaryValueFile(binLoc, pt, compression=false);
+}
+
+public void removeNonFileLocs(str systemName, str systemVersion) {
+	pt = loadBinary(systemName, systemVersion);
+	nonFileLocs = { l | l <- pt.files, !isFile(l) };
+	if (!isEmpty(nonFileLocs)) {
+		logMessage("Found <size(nonFileLocs)> non-file locations, removing from system", 2);
+		pt.files = domainX(pt.files, nonFileLocs);
+
+		loc binLoc = parsedDir + "<systemName>-<systemVersion>.pt";
+		logMessage("Writing binary for <systemName>, version <systemVersion>",2);
+		writeBinaryValueFile(binLoc, pt, compression=false);
 	}
 }
