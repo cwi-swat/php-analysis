@@ -67,16 +67,16 @@ public list[Name] getNames(Expr n) {
 			return [ computedPropertyName(target, e) ];
 		
 		case staticPropertyFetch(name(name(target)), name(name(vn))) :
-			return [ staticPopertyName(target, vn) ];
+			return [ staticPropertyName(target, vn) ];
 			
 		case staticPropertyFetch(name(name(target)), Expr e) :
-			return [ computedStaticPopertyName(target, e) ];
+			return [ computedStaticPropertyName(target, e) ];
 		
 		case staticPropertyFetch(expr(Expr target), name(name(vn))) :
-			return [ computedStaticPopertyName(target, vn) ];
+			return [ computedStaticPropertyName(target, vn) ];
 			
 		case staticPropertyFetch(expr(Expr target), Expr e) :
-			return [ computedStaticPopertyName(target, e) ];
+			return [ computedStaticPropertyName(target, e) ];
 			
 		default :
 			return [ computedName(n) ];
@@ -107,16 +107,16 @@ public set[Name] getNestedNames(CFGNode n, set[loc] locsToFilter) {
 			res = res + < computedPropertyName(target, e), ni@at >;
 		
 		case ni:staticPropertyFetch(name(name(target)), name(name(vn))) :
-			res = res + < staticPopertyName(target, vn), ni@at >;
+			res = res + < staticPropertyName(target, vn), ni@at >;
 			
 		case ni:staticPropertyFetch(name(name(target)), Expr e) :
-			res = res + < computedStaticPopertyName(target, e), ni@at >;
+			res = res + < computedStaticPropertyName(target, e), ni@at >;
 		
 		case ni:staticPropertyFetch(expr(Expr target), name(name(vn))) :
-			res = res + < computedStaticPopertyName(target, vn), ni@at >;
+			res = res + < computedStaticPropertyName(target, vn), ni@at >;
 			
 		case ni:staticPropertyFetch(expr(Expr target), Expr e) :
-			res = res + < computedStaticPopertyName(target, e), ni@at >;
+			res = res + < computedStaticPropertyName(target, e), ni@at >;
 	}
 	
 	int beforeFilteringSize = size(res);
