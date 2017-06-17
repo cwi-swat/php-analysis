@@ -9,6 +9,7 @@ import analysis::graphs::Graph;
 import Relation;
 import Set;
 import List;
+import Node;
 
 public set[CFGNode] pred(CFG cfg, CFGNode n) {
 	predlabels = { e.from | e <- cfg.edges, e.to == n@lab };
@@ -270,6 +271,7 @@ public set[&T] findAllReachingUntil(Graph[CFGNode] g, CFGNode startNode, bool(CF
 	return findAllReachedUntil(invert(g), startNode, pred, stop, gather, includeStartNode = includeStartNode);
 }
 
+@doc{Remove a node from the CFG, relinking edges as necessary}
 public CFG removeNode(CFG inputCFG, CFGNode n) {
 	// Get the edges into this node
 	edgesInto = { e | e <- inputCFG.edges, e.to == n.l };
@@ -283,6 +285,7 @@ public CFG removeNode(CFG inputCFG, CFGNode n) {
 	return inputCFG[edges=inputCFG.edges - edgesInto - edgesFrom + newEdges ][nodes = inputCFG.nodes - n];
 }
 
+@doc{Turn condition edges into regular edges if the header for the associated condition is no longer present}
 public CFG transformUnlinkedConditions(CFG inputCFG, set[CFGNode] alsoCheck = { }) {
 	newEdges = { };
 	presentHeaders = { n.l | n <- inputCFG.nodes, n is headerNode };
@@ -303,6 +306,7 @@ public CFG transformUnlinkedConditions(CFG inputCFG, set[CFGNode] alsoCheck = { 
 	return inputCFG[edges=newEdges];
 }
 
+@doc{Merge two edges into a single edge from the source of the first to the target of the second}
 public FlowEdge mergeEdges(FlowEdge e1, FlowEdge e2) {
 	// TODO: Handle other cases if needed, we may need to merge
 	// other conditions or handle combos of true and false edges...
@@ -322,7 +326,22 @@ public FlowEdge mergeEdges(FlowEdge e1, FlowEdge e2) {
 		return e2[from = e1.from];
 	}
 	
+	if (e1 is backEdge) {
+		return e1[to = e2.to];
+	}
+	
+	if (e2 is backEdge) {
+		return e2[from = e1.from];
+	}
+	
 	return flowEdge(e1.from, e2.to);
+}
+
+@doc{Remove any backedges from the CFG}
+public CFG removeBackEdges(CFG inputCFG) {
+	set[str] toRemove = { "backEdge", "jumpEdge", "conditionTrueBackEdge", "escapingBreakEdge", "escapingContinueEdge", "escapingGotoEdge" };
+	newEdges = { e | e <- inputCFG.edges, getName(e) notin toRemove };
+	return inputCFG[edges = newEdges];
 }
 
 // TODO: This uses a heuristic to optimize this, but does not take into

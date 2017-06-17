@@ -1016,10 +1016,10 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			< edges, lstate > = addBodyEdges(edges, lstate, body);			
 
 			if (size(body) > 0) {
-				edges += { conditionTrueFlowEdge(fe,i,headernode,cond) | fe <- final(cond, lstate), i <- init(head(body), lstate) };
+				edges += { conditionTrueBackEdge(fe,i,headernode,cond) | fe <- final(cond, lstate), i <- init(head(body), lstate) };
 				edges += { flowEdge(fe,i) | fe <- final(last(body), lstate), i <- init(cond, lstate) };			
 			} else {
-				edges += { conditionTrueflowEdge(fe, getOneFrom(init(cond, lstate)), headernode, cond) | fe <- final(cond, lstate) };
+				edges += { conditionTrueBackEdge(fe, getOneFrom(init(cond, lstate)), headernode, cond) | fe <- final(cond, lstate) };
 			}
 			edges += { conditionFalseFlowEdge(fc, footernode, headernode, cond) | fc <- final(cond, lstate) };
 			
@@ -1101,13 +1101,13 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				
 			// The backedge from the body
 			if (size(body) > 0 && size(exprs) > 0)
-				edges += { flowEdge(fi, ii) | fi <- final(last(body), lstate), ii <- init(head(exprs), lstate) };
+				edges += { backEdge(fi, ii) | fi <- final(last(body), lstate), ii <- init(head(exprs), lstate) };
 			else if (size(body) > 0 && size(conds) > 0)
-				edges += { flowEdge(fi, ii) | fi <- final(last(body), lstate), ii <- init(head(conds), lstate) };
+				edges += { backEdge(fi, ii) | fi <- final(last(body), lstate), ii <- init(head(conds), lstate) };
 			else if (size(body) > 0)
-				edges += { flowEdge(fi, fe) | fi <- final(last(body), lstate), fe <- init(head(body), lstate) };
+				edges += { backEdge(fi, fe) | fi <- final(last(body), lstate), fe <- init(head(body), lstate) };
 				
-			// The loop backedge
+			// Special edges: from increment expressions to the conditions, or variants based on empty bodies, conditions, etc
 			if (size(exprs) > 0 && size(conds) > 0)
 				edges += { flowEdge(fe, ii) | fe <- final(last(exprs), lstate), ii <- init(head(conds), lstate) };
 			else if (size(exprs) > 0 && size(body) > 0)
@@ -1167,7 +1167,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// we exhaust the array.
 			edges += { flowEdge(fe, varLabel) | fe <- final(asVar, lstate) };
 			if (size(body) > 0) {
-				edges += { flowEdge(varLabel, fi) | fi <- init(head(body), lstate) };
+				edges += { backEdge(varLabel, fi) | fi <- init(head(body), lstate) };
 				edges += { flowEdge(fe, testNode@lab) | fe <- final(last(body), lstate) };
 			} else {
 				edges += flowEdge(varLabel, testNode@lab);
@@ -1553,9 +1553,9 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			if (size(body) > 0) {
 				edges = edges + 
 					{ conditionTrueFlowEdge(fc, fi, headernode, cond) | fc <- final(cond, lstate), fi <- init(head(body), lstate) } + 
-					{ flowEdge(fb, ii) | fb <- final(last(body), lstate), ii <- init(cond, lstate)  };
+					{ backEdge(fb, ii) | fb <- final(last(body), lstate), ii <- init(cond, lstate)  };
 			} else {
-				edges += { conditionTrueFlowEdge(fe, ii, headernode, cond) | fe <- final(cond, lstate), ii <- init(cond, lstate) };
+				edges += { conditionTrueBackEdge(fe, ii, headernode, cond) | fe <- final(cond, lstate), ii <- init(cond, lstate) };
 			}
 			
 			for (il <- initLabels) edges += flowEdge(headernode, il);
