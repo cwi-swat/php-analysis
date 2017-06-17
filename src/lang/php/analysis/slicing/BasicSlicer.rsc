@@ -126,10 +126,14 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 			
 	nodesToRemove = inputCFG.nodes - nodesToKeep;
 
+	inputCFG = transformUnlinkedConditions(inputCFG, alsoCheck=nodesToRemove);
+
 	for (n2r <- nodesToRemove) {
 		inputCFG = removeNode(inputCFG, n2r);
 	}
 		
+	inputCFG = transformUnlinkedConditions(inputCFG);
+	
 	return inputCFG;
 }
 

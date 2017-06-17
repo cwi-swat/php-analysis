@@ -283,9 +283,45 @@ public CFG removeNode(CFG inputCFG, CFGNode n) {
 	return inputCFG[edges=inputCFG.edges - edgesInto - edgesFrom + newEdges ][nodes = inputCFG.nodes - n];
 }
 
+public CFG transformUnlinkedConditions(CFG inputCFG, set[CFGNode] alsoCheck = { }) {
+	newEdges = { };
+	presentHeaders = { n.l | n <- inputCFG.nodes, n is headerNode };
+	
+	if (!isEmpty(alsoCheck)) {
+		presentHeaders = presentHeaders - { n.l | n <- alsoCheck };
+	}
+	
+	for (e <- inputCFG.edges) {
+		if (e is conditionTrueFlowEdge && e.header notin presentHeaders) {
+			newEdges += flowEdge(e.from, e.to);
+		} else if (e is conditionFalseFlowEdge && e.header notin presentHeaders) {
+			newEdges += flowEdge(e.from, e.to);
+		} else {
+			newEdges += e;
+		}
+	}
+	return inputCFG[edges=newEdges];
+}
+
 public FlowEdge mergeEdges(FlowEdge e1, FlowEdge e2) {
-	// TODO: This just returns a normal edge, but we may want to return other edges
-	// if one or both input edge are jump edges, conditionalEdges, etc
+	// TODO: Handle other cases if needed, we may need to merge
+	// other conditions or handle combos of true and false edges...
+	if (e1 is conditionTrueFlowEdge && e2 is flowEdge) {
+		return e1[to = e2.to];
+	}
+
+	if (e2 is conditionTrueFlowEdge && e1 is flowEdge) {
+		return e2[from = e1.from];
+	}
+	
+	if (e1 is conditionFalseFlowEdge && e2 is flowEdge) {
+		return e1[to = e2.to];
+	}
+
+	if (e2 is conditionFalseFlowEdge && e1 is flowEdge) {
+		return e2[from = e1.from];
+	}
+	
 	return flowEdge(e1.from, e2.to);
 }
 
