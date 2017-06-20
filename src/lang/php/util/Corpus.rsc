@@ -67,7 +67,7 @@ public bool corpusItemExists(str product, str version) {
 			if (exists(productRoot)) return true;
 			productRoot = corpusRoot + product + "<toLowerCase(product)>_<version>";
 			if (exists(productRoot)) return true;
-			loc productRoot = corpusRoot + product + "<product>-<version>";
+			productRoot = corpusRoot + product + "<product>-<version>";
 			if (exists(productRoot)) return true;
 			productRoot = corpusRoot + product + "<product>_<version>";
 			if (exists(productRoot)) return true;
@@ -85,7 +85,7 @@ public loc getCorpusItem(str product, str version) {
 			if (exists(productRoot)) return productRoot;
 			productRoot = corpusRoot + product + "<toLowerCase(product)>_<version>";
 			if (exists(productRoot)) return productRoot;
-			loc productRoot = corpusRoot + product + "<product>-<version>";
+			productRoot = corpusRoot + product + "<product>-<version>";
 			if (exists(productRoot)) return productRoot;
 			productRoot = corpusRoot + product + "<product>_<version>";
 			if (exists(productRoot)) return productRoot;
