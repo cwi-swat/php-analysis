@@ -67,16 +67,16 @@ public list[Name] getNames(Expr n) {
 			return [ computedPropertyName(target, e) ];
 		
 		case staticPropertyFetch(name(name(target)), name(name(vn))) :
-			return [ staticPopertyName(target, vn) ];
+			return [ staticPropertyName(target, vn) ];
 			
 		case staticPropertyFetch(name(name(target)), Expr e) :
-			return [ computedStaticPopertyName(target, e) ];
+			return [ computedStaticPropertyName(target, e) ];
 		
 		case staticPropertyFetch(expr(Expr target), name(name(vn))) :
-			return [ computedStaticPopertyName(target, vn) ];
+			return [ computedStaticPropertyName(target, vn) ];
 			
 		case staticPropertyFetch(expr(Expr target), Expr e) :
-			return [ computedStaticPopertyName(target, e) ];
+			return [ computedStaticPropertyName(target, e) ];
 			
 		default :
 			return [ computedName(n) ];
@@ -107,16 +107,16 @@ public set[Name] getNestedNames(CFGNode n, set[loc] locsToFilter) {
 			res = res + < computedPropertyName(target, e), ni@at >;
 		
 		case ni:staticPropertyFetch(name(name(target)), name(name(vn))) :
-			res = res + < staticPopertyName(target, vn), ni@at >;
+			res = res + < staticPropertyName(target, vn), ni@at >;
 			
 		case ni:staticPropertyFetch(name(name(target)), Expr e) :
-			res = res + < computedStaticPopertyName(target, e), ni@at >;
+			res = res + < computedStaticPropertyName(target, e), ni@at >;
 		
 		case ni:staticPropertyFetch(expr(Expr target), name(name(vn))) :
-			res = res + < computedStaticPopertyName(target, vn), ni@at >;
+			res = res + < computedStaticPropertyName(target, vn), ni@at >;
 			
 		case ni:staticPropertyFetch(expr(Expr target), Expr e) :
-			res = res + < computedStaticPopertyName(target, e), ni@at >;
+			res = res + < computedStaticPropertyName(target, e), ni@at >;
 	}
 	
 	int beforeFilteringSize = size(res);
@@ -160,20 +160,20 @@ private set[str] superGlobalNames = { "GLOBALS", "_SERVER", "_REQUEST", "_POST",
 // TODO: For properties, we should kill all properties of the same name when one is
 // defined unless we can verify that the targets are disjoint. Currently properties
 // with syntactically different targets are kept distinct.
-public Defs definitions(CFG cfgFull) {
-	g = cfgAsGraph(cfgFull);
+public Defs definitions(CFG inputCFG) {
+	g = cfgAsGraph(inputCFG);
 	gInverted = invert(g);
 	map[Lab, rel[Name name, DefExpr definedAs, Lab definedAt]] resMap = ( );
 		
-	entry = getEntryNode(cfgFull);
-	usedSuperGlobalNames = { sgn | sgn <- superGlobalNames, /var(name(name(sgn))) := cfgFull.nodes };
+	entry = getEntryNode(inputCFG);
+	usedSuperGlobalNames = { sgn | sgn <- superGlobalNames, /var(name(name(sgn))) := inputCFG.nodes };
 	resMap[entry.l] = { < varName(sgn), globalDef(varName(sgn)), entry.l >  | sgn <- usedSuperGlobalNames };
 	
 	// Introduce the names for the parameters
 	if (entry is functionEntry || entry is methodEntry) {
 		// Grab out all the parameter nodes
-		actualProvidedNodes = { n | n <- cfgFull.nodes, n is actualProvided };
-		actualNotProvidedNodes = { n | n <- cfgFull.nodes, n is actualNotProvided };
+		actualProvidedNodes = { n | n <- inputCFG.nodes, n is actualProvided };
+		actualNotProvidedNodes = { n | n <- inputCFG.nodes, n is actualNotProvided };
 		
 		// The actualProvided nodes represent formal parameters with no defaults, so the actual must
 		// be provided to the program (and we don't know what that is)
@@ -190,7 +190,7 @@ public Defs definitions(CFG cfgFull) {
 	  
 	// TODO: This is a slower algorithm but it won't miss cases, should look at ordering
 	// the nodes to speed up the flow analysis
-	list[CFGNode] worklist = buildForwardWorklist(cfgFull);
+	list[CFGNode] worklist = buildForwardWorklist(inputCFG);
 	workset = toSet(worklist);
 	//println("Starting with worklist size <size(worklist)>");
 	int i = 0;
@@ -232,13 +232,13 @@ public Defs definitions(CFG cfgFull) {
 // TODO: This needs to better handle cases where the names are computed. These could, in theory,
 // be any name, or maybe any name that matches a partial patterns (for cases where part of the
 // name is given).
-public Uses uses(CFG cfgFull, Defs defs) {
-	g = cfgAsGraph(cfgFull);
+public Uses uses(CFG inputCFG, Defs defs) {
+	g = cfgAsGraph(inputCFG);
 	gInverted = invert(g);
 	Uses res = { };
 
 	set[loc] locsToFilter = { };
-	visit (cfgFull.nodes) {
+	visit (inputCFG.nodes) {
 		case assign(ni:Expr e1, _) : {
 			locsToFilter = locsToFilter + ni@at;
 		}
@@ -249,7 +249,7 @@ public Uses uses(CFG cfgFull, Defs defs) {
 	}
 	
 	// TODO: Remove defs, we don't want to use those as uses as well
-	for (n <- cfgFull.nodes) {
+	for (n <- inputCFG.nodes) {
 		// Grab back the definitions that reach this node (this doesn't include any that are
 		// created by this node)
 		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = defs[{ni.l | ni <- gInverted[n]}];

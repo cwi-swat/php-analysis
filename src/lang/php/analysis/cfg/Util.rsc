@@ -9,6 +9,7 @@ import analysis::graphs::Graph;
 import Relation;
 import Set;
 import List;
+import Node;
 
 public set[CFGNode] pred(CFG cfg, CFGNode n) {
 	predlabels = { e.from | e <- cfg.edges, e.to == n@lab };
@@ -101,20 +102,25 @@ public bool trueOnAReachingPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNod
 	return trueOnAReachedPath(invert(g), startNode, pred);
 }
 
-@doc{Return the CFG for the node at the given location}
-public CFG findContainingCFG(Script s, map[loc,CFG] cfgs, loc l) {
+@doc{Return the location/path of the CFG for the node at the given location}
+public loc findContainingCFGLoc(Script s, map[loc,CFG] cfgs, loc l) {
 	
 	for (/c:class(cname,_,_,_,mbrs) := s) {
 		for (m:method(mname,_,_,params,body) <- mbrs, l < m@at) {
-			return cfgs[methodPath(cname,mname)];
+			return methodPath(cname,mname);
 		}
 	}
 	
 	for (/f:function(fname,_,params,body) := s, l < f@at) {
-		return cfgs[functionPath(fname)];
+		return functionPath(fname);
 	}
 	
-	return cfgs[scriptPath()];
+	return scriptPath();
+}
+
+@doc{Return the CFG for the node at the given location}
+public CFG findContainingCFG(Script s, map[loc,CFG] cfgs, loc l) {
+	return cfgs[findContainingCFGLoc(s, cfgs, l)];
 }
 
 @doc{Check to see if the predicate can be satisfied on all paths from the start node.}
@@ -265,6 +271,7 @@ public set[&T] findAllReachingUntil(Graph[CFGNode] g, CFGNode startNode, bool(CF
 	return findAllReachedUntil(invert(g), startNode, pred, stop, gather, includeStartNode = includeStartNode);
 }
 
+@doc{Remove a node from the CFG, relinking edges as necessary}
 public CFG removeNode(CFG inputCFG, CFGNode n) {
 	// Get the edges into this node
 	edgesInto = { e | e <- inputCFG.edges, e.to == n.l };
@@ -278,10 +285,63 @@ public CFG removeNode(CFG inputCFG, CFGNode n) {
 	return inputCFG[edges=inputCFG.edges - edgesInto - edgesFrom + newEdges ][nodes = inputCFG.nodes - n];
 }
 
+@doc{Turn condition edges into regular edges if the header for the associated condition is no longer present}
+public CFG transformUnlinkedConditions(CFG inputCFG, set[CFGNode] alsoCheck = { }) {
+	newEdges = { };
+	presentHeaders = { n.l | n <- inputCFG.nodes, n is headerNode };
+	
+	if (!isEmpty(alsoCheck)) {
+		presentHeaders = presentHeaders - { n.l | n <- alsoCheck };
+	}
+	
+	for (e <- inputCFG.edges) {
+		if (e is conditionTrueFlowEdge && e.header notin presentHeaders) {
+			newEdges += flowEdge(e.from, e.to);
+		} else if (e is conditionFalseFlowEdge && e.header notin presentHeaders) {
+			newEdges += flowEdge(e.from, e.to);
+		} else {
+			newEdges += e;
+		}
+	}
+	return inputCFG[edges=newEdges];
+}
+
+@doc{Merge two edges into a single edge from the source of the first to the target of the second}
 public FlowEdge mergeEdges(FlowEdge e1, FlowEdge e2) {
-	// TODO: This just returns a normal edge, but we may want to return other edges
-	// if one or both input edge are jump edges, conditionalEdges, etc
+	// TODO: Handle other cases if needed, we may need to merge
+	// other conditions or handle combos of true and false edges...
+	if (e1 is conditionTrueFlowEdge && e2 is flowEdge) {
+		return e1[to = e2.to];
+	}
+
+	if (e2 is conditionTrueFlowEdge && e1 is flowEdge) {
+		return e2[from = e1.from];
+	}
+	
+	if (e1 is conditionFalseFlowEdge && e2 is flowEdge) {
+		return e1[to = e2.to];
+	}
+
+	if (e2 is conditionFalseFlowEdge && e1 is flowEdge) {
+		return e2[from = e1.from];
+	}
+	
+	if (e1 is backEdge) {
+		return e1[to = e2.to];
+	}
+	
+	if (e2 is backEdge) {
+		return e2[from = e1.from];
+	}
+	
 	return flowEdge(e1.from, e2.to);
+}
+
+@doc{Remove any backedges from the CFG}
+public CFG removeBackEdges(CFG inputCFG) {
+	set[str] toRemove = { "backEdge", "jumpEdge", "conditionTrueBackEdge", "escapingBreakEdge", "escapingContinueEdge", "escapingGotoEdge" };
+	newEdges = { e | e <- inputCFG.edges, getName(e) notin toRemove };
+	return inputCFG[edges = newEdges];
 }
 
 // TODO: This uses a heuristic to optimize this, but does not take into
