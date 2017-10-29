@@ -13,6 +13,7 @@ import lang::php::util::Utils;
 import Relation;
 import IO;
 import Set;
+import List;
 
 public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Uses u = { }) {
 	// This performs a basic slice, just using the CFG. A more precise slice,
@@ -30,7 +31,8 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	
 	// Convert the CFG into a standard graph (binary relation). We invert
 	// it since we are taking a backwards slice.
-	g = invert(cfgAsGraph(inputCFG));
+	forwardg = cfgAsGraph(inputCFG);
+	g = invert(forwardg);
 
 	// Which nodes in the CFG are reachable from the node where we are starting
 	// the slice?	
@@ -81,6 +83,7 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	
 	containedLocations = { gn.expr@at | gn <- definingNodes, gn is exprNode, (gn.expr@at)? } +
 						 { gn.stmt@at | gn <- definingNodes, gn is stmtNode, (gn.stmt@at)? };
+						 
 	if (n is exprNode && (n.expr@at)?) {
 		containedLocations = containedLocations + n.expr@at;
 	} else if (n is stmtNode && (n.stmt@at)?) {
@@ -123,9 +126,12 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 			 invert(headersForExprs)[containingExprs<1>] + 
 			 invert(footersForExprs)[containingExprs<1>];
 	}
+	
+	// Also keep all nodes that are reachable in the backwards slice that are decision points
+	otherNodesToKeep = { rn | rn <- reachableFromN, size(forwardg[rn]) > 1 };
 			
-	nodesToRemove = inputCFG.nodes - nodesToKeep;
-
+	nodesToRemove = inputCFG.nodes - (nodesToKeep + otherNodesToKeep);
+	
 	inputCFG = transformUnlinkedConditions(inputCFG, alsoCheck=nodesToRemove);
 
 	for (n2r <- nodesToRemove) {
