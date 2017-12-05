@@ -25,7 +25,7 @@ public set[CFGNode] succ(CFG cfg, CFGNode n) {
 
 public set[CFGNode] succ(Graph[CFGNode] g, CFGNode n) = g[n];
 
-public set[CFGNode] reachable(Graph[CFGNode] g, CFGNode n) = g+[n];
+public set[CFGNode] reachable(Graph[CFGNode] g, CFGNode n) = (g+)[n];
 
 public set[CFGNode] reaches(Graph[CFGNode] g, CFGNode n) = (invert(g)+)[n];
 
@@ -106,12 +106,12 @@ public bool trueOnAReachingPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNod
 public loc findContainingCFGLoc(Script s, map[loc,CFG] cfgs, loc l) {
 	
 	for (/c:class(cname,_,_,_,mbrs) := s) {
-		for (m:method(mname,_,_,params,body) <- mbrs, l < m@at) {
+		for (m:method(mname,_,_,params,body,_) <- mbrs, l < m@at) {
 			return methodPath(cname,mname);
 		}
 	}
 	
-	for (/f:function(fname,_,params,body) := s, l < f@at) {
+	for (/f:function(fname,_,params,body,_) := s, l < f@at) {
 		return functionPath(fname);
 	}
 	

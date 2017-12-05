@@ -18,6 +18,7 @@ import Set;
 import String;
 import List;
 import IO;
+import ValueIO;
 import lang::csv::IO;
 
 public bool containsVV(Expr e) = size({ v | /v:var(expr(Expr ev)) := e }) > 0;
@@ -55,7 +56,7 @@ public lrel[loc fileloc, Expr call] gatherVVRefAssigns(System scripts) = gatherE
  
 @doc{Gather information on object creations with variable class names}
 public list[Expr] fetchNewUses(Script scr) = [ f | /f:new(_,_) := scr ];
-public list[Expr] fetchNewUsesVVClass(Script scr) = [ f | f:new(expr(_),_) <- fetchNewUses(scr) ];
+public list[Expr] fetchNewUsesVVClass(Script scr) = [ f | f:new(computedName(_),_) <- fetchNewUses(scr) ];
 public lrel[loc fileloc, Expr call] gatherVVNews(System scripts) = gatherExprStats(scripts, fetchNewUsesVVClass);
 
 @doc{Gather information on calls where the function to call is given through a variable-variable}
@@ -98,12 +99,12 @@ public list[Expr] fetchVarUsesVV(Script scr) = [ v | v:var(expr(_)) <- fetchVarU
 public lrel[loc fileloc, Expr call] gatherVarVarUses(System scripts) = gatherExprStats(scripts, fetchVarUsesVV);
 
 @doc{Magic methods that implement overloads}
-public list[ClassItem] fetchOverloadedSet(System scripts) = [ x | l <- scripts.files<0>, /x:method("__set",_,_,_,_) := scripts.files[l] ];
-public list[ClassItem] fetchOverloadedGet(System scripts) = [ x | l <- scripts.files<0>, /x:method("__get",_,_,_,_) := scripts.files[l] ];
-public list[ClassItem] fetchOverloadedIsSet(System scripts) = [ x | l <- scripts.files<0>, /x:method("__isset",_,_,_,_) := scripts.files[l] ];
-public list[ClassItem] fetchOverloadedUnset(System scripts) = [ x | l <- scripts.files<0>, /x:method("__unset",_,_,_,_) := scripts.files[l] ];
-public list[ClassItem] fetchOverloadedCall(System scripts) = [ x | l <- scripts.files<0>, /x:method("__call",_,_,_,_) := scripts.files[l] ];
-public list[ClassItem] fetchOverloadedCallStatic(System scripts) = [ x | l <- scripts.files<0>, /x:method("__callStatic",_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedSet(System scripts) = [ x | l <- scripts.files<0>, /x:method("__set",_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedGet(System scripts) = [ x | l <- scripts.files<0>, /x:method("__get",_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedIsSet(System scripts) = [ x | l <- scripts.files<0>, /x:method("__isset",_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedUnset(System scripts) = [ x | l <- scripts.files<0>, /x:method("__unset",_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedCall(System scripts) = [ x | l <- scripts.files<0>, /x:method("__call",_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchOverloadedCallStatic(System scripts) = [ x | l <- scripts.files<0>, /x:method("__callStatic",_,_,_,_,_) := scripts.files[l] ];
 
 @doc{Support for var-args functions}
 public list[Expr] fetchVACalls(Script scr) = [ v | /v:call(name(name(fn)),_) := scr, fn in {"func_get_args","func_get_arg","func_num_args"} ];
@@ -216,7 +217,7 @@ public map[str,int] exprCounts(System scripts) {
 	return counts;
 }
 
-public str getExprKey(Expr::array(_)) = "array";
+public str getExprKey(Expr::array(_,_)) = "array";
 public str getExprKey(fetchArrayDim(_,_)) = "fetch array dim";
 public str getExprKey(fetchClassConst(_,_)) = "fetch class const";
 public str getExprKey(assign(_,_)) = "assign";
@@ -228,12 +229,12 @@ public str getExprKey(unaryOperation(_,Op op)) = "unary operation: <getOpKey(op)
 public str getExprKey(new(_,_)) = "new";
 public str getExprKey(cast(CastType ct,_)) = "cast to <getCastTypeKey(ct)>";
 public str getExprKey(clone(_)) = "clone";
-public str getExprKey(closure(_,_,_,_,_)) = "closure";
+public str getExprKey(closure(_,_,_,_,_,_)) = "closure";
 public str getExprKey(fetchConst(_)) = "fetch const";
 public str getExprKey(empty(_)) = "empty";
 public str getExprKey(suppress(_)) = "suppress";
 public str getExprKey(eval(_)) = "eval";
-public str getExprKey(exit(_)) = "exit";
+public str getExprKey(exit(_,_)) = "exit";
 public str getExprKey(call(_,_)) = "call";
 public str getExprKey(methodCall(_,_,_)) = "method call";
 public str getExprKey(staticCall(_,_,_)) = "static call";
@@ -339,7 +340,7 @@ public str getStmtKey(echo(_)) = "echo";
 public str getStmtKey(exprstmt(_)) = "expression statement (chain rule)";
 public str getStmtKey(\for(_,_,_,_)) = "for";
 public str getStmtKey(foreach(_,_,_,_,_)) = "foreach";
-public str getStmtKey(function(_,_,_,_)) = "function def";
+public str getStmtKey(function(_,_,_,_,_)) = "function def";
 public str getStmtKey(global(_)) = "global";
 public str getStmtKey(goto(_)) = "goto";
 public str getStmtKey(haltCompiler(_)) = "halt compiler";
@@ -355,7 +356,7 @@ public str getStmtKey(\switch(_,_)) = "switch";
 public str getStmtKey(\throw(_)) = "throw";
 public str getStmtKey(tryCatch(_,_)) = "try/catch";
 public str getStmtKey(Stmt::unset(_)) = "unset";
-public str getStmtKey(Stmt::use(_)) = "use";
+public str getStmtKey(Stmt::use(_,_,_)) = "use";
 public str getStmtKey(\while(_,_)) = "while";
 
 public list[str] stmtKeyOrder() = [ "break", "class def", "const", "continue", "declare", "do",
@@ -366,8 +367,8 @@ public list[str] stmtKeyOrder() = [ "break", "class def", "const", "continue", "
 								    "try/catch", "unset", "use", "while" ];
 								    
 public str getClassItemKey(ClassItem::property(set[Modifier] modifiers, list[Property] prop)) = "propertyDef";
-public str getClassItemKey(ClassItem::constCI(list[Const] consts)) = "classConstDef";
-public str getClassItemKey(ClassItem::method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body)) = "methodDef";
+public str getClassItemKey(ClassItem::constCI(list[Const] consts, set[Modifier] modifiers)) = "classConstDef";
+public str getClassItemKey(ClassItem::method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType)) = "methodDef";
 public str getClassItemKey(ClassItem::traitUse(list[Name] traits, list[Adaptation] adaptations)) = "traitUse";
 								    
 public list[str] classItemKeyOrder() = ["propertyDef","classConstDef","methodDef","traitUse"];

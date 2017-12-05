@@ -7,8 +7,6 @@ import Node;
 import List;
 import ValueIO;
 
-import Ambiguity;
-
 // hardcoded test inputs:
 private list[str] phpTypes = ["array", "mixed", "bool", "boolean", "int", "integer", "float", "string", "resource", "unset"];
 private list[str] variables = [ "$var", "$object", "$OBJ", "$_OBJ", "$_OBJ_o", "$_OBJ_ÿ", "$_{$O_ÿ}", "$a_b_c", "$randomName" ];
@@ -43,7 +41,7 @@ public bool testParser(type[&T<:Tree] t, lrel[str input, node expectedResult] in
             node n = implode(#node, parse(t, i.input));
         	
             // check if the result is the expected result
-            assert n == i.expectedResult : println("Expected:\n<i.expectedResult>\nActual:\n<delAnnotationsRec(n)>");
+            assert n == i.expectedResult : "Expected:\n<i.expectedResult>\nActual:\n<delAnnotationsRec(n)>";
         	
         } catch ParseError(loc l): {
             println("PARSE ERROR!! I found a parse error at type: <t> || input: <i> \nThis test stopped.\n"); 

@@ -62,14 +62,14 @@ public tuple[Script scr, map[loc,CFG] cfgs] buildCFGsAndScript(Script scr, bool 
 	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
 	res[scriptPath()] = scriptCFG;
 		
-	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,params,body) <- mbrs) {
+	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,params,body,_) <- mbrs) {
 		methodNamePath = methodPath(cname,mname);
 		//println("Creating CFG for <cname>::<mname>");
 		< methodCFG, lstate > = createMethodCFG(methodNamePath, m, lstate);
 		res[methodNamePath] = methodCFG;
 	}
 
-	for (/f:function(fname,_,params,body) := scrLabeled) {
+	for (/f:function(fname,_,params,body,rt) := scrLabeled) {
 		functionNamePath = functionPath(fname);
 		//println("Creating CFG for <fname>");
 		< functionCFG, lstate > = createFunctionCFG(functionNamePath, f, lstate);
@@ -97,14 +97,14 @@ public Script stripLabels(Script scr) {
 
 @doc{Retrieve all method declarations from a script.}
 private map[loc, ClassItem] getScriptMethods(Script scr) =
-	( [class(cname),method(mname)] : m | /class(cname,_,_,_,mbrs) := scr, m:method(mname,_,_,params,body) <- mbrs );
+	( methodPath(cname, mname) : m | /class(cname,_,_,_,mbrs) := scr, m:method(mname,_,_,params,body,rtype) <- mbrs );
 
 // TODO: It is possible in PHP to have non-unique or conditional declarations. We may need a way to represent
 // that here, assuming we ever run across it.
 
 @doc{Retrieve all function declarations from a script. Note: this assumes that definitions are unique.}
 private map[loc, Stmt] getScriptFunctions(Script scr) =
-	( functionPath(fname) : f | /f:function(fname,_,_,_) := scr );
+	( functionPath(fname) : f | /f:function(fname,_,_,_,_) := scr );
 
 private tuple[set[CFGNode] nodes, set[FlowEdge] edges] cleanUpGraph(LabelState lstate, set[FlowEdge] edges) {
 	allTargets = { e.to | e <- edges };
@@ -147,7 +147,7 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 		case r:classDef(_) => emptyStmt()[@lab=r@lab]
 		case r:interfaceDef(_) => emptyStmt()[@lab=r@lab]
 		case r:traitDef(_) => emptyStmt()[@lab=r@lab]
-		case r:function(_,_,_,_) => emptyStmt()[@lab=r@lab]
+		case r:function(_,_,_,_,_) => emptyStmt()[@lab=r@lab]
 	}
 	
 	lstate.gotoNodes = ( ln : lstmt@lab | /lstmt:label(ln) := sbReduced ); 
@@ -220,24 +220,27 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(loc np, ClassIte
 
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
-	paramNodes = [ ];
-	for (param(pn,oe,ot,br) <- m.params) {
+	list[CFGNode] paramNodes = [ ];
+	for (param(paramName,paramDefault,byRef,isVariadic,paramType) <- m.params) {
 		newLabel = incLabel();
-		newNode = (someExpr(e) := oe) ? actualNotProvided(pn, e, br, newLabel)[@lab=newLabel] : actualProvided(pn, br, newLabel)[@lab=newLabel];
+		newNode = (someExpr(e) := paramDefault) 
+			? actualNotProvided(paramName, e, byRef, newLabel)[@lab=newLabel] 
+			: actualProvided(paramName, byRef, newLabel)[@lab=newLabel];
 		lstate.nodes = lstate.nodes + newNode;
 
 		if (size(paramNodes) > 0) {
-			if (someExpr(e) := oe) {
-				edges += { flowEdge(last(paramNodes)@lab, i) | i <- init(e, lstate) };  
+			lastNode = last(paramNodes);
+			if (someExpr(e) := paramDefault) {
+				edges += { flowEdge(lastNode@lab, i) | i <- init(e, lstate) };  
 			} else {
-				edges += flowEdge(last(paramNodes)@lab, newNode@lab);
+				edges += flowEdge(lastNode@lab, newNode@lab);
 			}
 		}
 
 		paramNodes = paramNodes + newNode; 
 
-		if (someExpr(e) := oe) {
-			< edges, lstate > += addExpEdges(edges, lstate, e);
+		if (someExpr(e) := paramDefault) {
+			< edges, lstate > = addExpEdges(edges, lstate, e);
 			edges += { flowEdge(fi, newNode@lab) | fi <- final(e, lstate) };
 		}
 	}
@@ -305,28 +308,31 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(loc np, Stmt
 
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
-	paramNodes = [ ];
-	for (param(pn,oe,ot,br) <- f.params) {
+	list[CFGNode] paramNodes = [ ];
+	for (param(paramName,paramDefault,byRef,isVariadic,paramType) <- f.params) {
 		newLabel = incLabel();
-		newNode = (someExpr(e) := oe) ? actualNotProvided(pn, e, br, newLabel)[@lab=newLabel] : actualProvided(pn, br, newLabel)[@lab=newLabel];
+		newNode = (someExpr(e) := paramDefault) 
+			? actualNotProvided(paramName, e, byRef, newLabel)[@lab=newLabel] 
+			: actualProvided(paramName, byRef, newLabel)[@lab=newLabel];
 		lstate.nodes = lstate.nodes + newNode;
 
 		if (size(paramNodes) > 0) {
-			if (someExpr(e) := oe) {
-				edges += { flowEdge(last(paramNodes)@lab, i) | i <- init(e, lstate) };  
+			lastNode = last(paramNodes);
+			if (someExpr(e) := paramDefault) {
+				edges += { flowEdge(lastNode@lab, i) | i <- init(e, lstate) };  
 			} else {
-				edges += flowEdge(last(paramNodes)@lab, newNode@lab);
+				edges += flowEdge(lastNode@lab, newNode@lab);
 			}
 		}
 
 		paramNodes = paramNodes + newNode; 
 
-		if (someExpr(e) := oe) {
-			< edges, lstate > += addExpEdges(edges, lstate, e);
+		if (someExpr(e) := paramDefault) {
+			< edges, lstate > = addExpEdges(edges, lstate, e);
 			edges += { flowEdge(fi, newNode@lab) | fi <- final(e, lstate) };
 		}
-	}
-	
+	}	
+		
 	// Wire up the entry, exit, default init, and body nodes.
 	if (size(paramNodes) > 0) {
 		if (head(paramNodes) is actualNotProvided) {
@@ -481,7 +487,7 @@ public set[Lab] init(Stmt s, LabelState lstate) {
 		case unset(list[Expr] unsetVars) : return init(head(unsetVars), lstate);
 
 		// A use statement is atomic.
-		case use(_) : return { s@lab };
+		case use(_,_,_) : return { s@lab };
 
 		// In a while loop, the while condition is executed first and thus provides the first label.
 		case \while(Expr cond, _) : return init(cond, lstate);	
@@ -504,7 +510,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 	if (e@lab in lstate.headerNodes) return { lstate.headerNodes[e@lab] };
 
 	switch(e) {
-		case array(list[ArrayElement] items) : {
+		case array(list[ArrayElement] items,_) : {
 			if (size(items) == 0) {
 				return { e@lab };
 			} else if (arrayElement(someExpr(Expr key), Expr val, bool byRef) := head(items)) {
@@ -532,10 +538,11 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		
 		case unaryOperation(Expr operand, Op operation) : return init(operand, lstate);
 		
-		case new(NameOrExpr className, list[ActualParameter] parameters) : {
-			if (expr(Expr cname) := className)
+		case new(ClassName className, list[ActualParameter] parameters) : {
+			// TODO: Add support for anonymous classes here...
+			if (computedName(Expr cname) := className)
 				return init(cname, lstate);
-			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef) := head(parameters))
+			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef, bool isPacked) := head(parameters))
 				return init(expr, lstate);
 			return { e@lab };
 		}
@@ -546,7 +553,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		
 		// TODO: Add support for closures -- we should probably give them
 		// anonymous names and create independent CFGs for them as well
-		case closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static) : {
+		case closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static, _) : {
 			println("WARNING: Closures not yet fully supported");
 			return { e@lab };
 		}
@@ -559,13 +566,13 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		
 		case eval(Expr expr) : return init(expr, lstate);
 		
-		case exit(someExpr(Expr exitExpr)) : return init(exitExpr, lstate);
-		case exit(noExpr()) : return { e@lab };
+		case exit(someExpr(Expr exitExpr),_) : return init(exitExpr, lstate);
+		case exit(noExpr(),_) : return { e@lab };
 		
 		case call(NameOrExpr funName, list[ActualParameter] parameters) : {
 			if (expr(Expr fname) := funName)
 				return init(fname, lstate);
-			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef) := head(parameters))
+			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef, bool isPacked) := head(parameters))
 				return init(expr, lstate);
 			return { e@lab };
 		}
@@ -579,7 +586,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 				return init(sname, lstate);
 			else if (expr(Expr mname) := methodName)
 				return init(mname, lstate);
-			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef) := head(parameters))
+			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef, bool isPacked) := head(parameters))
 				return init(expr, lstate);
 			return { e@lab };
 		}
@@ -801,9 +808,9 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 			if (! isEmpty(finallyBody)) {
 				return final(last(finallyBody), lstate);
 			} else {
-				list[Stmt] finalStmts = [ final(cbody, lstate) | \catch(_, _, list[Stmt] cbody) <- catches, ! isEmpty(cbody) ];
+				list[Stmt] finalStmts = [ last(cbody) | \catch(_, _, list[Stmt] cbody) <- catches, ! isEmpty(cbody) ];
 				if (! isEmpty(body)) {
-					finalStmts += final(body, lstate);
+					finalStmts += last(body);
 				}
 				return { *final(fs, lstate) | fs <- finalStmts };
 			}
@@ -815,7 +822,7 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 		}
 
 		// A use is treated as a unit
-		case use(_) : {
+		case use(_,_,_) : {
 			return { s@lab };
 		}
 		
@@ -992,7 +999,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 		case declare(list[Declaration] decls, list[Stmt] body) : {
 			for (declaration(_,v) <- decls) < edges, lstate > = addExpEdges(edges, lstate, v);
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ v | declaration(v) <- decls ]);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ v | declaration(_,v) <- decls ]);
 			< edges, lstate > = addBodyEdges(edges, lstate, body);
 			        
 			if (size(decls) > 0 && size(body) > 0 && declaration(_,v) := last(decls) && b := head(body))
@@ -1299,10 +1306,10 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			< edges, lstate > = addBodyEdges(edges, lstate, body);
 		}		
 
-		case \return(someExpr(expr)) : {
-			< edges, lstate > = addExpEdges(edges, lstate, expr);
+		case \return(someExpr(sexpr)) : {
+			< edges, lstate > = addExpEdges(edges, lstate, sexpr);
 			edges = edges + 
-				{ flowEdge(fe, fl) | fe <- final(expr, lstate), fl <- finalLabels } + 
+				{ flowEdge(fe, fl) | fe <- final(sexpr, lstate), fl <- finalLabels } + 
 				{ jumpEdge(fl, getExitNodeLabel(lstate)) | fl <- finalLabels };
 		}
 
@@ -1454,7 +1461,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			lstate.nodes = lstate.nodes + footerNode(s, headernode, footernode)[@lab=footernode];
 
 			oldHandlers = lstate.catchHandlers;
-			for(\catch(name(xt),_,cbody) <- catches) {
+			for(\catch(_,str xt,cbody) <- catches) {
 				if (size(cbody) > 0 && size(init(head(cbody), lstate)) > 0) {
 					lstate.catchHandlers[xt] = getOneFrom(init(head(cbody), lstate));
 				} else {
@@ -1490,7 +1497,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			lstate.nodes = lstate.nodes + footerNode(s, headernode, footernode)[@lab=footernode];
 
 			oldHandlers = lstate.catchHandlers;
-			for(\catch(name(xt),_,cbody) <- catches) {
+			for(\catch(_,str xt,cbody) <- catches) {
 				if (size(cbody) > 0 && size(init(head(cbody), lstate)) > 0) {
 					lstate.catchHandlers[xt] = getOneFrom(init(head(cbody), lstate));
 				} else if (size(finallyBody) > 0 && size(init(head(finallyBody), lstate)) > 0) {
@@ -1511,14 +1518,14 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 
 			// Link the end of the main body, and each catch body, to the final label.
 			if (size(body) > 0 && size(finallyBody) > 0) {
-				edges += { flowEdge(fl, fi) | fl <- final(last(body), lstate), fi <- init(first(finallyBody), lstate) };
+				edges += { flowEdge(fl, fi) | fl <- final(last(body), lstate), fi <- init(finallyBody[0], lstate) };
 			}
 			else if (size(body) > 0 && size(finallyBody) > 0) {
 				edges += { flowEdge(fl, footernode) | fl <- final(last(body), lstate) };
 			}
 			for (\catch(_, _, cbody) <- catches, size(cbody) > 0) {
 				if (size(finallyBody) > 0) {
-					edges += { flowEdge(fl, fi) | fl <- final(last(cbody), lstate), fi <- init(first(finallyBody), lstate) };
+					edges += { flowEdge(fl, fi) | fl <- final(last(cbody), lstate), fi <- init(finallyBody[0], lstate) };
 				} else {
 					edges += { flowEdge(fl, footernode) | fl <- final(last(cbody), lstate) };
 				}
@@ -1598,7 +1605,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 	}
 	
 	switch(e) {
-		case array(list[ArrayElement] items) : {
+		case array(list[ArrayElement] items,_) : {
 			for (arrayElement(OptionExpr okey, Expr val, bool byRef) <- items) {
 				< edges, lstate > = addExpEdges(edges, lstate, val);
 				if (someExpr(Expr key) := okey)
@@ -1677,11 +1684,12 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges = edges + makeEdges(final(operand, lstate), finalLabels);
 		}
 		
-		case new(NameOrExpr className, list[ActualParameter] parameters) : {
-			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_) <- parameters]);
+		case new(ClassName className, list[ActualParameter] parameters) : {
+			for (actualParameter(aexp,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_) <- parameters]);
 
-			if (expr(Expr cn) := className) {
+			// TODO: Add support for anonymous classes
+			if (computedName(Expr cn) := className) {
 				< edges, lstate > = addExpEdges(edges, lstate, cn);
 				if (size(parameters) > 0) {
 					edges += makeEdges(final(cn, lstate), init(head(parameters).expr, lstate));
@@ -1724,14 +1732,14 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 		
-		case exit(someExpr(Expr exitExpr)) : {
+		case exit(someExpr(Expr exitExpr),_) : {
 			< edges, lstate > = addExpEdges(edges, lstate, exitExpr);
 			edges += makeEdges(final(exitExpr, lstate), finalLabels);
 		}
 		
 		case call(NameOrExpr funName, list[ActualParameter] parameters) : {
-			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_) <- parameters]);
+			for (actualParameter(aexp,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_) <- parameters]);
 		
 			if (expr(Expr fn) := funName) {
 				< edges, lstate > = addExpEdges(edges, lstate, fn);
@@ -1750,8 +1758,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		case methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters) : {
 			< edges, lstate > = addExpEdges(edges, lstate, target);
 
-			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_) <- parameters]);
+			for (actualParameter(aexp,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_) <- parameters]);
 			
 			if (expr(Expr mn) := methodName) {
 				< edges, lstate > = addExpEdges(edges, lstate, mn);
@@ -1774,8 +1782,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 
 		
 		case staticCall(NameOrExpr staticTarget, NameOrExpr methodName, list[ActualParameter] parameters) : {
-			for (actualParameter(aexp,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_) <- parameters]);
+			for (actualParameter(aexp,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_) <- parameters]);
 
 			if (expr(Expr tn) := staticTarget) {
 				< edges, lstate > = addExpEdges(edges, lstate, tn);
@@ -1807,17 +1815,16 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 		
-		case instanceOf(Expr expr, expr(Expr toCompare)) : {
+		case instanceOf(Expr expr, NameOrExpr toCompare) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			< edges, lstate > = addExpEdges(edges, lstate, toCompare);
-			edges = edges + makeEdges(final(expr, lstate),init(toCompare, lstate)) + makeEdges(final(toCompare, lstate),finalLabels);
+			if (NameOrExpr::expr(e) := toCompare) {
+				< edges, lstate > = addExpEdges(edges, lstate, e);
+				edges = edges + makeEdges(final(expr, lstate),init(e, lstate)) + makeEdges(final(e, lstate),finalLabels);
+			} else {
+				edges += makeEdges(final(expr, lstate), finalLabels);
+			}
 		}
 		
-		case instanceOf(Expr expr, name(Name toCompare)) : {
-			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += makeEdges(final(expr, lstate), finalLabels);
-		}
-
 		case isSet(list[Expr] exprs) : {
 			for (ex <- exprs) < edges, lstate > = addExpEdges(edges, lstate, ex);
 			< edges, lstate > = addExpSeqEdges(edges, lstate, exprs);

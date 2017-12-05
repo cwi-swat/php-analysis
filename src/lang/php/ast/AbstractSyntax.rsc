@@ -49,7 +49,7 @@ public data Expr
 	| refAssign(Expr assignTo, Expr assignExpr)
 	| binaryOperation(Expr left, Expr right, Op operation)
 	| unaryOperation(Expr operand, Op operation)
-	| new(ClassName className, list[ActualParameter] parameters)
+	| new(ClassName classToInstantiate, list[ActualParameter] parameters)
 	| cast(CastType castType, Expr expr)
 	| clone(Expr expr)
 	| closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static, PHPType returnType)

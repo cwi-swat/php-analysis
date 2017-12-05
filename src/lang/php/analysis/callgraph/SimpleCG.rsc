@@ -31,11 +31,11 @@ public CallGraph computeSystemCallGraph(System s) {
 	rel[str functionName, CallTarget callTargets] functionTargets = { };
 	rel[str methodName, CallTarget callTargets] methodTargets = { };
 	for (fileSignature(fileloc, items) <- sysSignatures<1>) {
-		for (fs:functionSig(path, _) <- items) {
-			functionTargets += < path.file, functionTarget(path.file, fs@at) >;
+		for (fs <- items, fs is functionSig) {
+			functionTargets += < fs.namepath.file, functionTarget(fs.namepath.file, fs@at) >;
 		}
-		for (ms:methodSig(path, _) <- items) {
-			methodTargets += < path.file, methodTarget(path.parent.file, path.file, ms@at) >;
+		for (ms <- items, ms is methodSig) {
+			methodTargets += < ms.namepath.file, methodTarget(ms.namepath.parent.file, ms.namepath.file, ms@at) >;
 		}
 	}
 		 
@@ -79,7 +79,7 @@ public CallGraph computeScriptCallGraph(Script s, map[str functionName, set[Call
 				// that function, else we treat it as a call to potentially any function in
 				// the system. NOTE: We don't create an edge to either call_user_func or
 				// call_user_func_array, even though we could create those edges as well.
-				if ([scalar(string(fn2))] := ps) {
+				if ([actualParameter(scalar(string(fn2)),_,_)] := ps) {
 					if (fn in functionTargetsMap) {
 						res = res + ( { c@at } join functionTargetsMap[fn] ); 
 					} else {
@@ -126,11 +126,6 @@ public CallGraph computeScriptCallGraph(Script s, map[str functionName, set[Call
 
 		case mc:methodCall(_,_,_) : {
 			res = res + ( { mc@at} join allMethods );
-		}
-
-		case sc:staticMethodCall(_,_,_) : {
-			// NOTE: To be more accurate, we should filter these to just be static methods.
-			res = res + ( { sc@at} join allMethods );
 		}
 	}
 	
