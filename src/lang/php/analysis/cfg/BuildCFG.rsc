@@ -540,7 +540,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		
 		case new(ClassName className, list[ActualParameter] parameters) : {
 			// TODO: Add support for anonymous classes here...
-			if (computedName(Expr cname) := className)
+			if (computedClassName(Expr cname) := className)
 				return init(cname, lstate);
 			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef, bool isPacked) := head(parameters))
 				return init(expr, lstate);
@@ -1689,7 +1689,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_) <- parameters]);
 
 			// TODO: Add support for anonymous classes
-			if (computedName(Expr cn) := className) {
+			if (computedClassName(Expr cn) := className) {
 				< edges, lstate > = addExpEdges(edges, lstate, cn);
 				if (size(parameters) > 0) {
 					edges += makeEdges(final(cn, lstate), init(head(parameters).expr, lstate));

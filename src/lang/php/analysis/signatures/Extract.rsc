@@ -52,7 +52,7 @@ public map[PageType,loc] getLibraryPages(loc startingLoc) {
 		bookloc = startingLoc.parent + bookhref;
 		booktxt = readHTMLFile(bookloc);
 		bookname = "";
-		if ("a"(["text"(bn),_*]) := book)
+		if ("a"(["text"(bn),*_]) := book)
 			bookname = bn;
 		else
 			throw "Error, cannot calculate name of book <book>";

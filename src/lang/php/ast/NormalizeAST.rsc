@@ -62,7 +62,7 @@ public Script normalizeIf(Script s) {
 public Script flattenBlocks(Script s) {
 	solve(s) {
 		s = bottom-up visit(s) {
-			case [*xs,block(list[Stmt] ys),*zs] => [*xs,*ys,*zs]
+			case list[Stmt] stmtList: [*xs,block(list[Stmt] ys),*zs] => [*xs,*ys,*zs]
 		}
 	}
 	return s;
@@ -71,7 +71,7 @@ public Script flattenBlocks(Script s) {
 public Script discardEmpties(Script s) {
 	solve(s) {
 		s = bottom-up visit(s) {
-			case [*xs,emptyStmt(),*zs] : {
+			case list[Stmt] stmtList: [*xs,emptyStmt(),*zs] : {
 				list[Stmt] r = [*xs,*zs];
 				insert(r);
 			}
@@ -83,23 +83,23 @@ public Script discardEmpties(Script s) {
 public Script useBuiltins(Script s) {
 	solve(s) {
 		s = bottom-up visit(s) {
-			case call(name(name("isset")),params) => isSet([e | actualParameter(e,_) <- params])
+			case call(name(name("isset")),params) => isSet([e | actualParameter(e,_,_) <- params])
 			
-			case call(name(name("exit")),[]) => exit(noExpr())
+			case call(name(name("exit")),[]) => exit(noExpr(), true)
 			
-			case call(name(name("exit")),[actualParameter(e,_)]) => exit(someExpr(e))
+			case call(name(name("exit")),[actualParameter(e,_,_)]) => exit(someExpr(e), true)
 			
-			case call(name(name("die")),[]) => exit(noExpr())
+			case call(name(name("die")),[]) => exit(noExpr(), false)
 			
-			case call(name(name("die")),[actualParameter(e,_)]) => exit(someExpr(e))
+			case call(name(name("die")),[actualParameter(e,_,_)]) => exit(someExpr(e), false)
 
-			case call(name(name("print")),[actualParameter(e,_)]) => Expr::print(e)
+			case call(name(name("print")),[actualParameter(e,_,_)]) => Expr::print(e)
 			
-			case exprstmt(call(name(name("unset")),params)) => unset([e | actualParameter(e,_) <- params])
+			case exprstmt(call(name(name("unset")),params)) => unset([e | actualParameter(e,_,_) <- params])
 
-			case call(name(name("empty")),[actualParameter(e,_)]) => empty(e)
+			case call(name(name("empty")),[actualParameter(e,_,_)]) => empty(e)
 
-			case call(name(name("eval")),[actualParameter(e,_)]) => eval(e)
+			case call(name(name("eval")),[actualParameter(e,_,_)]) => eval(e)
 		}
 	}
 	return s;
@@ -117,7 +117,7 @@ public Script discardHTML(Script s) {
 public Script mergeHTML(Script s) {
 	solve(s) {
 		s = bottom-up visit(s) {
-			case [*xs,inlineHTML(i),inlineHTML(j),*ys] => [*xs,inlineHTML(i+j),*ys]
+			case list[Stmt] stmtList: [*xs,inlineHTML(i),inlineHTML(j),*ys] => [*xs,inlineHTML(i+j),*ys]
 		}
 	}
 	return s;
@@ -218,14 +218,15 @@ public Script switchNamespaceSeparators(Script s) {
 	return s;
 }
 
-public Script setDefaultUseAlias(Script s) {
-	solve(s) {
-		s = visit(s) {
-			case use(name(str un), noName()) => use(name(un),someName(name(last(split("/",un)))))
-		}
-	}
-	return s;
-}
+// TODO: Fix this, but need to check to see current representation of use from PDT
+//public Script setDefaultUseAlias(Script s) {
+//	solve(s) {
+//		s = visit(s) {
+//			case use(name(str un), noName()) => use(name(un),someName(name(last(split("/",un)))))
+//		}
+//	}
+//	return s;
+//}
 
 public Script normalizeEncapsedStrings(Script s) {
 	solve(s) {
@@ -257,8 +258,8 @@ public Script addPublicModifierWhenNotProvided(Script s) {
 				setAnnotations( property(mfs + publicModifier, prop), getAnnotations(origNode))
 			when \public() notin mfs && \private() notin mfs && \protected() notin mfs
 				
-			case origNode:method(name, set[Modifier] mfs, byRef, params, body) =>
-				setAnnotations( method(name, mfs + publicModifier, byRef, params, body), getAnnotations(origNode))
+			case origNode:method(str mname, set[Modifier] mfs, byRef, params, body, rtype) => 
+				setAnnotations( method(mname, mfs + publicModifier, byRef, params, body, rtype), getAnnotations(origNode))
 			when \public() notin mfs && \private() notin mfs && \protected() notin mfs
 		}
 	}

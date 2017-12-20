@@ -10,13 +10,13 @@ module lang::php::analysis::includes::MatchIncludes
 
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Corpus;
-import lang::php::analysis::evaluators::ScalarEval;
 import lang::php::stats::Stats;
 import lang::php::util::Utils;
 import lang::php::ast::System;
-import lang::php::analysis::includes::IncludeGraph;
 import lang::php::pp::PrettyPrinter;
 import lang::php::util::LocUtils;
+import lang::php::analysis::includes::IncludeGraph;
+
 import Exception;
 import IO;
 import List;
@@ -26,15 +26,6 @@ import Relation;
 import util::Math;
 
 data FNBits = lit(str s) | fnBit();
-
-// This function just calls the next function on each script in the map. The bulk of
-// what happens is done in the function below.
-public System matchIncludes(System sys, loc baseLoc) {
-	println("MATCHING INCLUDE FILE PATTERNS");
-	sys.files = ( l : matchIncludes(sys.files<0>,sys.files[l],baseLoc,[]) | l <- sys.files );
-	println("MATCHING INCLUDE FILE PATTERNS FINISHED");
-	return sys;	
-}
 
 private map[str, set[loc]] lookupCacheRE = ( );
 

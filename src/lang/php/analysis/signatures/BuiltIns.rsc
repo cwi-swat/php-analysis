@@ -78,5 +78,5 @@ public set[str] getBuiltInConstantVersions(str builtInConstant) = builtIns[built
 	
 @doc{Get constant summaries for each of the built-in constants.}	
 public set[Summary] getBuiltInConstantSummaries() {
-	return { constantSummary([global(),const(cn)],ct) | <cn,ct> <- builtIns<0,1> };
+	return { constantSummary(constPath(cn),ct) | <cn,ct> <- builtIns<0,1> };
 }

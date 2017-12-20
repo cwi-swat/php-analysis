@@ -18,7 +18,7 @@ private set[str] simulatedFunctions = { "dirname", "MWInit", "strrchr", "substr"
 
 @doc{Evaluate the PHP dirname function, given a string literal argument.}
 public Expr simulateCall(Expr e) {
-	if (Expr c:call(name(name("dirname")),[actualParameter(scalar(string(s1)),false)]) := e) {
+	if (Expr c:call(name(name("dirname")),[actualParameter(scalar(string(s1)),false,false)]) := e) {
 		try {
 			// NOTE: This assumes that we use "/" as the directory separator. If this
 			// code is Windows-specific, it could be "\" as well.
@@ -32,23 +32,23 @@ public Expr simulateCall(Expr e) {
 			} else {
 				return scalar(string("."))[@at=c@at];
 			}
-		} catch MalFormedURI(estr) : {
+		} catch : {
 			; // do nothing, we just don't make any changes
 		}
-	} else if (Expr c:staticCall(name(name("MWInit")), name(name("compiledPath")), [actualParameter(scalar(string(s1)),false)]) := e) {
+	} else if (Expr c:staticCall(name(name("MWInit")), name(name("compiledPath")), [actualParameter(scalar(string(s1)),false,false)]) := e) {
 		return scalar(string(s1))[@at=c@at];
-	} else if (Expr c:staticCall(name(name("MWInit")), name(name("interpretedPath")), [actualParameter(scalar(string(s1)),false)]) := e) {
+	} else if (Expr c:staticCall(name(name("MWInit")), name(name("interpretedPath")), [actualParameter(scalar(string(s1)),false,false)]) := e) {
 		return scalar(string(s1))[@at=c@at];
-	} else if (Expr c:call(name(name("strrchr")),[actualParameter(scalar(string(s1)),false), actualParameter(scalar(string(s2)),false)]) := e) {
+	} else if (Expr c:call(name(name("strrchr")),[actualParameter(scalar(string(s1)),false,false), actualParameter(scalar(string(s2)),false,false)]) := e) {
 		if (size(s2) >= 1) {
 			if (size(s2) > 1) s2 = s2[0];
 			pos = findLast(s1,s2);
 			if (pos == -1)
-				return scalar(boolean(false))[@at=c@at];
+				return fetchConst(name("false"))[@at=c@at];
 			else
 				return scalar(string(substring(s1,pos)))[@at=c@at];
 		}
-	} else if (Expr c:call(name(name("substr")),[actualParameter(scalar(string(s1)),false), actualParameter(scalar(integer(i1)),false)]) := e) {
+	} else if (Expr c:call(name(name("substr")),[actualParameter(scalar(string(s1)),false,false), actualParameter(scalar(integer(i1)),false,false)]) := e) {
 		if (size(s1) > 0) {
 			if (i1 >= 0) {
 				if (i1 <= (size(s1)-1)) {
@@ -56,7 +56,7 @@ public Expr simulateCall(Expr e) {
 				} 
 			}
 		}
-	} else if (Expr c:call(name(name("substr")),[actualParameter(scalar(string(s1)),false), actualParameter(scalar(integer(i1)),false), actualParameter(scalar(integer(i2)),false)]) := e) {
+	} else if (Expr c:call(name(name("substr")),[actualParameter(scalar(string(s1)),false,false), actualParameter(scalar(integer(i1)),false,false), actualParameter(scalar(integer(i2)),false,false)]) := e) {
 		if (size(s1) > 0) {
 			if (i1 >= 0) {
 				if (i1 <= (size(s1)-1)) {
@@ -70,7 +70,7 @@ public Expr simulateCall(Expr e) {
 				} 
 			}
 		}
-	} else if (Expr c:call(name(name("sprintf")),[actualParameter(scalar(string(s1)),false), ps*]) := e) {
+	} else if (Expr c:call(name(name("sprintf")),[actualParameter(scalar(string(s1)),false,false), ps*]) := e) {
 		markers = findAll(s1,"%");
 		doReplacement = [ false | i <- markers ];
 		for (i <- index(markers), size(s1) >= (markers[i]+1), s1[markers[i]+1] == "s", size(ps) >= i, scalar(string(_)) := ps[i].expr) {

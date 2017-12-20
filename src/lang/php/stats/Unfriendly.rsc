@@ -5,13 +5,11 @@ import lang::php::stats::Stats;
 import lang::php::ast::System;
 import lang::php::util::Corpus;
 import lang::php::ast::AbstractSyntax;
-import lang::php::analysis::evaluators::ScalarEval;
-import lang::php::analysis::includes::IncludeCP;
-import lang::php::analysis::includes::IncludeGraph;
 import lang::rascal::types::AbstractType;
 import lang::php::util::Config;
 import lang::php::analysis::signatures::Summaries;
-import lang::php::analysis::includes::ResolveIncludes;
+import lang::php::analysis::includes::IncludeGraph;
+import lang::php::analysis::NamePaths;
 
 import List;
 import String;
@@ -36,7 +34,7 @@ data QueryResult
 	
 alias QueryResults = list[QueryResult];
 
-public real mygini(list[tuple[num observation,int frequency]] values) {
+public real mygini(lrel[num observation,int frequency] values) {
 	list[num] dup(num item, int frequency) {
 		if (frequency <= 0) return [ ];
 		return dup(item,frequency-1) + item;
@@ -45,14 +43,14 @@ public real mygini(list[tuple[num observation,int frequency]] values) {
 	return mygini([ *dup(o1,f) | <o1,f> <- values ]);
 }
 
-public real mygini(list[int] dist) {
+public real mygini(list[num] dist) {
 	dist = sort(dist);
 	n = size(dist);
 	sum1 = ( 0.0 | it + (n + 1 - (idx+1)) * dist[idx] | idx <- index(dist) );
 	sum2 = ( 0.0 | it + r | r <- dist );
 	sum3 = n + 1 - (2 * sum1 / sum2 );
 	total = sum3 / n;
-	return total;
+	return toReal(total);
 }
 
 public QueryResults getVVUses(str product, str version) {
@@ -64,7 +62,7 @@ public rel[str p, str v, QueryResult qr] getVVUses(Corpus corpus) {
 	return { < p, corpus[p], u > | p <- getProducts(), u <- getVVUses(p,corpus[p]) };
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVUsesAsList(Corpus corpus) {
+public lrel[str p, str v, QueryResult qr] getVVUsesAsList(Corpus corpus) {
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVUses(p,corpus[p]) ];
 }
 
@@ -73,7 +71,7 @@ public QueryResults getVVNews(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherVVNews(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVNewsAsList(Corpus corpus) {
+public lrel[str p, str v, QueryResult qr] getVVNewsAsList(Corpus corpus) {
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVNews(p,corpus[p]) ];
 }
 
@@ -82,7 +80,7 @@ public QueryResults getVVCalls(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherVVCalls(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVCallsAsList(Corpus corpus) {
+public lrel[str p, str v, QueryResult qr] getVVCallsAsList(Corpus corpus) {
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVCalls(p,corpus[p]) ];
 }
 
@@ -91,7 +89,7 @@ public QueryResults getVVMethodCalls(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherMethodVVCalls(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVMethodCallsAsList(Corpus corpus) {
+public lrel[str p, str v, QueryResult qr] getVVMethodCallsAsList(Corpus corpus) {
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVMethodCalls(p,corpus[p]) ];
 }
 
@@ -100,7 +98,7 @@ public QueryResults getVVPropertyRefs(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVPropertyRefsAsList(Corpus corpus) {
+public lrel[str p, str v, QueryResult qr] getVVPropertyRefsAsList(Corpus corpus) {
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVPropertyRefs(p,corpus[p]) ];
 }
 
@@ -109,7 +107,7 @@ public QueryResults getVVClassConsts(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherVVClassConsts(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVClassConstsAsList(Corpus corpus) {
+public lrel[str p, str v, QueryResult qr] getVVClassConstsAsList(Corpus corpus) {
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVClassConsts(p,corpus[p]) ];
 }
 
@@ -118,7 +116,7 @@ public QueryResults getVVStaticCalls(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherStaticVVCalls(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVStaticCallsAsList(Corpus corpus) {
+public lrel[str p, str v, QueryResult qr] getVVStaticCallsAsList(Corpus corpus) {
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVStaticCalls(p,corpus[p]) ];
 }
 
@@ -127,7 +125,7 @@ public QueryResults getVVStaticCallTargets(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherStaticVVTargets(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVStaticCallTargetsAsList(Corpus corpus) {
+public lrel[str p, str v, QueryResult qr] getVVStaticCallTargetsAsList(Corpus corpus) {
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVStaticCallTargets(p,corpus[p]) ];
 }
 
@@ -136,7 +134,7 @@ public QueryResults getVVStaticPropNames(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVStaticPropNamesAsList(Corpus corpus) {
+public lrel[str p, str v, QueryResult qr] getVVStaticPropNamesAsList(Corpus corpus) {
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVStaticPropNames(p,corpus[p]) ];
 }
 
@@ -145,7 +143,7 @@ public QueryResults getVVStaticPropTargets(str product, str version) {
 	return [exprResult(e@at,e) | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
 }
 
-public list[tuple[str p, str v, QueryResult qr]] getVVStaticPropTargetsAsList(Corpus corpus) {
+public lrel[str p, str v, QueryResult qr] getVVStaticPropTargetsAsList(Corpus corpus) {
 	return [ < p, corpus[p], u > | p <- getProducts(), u <- getVVStaticPropTargets(p,corpus[p]) ];
 }
 
@@ -161,40 +159,40 @@ data VVInfo = vvInfo(
 			lrel[str p, str v, QueryResult qr] vvsprops,
 			lrel[str p, str v, QueryResult qr] vvsptargets);
 
-public VVInfo toVVInfo(tuple[list[tuple[str p, str v, QueryResult qr]] vvuses, 
-			 list[tuple[str p, str v, QueryResult qr]] vvcalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvnews,
-			 list[tuple[str p, str v, QueryResult qr]] vvprops,
-			 list[tuple[str p, str v, QueryResult qr]] vvcconsts,
-			 list[tuple[str p, str v, QueryResult qr]] vvscalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvstargets,
-			 list[tuple[str p, str v, QueryResult qr]] vvsprops,
-			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] input) {
+public VVInfo toVVInfo(tuple[lrel[str p, str v, QueryResult qr] vvuses, 
+			 lrel[str p, str v, QueryResult qr] vvcalls,
+			 lrel[str p, str v, QueryResult qr] vvmcalls,
+			 lrel[str p, str v, QueryResult qr] vvnews,
+			 lrel[str p, str v, QueryResult qr] vvprops,
+			 lrel[str p, str v, QueryResult qr] vvcconsts,
+			 lrel[str p, str v, QueryResult qr] vvscalls,
+			 lrel[str p, str v, QueryResult qr] vvstargets,
+			 lrel[str p, str v, QueryResult qr] vvsprops,
+			 lrel[str p, str v, QueryResult qr] vvsptargets] input) {
 	return vvInfo(input.vvuses, input.vvcalls, input.vvmcalls, input.vvnews, input.vvprops, input.vvcconsts, input.vvscalls, input.vvstargets, input.vvsprops, input.vvsptargets);			 
 }
 			 
-public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses, 
-			 list[tuple[str p, str v, QueryResult qr]] vvcalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvnews,
-			 list[tuple[str p, str v, QueryResult qr]] vvprops,
-			 list[tuple[str p, str v, QueryResult qr]] vvcconsts,
-			 list[tuple[str p, str v, QueryResult qr]] vvscalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvstargets,
-			 list[tuple[str p, str v, QueryResult qr]] vvsprops,
-			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] getAllVV(Corpus corpus) 
+public tuple[lrel[str p, str v, QueryResult qr] vvuses, 
+			 lrel[str p, str v, QueryResult qr] vvcalls,
+			 lrel[str p, str v, QueryResult qr] vvmcalls,
+			 lrel[str p, str v, QueryResult qr] vvnews,
+			 lrel[str p, str v, QueryResult qr] vvprops,
+			 lrel[str p, str v, QueryResult qr] vvcconsts,
+			 lrel[str p, str v, QueryResult qr] vvscalls,
+			 lrel[str p, str v, QueryResult qr] vvstargets,
+			 lrel[str p, str v, QueryResult qr] vvsprops,
+			 lrel[str p, str v, QueryResult qr] vvsptargets] getAllVV(Corpus corpus) 
 {
-	list[tuple[str p, str v, QueryResult qr]] vvuses = [ ]; 
-	list[tuple[str p, str v, QueryResult qr]] vvcalls = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvmcalls = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvnews = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvprops = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvcconsts = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvscalls = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvstargets = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvsprops = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvsptargets = [ ];
+	lrel[str p, str v, QueryResult qr] vvuses = [ ]; 
+	lrel[str p, str v, QueryResult qr] vvcalls = [ ];
+	lrel[str p, str v, QueryResult qr] vvmcalls = [ ];
+	lrel[str p, str v, QueryResult qr] vvnews = [ ];
+	lrel[str p, str v, QueryResult qr] vvprops = [ ];
+	lrel[str p, str v, QueryResult qr] vvcconsts = [ ];
+	lrel[str p, str v, QueryResult qr] vvscalls = [ ];
+	lrel[str p, str v, QueryResult qr] vvstargets = [ ];
+	lrel[str p, str v, QueryResult qr] vvsprops = [ ];
+	lrel[str p, str v, QueryResult qr] vvsptargets = [ ];
 	
 	for (product <- corpus) {
 		ptmap = loadBinary(product,corpus[product]);
@@ -214,27 +212,27 @@ public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses,
 	return < vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets >;
 }
 
-public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses, 
-			 list[tuple[str p, str v, QueryResult qr]] vvcalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvnews,
-			 list[tuple[str p, str v, QueryResult qr]] vvprops,
-			 list[tuple[str p, str v, QueryResult qr]] vvcconsts,
-			 list[tuple[str p, str v, QueryResult qr]] vvscalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvstargets,
-			 list[tuple[str p, str v, QueryResult qr]] vvsprops,
-			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] getAllVV(str product, str version, System ptmap) 
+public tuple[lrel[str p, str v, QueryResult qr] vvuses, 
+			 lrel[str p, str v, QueryResult qr] vvcalls,
+			 lrel[str p, str v, QueryResult qr] vvmcalls,
+			 lrel[str p, str v, QueryResult qr] vvnews,
+			 lrel[str p, str v, QueryResult qr] vvprops,
+			 lrel[str p, str v, QueryResult qr] vvcconsts,
+			 lrel[str p, str v, QueryResult qr] vvscalls,
+			 lrel[str p, str v, QueryResult qr] vvstargets,
+			 lrel[str p, str v, QueryResult qr] vvsprops,
+			 lrel[str p, str v, QueryResult qr] vvsptargets] getAllVV(str product, str version, System ptmap) 
 {
-	list[tuple[str p, str v, QueryResult qr]] vvuses = [ ]; 
-	list[tuple[str p, str v, QueryResult qr]] vvcalls = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvmcalls = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvnews = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvprops = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvcconsts = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvscalls = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvstargets = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvsprops = [ ];
-	list[tuple[str p, str v, QueryResult qr]] vvsptargets = [ ];
+	lrel[str p, str v, QueryResult qr] vvuses = [ ]; 
+	lrel[str p, str v, QueryResult qr] vvcalls = [ ];
+	lrel[str p, str v, QueryResult qr] vvmcalls = [ ];
+	lrel[str p, str v, QueryResult qr] vvnews = [ ];
+	lrel[str p, str v, QueryResult qr] vvprops = [ ];
+	lrel[str p, str v, QueryResult qr] vvcconsts = [ ];
+	lrel[str p, str v, QueryResult qr] vvscalls = [ ];
+	lrel[str p, str v, QueryResult qr] vvstargets = [ ];
+	lrel[str p, str v, QueryResult qr] vvsprops = [ ];
+	lrel[str p, str v, QueryResult qr] vvsptargets = [ ];
 	
 	vvuses += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherVarVarUses(ptmap)];
 	vvcalls += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherVVCalls(ptmap)];
@@ -250,7 +248,7 @@ public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses,
 	return < vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets >;
 }
 
-public list[tuple[str p, str path, int line]] showOrderedRel(rel[str p, str v, QueryResult qr] res) =
+public lrel[str p, str path, int line] showOrderedRel(rel[str p, str v, QueryResult qr] res) =
 	[ < i, rst, j.l.begin.line > | i <- sort(toList(res<0>)), j <- sort(toList(res[i]<1>),bool(QueryResult a, QueryResult b) { return (a.l.file < b.l.file) || (a.l.file == b.l.file && a.l.begin.line < b.l.begin.line); }), /<i>\/[^\/]+\/<rst:.+>/ := j.l.path ];
 	
 public void writeOrderedRel(rel[str p, str v, QueryResult qr] res, loc writeLoc) {
@@ -271,24 +269,24 @@ public map[str,tuple[int totalCount, int derivableCount]] varVarUsesInfo(Corpus 
 	return ( p : < totalCount[p], derivableCount[p] > | p <- corpus<0> );
 }
 
-public void showUsageCounts(Corpus corpus, list[tuple[str p, str v, QueryResult qr]] res) {
+public void showUsageCounts(Corpus corpus, lrel[str p, str v, QueryResult qr] res) {
 	mr = ( p : size([ e | <p,_,e> <- res ]) | p <- corpus );
 	for (p <- sort([p | str p <- mr<0>])) println("<p>:<mr[p]>");
 }
 
-public void showFileInfo(Corpus corpus, list[tuple[str p, str v, QueryResult qr]] res) {
+public void showFileInfo(Corpus corpus, lrel[str p, str v, QueryResult qr] res) {
 	ci = loadCountsCSV();
 	pr = { < p, v, qr.l.path > | <p, v, qr > <- res };
 	pc = ( p : size([qr|<p,_,qr><-res])  | p <- corpus );
 	println("product,# of files,# of hits,# of files with hits,% of files with hits,average number per file with hit");
-	for (p <- sort(toList(corpus))) {
+	for ( p <- sort(toList(corpus<0>))) {
 		< lineCount, fileCount > = getOneFrom(ci[p,corpus[p]]);
 		featureFileCount = size(pr[p,corpus[p]]);
 		println("<p>: <fileCount>, <pc[p]>, <featureFileCount>, < toInt((featureFileCount*1.0)/fileCount*100000)/1000.0 >, < (featureFileCount == 0) ? 0 : (toInt((pc[p]*1.0)/featureFileCount*1000)/1000.0) >");
 	}
 }
 
-public str createSubfloat(list[tuple[str p, str v, QueryResult qr]] qrlist, str caption, str label) {
+public str createSubfloat(lrel[str p, str v, QueryResult qr] qrlist, str caption, str label) {
 	lv = getLatestVersions();
 	ci = loadCountsCSV();
 	// relation between products and the files that contain the features of interest
@@ -320,12 +318,12 @@ public str createSubfloat(list[tuple[str p, str v, QueryResult qr]] qrlist, str 
 	return res;
 }
 
-//public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses, 
-//				 		   	 list[tuple[str p, str v, QueryResult qr]] vvcalls,
-//							 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-//							 list[tuple[str p, str v, QueryResult qr]] vvnews,
-//							 list[tuple[str p, str v, QueryResult qr]] vvprops,
-//							 list[tuple[str p, str v, QueryResult qr]] vvall) {
+//public str showVVInfoAsLatex(lrel[str p, str v, QueryResult qr] vvuses, 
+//				 		   	 lrel[str p, str v, QueryResult qr] vvcalls,
+//							 lrel[str p, str v, QueryResult qr] vvmcalls,
+//							 lrel[str p, str v, QueryResult qr] vvnews,
+//							 lrel[str p, str v, QueryResult qr] vvprops,
+//							 lrel[str p, str v, QueryResult qr] vvall) {
 //	res = "\\begin{table*}
 //		  '  \\centering
 //		  '  <createSubfloat(vvuses,"Variable Variables","tbl-vvuses")>
@@ -345,12 +343,12 @@ public str createSubfloat(list[tuple[str p, str v, QueryResult qr]] qrlist, str 
 //	return res;
 //}
 
-public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses, 
-				 		   	 list[tuple[str p, str v, QueryResult qr]] vvcalls,
-							 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-							 list[tuple[str p, str v, QueryResult qr]] vvnews,
-							 list[tuple[str p, str v, QueryResult qr]] vvprops,
-							 list[tuple[str p, str v, QueryResult qr]] vvall,
+public str showVVInfoAsLatex(lrel[str p, str v, QueryResult qr] vvuses, 
+				 		   	 lrel[str p, str v, QueryResult qr] vvcalls,
+							 lrel[str p, str v, QueryResult qr] vvmcalls,
+							 lrel[str p, str v, QueryResult qr] vvnews,
+							 lrel[str p, str v, QueryResult qr] vvprops,
+							 lrel[str p, str v, QueryResult qr] vvall,
 							 map[str,set[loc]] transitiveUses, Corpus corpus) {
 							 
 	ci = loadCountsCSV();
@@ -366,7 +364,7 @@ public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses,
 		       ' &  & Files & Uses && Files & Uses && Files & Uses && Files & Uses && Files & Uses && Files & w/Inc & Uses & Gini \\\\ \\midrule";
 	}
 	
-	str c(str p, list[tuple[str p, str v, QueryResult qr]] vv) = "\\numprint{<size({qr.l.path|<p,_,qr><-vv})>} & \\numprint{<size([qr|<p,_,qr><-vv])>}";
+	str c(str p, lrel[str p, str v, QueryResult qr] vv) = "\\numprint{<size({qr.l.path|<p,_,qr><-vv})>} & \\numprint{<size([qr|<p,_,qr><-vv])>}";
 	
 	str productLine(str p) {
 		< lineCount, fileCount > = getOneFrom(ci[p,corpus[p]]);
@@ -391,16 +389,16 @@ public str showVVInfoAsLatex(list[tuple[str p, str v, QueryResult qr]] vvuses,
 	return res;
 }
 
-public void saveVVFiles(list[tuple[str p, str v, QueryResult qr]] vvuses, 
-					    list[tuple[str p, str v, QueryResult qr]] vvcalls,
-					    list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-					    list[tuple[str p, str v, QueryResult qr]] vvnews,
-					    list[tuple[str p, str v, QueryResult qr]] vvprops,
-					    list[tuple[str p, str v, QueryResult qr]] vvcconsts,
-					    list[tuple[str p, str v, QueryResult qr]] vvscalls,
-					    list[tuple[str p, str v, QueryResult qr]] vvstargets,
-					    list[tuple[str p, str v, QueryResult qr]] vvsprops,
-					    list[tuple[str p, str v, QueryResult qr]] vvsptargets
+public void saveVVFiles(lrel[str p, str v, QueryResult qr] vvuses, 
+					    lrel[str p, str v, QueryResult qr] vvcalls,
+					    lrel[str p, str v, QueryResult qr] vvmcalls,
+					    lrel[str p, str v, QueryResult qr] vvnews,
+					    lrel[str p, str v, QueryResult qr] vvprops,
+					    lrel[str p, str v, QueryResult qr] vvcconsts,
+					    lrel[str p, str v, QueryResult qr] vvscalls,
+					    lrel[str p, str v, QueryResult qr] vvstargets,
+					    lrel[str p, str v, QueryResult qr] vvsprops,
+					    lrel[str p, str v, QueryResult qr] vvsptargets
 					   ) {
 	writeBinaryValueFile(|file:///export/scratch1/hills/temp/vvuses.bin|, vvuses);
 	writeBinaryValueFile(|file:///export/scratch1/hills/temp/vvcalls.bin|, vvcalls);
@@ -414,47 +412,48 @@ public void saveVVFiles(list[tuple[str p, str v, QueryResult qr]] vvuses,
 	writeBinaryValueFile(|file:///export/scratch1/hills/temp/vvsptargets.bin|, vvsptargets);
 }					   
 
-public tuple[list[tuple[str p, str v, QueryResult qr]] vvuses, 
-			 list[tuple[str p, str v, QueryResult qr]] vvcalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvnews,
-			 list[tuple[str p, str v, QueryResult qr]] vvprops,
-			 list[tuple[str p, str v, QueryResult qr]] vvcconsts,
-			 list[tuple[str p, str v, QueryResult qr]] vvscalls,
-			 list[tuple[str p, str v, QueryResult qr]] vvstargets,
-			 list[tuple[str p, str v, QueryResult qr]] vvsprops,
-			 list[tuple[str p, str v, QueryResult qr]] vvsptargets] loadVVFiles() {
+public tuple[lrel[str p, str v, QueryResult qr] vvuses, 
+			 lrel[str p, str v, QueryResult qr] vvcalls,
+			 lrel[str p, str v, QueryResult qr] vvmcalls,
+			 lrel[str p, str v, QueryResult qr] vvnews,
+			 lrel[str p, str v, QueryResult qr] vvprops,
+			 lrel[str p, str v, QueryResult qr] vvcconsts,
+			 lrel[str p, str v, QueryResult qr] vvscalls,
+			 lrel[str p, str v, QueryResult qr] vvstargets,
+			 lrel[str p, str v, QueryResult qr] vvsprops,
+			 lrel[str p, str v, QueryResult qr] vvsptargets] loadVVFiles() {
 	return <
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvuses.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvcalls.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvmcalls.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvnews.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvprops.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvcconsts.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvscalls.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvstargets.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvsprops.bin|),
-	readBinaryValueFile(#list[tuple[str p, str v, QueryResult qr]],|rascal://src/lang/php/serialized/vvsptargets.bin|) >;
+	readBinaryValueFile(#lrel[str p, str v, QueryResult qr],|rascal://src/lang/php/serialized/vvuses.bin|),
+	readBinaryValueFile(#lrel[str p, str v, QueryResult qr],|rascal://src/lang/php/serialized/vvcalls.bin|),
+	readBinaryValueFile(#lrel[str p, str v, QueryResult qr],|rascal://src/lang/php/serialized/vvmcalls.bin|),
+	readBinaryValueFile(#lrel[str p, str v, QueryResult qr],|rascal://src/lang/php/serialized/vvnews.bin|),
+	readBinaryValueFile(#lrel[str p, str v, QueryResult qr],|rascal://src/lang/php/serialized/vvprops.bin|),
+	readBinaryValueFile(#lrel[str p, str v, QueryResult qr],|rascal://src/lang/php/serialized/vvcconsts.bin|),
+	readBinaryValueFile(#lrel[str p, str v, QueryResult qr],|rascal://src/lang/php/serialized/vvscalls.bin|),
+	readBinaryValueFile(#lrel[str p, str v, QueryResult qr],|rascal://src/lang/php/serialized/vvstargets.bin|),
+	readBinaryValueFile(#lrel[str p, str v, QueryResult qr],|rascal://src/lang/php/serialized/vvsprops.bin|),
+	readBinaryValueFile(#lrel[str p, str v, QueryResult qr],|rascal://src/lang/php/serialized/vvsptargets.bin|) >;
 }
 
 // TODO: Change this to generate these list...
-public void generateTableFiles(list[tuple[str p, str v, QueryResult qr]] vvuses, 
-							   list[tuple[str p, str v, QueryResult qr]] vvcalls,
-							   list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-							   list[tuple[str p, str v, QueryResult qr]] vvnews,
-							   list[tuple[str p, str v, QueryResult qr]] vvprops,
-							   list[tuple[str p, str v, QueryResult qr]] vvcconsts,
-							   list[tuple[str p, str v, QueryResult qr]] vvscalls,
-							   list[tuple[str p, str v, QueryResult qr]] vvstargets,
-							   list[tuple[str p, str v, QueryResult qr]] vvsprops,
-							   list[tuple[str p, str v, QueryResult qr]] vvsptargets,
-							   map[str,set[str]] transitiveUses
+public void generateTableFiles(lrel[str p, str v, QueryResult qr] vvuses, 
+							   lrel[str p, str v, QueryResult qr] vvcalls,
+							   lrel[str p, str v, QueryResult qr] vvmcalls,
+							   lrel[str p, str v, QueryResult qr] vvnews,
+							   lrel[str p, str v, QueryResult qr] vvprops,
+							   lrel[str p, str v, QueryResult qr] vvcconsts,
+							   lrel[str p, str v, QueryResult qr] vvscalls,
+							   lrel[str p, str v, QueryResult qr] vvstargets,
+							   lrel[str p, str v, QueryResult qr] vvsprops,
+							   lrel[str p, str v, QueryResult qr] vvsptargets,
+							   map[str,set[loc]] transitiveUses,
+							   Corpus corpus
 							   ) {
-	res = showVVInfoAsLatex(vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets, transitiveUses);
+	res = showVVInfoAsLatex(vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvuses + vvcalls + vvmcalls + vvnews + vvprops + vvcconsts + vvscalls + vvstargets + vvsprops + vvsptargets, transitiveUses, corpus);
 	writeFile(|file:///ufs/hills/Documents/Papers/2012/php-icse12/vvstats.tex|, res);
 }
 
-public map[str p, real gc] resultsToGini(list[tuple[str p, str v, QueryResult qr]] res) {
+public map[str p, real gc] resultsToGini(lrel[str p, str v, QueryResult qr] res) {
 	// Overall, we want to calculate the distribution of number of hits in a file,
 	// since we want to know if the number of hits is fairly uniform across the files
 	// or is instead heavily weighted to one file. The first step to doing this
@@ -504,7 +503,7 @@ public map[str p, real gc] resultsToGini(list[tuple[str p, str v, QueryResult qr
 	return gcmap;
 }
 
-//alias ICLists = map[tuple[str product, str version] sysinfo, tuple[lrel[loc fileloc, Expr call] initial, lrel[loc fileloc, Expr call] unresolved] hits];
+alias ICLists = map[tuple[str product, str version] sysinfo, tuple[lrel[loc fileloc, Expr call] initial, lrel[loc fileloc, Expr call] unresolved] hits];
 //
 //public ICLists includesAnalysis() {
 //	corpus = getLatestVersions();
@@ -539,13 +538,13 @@ public map[str p, real gc] resultsToGini(list[tuple[str p, str v, QueryResult qr
 //	return res;
 //}
 //
-//public void saveForLater(ICLists res) {
-//	writeBinaryValueFile(|rascal://src/lang/php/serialized/includes.bin|, res);
-//}
-//
-//public ICLists reload() {
-//	return readBinaryValueFile(#ICLists, |rascal://src/lang/php/serialized/includes.bin|); 
-//}
+public void saveForLater(ICLists res) {
+	writeBinaryValueFile(|rascal://src/lang/php/serialized/includes.bin|, res);
+}
+
+public ICLists reload() {
+	return readBinaryValueFile(#ICLists, |rascal://src/lang/php/serialized/includes.bin|); 
+}
 
 // NOTE: Technically, field resolved holds info on the number of unresolved includes
 // left after all resolution attempts are made.
@@ -717,8 +716,8 @@ public str generateIncludeCountsTable(ICResult counts, map[tuple[str p, str v], 
 	return res;	
 }
 
-public void writeIncludeCountsTable(ICResult counts) {
-	writeFile(|home:///Documents/Papers/2012/php-icse12/includes.tex|, generateIncludeCountsTable(counts));
+public void writeIncludeCountsTable(ICResult counts, map[tuple[str p, str v], int] totalIncludes) {
+	writeFile(|home:///Documents/Papers/2012/php-icse12/includes.tex|, generateIncludeCountsTable(counts, totalIncludes));
 }
 
 alias MMResult = map[tuple[str p, str v], tuple[list[ClassItem] sets, list[ClassItem] gets, list[ClassItem] isSets, list[ClassItem] unsets, list[ClassItem] calls, list[ClassItem] staticCalls]];
@@ -752,7 +751,7 @@ public str magicMethodCounts(Corpus corpus, MMResult res, map[str,set[loc]] tran
 		callsSize = size(res[<p,corpus[p]>].calls);
 		staticCallsSize = size(res[<p,corpus[p]>].staticCalls);
 		allMM = res[<p,corpus[p]>].sets + res[<p,corpus[p]>].gets + res[<p,corpus[p]>].isSets + res[<p,corpus[p]>].unsets + res[<p,corpus[p]>].calls + res[<p,corpus[p]>].staticCalls;
-		hits = ( );
+		map[str, int] hits = ( );
 		for (citem <- allMM) {
 			hitloc = citem@at.path;
 			if (hitloc in hits)
@@ -792,18 +791,18 @@ alias HistInfo = rel[str p, str file, int variableVariables, int variableCalls, 
                      int variableProperties, int variableClassConsts, int variableStaticCalls, int variableStaticTargets,
                      int variableStaticProperties, int variableStaticPropertyTargets];
                      
-public HistInfo calculateHistData(list[tuple[str p, str v, QueryResult qr]] vvuses, 
-								  list[tuple[str p, str v, QueryResult qr]] vvcalls,
-								  list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-								  list[tuple[str p, str v, QueryResult qr]] vvnews,
-								  list[tuple[str p, str v, QueryResult qr]] vvprops,
-								  list[tuple[str p, str v, QueryResult qr]] vvcconsts,
-								  list[tuple[str p, str v, QueryResult qr]] vvscalls,
-								  list[tuple[str p, str v, QueryResult qr]] vvstargets,
-								  list[tuple[str p, str v, QueryResult qr]] vvsprops,
-								  list[tuple[str p, str v, QueryResult qr]] vvsptargets) 
+public HistInfo calculateHistData(lrel[str p, str v, QueryResult qr] vvuses, 
+								  lrel[str p, str v, QueryResult qr] vvcalls,
+								  lrel[str p, str v, QueryResult qr] vvmcalls,
+								  lrel[str p, str v, QueryResult qr] vvnews,
+								  lrel[str p, str v, QueryResult qr] vvprops,
+								  lrel[str p, str v, QueryResult qr] vvcconsts,
+								  lrel[str p, str v, QueryResult qr] vvscalls,
+								  lrel[str p, str v, QueryResult qr] vvstargets,
+								  lrel[str p, str v, QueryResult qr] vvsprops,
+								  lrel[str p, str v, QueryResult qr] vvsptargets) 
 {
-	rel[str p, str file] lstFiles(list[tuple[str p, str v, QueryResult qr]] vv) = { < p, qr.l.path > | <p,_,qr> <- vv };
+	rel[str p, str file] lstFiles(lrel[str p, str v, QueryResult qr] vv) = { < p, qr.l.path > | <p,_,qr> <- vv };
 	rel[str p, str file] allHits = lstFiles(vvuses) + lstFiles(vvcalls) + lstFiles(vvmcalls) + lstFiles(vvnews) +
 								   lstFiles(vvprops) + lstFiles(vvcconsts) + lstFiles(vvscalls) + lstFiles(vvstargets) +
 								   lstFiles(vvsprops) + lstFiles(vvsptargets);
@@ -812,11 +811,11 @@ public HistInfo calculateHistData(list[tuple[str p, str v, QueryResult qr]] vvus
 	rel[str p, str file] allOthers = { };
 	for (p <- lv) {
 		pt = loadBinary(p,lv[p]);
-		allOthers = allOthers + { < p, f.path > | f <- pt, <p,f.path> notin allHits }; 
+		allOthers = allOthers + { < p, f.path > | f <- pt.files, <p,f.path> notin allHits }; 
 		println("For <p>, <size(allHits[p])> hits and <size(allOthers[p])> others");
 	}
 	
-	list[QueryResult] pvQueries(list[tuple[str p, str v, QueryResult qr]] vv, str p, str v, str file) = [ qr | <p,v,qr> <- vv, file := qr.l.path ];
+	list[QueryResult] pvQueries(lrel[str p, str v, QueryResult qr] vv, str p, str v, str file) = [ qr | <p,v,qr> <- vv, file := qr.l.path ];
 	 									
 	HistInfo res = { < p, file, 
 	  size(pvQueries(vvuses, p, lv[p], file)), 
@@ -1422,7 +1421,7 @@ public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice)
 					// if we did add something, extend the nextFeatureCount as well, since that should
 					// also have grown (i.e., we cover more files now that we added more stuff into
 					// the solution set)
-					nextFeatureCount = size({*(n@transFile) | n <- nodes, n.features < solution});
+					nextFeatureCount = size({*(n@transFiles) | n <- nodes, n.features < solution});
 				}
 			} else {
 				break;
@@ -1441,13 +1440,15 @@ public CoverageMap featuresForAllPercents(FMap fmap, FeatureLattice lattice) {
 	return featuresForPercents(fmap, lattice, [1..101]);
 }
 
-public CoverageMap featuresForPercents2(FMap fmap, FeatureLattice lattice, list[int] percents) {
-	return ( p : minimumFeaturesForPercent2(fmap,lattice,p) | p <- percents );
-}
+// TODO: Check all features functions, including this, to see which are still needed, this is type incorrect
+//public CoverageMap featuresForPercents2(FMap fmap, FeatureLattice lattice, list[int] percents) {
+//	return ( p : minimumFeaturesForPercents2(fmap,lattice,p) | p <- percents );
+//}
 
-public CoverageMap featuresForAllPercents2(FMap fmap, FeatureLattice lattice) {
-	return featuresForPercents2(fmap, lattice, [1..101]);
-}
+// TODO: Check all features functions, including this, to see which are still needed, this is type incorrect
+//public CoverageMap featuresForAllPercents2(FMap fmap, FeatureLattice lattice) {
+//	return featuresForPercents2(fmap, lattice, [1..101]);
+//}
 
 private loc coverageMapLoc = baseLoc + "serialized/features/coverageMap.bin";
 
@@ -1534,8 +1535,8 @@ public str vvUsagePatternsTable(Corpus corpus) {
 	return res;	
 }
 
-public set[loc] getVVLocs(list[tuple[str p, str v, QueryResult qr]] vv) = { qr.l | <_,_,qr> <- vv };
-public set[loc] getVVLocs(str p, str v, list[tuple[str p, str v, QueryResult qr]] vv) = { qr.l | <p,v,qr> <- vv };
+public set[loc] getVVLocs(lrel[str p, str v, QueryResult qr] vv) = { qr.l | <_,_,qr> <- vv };
+public set[loc] getVVLocs(str p, str v, lrel[str p, str v, QueryResult qr] vv) = { qr.l | <p,v,qr> <- vv };
 
 @doc{Given an includes graph and a set of files, return these files plus the files that (transitively) import them.}
 public set[loc] calculateFeatureTrans(rel[loc,loc,loc] includes, set[loc] featureLocs) {
@@ -1548,16 +1549,16 @@ public set[loc] calculateFeatureTrans(rel[loc,loc,loc] includes, set[loc] featur
 }
 
 public map[str,set[loc]] calculateVVTransIncludes(
-	list[tuple[str p, str v, QueryResult qr]] vvuses, 
-	list[tuple[str p, str v, QueryResult qr]] vvcalls,
-	list[tuple[str p, str v, QueryResult qr]] vvmcalls,
-	list[tuple[str p, str v, QueryResult qr]] vvnews,
-	list[tuple[str p, str v, QueryResult qr]] vvprops,
-	list[tuple[str p, str v, QueryResult qr]] vvcconsts,
-	list[tuple[str p, str v, QueryResult qr]] vvscalls,
-	list[tuple[str p, str v, QueryResult qr]] vvstargets,
-	list[tuple[str p, str v, QueryResult qr]] vvsprops,
-	list[tuple[str p, str v, QueryResult qr]] vvsptargets,
+	lrel[str p, str v, QueryResult qr] vvuses, 
+	lrel[str p, str v, QueryResult qr] vvcalls,
+	lrel[str p, str v, QueryResult qr] vvmcalls,
+	lrel[str p, str v, QueryResult qr] vvnews,
+	lrel[str p, str v, QueryResult qr] vvprops,
+	lrel[str p, str v, QueryResult qr] vvcconsts,
+	lrel[str p, str v, QueryResult qr] vvscalls,
+	lrel[str p, str v, QueryResult qr] vvstargets,
+	lrel[str p, str v, QueryResult qr] vvsprops,
+	lrel[str p, str v, QueryResult qr] vvsptargets,
 	Corpus corpus,
 	map[tuple[str p, str v], rel[loc,loc,loc]] includes)
 {
@@ -1589,28 +1590,7 @@ public map[str,set[loc]] calculateMMTransIncludes(Corpus corpus, MMResult mmr, m
 	return transitiveFiles;
 } 
 
-public void writeIncludeBinaries(Corpus corpus) {
-	for (product <- corpus) {
-		version = corpus[product];
-		pt = loadBinary(product,version);
-		pt = resolveIncludes(pt,getCorpusItem(product,corpus[product]));
-		parsedItem = parsedDir.parent + "includes/<product>-<version>-icp.pt";
-		println("Writing binary: <parsedItem>");
-		writeBinaryValueFile(parsedItem, pt);
-	}
-}
-
-public void writeIncludeBinariesExperimental(Corpus corpus) {
-	for (product <- corpus) {
-		version = corpus[product];
-		pt = loadBinary(product,version);
-		pt = resolveIncludesWithVars(pt,getCorpusItem(product,corpus[product]));
-		parsedItem = parsedDir + "<product>-<version>-icp-exp.pt";
-		println("Writing binary: <parsedItem>");
-		writeBinaryValueFile(parsedItem, pt);
-	}
-}
-
+// TODO: Change to use new inclues analysis
 public System loadBinaryWithIncludes(str product, str version) {
 	parsedItem = parsedDir + "<product>-<version>-icp.pt";
 	println("Loading binary: <parsedItem>");
@@ -1727,21 +1707,22 @@ public map[str,set[loc]] calculateFunctionTransIncludes(Corpus corpus, FunctionU
 	return transitiveFiles;
 } 
 
-public map[str,set[str]] calculateTransIncludes(Corpus corpus, set[loc] locset)
-{
-	map[str,set[str]] transitiveFiles = ( );
-	
-	for (product <- corpus) {
-		version = corpus[product];
-		pt = loadBinaryWithIncludes(product,version);
-		corpusItemLoc = getCorpusItem(product,version);
-		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
-		transFiles = calculateFeatureTrans(ig, locset, corpusItemLoc.path);
-		transitiveFiles[product] = transFiles;
-	}
-	
-	return transitiveFiles;
-} 
+// TODO: Update to use newer includes analysis
+//public map[str,set[str]] calculateTransIncludes(Corpus corpus, set[loc] locset)
+//{
+//	map[str,set[str]] transitiveFiles = ( );
+//	
+//	for (product <- corpus) {
+//		version = corpus[product];
+//		pt = loadBinaryWithIncludes(product,version);
+//		corpusItemLoc = getCorpusItem(product,version);
+//		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
+//		transFiles = calculateFeatureTrans(ig, locset, corpusItemLoc.path);
+//		transitiveFiles[product] = transFiles;
+//	}
+//	
+//	return transitiveFiles;
+//} 
 
 public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses, map[str,set[loc]] transEvals, map[str,set[loc]] transFuses) {
 	ci = loadCountsCSV();
@@ -1751,7 +1732,7 @@ public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses, map[
 		v = corpus[p];
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
 		evalsForProduct = size(evalUses[p,v]);
-		hits = ( );
+		map[str,int] hits = ( );
 		for (<l,e> <- (evalUses[p,v]+fuses[p,v])) {
 			hitloc = l.path;
 			if (hitloc in hits)
@@ -1831,7 +1812,7 @@ public str functionUsesCounts(Corpus corpus, FunctionUses functionUses) {
 		v = corpus[p];
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
 		usesForProduct = size(functionUses[p,v]);
-		hits = ( );
+		map[str, int] hits = ( );
 		for (<l,e> <- functionUses[p,v]) {
 			hitloc = l.path;
 			if (hitloc in hits)
@@ -1890,15 +1871,15 @@ public set[Def] varargsFunctionsAndMethods(System sys) {
 	set[Def] res = { };
 	funsToFind = { "func_get_args", "func_num_args", "func_get_arg" };
 	
-	for (/f:function(fname, _, _, body) := sys.files) {
+	for (/f:function(fname, _, _, body, _) := sys.files) {
 		if (/e:call(name(name(str fn)),_) := body, fn in funsToFind) {
 			res += functionDef(fname, f, f@at);   
 		}
 	}
 	for (/c:class(cname, _, _, _, members) := sys.files) {
-		for (m:method(name, modifiers, byRef, params, body) <- members) {
+		for (m:method(mname, modifiers, byRef, params, body, rtype) <- members) {
 			if (/e:call(name(name(str fn)),_) := body, fn in funsToFind) {
-				res += methodDef(cname, name, m, m@at);   
+				res += methodDef(cname, mname, m, m@at);   
 			}
 		}
 	}
@@ -1922,7 +1903,7 @@ public rel[loc,Expr,bool] varargsCalls(System sys) {
 	// Build maps from the function names to their definitions
 	functionDefs = ( fn : d | d:functionDef(fn,_,_) <- defs );
 	systemFunctionNames = functionDefs<0>;
-	functionNames = systemFunctionNames + { fn | functionSummary([library(_),function(fn)],_,_,_,_,_) <- functionSummaries };
+	functionNames = systemFunctionNames + { getFunctionName(fpath) | functionSummary(fpath,_,_,_,_,_) <- functionSummaries };
 	
 	// Also do the same with methods -- here we collapse these into a
 	// relation for method names (since we could have multiple methods
@@ -1931,7 +1912,7 @@ public rel[loc,Expr,bool] varargsCalls(System sys) {
 	methodDefs = ( cn : ( mn : d | d:methodDef(cn,mn,_,_) <- defs ) | cn <- { cn | methodDef(cn,_,_,_) <- defs } );
 	flatMethodDefs = { < mn , d > | d:methodDef(_,mn,_,_) <- defs };
 	systemMethods = flatMethodDefs<0>;
-	methodNames = systemMethods + { mn | methodSummary([library(_),class(_),method(mn)],_,_,_,_,_,_) <- methodSummaries };
+	methodNames = systemMethods + { getMethodName(mpath) | methodSummary(mpath,_,_,_,_,_,_) <- methodSummaries };
 	
 	// Now, find calls to the varargs functions and methods. We can have standard
 	// function calls, standard method calls, and calls to static methods.
@@ -2027,7 +2008,7 @@ public str showVarArgsUses(Corpus corpus, rel[str p, str v, Def d] vaDefs, rel[s
 		v = corpus[p];
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
 		
-		hits = ( );
+		map[str, int] hits = ( );
 		for (<l,e,b> <- vaCalls[p,v]) {
 			hitloc = l.path;
 			if (hitloc in hits)
@@ -2076,7 +2057,7 @@ public str invokeFunctionUsesCounts(Corpus corpus, FunctionUses functionUses, ma
 		v = corpus[p];
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
 		usesForProduct = size(functionUses[p,v]);
-		hits = ( );
+		map[str, int] hits = ( );
 		for (<l,e> <- functionUses[p,v]) {
 			hitloc = l.path;
 			if (hitloc in hits)
@@ -2117,22 +2098,23 @@ public str invokeFunctionUsesCounts(Corpus corpus, FunctionUses functionUses, ma
 	return tbl;		
 }
 
-public map[str,set[str]] calculateVACallsTransIncludes(Corpus corpus, rel[str,str,loc,Expr,bool] vaCalls)
-{
-	map[str,set[str]] transitiveFiles = ( );
-	
-	for (product <- corpus) {
-		version = corpus[product];
-		pt = loadBinaryWithIncludes(product,version);
-		corpusItemLoc = getCorpusItem(product,version);
-		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc.path);
-		vaLocs = { l | l <- vaCalls[product, version]<0>  };
-		transFiles = calculateFeatureTrans(ig, vaLocs, corpusItemLoc.path);
-		transitiveFiles[product] = transFiles;
-	}
-	
-	return transitiveFiles;
-} 
+// TODO: Update to use new includes relation
+//public map[str,set[str]] calculateVACallsTransIncludes(Corpus corpus, rel[str,str,loc,Expr,bool] vaCalls)
+//{
+//	map[str,set[str]] transitiveFiles = ( );
+//	
+//	for (product <- corpus) {
+//		version = corpus[product];
+//		pt = loadBinaryWithIncludes(product,version);
+//		corpusItemLoc = getCorpusItem(product,version);
+//		IncludeGraph ig = extractIncludeGraph(pt, corpusItemLoc, { });
+//		vaLocs = { l | l <- vaCalls[product, version]<0>  };
+//		transFiles = calculateFeatureTrans(ig, vaLocs, corpusItemLoc.path);
+//		transitiveFiles[product] = transFiles;
+//	}
+//	
+//	return transitiveFiles;
+//} 
 
 alias TotalRes = map[tuple[str,str],set[str]];
 

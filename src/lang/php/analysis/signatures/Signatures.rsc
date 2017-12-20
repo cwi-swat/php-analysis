@@ -36,30 +36,30 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 	
 	// First, pull out all class definitions
 	classDefs = { c | /ClassDef c := scr };
-	for (class(cn,_,_,_,cis) <- classDefs) {
-		items += classSig(classPath(cn));
-		for (mt:method(mn,_,_,mps,_) <- cis) {
+	for (class(cln,_,_,_,cis) <- classDefs) {
+		items += classSig(classPath(cln));
+		for (mt:method(mn,_,_,mps,_,_) <- cis) {
 			if (buildInfo) {
 				if ( (mt@at)? ) {
-					items += methodSig(methodPath(cn, mn), [ paramInfo(mp.paramName, mp.byRef) | mp <- mps ])[@at=mt@at];
+					items += methodSig(methodPath(cln, mn), [ paramInfo(mp.paramName, mp.byRef) | mp <- mps ])[@at=mt@at];
 				} else {
-					items += methodSig(methodPath(cn, mn), [ paramInfo(mp.paramName, mp.byRef) | mp <- mps ]);
+					items += methodSig(methodPath(cln, mn), [ paramInfo(mp.paramName, mp.byRef) | mp <- mps ]);
 				}
 			} else {
 				if ( (mt@at)? ) {
-					items += methodSig(methodPath(cn, mn), size(mps))[@at=mt@at];
+					items += methodSig(methodPath(cln, mn), size(mps))[@at=mt@at];
 				} else {
-					items += methodSig(methodPath(cn, mn), size(mps));
+					items += methodSig(methodPath(cln, mn), size(mps));
 				}
 			}
 		}
-		for(constCI(consts) <- cis, const(name,ce) <- consts) {
-			items += classConstSig(classConstPath(cn, name), ce);
+		for(constCI(consts,_) <- cis, const(cn,ce) <- consts) {
+			items += classConstSig(classConstPath(cln, cn), ce);
 		}
 	}
 	
 	// Second, get all top-level functions
-	for (/f:function(fn,_,fps,_) := scr) {
+	for (/f:function(fn,_,fps,_,_) := scr) {
 		if (buildInfo) {
 			if ( (f@at)? ) {
 				items += functionSig(functionPath(fn), [ paramInfo(fp.paramName, fp.byRef) | fp <- fps ])[@at=f@at];
@@ -82,15 +82,15 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 	// that there are no includes.
 		
 	// Finally, get all defined constants
-	items += { constSig(constPath(cn),e) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e,false)]) := scr };
+	items += { constSig(constPath(cn),e) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false,false),actualParameter(e,false,false)]) := scr };
 	
 	return fileSignature(fileloc, items);
 }
 
 public Signature getScriptConstants(loc fileloc, Script scr) {
 	set[SignatureItem] items = 
-		{ classConstSig(classConstPath(cn, name), ce) | /class(cn,_,_,_,cis) := scr, constCI(consts) <- cis, const(name,ce) <- consts } +
-		{ constSig(constPath(cn),e) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(e,false)]) := scr };
+		{ classConstSig(classConstPath(cln, cn), ce) | /class(cln,_,_,_,cis) := scr, constCI(consts,_) <- cis, const(cn,ce) <- consts } +
+		{ constSig(constPath(cn),e) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false,false),actualParameter(e,false,false)]) := scr };
 	return fileSignature(fileloc, items);
 }
 		
@@ -105,8 +105,8 @@ public map[loc,Signature] getConstantSignatures(System sys) {
 public rel[SignatureItem, loc] getAllDefinedConstants(System scripts) {
 	ssigs = getSystemSignatures(scripts);
 	return { < si, l > | fileSignature(l,sis) <- ssigs<1>, 
-						 si <- sis, 
-						 constSig(cn,e) := si || classConstSig(cln,cn,e) := si };
+						 si <- sis,
+						 si is constSig || si is classConstSig };
 }
 
 public rel[SignatureItem,loc] getDefinitionsForItem(System scripts, loc itemName) {

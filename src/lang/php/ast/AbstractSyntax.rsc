@@ -25,7 +25,7 @@ public data Name = name(str name);
 
 public data NameOrExpr = name(Name name) | expr(Expr expr);
 
-public data ClassName = explicitName(Name name) | computedName(Expr expr) | anonymousClass(Stmt stmt);
+public data ClassName = explicitClassName(Name name) | computedClassName(Expr expr) | anonymousClass(Stmt stmt);
 
 public data CastType = \int() | \bool() | float() | string() | array() | object() | unset();
 	

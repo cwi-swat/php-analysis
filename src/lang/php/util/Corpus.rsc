@@ -8,10 +8,12 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::util::Corpus
 
+import lang::php::stats::Stats;
+import lang::php::util::Config;
+
 import String;
 import IO;
 import Exception;
-import lang::php::util::Config;
 import List;
 import Set;
 
@@ -181,3 +183,25 @@ public str bundleCorpusItems(map[str,str] corpus, str corpusName) {
 	}
 	return "zip -r <corpusName>.zip " + intercalate(" ", corpusPaths);
 }
+
+public map[str Product, str Version] getLatestVersionsByVersionNumber() {
+	versionsRel = loadVersionsCSV();
+	return ( p : last(vl)[0] | p <- versionsRel<0>, vl := sort([ <v,d> | <v,d,pv,_> <- versionsRel[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }) );
+}
+
+public map[str Product, str Version] getLatestPHP4VersionsByVersionNumber() {
+	versionsRel = loadVersionsCSV();
+	return ( p : last(v4l)[0] | p <- versionsRel<0>, v4l := sort([ <v,d> | <v,d,pv,_> <- versionsRel[p], "4" == pv[0] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0], t2[0]); }), !isEmpty(v4l) );
+}
+
+public map[str Product, str Version] getLatestPHP5VersionsByVersionNumber() {
+	versionsRel = loadVersionsCSV();
+	return ( p : last(v5l)[0] | p <- versionsRel<0>, v5l := sort([ <v,d> | <v,d,pv,_> <- versionsRel[p], "5" == pv[0] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }), !isEmpty(v5l) );
+}
+
+public map[str Product, str Version] getLatestVersions() = getLatestVersionsByVersionNumber();
+
+public map[str Product, str Version] getLatestPHP4Versions() = getLatestPHP4VersionsByVersionNumber();
+
+public map[str Product, str Version] getLatestPHP5Versions() = getLatestPHP5VersionsByVersionNumber();
+

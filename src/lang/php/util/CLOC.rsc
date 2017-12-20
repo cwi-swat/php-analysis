@@ -4,10 +4,13 @@ import util::ShellExec;
 import IO;
 import String;
 import List;
+
+import lang::php::ast::System;
+import lang::php::util::Corpus;
 import lang::php::util::Utils;
 
 public int phpLinesOfCode(loc l) {
-	pid = createProcess("/cwi/bin/perl", ["/ufs/hills/project/cloc/cloc-1.53.pl", "--read-lang-def=/ufs/hills/project/cloc/ld.txt", "<l.path>"]);
+	pid = createProcess("/cwi/bin/perl", args = ["/ufs/hills/project/cloc/cloc-1.53.pl", "--read-lang-def=/ufs/hills/project/cloc/ld.txt", "<l.path>"]);
 	res = readEntireStream(pid);
 	killProcess(pid);
 	if(/PHP\s+<n1:\d+>\s+<n2:\d+>\s+<n3:\d+>\s+<n4:\d+>/ := res) {
@@ -19,7 +22,8 @@ public int phpLinesOfCode(loc l) {
 }
 
 public map[loc,int] locsForProduct(str p, str v) {
-	return ( l : phpLinesOfCode(l) | l <- loadBinary(p,v) ); 
+	System s = loadBinary(p,v);
+	return ( l : phpLinesOfCode(l) | l <- s.files ); 
 }
 
 public void locsForProducts() {

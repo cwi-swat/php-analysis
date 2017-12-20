@@ -12,6 +12,7 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::analysis::signatures::Signatures;
 import lang::php::analysis::includes::IncludeGraph;
 import lang::php::ast::System;
+import lang::php::analysis::NamePaths;
 
 import Set;
 import List;
@@ -26,7 +27,7 @@ data ConstItemExp = normalConst(str constName, Expr e) | classConst(str classNam
 
 @doc{Evaluate any constants, replacing them with their assigned value in cases where 
 	 this assigned value is itself a literal.}
-public Script evalConsts(loc scriptLoc, Script scr, ConstInfo cinfo, set[IncludeGraphNode] reachable) {
+public Script evalConsts(loc scriptLoc, Script scr, ConstInfo cinfo, set[IncludeGraphNode] reachable, map[loc,Signature] sigs) {
 	// If we can reach an unknown (i.e., dynamic) include on our include path, this means
 	// we could pull in alternate definitions for the include. In this case, we just use
 	// the constMap, since that contains constants that we know are uniquely defined.
@@ -62,26 +63,28 @@ public Script evalConsts(loc scriptLoc, Script scr, ConstInfo cinfo, set[Include
 	// Get back all the constants, by name. Then, narrow this down -- only keep those where 
 	// 1) only one constant of that name is found, and
 	// 2) the definition of the constant is a constant (scalar) value.
-	rel[str,Expr] constsRel = { <cn,ce> | l <- reachableSigs, fileSignature(_,items) := reachableSigs[l], constSig([global(),const(cn)],ce) <- items };
+	rel[str,Expr] constsRel = { <getConstName(np),ce> | l <- reachableSigs, fileSignature(_,items) := reachableSigs[l], constSig(np,ce) <- items };
 	map[str,Expr] constsInScript = ( cn : ce | cn <- constsRel<0>, size(constsRel[cn]) == 1, ce:scalar(sv) := getOneFrom(constsRel[cn]), encapsed(_) !:= sv );
 
 	// Do the same as the above, but for class constants, not standard constants.
-	rel[str,str,Expr] classConstsRel = { <cln,cn,ce> | l <- reachableSigs, fileSignature(_,items) := reachableSigs[l], classConstSig([class(cln),const(cn)],ce) <- items };
-	map[str,map[str,Expr]] classConstsInScript = ( cln : ( cn : ce | cn <- classConstsRel[cln]<0>, size(classConstsRel[cln,cn]) == 1, ce:scalar(sv) := getOneFrom(classConstsRel[cln,cn]) ) | cln <- classConstsRel<0>, encapsed(_) !:= sv);
+	rel[str,str,Expr] classConstsRel = { <getClassConstClassName(np), getClassConstName(np),ce> | l <- reachableSigs, fileSignature(_,items) := reachableSigs[l], classConstSig(np,ce) <- items };
+	map[str,map[str,Expr]] classConstsInScript = ( cln : 
+		( cn : ce | cn <- classConstsRel[cln]<0>, size(classConstsRel[cln,cn]) == 1, ce:scalar(sv) := getOneFrom(classConstsRel[cln,cn]), encapsed(_) !:= sv ) 
+		| cln <- classConstsRel<0> );
 
 	// Replace constants and class constants with their defining values where possible
 	scr = visit(scr) {
 		case c:fetchClassConst(name(name(cln)), str cn) : {
-			if (cln in classConstMap && cn in classConstMap[cln]) {
-				insert(classConstMap[cln][cn][@at=c@at]);
+			if (cln in cinfo.classConstMap && cn in cinfo.classConstMap[cln]) {
+				insert(cinfo.classConstMap[cln][cn][@at=c@at]);
 			} else if (cln in classConstsInScript && cn in classConstsInScript[cln]) {
 				insert(classConstsInScript[cln][cn][@at=c@at]);
 			}
 		}
 		
 		case c:fetchConst(name(s)) : {
-			if (s in constMap) {
-				insert(constMap[s][@at=c@at]);
+			if (s in cinfo.constMap) {
+				insert(cinfo.constMap[s][@at=c@at]);
 			} else if (s in constsInScript) {
 				insert(constsInScript[s][@at=c@at]);
 			}
@@ -102,15 +105,15 @@ public set[ConstItem] getScriptConstUses(Script scr) {
 }
 
 public set[ConstItemExp] getScriptConstDefs(Script scr) =
-	{ classConst(cn, name, ce) | /class(cn,_,_,_,cis) := scr, constCI(consts) <- cis, const(name,ce) <- consts } +
-	{ normalConst(cn, ce) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false),actualParameter(ce,false)]) := scr } +
+	{ classConst(cln, cn, ce) | /class(cln,_,_,_,cis) := scr, constCI(consts,_) <- cis, const(cn,ce) <- consts } + // TODO: Do we need to worry about const modifiers?
+	{ normalConst(cn, ce) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false,false),actualParameter(ce,false,false)]) := scr } +
 	{ normalConst(cn, ce) | /Stmt::const(cl) := scr, Const::const(cn,ce) <- cl };
 
 public set[ConstItemExp] getSignatureConsts(Signature sig) {
 	set[ConstItemExp] res = { };
 	if (fileSignature(_,items) := sig) {
-		res = { classConst(cln, cn, ce) | classConstSig([class(cln),const(cn)],ce) <- items } + 
-			  { normalConst(cn, ce) | constSig([global(),const(cn)],ce) <- items };
+		res = { classConst(getClassConstClassName(np), getClassConstName(np), ce) | classConstSig(np,ce) <- items } + 
+			  { normalConst(getConstName(np), ce) | constSig(np,ce) <- items };
 	}
 	return res; 
 }
@@ -141,9 +144,10 @@ public ConstInfo getConstInfo(System sys) {
 	classConstUseLocs = getClassConstUseLocs(systemConstUses);
 	
 	map[str, Expr] constMap = ( );
-	if ("DIRECTORY_SEPARATOR" notin systemConstDefs)
+	predefined = { constName | cl <- systemConstDefs, normalConst(str constName, _) <- systemConstDefs[cl] };
+	if ("DIRECTORY_SEPARATOR" notin predefined)
 		constMap["DIRECTORY_SEPARATOR"] = scalar(string("/"));
-	if ("PATH_SEPARATOR" notin systemConstDefs)
+	if ("PATH_SEPARATOR" notin predefined)
 		constMap["PATH_SEPARATOR"] = scalar(string(":"));
 	constMap += ( cn : ce | cn <- constDefExprs, cset := { *de | l <- constDefExprs[cn], de <- constDefExprs[cn][l] }, size(cset) == 1, ce:scalar(sv) := getOneFrom(cset), encapsed(_) !:= sv );  
 
@@ -159,7 +163,7 @@ public ConstInfo getConstInfo(System sys) {
 					 constMap, classConstMap); 	
 }
 	
-public map[loc,set[ConstItem]] getSystemConstUses(System sys) = ( l : getScriptConsts(sys.files[l]) | l <- sys.files);
+public map[loc,set[ConstItem]] getSystemConstUses(System sys) = ( l : getScriptConstUses(sys.files[l]) | l <- sys.files);
 
 public map[str constName, set[loc] useLocs] getConstUseLocs(map[loc,set[ConstItem]] constUses) {
 	map[str constName, set[loc] useLocs] res = ( );

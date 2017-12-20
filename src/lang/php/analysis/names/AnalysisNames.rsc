@@ -3,6 +3,8 @@ module lang::php::analysis::names::AnalysisNames
 import lang::php::ast::AbstractSyntax;
 import lang::php::pp::PrettyPrinter;
 
+import IO;
+
 data AnalysisName
 	= nameSet(set[AnalysisName] possibleNames)
 	| fieldName(str fieldName) 
@@ -103,7 +105,7 @@ public AnalysisName computeName(Expr e) {
 		
 		default : {
 			println("WARNING: No support for the following name: <pp(e)>");
-			return unknownName();
+			return unknownVar();
 		}
 	}
 }

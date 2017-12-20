@@ -36,14 +36,14 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 			insert(c[members=members]);
 		}
 		
-		case m:method(methodName,_,_,_,body) : {
+		case m:method(methodName,_,_,_,body,_) : {
 			body = bottom-up visit(body) {
 				case s:scalar(methodConstant()) => scalar(string(methodName))[@at=s@at]
 			}
 			insert(m[body=body]);
 		}
 		
-		case f:function(funcName,_,_,body) : {
+		case f:function(funcName,_,_,body,_) : {
 			body = bottom-up visit(body) {
 				case s:scalar(funcConstant()) => scalar(string(funcName))[@at=s@at]
 			}
@@ -89,8 +89,8 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 		case s:scalar(lineConstant()) : {
 			try {
 				insert(scalar(integer(s@at.begin.line))[@at=s@at]);
-			} catch UnavailableInformation() : {
-				println("Tried to extract line number from location <s@at> with no line number information");
+			} catch UnavailableInformation(str msg2catch) : {
+				println("Tried to extract line number from location <s@at> with no line number information, <msg2catch>");
 			}
 		}
 	}
@@ -98,7 +98,7 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 }
 
 public System inlineMagicConstants(System sys, loc baseloc) {
-	return ( l : inlineMagicConstants(sys.files[l],l,baseloc) | l <- sys.files );
+	return sys[files = ( l : inlineMagicConstants(sys.files[l],l,baseloc) | l <- sys.files )];
 }
 
 public Expr inlineMagicConstants(Expr e, loc baseloc) {

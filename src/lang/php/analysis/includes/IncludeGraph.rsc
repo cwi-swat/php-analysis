@@ -58,7 +58,7 @@ public IncludeGraph extractIncludeGraph(System scripts, loc productRoot, set[Lib
 			}
 			if (scalar(string(sp)) := e) {
 				try {
-					iloc = calculateLoc(scripts.files<0>,l,productRoot,sp,true,[]);
+					iloc = calculateLoc(scripts.files<0>,l,productRoot,sp,checkFS=true,ipath=[]);
 					edgeSet += igEdge(nodeMap[l],nodeMap[iloc],iexp[expr=e]);					
 				} catch UnavailableLoc(_) : {
 					edgeSet += igEdge(nodeMap[l],unknownNode(),iexp[expr=e]);
@@ -85,7 +85,7 @@ public Graph[IncludeGraphNode] collapseToNodeGraph(IncludeGraph ig) {
 }
 
 public IncludeGraphNode nodeForLoc(IncludeGraph ig, loc l) {
-	matches = { n | n:igNode(_,l) <- ig.nodes };
+	matches = { n | n:igNode(_,l) <- ig.nodes<1> };
 	if (size(matches) > 1) throw "WARNING: We should only have one node for each location";
 	if (size(matches) == 0) throw "WARNING: We should have at least one node for each location";
 	return getOneFrom(matches);

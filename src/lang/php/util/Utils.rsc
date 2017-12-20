@@ -163,8 +163,8 @@ private System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocatio
 				phpNodes.files[e] = scr;
 			} catch IO(msg) : {
 				println("<msg>");
-			} catch Java(msg) : {
-				println("<msg>");
+			} catch Java(cls, msg) : {
+				println("<cls>:<msg>");
 			}
 		}
 	}
@@ -276,7 +276,7 @@ public void buildMissingBinaries(bool addLocationAnnotations = true, bool addUni
 public void buildNewestBinaries(bool addLocationAnnotations = true, bool addUniqueIds = false) {
 	lv = getLatestVersions();
 	for (product <- lv)
-		buildBinaries(product, lv[product], getCorpusItem(product,version), addLocationAnnotations, addUniqueIds);
+		buildBinaries(product, lv[product], getCorpusItem(product,lv[product]), addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds);
 }
 
 @doc{Load the serialized ASTs for a specific system in the corpus.}

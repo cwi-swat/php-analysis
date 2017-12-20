@@ -68,7 +68,7 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	doNodes = { < ni, s > | ni:stmtNode(s:do(_,_),_) <- inputCFG.nodes };
 	whileNodes = { < ni, s > | ni:stmtNode(s:\while(_,_),_) <- inputCFG.nodes };
 	forNodes = { < ni, s > | ni:stmtNode(s:\for(_,_,_,_),_) <- inputCFG.nodes };
-	forEachNodes = { < ni, s > | ni:stmtNode(s:\forEach(_,_,_,_,_),_) <- inputCFG.nodes };
+	forEachNodes = { < ni, s > | ni:stmtNode(s:\foreach(_,_,_,_,_),_) <- inputCFG.nodes };
 	// TODO: Add switch, which also means adding the related case...
 	// TODO: Add try/catch and try/catch/finally
 	ternaryNodes = { < ni, e > | ni:exprNode(e:ternary(_,_,_),_) <- inputCFG.nodes };
@@ -96,7 +96,7 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	
 	logMessage("<containedLocations>", 2);
 	 
-	containingStmts = { };
+	rel[CFGNode, Stmt] containingStmts = { };
 	for (< ni, s > <- predStmtNodes) {
 		if (size({ l | l <- containedLocations, l < s@at }) > 0) {
 			containingStmts = containingStmts + < ni, s >;

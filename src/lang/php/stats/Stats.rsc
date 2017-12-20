@@ -56,7 +56,7 @@ public lrel[loc fileloc, Expr call] gatherVVRefAssigns(System scripts) = gatherE
  
 @doc{Gather information on object creations with variable class names}
 public list[Expr] fetchNewUses(Script scr) = [ f | /f:new(_,_) := scr ];
-public list[Expr] fetchNewUsesVVClass(Script scr) = [ f | f:new(computedName(_),_) <- fetchNewUses(scr) ];
+public list[Expr] fetchNewUsesVVClass(Script scr) = [ f | f:new(computedClassName(_),_) <- fetchNewUses(scr) ];
 public lrel[loc fileloc, Expr call] gatherVVNews(System scripts) = gatherExprStats(scripts, fetchNewUsesVVClass);
 
 @doc{Gather information on calls where the function to call is given through a variable-variable}

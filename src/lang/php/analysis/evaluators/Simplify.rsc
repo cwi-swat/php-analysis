@@ -6,7 +6,6 @@ import lang::php::analysis::evaluators::AlgebraicSimplification;
 import lang::php::analysis::evaluators::SimulateCalls;
 import lang::php::analysis::evaluators::MagicConstants;
 import lang::php::analysis::includes::NormalizeConstCase;
-import lang::php::analysis::evaluators::DefinedConstants;
 
 @doc{Apply available normalization functions to simplify the expression}
 public Expr simplifyExpr(Expr e, loc baseLoc) {

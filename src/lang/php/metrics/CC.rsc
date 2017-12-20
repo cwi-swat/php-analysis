@@ -1,7 +1,7 @@
 module lang::php::metrics::CC
 
 import lang::php::ast::AbstractSyntax;
-import lang::php::util::System;
+import lang::php::ast::System;
 
 import List;
 

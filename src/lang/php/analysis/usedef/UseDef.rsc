@@ -24,14 +24,14 @@ data Name
 	| computedStaticPropertyName(Expr computedClassName, Expr computedPropertyName)
 	;
 
-public str printName(varName(str varName)) = "$<varName>";
-public str printName(computedName(Expr computedName)) = "{<pp(computedName)>}";
-public str printName(propertyName(Expr targetObject, str propertyName)) = "{<pp(targetObject)>}.<propertyName>";
-public str printName(computedPropertyName(Expr targetObject, Expr computedPropertyName)) = "{<pp(targetObject)>}.{<pp(computedPropertyName)>}";
-public str printName(staticPropertyName(str className, str propertyName)) = "<className>::<propertyName>";
-public str printName(computedStaticPropertyName(Expr computedClassName, str propertyName)) = "{<pp(computedClassName)>}::<propertyName>";
-public str printName(computedStaticPropertyName(str className, Expr computedPropertyName)) = "<className>::{<pp(computedPropertyName)>}";
-public str printName(computedStaticPropertyName(Expr computedClassName, Expr computedPropertyName)) = "{<pp(computedClassName)>}::{<pp(computedPropertyName)>}";
+public str printName(varName(str vname)) = "$<vname>";
+public str printName(computedName(Expr cname)) = "{<pp(cname)>}";
+public str printName(propertyName(Expr targetObject, str pname)) = "{<pp(targetObject)>}.<pname>";
+public str printName(computedPropertyName(Expr targetObject, Expr pname)) = "{<pp(targetObject)>}.{<pp(pname)>}";
+public str printName(staticPropertyName(str className, str pname)) = "<className>::<pname>";
+public str printName(computedStaticPropertyName(Expr computedClassName, str pname)) = "{<pp(computedClassName)>}::<pname>";
+public str printName(computedStaticPropertyName(str className, Expr pname)) = "<className>::{<pp(pname)>}";
+public str printName(computedStaticPropertyName(Expr computedClassName, Expr pname)) = "{<pp(computedClassName)>}::{<pp(pname)>}";
 
 data DefExpr = defExpr(Expr e) | defExprWOp(Name usedName, Expr e, Op usedOp) | inputParamDef(Name paramName) | globalDef(Name globalName);
 
@@ -43,7 +43,7 @@ public bool isDefNode(exprNode(assign(_,_),_)) = true;
 public bool isDefNode(exprNode(assignWOp(_,_,_),_)) = true;
 public bool isDefNode(exprNode(refAssign(_,_),_)) = true;
 public bool isDefNode(headerNode(global(_),_,_)) = true;
-public default bool isDefNode(_) = false;
+public default bool isDefNode(CFGNode n) = false;
 
 public list[Name] getNames(Expr n) {
 	// TODO: Add support for list_expr
@@ -63,19 +63,19 @@ public list[Name] getNames(Expr n) {
 		case propertyFetch(target, name(name(vn))) :
 			return [ propertyName(target, vn) ];
 			
-		case propertyFetch(target, Expr e) :
+		case propertyFetch(target, expr(Expr e)) :
 			return [ computedPropertyName(target, e) ];
 		
 		case staticPropertyFetch(name(name(target)), name(name(vn))) :
 			return [ staticPropertyName(target, vn) ];
 			
-		case staticPropertyFetch(name(name(target)), Expr e) :
+		case staticPropertyFetch(name(name(target)), expr(Expr e)) :
 			return [ computedStaticPropertyName(target, e) ];
 		
 		case staticPropertyFetch(expr(Expr target), name(name(vn))) :
 			return [ computedStaticPropertyName(target, vn) ];
 			
-		case staticPropertyFetch(expr(Expr target), Expr e) :
+		case staticPropertyFetch(expr(Expr target), expr(Expr e)) :
 			return [ computedStaticPropertyName(target, e) ];
 			
 		default :
@@ -103,19 +103,19 @@ public set[Name] getNestedNames(CFGNode n, set[loc] locsToFilter) {
 		case ni:propertyFetch(target, name(name(vn))) :
 			res = res + < propertyName(target, vn), ni@at >;
 			
-		case ni:propertyFetch(target, Expr e) :
+		case ni:propertyFetch(target, expr(Expr e)) :
 			res = res + < computedPropertyName(target, e), ni@at >;
 		
 		case ni:staticPropertyFetch(name(name(target)), name(name(vn))) :
 			res = res + < staticPropertyName(target, vn), ni@at >;
 			
-		case ni:staticPropertyFetch(name(name(target)), Expr e) :
+		case ni:staticPropertyFetch(name(name(target)), expr(Expr e)) :
 			res = res + < computedStaticPropertyName(target, e), ni@at >;
 		
 		case ni:staticPropertyFetch(expr(Expr target), name(name(vn))) :
 			res = res + < computedStaticPropertyName(target, vn), ni@at >;
 			
-		case ni:staticPropertyFetch(expr(Expr target), Expr e) :
+		case ni:staticPropertyFetch(expr(Expr target), expr(Expr e)) :
 			res = res + < computedStaticPropertyName(target, e), ni@at >;
 	}
 	
@@ -254,7 +254,7 @@ public Uses uses(CFG inputCFG, Defs defs) {
 		// created by this node)
 		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = defs[{ni.l | ni <- gInverted[n]}];
 		names = getNestedNames(n,locsToFilter);
-		res = res + { < n.l, name, definedAt > | name <- names, < name, _, definedAt > <- inbound };
+		res = res + { < n.l, name, definedAt > | Name name <- names, < name, _, definedAt > <- inbound };
 	}
 	
 	return res;

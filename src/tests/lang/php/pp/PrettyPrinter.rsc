@@ -120,8 +120,8 @@ private str getCodeFromFile(list[str] lines) {
 	// only get the code , discard the rest
 	str out = "";
 	for (strings <- tests[1,3..]) {
-		for (string <- strings) {
-			out += string + "\n";
+		for (s <- strings) {
+			out += s + "\n";
 		}
 	}
 	

@@ -14,6 +14,7 @@ import lang::php::analysis::evaluators::Simplify;
 import Set;
 import IO;
 import ValueIO;
+import Map;
 
 private loc infoLoc = baseLoc + "serialized/includeInfo";
 
@@ -97,7 +98,7 @@ public IncludesInfo mergeIncludesInfo(IncludesInfo ii1, IncludesInfo ii2) {
 	// which (see code above) is a scalar, non-encapsed value.
 	constMap = domainX(ii1.constMap, ii2.constMap<0>) + 
 		domainX(ii2.constMap, ii1.constMap<0>) + 
-		( s : ii1.constMap[s] | s <- ii1.constMap, s in ii2.constMap, ii1.constMap[s] == ii2.constMap[2] );
+		( s : ii1.constMap[s] | s <- ii1.constMap, s in ii2.constMap, ii1.constMap[s] == ii2.constMap[s] );
 	
 	// Build the merged class const map. The easiest way to do this is to flatten it into a relation
 	// and then put it back into a map form when possible (when the class constant only has a unique
@@ -110,7 +111,7 @@ public IncludesInfo mergeIncludesInfo(IncludesInfo ii1, IncludesInfo ii2) {
 		classConstMap[cl] = submap;
 	}
 	
-	return includesInfo(loc2consts, constRel, constMap, classConstRel);
+	return includesInfo(loc2consts, constRel, constMap, classConstMap);
 }
 
 public bool includesInfoExists(str p, str v) = includesInfoExists("<p>-<v>");

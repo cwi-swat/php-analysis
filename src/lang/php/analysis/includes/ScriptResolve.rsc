@@ -12,10 +12,10 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::util::Utils;
 import lang::php::util::LocUtils;
 import lang::php::ast::System;
+import lang::php::analysis::includes::IncludeGraph;
 import lang::php::analysis::includes::IncludesInfo;
 import lang::php::analysis::includes::MatchIncludes;
 import lang::php::analysis::includes::QuickResolve;
-import lang::php::analysis::includes::IncludeGraph;
 import lang::php::analysis::evaluators::DefinedConstants;
 import lang::php::analysis::includes::NormalizeConstCase;
 import lang::php::analysis::evaluators::AlgebraicSimplification;
@@ -120,7 +120,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	map[loc,IncludeGraphNode] nodeMap = ( l:igNode((l.scheme != "php+lib") ? substring(l.path,sizeToRemove) : l.path,l) | l <- worked );// + (|file:///synthesizedLoc/<lib.path>| : libNode(lib.name,lib.path) | lib <- libraries);	
 	set[IncludeGraphEdge] edgeSet = { };
 	for (l <- includeMap) {
-		possibleTargets = (l in quickResolved) ? quickResolved[l] : { };
+		possibleTargets = (l in quickResolved<0>) ? quickResolved[l] : { };
 		if (size(possibleTargets) == 0) {
 			// This means that no possible files could be included.
 			edgeSet += igEdge(nodeMap[l.top], unknownNode(), includeMap[l]); // TODO: Should use resolved version, just for completeness	
@@ -147,7 +147,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// a string analysis to rule this out, though, if possible.	
 	set[loc] setsIncludePath = { l | l <- worked, l.scheme != "php+lib", /call(name(name("set_include_path")),_) := sys.files[l] } +
 							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("chdir")),_) := sys.files[l] } + 
-							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("ini_set")),[actualParameter(pe,_)]) := sys.files[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
+							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("ini_set")),[actualParameter(pe,_,false)]) := sys.files[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
 	timings += < "Found <size(setsIncludePath)> locations that set the include path", now() >;
 
 	// Decorate the nodes in the include graph with info on constants and behaviors.
