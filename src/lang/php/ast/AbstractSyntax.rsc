@@ -19,7 +19,7 @@ public data ActualParameter = actualParameter(Expr expr, bool byRef, bool isPack
 	
 public data Const = const(str name, Expr constValue);
 
-public data ArrayElement = arrayElement(OptionExpr key, Expr val, bool byRef);
+public data ArrayElement = arrayElement(OptionExpr key, Expr val, bool byRef) | emptyElement();
 	 
 public data Name = name(str name);
 
@@ -73,7 +73,7 @@ public data Expr
 	| var(NameOrExpr varName)	
 	| yield(OptionExpr keyExpr, OptionExpr valueExpr)
 	| yieldFrom(Expr fromExpr)
-	| listExpr(list[OptionExpr] listExprs)
+	| listExpr(list[ArrayElement] listExprs)
 	;
 	
 
