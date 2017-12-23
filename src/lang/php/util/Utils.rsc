@@ -57,7 +57,7 @@ private Script parsePHPfile(loc f, list[str] opts, Script error) {
 		if (f.authority != "") {
 			filePath = f.authority + "/" + filePath;
 		}
-		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", (parserLoc + astToRascal).path, "-f<filePath>"] + opts, parserWorkingDir);
+		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", /*"-d short_open_tag=On",*/ (parserLoc + astToRascal).path, "-f<filePath>"] + opts, parserWorkingDir);
 	} catch RuntimeException: {
 		return error;
 	}
