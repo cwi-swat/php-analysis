@@ -33,7 +33,7 @@ public data ClosureUse = closureUse(Expr varName, bool byRef);
 
 public data IncludeType = include() | includeOnce() | require() | requireOnce();
 
-public data PHPType = nullableType(str typeName) | regularType(str typeName) | noType();
+public data PHPType = nullableType(PHPType nestedType) | regularType(Name typeName) | noType();
 
 // NOTE: In PHP, yield is a statement, but it can also be used as an expression.
 // To handle this, we just treat it as an expression. The parser does this as well.
@@ -135,7 +135,7 @@ public data Stmt
 	| tryCatch(list[Stmt] body, list[Catch] catches)
 	| tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
 	| unset(list[Expr] unsetVars)
-	| use(list[Use] uses, OptionName prefix, UseType useType)
+	| useStmt(list[Use] uses, UseType useType)
 	| \while(Expr cond, list[Stmt] body)
 	| emptyStmt()
 	| block(list[Stmt] body)
