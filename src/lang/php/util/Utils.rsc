@@ -516,3 +516,45 @@ public void removeNonFileLocs(str systemName, str systemVersion) {
 		writeBinaryValueFile(binLoc, pt, compression=false);
 	}
 }
+
+public void patchBinaries() {
+	for (systemName <- getProducts(), systemVersion <- getVersions(systemName)) {
+		patchBinaries(systemName, systemVersion);
+	}
+}
+
+public void patchBinaries(str systemName) {
+	for (systemVersion <- getVersions(systemName)) {
+		patchBinaries(systemName, systemVersion);
+	}
+}
+
+public void patchBinaries(str systemName, str systemVersion) {
+	pt = loadBinary(systemName, systemVersion);
+	
+	// Find any locations of files that did not parse correctly
+	errorLocs = { l | l <- pt.files, pt.files[l] is errscript };
+	
+	if (size(errorLocs) == 0) {
+		logMessage("No errored locations found for <systemName>, version <systemVersion>", 2);
+		return;
+	}
+	
+	fixedLocs = { };
+	
+	for (l <- errorLocs) {
+		s = loadPHPFile(l);
+		if (s is errscript) {
+			logMessage("Unable to fix script at location <l> for <systemName>, version <systemVersion>", 2);
+		} else {
+			fixedLocs += l;
+			pt.files[l] = s;
+			logMessage("Fixed script at location <l> for <systemName>, version <systemVersion>", 2);
+		}
+	}
+
+	if (size(fixedLocs) > 0) {
+		loc binLoc = parsedDir + "<systemName>-<systemVersion>.pt";
+		writeBinaryValueFile(binLoc, pt, compression=false);		
+	}
+}
