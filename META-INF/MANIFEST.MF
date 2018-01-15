@@ -3,11 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: PHPAnalysis
 Bundle-SymbolicName: PHPAnalysis
 Bundle-Version: 1.0.0
-Require-Bundle: rascal_eclipse
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: org.rascalmpl.interpreter.utils
 Export-Package: 
- lang.php.abstractions.templates,
  lang.php.analysis,
  lang.php.analysis.callgraph,
  lang.php.analysis.cfg,
@@ -16,14 +13,12 @@ Export-Package:
  lang.php.analysis.includes,
  lang.php.analysis.signatures,
  lang.php.ast,
- lang.php.core,
  lang.php.experiments.esec2013,
  lang.php.experiments.icse2013,
  lang.php.experiments.wasdett2013,
  lang.php.experiments.wcre2014,
  lang.php.extract.csvs,
  lang.php.pp,
- lang.php.resolve,
  lang.php.sdf,
  lang.php.sdf.languages.php.common,
  lang.php.sdf.languages.php.common.literals,
@@ -35,7 +30,5 @@ Export-Package:
  lang.php.semantics.shared,
  lang.php.stats,
  lang.php.syntax,
- lang.php.systems,
- lang.php.transform,
  lang.php.types,
  lang.php.util
