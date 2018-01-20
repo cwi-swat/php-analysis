@@ -24,7 +24,7 @@ public map[str lang, tuple[int lineCount, int fileCount] counts] loadCounts(str 
 	lines = readFileLines(countItem);
 	
 	for (l <- lines, /<lang:\S+>\s+<langfiles:\d+>\s+\d+\s+\d+\s+<langloc:\d+>/ := l) {
-		 res[lang] = < toInt(langfiles), toInt(langloc) >;
+		 res[lang] = < toInt(langloc), toInt(langfiles) >;
 	}
 	
 	if ("PHP" notin res) {
