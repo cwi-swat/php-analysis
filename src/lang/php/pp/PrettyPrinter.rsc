@@ -202,8 +202,8 @@ public str pp(yield(someExpr(Expr k), noExpr())) { throw "Yielding a key with no
 //  | yieldFrom(Expr fromExpr)	
 public str pp(yieldFrom(Expr f)) = "yield from <pp(f)>";
 
-//  | listExpr(list[OptionExpr] listExprs)
-public str pp(listExpr(list[OptionExpr] listExprs)) = "list(<intercalate(", ", [ pp(oe) | oe <- listExprs ])>)";
+//  | listExpr(list[ArrayElement] listExprs)
+public str pp(listExpr(list[ArrayElement] listExprs)) = "list(<intercalate(", ", [ pp(ae) | ae <- listExprs ])>)";
 
 public str pp(bitwiseAnd()) = "&";
 public str pp(bitwiseOr()) = "|";
