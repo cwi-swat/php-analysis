@@ -163,6 +163,16 @@ private set[str] superGlobalNames = { "GLOBALS", "_SERVER", "_REQUEST", "_POST",
 public Defs definitions(CFG inputCFG) {
 	g = cfgAsGraph(inputCFG);
 	gInverted = invert(g);
+	
+	map[CFGNode, set[CFGNode]] gmap = ( n : { } | n <- inputCFG.nodes );
+	map[CFGNode, set[CFGNode]] gmapInverted = ( n : { } | n <- inputCFG.nodes );
+	for (< n1, n2 > <- g) {
+		gmap[n1] = gmap[n1] + n2;
+	}
+	for ( < n1, n2 > <- gInverted) {
+		gmapInverted[n1] = gmapInverted[n1] + n2;
+	}
+	
 	map[Lab, rel[Name name, DefExpr definedAs, Lab definedAt]] resMap = ( );
 		
 	entry = getEntryNode(inputCFG);
@@ -202,7 +212,7 @@ public Defs definitions(CFG inputCFG) {
 		workset = workset - n;
 		resStart = resMap[n.l] ? {};
 		
-		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = { *(resMap[ni.l]? {}) | ni <- gInverted[n]};
+		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = { *(resMap[ni.l]? {}) | ni <- gmapInverted[n]};
 		rel[Name name, DefExpr definedAs, Lab definedAt] kills = { };
 		
 		if (isDefNode(n)) {
@@ -220,7 +230,7 @@ public Defs definitions(CFG inputCFG) {
 		resEnd = resMap[n.l] ? {};
 		
 		if (resStart != resEnd) {
-			newElements = [ gi | gi <- g[n], gi notin workset ];
+			newElements = [ gi | gi <- gmap[n], gi notin workset ];
 			worklist = newElements + worklist;
 			workset = workset + toSet(newElements);
 		}
@@ -235,6 +245,16 @@ public Defs definitions(CFG inputCFG) {
 public Uses uses(CFG inputCFG, Defs defs) {
 	g = cfgAsGraph(inputCFG);
 	gInverted = invert(g);
+
+	map[CFGNode, set[CFGNode]] gmap = ( n : { } | n <- inputCFG.nodes );
+	map[CFGNode, set[CFGNode]] gmapInverted = ( n : { } | n <- inputCFG.nodes );
+	for (< n1, n2 > <- g) {
+		gmap[n1] = gmap[n1] + n2;
+	}
+	for ( < n1, n2 > <- gInverted) {
+		gmapInverted[n1] = gmapInverted[n1] + n2;
+	}
+
 	Uses res = { };
 
 	set[loc] locsToFilter = { };
@@ -249,10 +269,14 @@ public Uses uses(CFG inputCFG, Defs defs) {
 	}
 	
 	// TODO: Remove defs, we don't want to use those as uses as well
+	map[Lab, rel[Name name, DefExpr definedAs, Lab definedAt]] defsMap = ( n.l : { } | n <- inputCFG.nodes );
+	for ( < dl, dn, da, ddl > <- defs ) {
+		defsMap[dl] += < dn, da, ddl >;
+	}
 	for (n <- inputCFG.nodes) {
 		// Grab back the definitions that reach this node (this doesn't include any that are
 		// created by this node)
-		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = defs[{ni.l | ni <- gInverted[n]}];
+		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = defsMap[n.l];
 		names = getNestedNames(n,locsToFilter);
 		res = res + { < n.l, name, definedAt > | Name name <- names, < name, _, definedAt > <- inbound };
 	}

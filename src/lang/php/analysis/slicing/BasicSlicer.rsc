@@ -14,6 +14,32 @@ import Relation;
 import IO;
 import Set;
 import List;
+import analysis::graphs::Graph;
+
+public set[CFGNode] reachableViaMap(CFG g, CFGNode n, bool star = false, bool backwards=false) {
+	map[Lab, set[Lab]] cfgMap = ( gn.l : { } | gn <- g.nodes );
+	for ( e <- g.edges) {
+		if (backwards) {
+			cfgMap[e.to] += e.from;
+		} else {
+			cfgMap[e.from] += e.to;
+		}
+	}
+
+	list[Lab] worklist = toList(cfgMap[n.l]);
+	set[Lab] worked = { };
+	set[Lab] reachable = star ? { n.l } : { };
+
+	while(size(worklist) > 0) {
+		item = worklist[0]; worklist = worklist[1..];
+		worked = worked + item;	
+		newReachable = cfgMap[item] - reachable;
+		reachable = reachable + newReachable;
+		worklist = worklist + toList(newReachable);
+	}
+	
+	return { gn | gn <- g.nodes, gn.l in reachable };
+}
 
 public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Uses u = { }) {
 	// This performs a basic slice, just using the CFG. A more precise slice,
@@ -32,11 +58,11 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	// Convert the CFG into a standard graph (binary relation). We invert
 	// it since we are taking a backwards slice.
 	forwardg = cfgAsGraph(inputCFG);
-	g = invert(forwardg);
+	//g = invert(forwardg);
 
 	// Which nodes in the CFG are reachable from the node where we are starting
 	// the slice?	
-	reachableFromN = (g*)[n];
+	reachableFromN = reachableViaMap(inputCFG, n, star=true, backwards=true);
 	
 	// Which uses do we initially care about? The slicing criteria include both the node
 	// where we start the slice and the names we are interested in; we take uses of those
@@ -134,9 +160,7 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	
 	inputCFG = transformUnlinkedConditions(inputCFG, alsoCheck=nodesToRemove);
 
-	for (n2r <- nodesToRemove) {
-		inputCFG = removeNode(inputCFG, n2r);
-	}
+	inputCFG = removeNodes(inputCFG, nodesToRemove);
 		
 	inputCFG = transformUnlinkedConditions(inputCFG);
 	
