@@ -333,36 +333,6 @@ public list[tuple[str p, str v, map[str,int] fc, map[str,int] sc, map[str,int] e
 	return res;
 }
 
-public tuple[int lineCount, int fileCount] loadCounts(str product, str version) {
-	countItem = countsDir + "<toLowerCase(product)>-<version>";
-	if (!exists(countItem))
-		countItem = countsDir + "<toLowerCase(product)>_<version>";
-	if (!exists(countItem))
-		throw "Could not find counts file for <product>-<version>";
-	lines = readFileLines(countItem);
-	if(l <- lines, /PHP\s+<phpfiles:\d+>\s+\d+\s+\d+\s+<phploc:\d+>/ := l) return < toInt(phploc), toInt(phpfiles) >; 
-	throw "Could not find PHP LOC counts for <product>-<version>";
-}
-
-public int loadCount(str product, str version) = loadCounts(product,version).lineCount;
-public int loadFileCount(str product, str version) = loadCounts(product,version).fileCount;
-
-public list[tuple[str p, str v, int count, int fileCount]] getSortedCounts() {
-	return [ <p,v,lc,fc> | p <- sort(toList(getProducts())), v <- sort(toList(getVersions(p)),compareVersion), <lc,fc> := loadCounts(p,v) ];	
-}
-
-public list[tuple[str p, str v, int count, int fileCount]] getSortedCountsCaseInsensitive() {
-	pForSort = [ < toUpperCase(p), p > | p <- getProducts() ];
-	pForSort = sort(pForSort, bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[0] < t2[0]; });
-	return [ <p,v,lc,fc> | <p2,p> <- pForSort, v <- sort(toList(getVersions(p)),compareVersion), <lc,fc> := loadCounts(p,v) ];	
-}
-
-public void writeSortedCounts() {
-	sc = getSortedCounts();
-	scLines = [ "Product,Version,LoC,Files" ] + [ "<i.p>,<i.v>,<i.count>,<i.fileCount>" | i <- sc ];
-	writeFile(|project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|, intercalate("\n",scLines));
-}
-
 public map[tuple[str product, str version], System] getLatestTrees() {
 	lv = getLatestVersions();
 	return ( <p,lv[p]> : loadBinary(p,lv[p]) | p <- lv<0> );
