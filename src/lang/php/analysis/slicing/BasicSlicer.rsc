@@ -17,7 +17,7 @@ import List;
 import analysis::graphs::Graph;
 
 public set[CFGNode] reachableViaMap(CFG g, CFGNode n, bool star = false, bool backwards=false) {
-	map[Lab, set[Lab]] cfgMap = ( gn.l : { } | gn <- g.nodes );
+	map[Lab, set[Lab]] cfgMap = ( gn.l : ( star ? { gn.l } : { } ) | gn <- g.nodes );
 	for ( e <- g.edges) {
 		if (backwards) {
 			cfgMap[e.to] += e.from;
@@ -28,7 +28,7 @@ public set[CFGNode] reachableViaMap(CFG g, CFGNode n, bool star = false, bool ba
 
 	list[Lab] worklist = toList(cfgMap[n.l]);
 	set[Lab] worked = { };
-	set[Lab] reachable = star ? { n.l } : { };
+	set[Lab] reachable = { };
 
 	while(size(worklist) > 0) {
 		item = worklist[0]; worklist = worklist[1..];
@@ -63,6 +63,7 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	// Which nodes in the CFG are reachable from the node where we are starting
 	// the slice?	
 	reachableFromN = reachableViaMap(inputCFG, n, star=true, backwards=true);
+	logMessage("Found <size(reachableFromN)> reachable nodes", 2);
 	
 	// Which uses do we initially care about? The slicing criteria include both the node
 	// where we start the slice and the names we are interested in; we take uses of those
@@ -85,9 +86,9 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	logMessage("Found <size(definingNodes)> nodes based on needed definitions", 2);
 	
 	llr = getLabelLocationRel(inputCFG);
-	for (l <- llr[{gn.l | gn <- definingNodes}]) {
-		logMessage("<l>", 2);
-	}
+	//for (l <- llr[{gn.l | gn <- definingNodes}]) {
+	//	logMessage("<l>", 2);
+	//}
 	
 	// Find all containing predicate nodes.
 	ifNodes = { < ni, s > | ni:stmtNode(s:\if(_,_,_,_),_) <- inputCFG.nodes };
@@ -116,11 +117,11 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 		containedLocations = containedLocations + n.stmt@at;
 	}
 	
-	for (< ni, s > <- predStmtNodes) {
-		logMessage("Stmt: <s@at>", 2);
-	}
+	//for (< ni, s > <- predStmtNodes) {
+	//	logMessage("Stmt: <s@at>", 2);
+	//}
 	
-	logMessage("<containedLocations>", 2);
+	//logMessage("<containedLocations>", 2);
 	 
 	rel[CFGNode, Stmt] containingStmts = { };
 	for (< ni, s > <- predStmtNodes) {
