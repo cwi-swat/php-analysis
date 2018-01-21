@@ -243,18 +243,6 @@ public Defs definitions(CFG inputCFG) {
 // be any name, or maybe any name that matches a partial patterns (for cases where part of the
 // name is given).
 public Uses uses(CFG inputCFG, Defs defs) {
-	g = cfgAsGraph(inputCFG);
-	gInverted = invert(g);
-
-	map[CFGNode, set[CFGNode]] gmap = ( n : { } | n <- inputCFG.nodes );
-	map[CFGNode, set[CFGNode]] gmapInverted = ( n : { } | n <- inputCFG.nodes );
-	for (< n1, n2 > <- g) {
-		gmap[n1] = gmap[n1] + n2;
-	}
-	for ( < n1, n2 > <- gInverted) {
-		gmapInverted[n1] = gmapInverted[n1] + n2;
-	}
-
 	Uses res = { };
 
 	set[loc] locsToFilter = { };
