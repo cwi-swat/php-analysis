@@ -243,6 +243,12 @@ public Defs definitions(CFG inputCFG) {
 // be any name, or maybe any name that matches a partial patterns (for cases where part of the
 // name is given).
 public Uses uses(CFG inputCFG, Defs defs) {
+	gInverted = invert(cfgAsGraph(inputCFG));
+	map[CFGNode, set[CFGNode]] gmapInverted = ( n : { } | n <- inputCFG.nodes );
+	for ( < n1, n2 > <- gInverted) {
+		gmapInverted[n1] = gmapInverted[n1] + n2;
+	}
+
 	Uses res = { };
 
 	set[loc] locsToFilter = { };
@@ -264,7 +270,10 @@ public Uses uses(CFG inputCFG, Defs defs) {
 	for (n <- inputCFG.nodes) {
 		// Grab back the definitions that reach this node (this doesn't include any that are
 		// created by this node)
-		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = defsMap[n.l];
+		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = { };
+		for (ni <- gmapInverted[n]) {
+			inbound = inbound + defsMap[ni.l];
+		}
 		names = getNestedNames(n,locsToFilter);
 		res = res + { < n.l, name, definedAt > | Name name <- names, < name, _, definedAt > <- inbound };
 	}
