@@ -43,6 +43,8 @@ public bool isDefNode(exprNode(assign(_,_),_)) = true;
 public bool isDefNode(exprNode(assignWOp(_,_,_),_)) = true;
 public bool isDefNode(exprNode(refAssign(_,_),_)) = true;
 public bool isDefNode(headerNode(global(_),_,_)) = true;
+public bool isDefNode(foreachAssignValue(_,_,_)) = true;
+public bool isDefNode(foreachAssignKey(_,_,_)) = true;
 public default bool isDefNode(CFGNode n) = false;
 
 public list[Name] getNames(Expr n) {
@@ -149,6 +151,14 @@ public rel[Name name, DefExpr definedAs, Lab definedAt] getDefInfo(CFGNode n) {
 		
 		case headerNode(global(el),_,_) : {
 			res = res + { < ni, globalDef(ni), n.l > | ei <- el, ni <- getNames(ei) };
+		}
+
+		case foreachAssignValue(Expr expr, Expr valExpr, Lab l) : {
+			res = res + { < ni, defExpr(expr), n.l > | ni <- getNames(valExpr) };
+		}
+		
+		case foreachAssignKey(Expr expr, Expr keyExpr, Lab l) : {
+			res = res + { < ni, defExpr(expr), n.l > | ni <- getNames(keyExpr) };
 		}
 	}
 	return res;
