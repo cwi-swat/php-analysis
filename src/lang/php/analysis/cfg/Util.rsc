@@ -5,6 +5,8 @@ import lang::php::analysis::cfg::CFG;
 import lang::php::analysis::cfg::FlowEdge;
 import lang::php::analysis::cfg::BasicBlocks;
 import lang::php::analysis::NamePaths;
+import lang::php::analysis::cfg::Label;
+import lang::php::analysis::cfg::FlowEdge;
 
 import analysis::graphs::Graph;
 import Relation;
@@ -12,6 +14,7 @@ import Set;
 import List;
 import Node;
 import Map;
+import IO;
 
 public set[CFGNode] pred(CFG cfg, CFGNode n) {
 	predlabels = { e.from | e <- cfg.edges, e.to == n@lab };
@@ -288,68 +291,46 @@ public CFG removeNode(CFG inputCFG, CFGNode n) {
 }
 
 public CFG removeNodes(CFG inputCFG, set[CFGNode] ns) {
-	// Get the edges into each node that will be removed
-	map[Lab, FlowEdges] edgesIntoAllNodes = ( n.l : { } | n <- ns ); 
-	for (e <- inputCFG.edges, e.to in edgesIntoAllNodes) {
+	// Turn the edge relation into two maps: one with edges into nodes, one
+	// with edges from nodes.
+	map[Lab, FlowEdges] edgesIntoAllNodes = ( n.l : { } | n <- inputCFG.nodes ); 
+	map[Lab, FlowEdges] edgesFromAllNodes = ( n.l : { } | n <- inputCFG.nodes );
+
+	// Populate the edge maps
+	for (e <- inputCFG.edges) {
+		edgesFromAllNodes[e.from] += e;
 		edgesIntoAllNodes[e.to] += e;
 	}
-	
-	// Get the edges from each node that will be removed
-	map[Lab, FlowEdges] edgesFromAllNodes = ( n.l : { } | n <- ns );
-	for (e <- inputCFG.edges, e.from in edgesFromAllNodes) {
-		edgesFromAllNodes[e.from] += e;
-	}
-	
-	// Keep track of the edges we will eventually remove
-	FlowEdges edgesToRemove = { };
 	
 	// Now, for each node that we will remove, link up their edges appropriately
 	for (n <- ns) {
 		// For node n, get the edges into this node
 		FlowEdges edgesInto = edgesIntoAllNodes[n.l];
-		
+
 		// For node n, get the edges from this node
 		FlowEdges edgesFrom = edgesFromAllNodes[n.l];
 		
-		// Add all these edges into the edges to remove
-		FlowEdges edgesToRemove = edgesToRemove + edgesInto + edgesFrom;
-		
-		// Compute the new edges we want to add
-		FlowEdges newEdges = { mergeEdges(e1,e2) | e1 <- edgesInto, e2 <- edgesFrom };
-		
-		// For each of the new edges, add it into the appropriate from or two
-		// maps we created above
+		// Compute the new edges we want to add; skip those that are self-loops
+		FlowEdges newEdges = { mergeEdges(e1,e2) | e1 <- edgesInto, e1.from != n.l, e2 <- edgesFrom, e2.to != n.l };
+
+		// Add the new edges into the appropriate maps
 		for (ne <- newEdges) {
-			// Add the edge into the appropriate "from" bucket
-			if (ne.from in edgesFromAllNodes) {
-				edgesFromAllNodes[ne.from] = edgesFromAllNodes[ne.from] + ne;
-			} else {
-				edgesFromAllNodes[ne.from] = { ne };
-			}
-			
-			// Add the edge into the appropriate "to" bucket
-			if (ne.to in edgesIntoAllNodes) {
-				edgesIntoAllNodes[ne.to] = edgesIntoAllNodes[ne.to] + ne;
-			} else {
-				edgesIntoAllNodes[ne.to] = { ne };
-			} 		
+			edgesFromAllNodes[ne.from] += ne;
+			edgesIntoAllNodes[ne.to] += ne;
 		}
 		
-		// For each of the "from" edges we are removing, we are already removing
-		// the "from" end, now remove the edge from the "to" part of the map
-		for (oe <- edgesFrom) {
-			if (oe.to in edgesIntoAllNodes) {
-				edgesIntoAllNodes[oe.to] = edgesIntoAllNodes[oe.to] - oe; 
-			}
+		// Remove the old edges from the appropriate maps. This is needed since we
+		// have two references to each edge: one in the from map, one in the two.
+		// So, all the "from" edges need to be removed from the appropriate "to"
+		// map items, and all the "to" edges need to be removed from the appropriate
+		// "from" map items. The only references will be left in the map elements
+		// indexed by n, which will be removed eventually.
+		for (e <- edgesInto) {
+			edgesFromAllNodes[e.from] -= e;
 		}
-		
-		// For each of the "to" edges we are removing, we are already removing
-		// the "to" end, now remove the edge from the "from" part of the map
-		for (oe <- edgesInto) {
-			if (oe.from in edgesFromAllNodes) {
-				edgesFromAllNodes[oe.from] = edgesFromAllNodes[oe.from] - oe;
-			}
-		}		
+		for (e <- edgesFrom) {
+			edgesIntoAllNodes[e.to] -= e;
+		}
 	}
 	
 	// Finally, remove the node from the into and from maps and update the nodes set
@@ -360,7 +341,7 @@ public CFG removeNodes(CFG inputCFG, set[CFGNode] ns) {
 	// Then updates the edges as well
 	consolidatedFrom = { *ef | ef <- edgesFromAllNodes<1> };
 	consolidatedTo = { *et | et <- edgesIntoAllNodes<1> };
-	inputCFG.edges = (inputCFG.edges + consolidatedFrom + consolidatedTo) - edgesToRemove;
+	inputCFG.edges = consolidatedFrom + consolidatedTo;
 
 	return inputCFG;
 }
