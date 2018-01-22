@@ -1147,7 +1147,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			Lab newLabel = incLabel();
 			Lab varLabel = incLabel(); 
 			testNode = foreachTest(arrayExpr,newLabel)[@lab=newLabel];
-			varNode = foreachAssignValue(asVar,varLabel)[@lab=varLabel];
+			varNode = foreachAssignValue(arrayExpr,asVar,varLabel)[@lab=varLabel];
 			lstate.nodes = lstate.nodes + testNode + varNode;
 			edges += iteratorEmptyFlowEdge(testNode@lab, footernode, headernode, arrayExpr);
 			
@@ -1185,7 +1185,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// and we link it to the value, else we just link the test to the value.
 			if (someExpr(keyexp) := keyvar) {
 				Lab keyLabel = incLabel();
-				keyNode = foreachAssignKey(keyexp,keyLabel)[@lab=keyLabel];
+				keyNode = foreachAssignKey(arrayExpr,keyexp,keyLabel)[@lab=keyLabel];
 				lstate.nodes = lstate.nodes + keyNode;
 				edges = edges +
 					{ iteratorNotEmptyFlowEdge(testNode@lab, ii, headernode, arrayExpr) | ii <- init(keyexp, lstate) } + 

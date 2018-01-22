@@ -36,8 +36,8 @@ data CFGNode
 	| stmtNode(Stmt stmt, Lab l)
 	| exprNode(Expr expr, Lab l)
 	| foreachTest(Expr expr, Lab l)
-	| foreachAssignKey(Expr expr, Lab l)
-	| foreachAssignValue(Expr expr, Lab l)
+	| foreachAssignKey(Expr expr, Expr keyExpr, Lab l)
+	| foreachAssignValue(Expr expr, Expr valExpr, Lab l)
 	| headerNode(Stmt stmt, Lab footer, Lab l)
 	| headerNode(Expr expr, Lab footer, Lab l)
 	| footerNode(Stmt stmt, Lab header, Lab l)
@@ -59,8 +59,8 @@ public str printCFGNode(methodExit(str cn, str mn, _)) = "Exit: <cn>::<mn>";
 public str printCFGNode(scriptEntry(_)) = "Entry";
 public str printCFGNode(scriptExit(_)) = "Exit";
 public str printCFGNode(foreachTest(Expr expr, Lab l)) = "Iteration Test";
-public str printCFGNode(foreachAssignKey(Expr expr, Lab l)) = "Assign Foreach Key <pp(expr)>";
-public str printCFGNode(foreachAssignValue(Expr expr, Lab l)) = "Assign Foreach Value <pp(expr)>";
+public str printCFGNode(foreachAssignKey(Expr expr, Expr keyExpr, Lab l)) = "Assign Foreach Key <pp(keyExpr)>";
+public str printCFGNode(foreachAssignValue(Expr expr, Expr valExpr, Lab l)) = "Assign Foreach Value <pp(valExpr)>";
 public str printCFGNode(headerNode(Expr e,_,Lab l)) = "header: <getName(e)>";
 public str printCFGNode(headerNode(Stmt s,_,Lab l)) = "header: <getName(s)>";
 public str printCFGNode(footerNode(Expr e,_,Lab l)) = "footer: <getName(e)>";
