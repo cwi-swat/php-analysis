@@ -1174,8 +1174,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// we exhaust the array.
 			edges += { flowEdge(fe, varLabel) | fe <- final(asVar, lstate) };
 			if (size(body) > 0) {
-				edges += { backEdge(varLabel, fi) | fi <- init(head(body), lstate) };
-				edges += { flowEdge(fe, testNode@lab) | fe <- final(last(body), lstate) };
+				edges += { flowEdge(varLabel, fi) | fi <- init(head(body), lstate) };
+				edges += { backEdge(fe, testNode@lab) | fe <- final(last(body), lstate) };
 			} else {
 				edges += flowEdge(varLabel, testNode@lab);
 			}
