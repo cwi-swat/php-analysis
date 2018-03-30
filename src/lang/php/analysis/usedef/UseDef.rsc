@@ -14,7 +14,8 @@ import Set;
 import List;
 
 data Name 
-	= varName(str varName) 
+	= varName(str varName)
+	| elementName(str varName, str indexName) 
 	| computedName(Expr computedName)
 	| propertyName(Expr targetObject, str propertyName)
 	| computedPropertyName(Expr targetObject, Expr computedPropertyName)
@@ -25,6 +26,7 @@ data Name
 	;
 
 public str printName(varName(str vname)) = "$<vname>";
+public str printName(elementName(str vname, str indexName)) = "$<vname>[\'<indexName>\']";
 public str printName(computedName(Expr cname)) = "{<pp(cname)>}";
 public str printName(propertyName(Expr targetObject, str pname)) = "{<pp(targetObject)>}.<pname>";
 public str printName(computedPropertyName(Expr targetObject, Expr pname)) = "{<pp(targetObject)>}.{<pp(pname)>}";
@@ -47,18 +49,33 @@ public bool isDefNode(foreachAssignValue(_,_,_)) = true;
 public bool isDefNode(foreachAssignKey(_,_,_)) = true;
 public default bool isDefNode(CFGNode n) = false;
 
+private set[str] superGlobalNames = { "GLOBALS", "_SERVER", "_REQUEST", "_POST", "_GET", "_FILES", "_ENV", "_COOKIE", "_SESSION" };
+
 public list[Name] getNames(Expr n) {
 	// TODO: Add support for list_expr
 	switch(n) {
 		case var(name(name(vn))) :
 			return [ varName(vn) ];
 		
-		case fetchArrayDim(var(name(name(vn))),_) :
-			return [ varName(vn) ];
-			
 		case var(expr(Expr e)) :
 			return [ computedName(e) ];
 		
+		case fetchArrayDim(var(name(name(vn))), noExpr()) :
+			return [ varName(vn) ];
+			
+		case fetchArrayDim(var(name(name(vn))),someExpr(idx)) : {
+			// If we have an array and a scalar string index, we treat this specially
+			// so the analysis can differentiate different array elements.
+			// NOTE: At this point, we only do this for superglobals
+			// TODO: It would be good to enable this for all arrays, but we need enough type
+			// information to know which names reference arrays and/or array elements.
+			if (scalar(string(idxname)) := idx && vn in superGlobalNames) {
+				return [ elementName(vn,idxname) ];
+			} else {
+				return [ varName(vn) ];
+			}
+		}
+			
 		case fetchArrayDim(var(expr(Expr e)),_) :
 			return [ computedName(e) ];
 		
@@ -93,9 +110,16 @@ public set[Name] getNestedNames(CFGNode n, set[loc] locsToFilter) {
 		case ni:var(name(name(vn))) :
 			res = res + < varName(vn), ni@at >;
 		
-		case ni:fetchArrayDim(var(name(name(vn))),_) :
+		case ni:fetchArrayDim(var(name(name(vn))),noExpr()) :
 			res = res + < varName(vn), ni@at >;
 			
+		case ni:fetchArrayDim(var(name(name(vn))),someExpr(idx)) :
+			if (scalar(string(idxname)) := idx && vn in superGlobalNames) {
+				res = res + < elementName(vn,idxname), ni@at >;
+			} else {
+				res = res + < varName(vn), ni@at >;
+			}
+
 		case ni:var(expr(Expr e)) :
 			res = res + < computedName(e), ni@at >;
 		
@@ -164,8 +188,6 @@ public rel[Name name, DefExpr definedAs, Lab definedAt] getDefInfo(CFGNode n) {
 	return res;
 }
 
-private set[str] superGlobalNames = { "GLOBALS", "_SERVER", "_REQUEST", "_POST", "_GET", "_FILES", "_ENV", "_COOKIE", "_SESSION" };
-
 // TODO: This does not properly handle computed names, such as variable variables.
 // TODO: For properties, we should kill all properties of the same name when one is
 // defined unless we can verify that the targets are disjoint. Currently properties
@@ -186,10 +208,17 @@ public Defs definitions(CFG inputCFG) {
 	map[Lab, rel[Name name, DefExpr definedAs, Lab definedAt]] resMap = ( );
 		
 	entry = getEntryNode(inputCFG);
-	usedSuperGlobalNames = { sgn | sgn <- superGlobalNames, /var(name(name(sgn))) := inputCFG.nodes };
-	resMap[entry.l] = { < varName(sgn), globalDef(varName(sgn)), entry.l >  | sgn <- usedSuperGlobalNames };
 	
-	// Introduce the names for the parameters
+	// Pull out both the bare superglobal names (e.g., $_REQUEST) and any literal index used with the
+	// superglobal arrays (e.g., $_REQUEST['first_name']). We add these as defs in the entry node,
+	// since they are provided globally and so are already defined.
+	usedSuperGlobalNames = { sgn | sgn <- superGlobalNames, /var(name(name(sgn))) := inputCFG.nodes };
+	usedIndexedNames = { < vn, idxname > | /fetchArrayDim(var(name(name(vn))),someExpr(scalar(string(idxname)))) := inputCFG.nodes, vn in usedSuperGlobalNames };
+	resMap[entry.l] = { < varName(sgn), globalDef(varName(sgn)), entry.l >  | sgn <- usedSuperGlobalNames }
+					+ { < elementName(sgn, idxname), globalDef(elementName(sgn, idxname)), entry.l > | < sgn, idxname > <- usedIndexedNames };
+	
+	// Introduce the names for any parameters and add them as defs in the entry node, since they
+	// are actually defined automatically by the function.
 	if (entry is functionEntry || entry is methodEntry) {
 		// Grab out all the parameter nodes
 		actualProvidedNodes = { n | n <- inputCFG.nodes, n is actualProvided };
@@ -229,8 +258,15 @@ public Defs definitions(CFG inputCFG) {
 			kills = getDefInfo(n);
 		}
 		
+		// We are trying to distinguish different named array indices for precision. If we have a kill
+		// of the array name without an index, this kills all the inbound individual named indices,
+		// so we take those out of inbound here: killedNames is all names we kill, killedIndexedNames
+		// is all inbound array element names where the name, without index, is also killed, and
+		// remainingInbound is all inbound names that are not killed in this way
+		directKills = { ni.name | ni <- kills };
+		indirectKills = { ni.name | ni <- inbound, elementName(vn,_) := ni.name, varName(vn) in directKills };
 		
-		tempRel = { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- inbound, ni.name notin kills.name } 
+		tempRel = { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- inbound, ni.name notin (directKills + indirectKills) } 
 			    + { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- kills };
 			    
 		for (l <- tempRel<0>) {
@@ -272,7 +308,6 @@ public Uses uses(CFG inputCFG, Defs defs) {
 		}
 	}
 	
-	// TODO: Remove defs, we don't want to use those as uses as well
 	map[Lab, rel[Name name, DefExpr definedAs, Lab definedAt]] defsMap = ( n.l : { } | n <- inputCFG.nodes );
 	for ( < dl, dn, da, ddl > <- defs ) {
 		defsMap[dl] += < dn, da, ddl >;
