@@ -63,19 +63,19 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	// Which nodes in the CFG are reachable from the node where we are starting
 	// the slice?	
 	reachableFromN = reachableViaMap(inputCFG, n, star=true, backwards=true);
-	logMessage("Found <size(reachableFromN)> reachable nodes", 2);
+	//logMessage("Found <size(reachableFromN)> reachable nodes", 2);
 	
 	// Which uses do we initially care about? The slicing criteria include both the node
 	// where we start the slice and the names we are interested in; we take uses of those
 	// names, which indicate the definitions that are important to the slice. 
 	rel[Name name, Lab definedAt] importantUses = { ui | tuple[Name name, Lab definedAt] ui <- u[n.l], ui.name in names };
-	logMessage("Found <size(importantUses)> important uses:\n<importantUses>", 2);
+	//logMessage("Found <size(importantUses)> important uses:\n<importantUses>", 2);
 	solve(importantUses) {
 		// Now, we compute a fixpoint, extending the set with the uses which contributed to the
 		// uses we already know about. When this terminates, we will have the uses, indicating
 		// the important definitions, for all the names that contribute to the query. 
 		importantUses = importantUses + { ui | l <- importantUses.definedAt, tuple[Name name, Lab definedAt] ui <- u[l] };
-		logMessage("Found <size(importantUses)> important uses:\n<importantUses>", 2);
+		//logMessage("Found <size(importantUses)> important uses:\n<importantUses>", 2);
 	}
 	
 	// The important uses indicate the labels of the nodes that define each use. We need to keep each of these
@@ -83,7 +83,7 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	// predicates/conditionals that contain these nodes (step 3).
 	definingLabels = importantUses.definedAt;
 	definingNodes = { gn | gn <- reachableFromN, gn.l in definingLabels };
-	logMessage("Found <size(definingNodes)> nodes based on needed definitions", 2);
+	//logMessage("Found <size(definingNodes)> nodes based on needed definitions", 2);
 	
 	llr = getLabelLocationRel(inputCFG);
 	//for (l <- llr[{gn.l | gn <- definingNodes}]) {
