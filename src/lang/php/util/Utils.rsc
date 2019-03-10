@@ -251,6 +251,19 @@ public void buildBinaries(bool addLocationAnnotations = true, bool addUniqueIds 
 	}
 }
 
+@doc{Build the serialized ASTs for the current version specific system at a specific location}
+public void buildCurrent(str product, loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
+	str version = "current";
+	buildBinaries(product, version, l, addLocationAnntations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
+}
+
+@doc{Build the serialized ASTs for all product/version combos in the corpus}
+public void buildCurrent(loc rootLoc, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
+	for (l <- rootLoc.ls, isDirectory(l)) {
+		buildCurrent(l.file, rootLoc + l.file, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
+	}
+}
+
 @doc{Build the serialized ASTs for a specific system if they have not been built already}
 public void buildMissingBinaries(str product, str version, bool addLocationAnnotations = true, bool addUniqueIds = false) {
 	loc l = getCorpusItem(product,version);
