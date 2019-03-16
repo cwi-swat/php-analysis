@@ -34,11 +34,21 @@ public map[PageType,loc] getDBLibraryPages() = getLibraryPages(dbVendorStart);
 
 public map[PageType,loc] getAllLibraryPages() = getLibraryPages() + getDBLibraryPages();
 
+private node getHTMLFile(loc fileLoc) {
+	while(true) {
+		try {
+			return readHTMLFile(fileLoc);
+		} catch v : {
+			println("Warning, exception: <v>");
+		}
+	}  
+}
+
 public map[PageType,loc] getLibraryPages(loc startingLoc) {
 	map[PageType,loc] pathPages = ( );
 	
 	// First, get back the root of the library documentation
-	node srctxt = readHTMLFile(startingLoc);
+	node srctxt = getHTMLFile(startingLoc);
 	
 	// Now, extract out the names of the "books", which are the starting points for
 	// the descriptions of the various libraries
@@ -50,7 +60,7 @@ public map[PageType,loc] getLibraryPages(loc startingLoc) {
 	for (book <- books, str bookhref := getKeywordParameters(book)["href"]) {
 	//for (book <- books, str bookhref := getKeywordParameters(book)["href"], limiter < 10, "a"(["text"(bn)]) := book, /Cairo/ := bn) {
 		bookloc = startingLoc.parent + bookhref;
-		booktxt = readHTMLFile(bookloc);
+		booktxt = getHTMLFile(bookloc);
 		bookname = "";
 		if ("a"(["text"(bn),*_]) := book)
 			bookname = bn;
@@ -113,7 +123,7 @@ public map[PageType,loc] getLibraryPages(loc startingLoc) {
 
 public set[Summary] extractFunctionSummary(str bookname, str functionName, loc functionLoc) {
 	println("<bookname>: Extracting summaries for function <functionName> from path <functionLoc.path>");
-	node ftxt = readHTMLFile(functionLoc);
+	node ftxt = getHTMLFile(functionLoc);
 	str httpishName = replaceAll(functionName,"_","-");
 	set[node] matches = { n | /node n := ftxt, getName(n) == "div", "id" in getKeywordParameters(n), getKeywordParameters(n)["id"] == "function.<httpishName>" };
 	if (size(matches) == 0) {
@@ -217,7 +227,7 @@ public set[Summary] extractConstantSummary(str bookname, loc constantLoc) {
 	set[str] alreadyFound = { };
 
 	try {
-		node ctxt = readHTMLFile(constantLoc);
+		node ctxt = getHTMLFile(constantLoc);
 		
 		for (/str s(list[node] cl) := ctxt,
 			 s in {"dt","td","span" }, 
@@ -254,7 +264,7 @@ public set[Summary] extractConstantSummary(str bookname, loc constantLoc) {
 
 public set[Summary] extractClassSummary(str bookname, str className, loc classLoc) {
 	println("<bookname>: Extracting summaries for class <className> from path <classLoc.path>");
-	node ctxt = readHTMLFile(classLoc);
+	node ctxt = getHTMLFile(classLoc);
 	set[Summary] summaries = { };
 	
 	extendsSet = { cn | /node n:"span"([node m:"span"(["text"(str ext)]), _*, "a"(["text"(str cn)]), _*]) := ctxt,
@@ -338,7 +348,7 @@ public set[Summary] extractClassSummary(str bookname, str className, loc classLo
 
 public set[Summary] extractMethodSummary(str bookname, str className, str methodName, loc methodLoc) {
 	println("<bookname>: Extracting summaries for method <className>::<methodName> from path <methodLoc.path>");
-	node mtxt = readHTMLFile(methodLoc);
+	node mtxt = getHTMLFile(methodLoc);
 	str httpishName = "<toLowerCase(className)>.";
 	set[Summary] summaries = { };
 	bool ooMode = true;
