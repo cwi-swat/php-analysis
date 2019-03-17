@@ -633,6 +633,10 @@ public set[Lab] init(Expr e, LabelState lstate) {
 			return { e@lab };
 		}
 		
+		case yieldFrom(Expr fromExpr) : {
+			return init(fromExpr, lstate);
+		}
+		
 		default: {
 			println("Unhandled expression <e>");
 			return { };
