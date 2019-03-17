@@ -49,6 +49,15 @@ public str getFunctionName(loc functionPath) {
 	}
 }
 
+@doc{Create name paths for a closure, with or without an explicit namespace}
+public loc closurePath(loc closureLoc, str library="", str namespace="") =
+	addLibrary(|php+closure:///<cleanString(closureLoc.file)>/<closureLoc.offset>/<closureLoc.length>|,library) when size(trim(namespace)) == 0;
+public loc closurePath(loc closureLoc, str library="", str namespace="") = 
+	addLibrary(|php+closure:///<cleanString(namespace)>/<cleanString(closureLoc.file)>/<closureLoc.offset>/<closureLoc.length>|,library) when size(trim(namespace)) > 0;
+
+@doc{Check to see if the provided path is for a PHP closure}
+public bool isClosurePath(loc path) = path.scheme == "php+closure";
+	
 @doc{Create name paths for a regular constant, with or without an explicit namespace}
 public loc constPath(str cname, str library="", str namespace="") = 
 	addLibrary(|php+constant:///<cleanString(cname)>|,library) when size(trim(namespace)) == 0;

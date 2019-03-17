@@ -31,6 +31,8 @@ data CFGNode
 	| functionExit(str functionName, Lab l)
 	| methodEntry(str className, str methodName, Lab l)
 	| methodExit(str className, str methodName, Lab l)
+	| closureEntry(str fileName, int offset, int length, Lab l)
+	| closureExit(str fileName, int offset, int length, Lab l)
 	| scriptEntry(Lab l)
 	| scriptExit(Lab l)
 	| stmtNode(Stmt stmt, Lab l)
@@ -56,6 +58,8 @@ public str printCFGNode(functionEntry(str fn ,_)) = "Entry: <fn>";
 public str printCFGNode(functionExit(str fn, _)) = "Exit: <fn>";
 public str printCFGNode(methodEntry(str cn, str mn, _)) = "Entry: <cn>::<mn>";
 public str printCFGNode(methodExit(str cn, str mn, _)) = "Exit: <cn>::<mn>";
+public str printCFGNode(closureEntry(str fn, int offset, int len, _)) = "Entry: <fn>,<offset>,<len>";
+public str printCFGNode(closureExit(str fn, int offset, int len, _)) = "Exit: <fn>,<offset>,<len>";
 public str printCFGNode(scriptEntry(_)) = "Entry";
 public str printCFGNode(scriptExit(_)) = "Exit";
 public str printCFGNode(foreachTest(Expr expr, Lab l)) = "Iteration Test";
@@ -83,7 +87,7 @@ public Graph[CFGNode] cfgAsGraph(CFG cfg) {
 }
 
 @doc{Given a node, determine if it is an entry node.}
-public bool isEntryNode(CFGNode n) = (n is functionEntry) || (n is methodEntry) || (n is scriptEntry);
+public bool isEntryNode(CFGNode n) = (n is functionEntry) || (n is methodEntry) || (n is scriptEntry) || (n is closureEntry);
 
 @doc{Get the unique entry node for the CFG.}
 public CFGNode getEntryNode(CFG g) {
@@ -95,7 +99,7 @@ public CFGNode getEntryNode(CFG g) {
 }
 
 @doc{Given a node, determine if it is an exit node.}
-public bool isExitNode(CFGNode n) = (n is functionExit) || (n is methodExit) || (n is scriptExit);
+public bool isExitNode(CFGNode n) = (n is functionExit) || (n is methodExit) || (n is scriptExit) || (n is closureExit);
 
 @doc{Get the unique exit node for the CFG.}
 public CFGNode getExitNode(CFG g) {
