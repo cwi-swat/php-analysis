@@ -551,13 +551,6 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		
 		case clone(Expr expr) : return init(expr, lstate);
 		
-		// TODO: Add support for closures -- we should probably give them
-		// anonymous names and create independent CFGs for them as well
-		case closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static, _) : {
-			println("WARNING: Closures not yet fully supported");
-			return { e@lab };
-		}
-		
 		case fetchConst(Name name) : return { e@lab };
 		
 		case empty(Expr expr) : return init(expr, lstate);
