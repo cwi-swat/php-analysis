@@ -629,6 +629,10 @@ public set[Lab] init(Expr e, LabelState lstate) {
 			return isEmpty(actualExprs) ? { e@lab } : init(head(actualExprs), lstate);
 		}
 		
+		case closure(_,_,_,_,_,_) : {
+			return { e@lab };
+		}
+		
 		default: {
 			println("Unhandled expression <e>");
 			return { };
