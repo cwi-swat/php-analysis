@@ -258,10 +258,8 @@ public void buildCurrent(str product, loc l, bool addLocationAnnotations = true,
 }
 
 @doc{Build the serialized ASTs for all product/version combos in the corpus}
-public void buildCurrent(loc rootLoc, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
-	for (l <- rootLoc.ls, isDirectory(l)) {
-		buildCurrent(l.file, rootLoc + l.file, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
-	}
+public void buildCurrent(loc systemLoc, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
+	buildCurrent(systemLoc.file, systemLoc, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
 }
 
 @doc{Build the serialized ASTs for a specific system if they have not been built already}
