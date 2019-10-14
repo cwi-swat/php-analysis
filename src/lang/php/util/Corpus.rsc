@@ -156,12 +156,16 @@ public bool compareVersion(str v1, str v2) {
 			println("Error, cannot convert <b1> to an int");
 			throw "AAAAAAAAAAAAAAAA";
 		}
+	} else if (/0*<a1:\d+>/ := v1) {
+		v1a = toInt(a1);
 	}
 	
 	if(/<a1:\d+>[.]<b1:\d+>[.]<c1:\d+>/ := v2) {
 		v2a = toInt(a1); v2b = toInt(b1); v2c = toInt(c1);
 	} else if(/<a1:\d+>[.]<b1:\d+>/ := v2) {
 		v2a = toInt(a1); v2b = toInt(b1);
+	} else if (/0*<a1:\d+>/ := v2) {
+		v2a = toInt(a1);
 	}
 	
 	if (v1a < v2a) return true;
