@@ -15,14 +15,14 @@ import lang::php::util::Config;
 
 import IO;
 import ValueIO;
-import util::ValueUI;
+// import util::ValueUI;
 import String;
 import Set;
 import List;
 import Exception;
 import DateTime;
 import util::ShellExec;
-import util::Resources;
+// import util::Resources;
 import Map;
 
 import lang::php::pp::PrettyPrinter;
@@ -134,13 +134,8 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	return res;
 }
 
-@doc{Load all PHP files at a given directory location using the default loader.}
-public System loadPHPFiles(loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) throws AssertionFailed {
-	return loadPHPFiles(l, loadPHPFile, addLocationAnnotations = addLocationAnnotations, addUniqueIds = addUniqueIds, extensions = extensions);
-}
-
-@doc{Load all PHP files at a given directory location, with options for which extensions are PHP files, which loader to use, location annotations and unique node ids.}
-private System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) throws AssertionFailed {
+@doc{Load all PHP files at a given directory location, with options for which extensions are PHP files, location annotations, and unique node ids.}
+private System loadPHPFiles(loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) throws AssertionFailed {
 
 	if ((l.scheme == "file" || l.scheme == "home") && !exists(l)) throw AssertionFailed("Location <l> does not exist");
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
@@ -159,7 +154,7 @@ private System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocatio
 		logMessage("<((folderCounter * 100) / folderTotal)>% [<folderCounter>/<folderTotal>] Parsing <size(phpEntries)> files in directory: <l>", 2);
 		for (e <- phpEntries) {
 			try {
-				Script scr = loader(e, addLocationAnnotations, addUniqueIds);
+				Script scr = loadPHPFile(e, addLocationAnnotations, addUniqueIds);
 				phpNodes.files[e] = scr;
 			} catch IO(msg) : {
 				println("<msg>");
@@ -170,7 +165,7 @@ private System loadPHPFiles(loc l, Script(loc,bool,bool) loader, bool addLocatio
 	}
 	
 	for (d <- dirEntries) {
-		newNodes = loadPHPFiles(d, loader, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
+		newNodes = loadPHPFiles(d, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 		phpNodes.files = phpNodes.files + newNodes.files;
 	}
 	

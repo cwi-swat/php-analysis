@@ -1,1 +1,4 @@
-Source: src
+Project-Name: PHPAir
+Source: src/main/rascal
+Require-Libraries: 
+    
