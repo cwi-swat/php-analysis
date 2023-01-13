@@ -35,7 +35,7 @@ public Script evalConsts(loc scriptLoc, Script scr, ConstInfo cinfo, set[Include
 	usedConsts = cinfo.systemConstUses[scriptLoc];
 
 	if (unknownNode() in reachable) {
-		//println("A dynamic include is reachable from <head(scr.body)@at.path>, using unique constants");
+		//println("A dynamic include is reachable from <head(scr.body).at.path>, using unique constants");
 		for (usedConst <- usedConsts) {
 			if (normalConst(cn) := usedConst && cn in cinfo.constMap)
 				replacements[usedConst] = cinfo.constMap[cn];
@@ -76,17 +76,17 @@ public Script evalConsts(loc scriptLoc, Script scr, ConstInfo cinfo, set[Include
 	scr = visit(scr) {
 		case c:fetchClassConst(name(name(cln)), str cn) : {
 			if (cln in cinfo.classConstMap && cn in cinfo.classConstMap[cln]) {
-				insert(cinfo.classConstMap[cln][cn][@at=c@at]);
+				insert(cinfo.classConstMap[cln][cn][at=c.at]);
 			} else if (cln in classConstsInScript && cn in classConstsInScript[cln]) {
-				insert(classConstsInScript[cln][cn][@at=c@at]);
+				insert(classConstsInScript[cln][cn][at=c.at]);
 			}
 		}
 		
 		case c:fetchConst(name(s)) : {
 			if (s in cinfo.constMap) {
-				insert(cinfo.constMap[s][@at=c@at]);
+				insert(cinfo.constMap[s][at=c.at]);
 			} else if (s in constsInScript) {
-				insert(constsInScript[s][@at=c@at]);
+				insert(constsInScript[s][at=c.at]);
 			}
 		}
 	}

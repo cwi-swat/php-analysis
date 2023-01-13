@@ -26,7 +26,7 @@ public bool containsVV(someExpr(Expr e)) = size({ v | /v:var(expr(Expr ev)) := e
 public bool containsVV(noExpr()) = false;
 
 public lrel[loc fileloc, Expr call] gatherExprStats(System scripts, list[Expr](Script) f) {
-	return [ < e@at, e > | l <- scripts.files<0>, e <- f(scripts.files[l]) ];
+	return [ < e.at, e > | l <- scripts.files<0>, e <- f(scripts.files[l]) ];
 }
 
 @doc{Gather information on uses of class constants where the class name is given using a variable-variable}

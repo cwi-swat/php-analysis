@@ -32,10 +32,10 @@ public CallGraph computeSystemCallGraph(System s) {
 	rel[str methodName, CallTarget callTargets] methodTargets = { };
 	for (fileSignature(fileloc, items) <- sysSignatures<1>) {
 		for (fs <- items, fs is functionSig) {
-			functionTargets += < fs.namepath.file, functionTarget(fs.namepath.file, fs@at) >;
+			functionTargets += < fs.namepath.file, functionTarget(fs.namepath.file, fs.at) >;
 		}
 		for (ms <- items, ms is methodSig) {
-			methodTargets += < ms.namepath.file, methodTarget(ms.namepath.parent.file, ms.namepath.file, ms@at) >;
+			methodTargets += < ms.namepath.file, methodTarget(ms.namepath.parent.file, ms.namepath.file, ms.at) >;
 		}
 	}
 		 
@@ -81,51 +81,51 @@ public CallGraph computeScriptCallGraph(Script s, map[str functionName, set[Call
 				// call_user_func_array, even though we could create those edges as well.
 				if ([actualParameter(scalar(string(fn2)),_,_)] := ps) {
 					if (fn in functionTargetsMap) {
-						res = res + ( { c@at } join functionTargetsMap[fn] ); 
+						res = res + ( { c.at } join functionTargetsMap[fn] ); 
 					} else {
-						res = res + < c@at, unknownTarget(fn) >;
+						res = res + < c.at, unknownTarget(fn) >;
 					}
 				} else {
-					res = res + ( { c@at} join allFunctions );
+					res = res + ( { c.at} join allFunctions );
 				}
 			} else if (fn in functionTargetsMap) {
-				res = res + ( { c@at } join functionTargetsMap[fn] );
+				res = res + ( { c.at } join functionTargetsMap[fn] );
 			} else {
-				res = res + < c@at, unknownTarget(fn) >;
+				res = res + < c.at, unknownTarget(fn) >;
 			}
 		}
 
 		case mc:methodCall(_,name(name(mn)),_) : {
 			if (mn in methodTargetsMap) {
-				res = res + ( { mc@at } join methodTargetsMap[mn] );
+				res = res + ( { mc.at } join methodTargetsMap[mn] );
 			} else {
-				res = res + < mc@at, unknownTarget(mn) >;
+				res = res + < mc.at, unknownTarget(mn) >;
 			}
 		}
 
 		case sc:staticCall(name(name(cn)),name(name(mn)),_) : {
 			if (mn in methodTargetsMap && {_*,mc:methodTarget(cn,mn,_)} := methodTargetsMap[mn]) {
-				res = res + < sc@at, mc >;
+				res = res + < sc.at, mc >;
 			} else {
-				res = res + < sc@at, unknownTarget("<cn>::<mn>") >;
+				res = res + < sc.at, unknownTarget("<cn>::<mn>") >;
 			}
 		}
 
 		case sc:staticCall(_,name(name(mn)),_) : {
 			if (mn in methodTargetsMap) {
 				// NOTE: To be more accurate, we should filter these to just be static methods.
-				res = res + ( { sc@at } join methodTargetsMap[mn] );
+				res = res + ( { sc.at } join methodTargetsMap[mn] );
 			} else {
-				res = res + < sc@at, unknownTarget("?::<mn>") >;
+				res = res + < sc.at, unknownTarget("?::<mn>") >;
 			}
 		}
 		
 		case c:call(_,_) : {
-			res = res + ( { c@at} join allFunctions );
+			res = res + ( { c.at} join allFunctions );
 		}
 
 		case mc:methodCall(_,_,_) : {
-			res = res + ( { mc@at} join allMethods );
+			res = res + ( { mc.at} join allMethods );
 		}
 	}
 	

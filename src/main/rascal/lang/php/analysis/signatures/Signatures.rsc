@@ -15,7 +15,7 @@ import List;
 
 data ParamInfo = paramInfo(str paramName, bool isRef) | paramInfo(str paramName, str givenType, bool isRef);
 
-data SignatureItem
+data SignatureItem(loc at=|unknown:///|)
 	= functionSig(loc namepath, int parameterCount)
 	| functionSig(loc namepath, list[ParamInfo] parameterInfo) 
 	| constSig(loc namepath, Expr e)
@@ -24,8 +24,6 @@ data SignatureItem
 	| methodSig(loc namepath, list[ParamInfo] parameterInfo)
 	| classConstSig(loc namepath, Expr e)
 	;
-
-public anno loc SignatureItem@at;
 
 data Signature
 	= fileSignature(loc fileloc, set[SignatureItem] items)
@@ -40,14 +38,14 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 		items += classSig(classPath(cln));
 		for (mt:method(mn,_,_,mps,_,_) <- cis) {
 			if (buildInfo) {
-				if ( (mt@at)? ) {
-					items += methodSig(methodPath(cln, mn), [ paramInfo(mp.paramName, mp.byRef) | mp <- mps ])[@at=mt@at];
+				if ( (mt.at.scheme != "unknown") ) {
+					items += methodSig(methodPath(cln, mn), [ paramInfo(mp.paramName, mp.byRef) | mp <- mps ])[at=mt.at];
 				} else {
 					items += methodSig(methodPath(cln, mn), [ paramInfo(mp.paramName, mp.byRef) | mp <- mps ]);
 				}
 			} else {
-				if ( (mt@at)? ) {
-					items += methodSig(methodPath(cln, mn), size(mps))[@at=mt@at];
+				if ( (mt.at.scheme != "unknown") ) {
+					items += methodSig(methodPath(cln, mn), size(mps))[at=mt.at];
 				} else {
 					items += methodSig(methodPath(cln, mn), size(mps));
 				}
@@ -61,14 +59,14 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 	// Second, get all top-level functions
 	for (/f:function(fn,_,fps,_,_) := scr) {
 		if (buildInfo) {
-			if ( (f@at)? ) {
-				items += functionSig(functionPath(fn), [ paramInfo(fp.paramName, fp.byRef) | fp <- fps ])[@at=f@at];
+			if ( (f.at.scheme != "unknown") ) {
+				items += functionSig(functionPath(fn), [ paramInfo(fp.paramName, fp.byRef) | fp <- fps ])[at=f.at];
 			} else {
 				items += functionSig(functionPath(fn), [ paramInfo(fp.paramName, fp.byRef) | fp <- fps ]);
 			}
 		} else {
-			if ( (f@at)? ) {
-				items += functionSig(functionPath(fn), size(fps))[@at=f@at];
+			if ( (f.at.scheme != "unknown") ) {
+				items += functionSig(functionPath(fn), size(fps))[at=f.at];
 			} else {
 				items += functionSig(functionPath(fn), size(fps));
 			}

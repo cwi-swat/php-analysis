@@ -108,31 +108,31 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	predStmtNodes = ifNodes + doNodes + whileNodes + forNodes + forEachNodes + headersForStmts;
 	predExprNodes = ternaryNodes + headersForExprs;
 	
-	containedLocations = { gn.expr@at | gn <- definingNodes, gn is exprNode, (gn.expr@at)? } +
-						 { gn.stmt@at | gn <- definingNodes, gn is stmtNode, (gn.stmt@at)? };
+	containedLocations = { gn.expr.at | gn <- definingNodes, gn is exprNode, (gn.expr.at.scheme != "unknown") } +
+						 { gn.stmt.at | gn <- definingNodes, gn is stmtNode, (gn.stmt.at.scheme != "unknown") };
 						 
-	if (n is exprNode && (n.expr@at)?) {
-		containedLocations = containedLocations + n.expr@at;
-	} else if (n is stmtNode && (n.stmt@at)?) {
-		containedLocations = containedLocations + n.stmt@at;
+	if (n is exprNode && (n.expr.at.scheme != "unknown")) {
+		containedLocations = containedLocations + n.expr.at;
+	} else if (n is stmtNode && (n.stmt.at.scheme != "unknown")) {
+		containedLocations = containedLocations + n.stmt.at;
 	}
 	
 	//for (< ni, s > <- predStmtNodes) {
-	//	logMessage("Stmt: <s@at>", 2);
+	//	logMessage("Stmt: <s.at>", 2);
 	//}
 	
 	//logMessage("<containedLocations>", 2);
 	 
 	rel[CFGNode, Stmt] containingStmts = { };
 	for (< ni, s > <- predStmtNodes) {
-		if (size({ l | l <- containedLocations, l < s@at }) > 0) {
+		if (size({ l | l <- containedLocations, l < s.at }) > 0) {
 			containingStmts = containingStmts + < ni, s >;
 		}
 	}
 
 	containingExprs = { };
 	for (< ni, e > <- predExprNodes) {
-		if (size({ l | l <- containedLocations, l < e@at }) > 0) {
+		if (size({ l | l <- containedLocations, l < e.at }) > 0) {
 			containingExprs = containingExprs + < ni, e >;
 		}
 	}

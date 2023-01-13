@@ -108,41 +108,41 @@ public set[Name] getNestedNames(CFGNode n, set[loc] locsToFilter) {
 	
 	bottom-up visit(n) {
 		case ni:var(name(name(vn))) :
-			res = res + < varName(vn), ni@at >;
+			res = res + < varName(vn), ni.at >;
 		
 		case ni:fetchArrayDim(var(name(name(vn))),noExpr()) :
-			res = res + < varName(vn), ni@at >;
+			res = res + < varName(vn), ni.at >;
 			
 		case ni:fetchArrayDim(var(name(name(vn))),someExpr(idx)) :
 			if (scalar(string(idxname)) := idx && vn in superGlobalNames) {
-				res = res + < elementName(vn,idxname), ni@at >;
+				res = res + < elementName(vn,idxname), ni.at >;
 			} else {
-				res = res + < varName(vn), ni@at >;
+				res = res + < varName(vn), ni.at >;
 			}
 
 		case ni:var(expr(Expr e)) :
-			res = res + < computedName(e), ni@at >;
+			res = res + < computedName(e), ni.at >;
 		
 		case ni:fetchArrayDim(var(expr(Expr e)),_) :
-			res = res + < computedName(e), ni@at >;
+			res = res + < computedName(e), ni.at >;
 		
 		case ni:propertyFetch(target, name(name(vn))) :
-			res = res + < propertyName(target, vn), ni@at >;
+			res = res + < propertyName(target, vn), ni.at >;
 			
 		case ni:propertyFetch(target, expr(Expr e)) :
-			res = res + < computedPropertyName(target, e), ni@at >;
+			res = res + < computedPropertyName(target, e), ni.at >;
 		
 		case ni:staticPropertyFetch(name(name(target)), name(name(vn))) :
-			res = res + < staticPropertyName(target, vn), ni@at >;
+			res = res + < staticPropertyName(target, vn), ni.at >;
 			
 		case ni:staticPropertyFetch(name(name(target)), expr(Expr e)) :
-			res = res + < computedStaticPropertyName(target, e), ni@at >;
+			res = res + < computedStaticPropertyName(target, e), ni.at >;
 		
 		case ni:staticPropertyFetch(expr(Expr target), name(name(vn))) :
-			res = res + < computedStaticPropertyName(target, vn), ni@at >;
+			res = res + < computedStaticPropertyName(target, vn), ni.at >;
 			
 		case ni:staticPropertyFetch(expr(Expr target), expr(Expr e)) :
-			res = res + < computedStaticPropertyName(target, e), ni@at >;
+			res = res + < computedStaticPropertyName(target, e), ni.at >;
 	}
 	
 	int beforeFilteringSize = size(res);
@@ -300,11 +300,11 @@ public Uses uses(CFG inputCFG, Defs defs) {
 	set[loc] locsToFilter = { };
 	visit (inputCFG.nodes) {
 		case assign(ni:Expr e1, _) : {
-			locsToFilter = locsToFilter + ni@at;
+			locsToFilter = locsToFilter + ni.at;
 		}
 
 		case refAssign(ni:Expr e1, _) : {
-			locsToFilter = locsToFilter + ni@at;
+			locsToFilter = locsToFilter + ni.at;
 		}
 	}
 	

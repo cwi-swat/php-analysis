@@ -31,21 +31,21 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 	scr = top-down visit(scr) {
 		case c:class(className,_,_,_,members) : {
 			members = bottom-up visit(members) {
-				case s:scalar(classConstant()) => scalar(string(className))[@at=s@at]
+				case s:scalar(classConstant()) => scalar(string(className))[at=s.at]
 			}
 			insert(c[members=members]);
 		}
 		
 		case m:method(methodName,_,_,_,body,_) : {
 			body = bottom-up visit(body) {
-				case s:scalar(methodConstant()) => scalar(string(methodName))[@at=s@at]
+				case s:scalar(methodConstant()) => scalar(string(methodName))[at=s.at]
 			}
 			insert(m[body=body]);
 		}
 		
 		case f:function(funcName,_,_,body,_) : {
 			body = bottom-up visit(body) {
-				case s:scalar(funcConstant()) => scalar(string(funcName))[@at=s@at]
+				case s:scalar(funcConstant()) => scalar(string(funcName))[at=s.at]
 			}
 			insert(f[body=body]);
 		}
@@ -56,7 +56,7 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 			namespaceName = "";
 			if (someName(name(str nn)) := maybeName) namespaceName = nn;
 			body = bottom-up visit(body) {
-				case s:scalar(namespaceConstant()) => scalar(string(namespaceName))[@at=s@at]
+				case s:scalar(namespaceConstant()) => scalar(string(namespaceName))[at=s.at]
 			}
 			insert(n[body=body]);
 		}
@@ -78,19 +78,19 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 	dirLoc = substring(l.parent.path,size(baseloc.path));
 	
 	scr = bottom-up visit(scr) {
-		case s:scalar(classConstant()) => scalar(string(""))[@at=s@at]
-		case s:scalar(methodConstant()) => scalar(string(""))[@at=s@at]
-		case s:scalar(funcConstant()) => scalar(string(""))[@at=s@at]
-		case s:scalar(namespaceConstant()) => scalar(string(""))[@at=s@at]
+		case s:scalar(classConstant()) => scalar(string(""))[at=s.at]
+		case s:scalar(methodConstant()) => scalar(string(""))[at=s.at]
+		case s:scalar(funcConstant()) => scalar(string(""))[at=s.at]
+		case s:scalar(namespaceConstant()) => scalar(string(""))[at=s.at]
 
-		case s:scalar(fileConstant()) => scalar(string(fileLoc))[@at=s@at]
-		case s:scalar(dirConstant()) => scalar(string(dirLoc))[@at=s@at]
+		case s:scalar(fileConstant()) => scalar(string(fileLoc))[at=s.at]
+		case s:scalar(dirConstant()) => scalar(string(dirLoc))[at=s.at]
 
 		case s:scalar(lineConstant()) : {
 			try {
-				insert(scalar(integer(s@at.begin.line))[@at=s@at]);
+				insert(scalar(integer(s.at.begin.line))[at=s.at]);
 			} catch UnavailableInformation(str msg2catch) : {
-				println("Tried to extract line number from location <s@at> with no line number information, <msg2catch>");
+				println("Tried to extract line number from location <s.at> with no line number information, <msg2catch>");
 			}
 		}
 	}
@@ -104,27 +104,27 @@ public System inlineMagicConstants(System sys, loc baseloc) {
 public Expr inlineMagicConstants(Expr e, loc baseloc) {
 	e = bottom-up visit(e) {
 		case s:scalar(v:classConstant()) => 
-			scalar(string(v@actualValue))[@at=s@at]
+			scalar(string(v@actualValue))[at=s.at]
 		when (v@actualValue)?
 		
 		case s:scalar(v:methodConstant()) => 
-			scalar(string(v@actualValue))[@at=s@at]
+			scalar(string(v@actualValue))[at=s.at]
 		when (v@actualValue)?
 		
 		case s:scalar(v:funcConstant()) => 
-			scalar(string(v@actualValue))[@at=s@at]
+			scalar(string(v@actualValue))[at=s.at]
 		when (v@actualValue)?
 		
 		case s:scalar(v:namespaceConstant()) => 
-			scalar(string(v@actualValue))[@at=s@at]
+			scalar(string(v@actualValue))[at=s.at]
 		when (v@actualValue)?
 		
 		case s:scalar(v:fileConstant()) => 
-			scalar(string(substring(v@actualValue,size(baseloc.path))))[@at=s@at]
+			scalar(string(substring(v@actualValue,size(baseloc.path))))[at=s.at]
 		when (v@actualValue)?
 		
 		case s:scalar(v:dirConstant()) => 
-			scalar(string(v@actualValue))[@at=s@at]
+			scalar(string(v@actualValue))[at=s.at]
 		when (v@actualValue)?
 		
 		case s:scalar(v:lineConstant()) => 

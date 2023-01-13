@@ -36,19 +36,19 @@ public set[CFGNode] reaches(Graph[CFGNode] g, CFGNode n) = (invert(g)+)[n];
 
 @doc{Given an existing expression, find the node that represents this expression}
 public CFGNode findNodeForExpr(CFG cfg, Expr expr) {
-	possibleMatches = { n | n:exprNode(e,_) <- cfg.nodes, e == expr, (e@at)?, (expr@at)?, e@at == expr@at };
+	possibleMatches = { n | n:exprNode(e,_) <- cfg.nodes, e == expr, (e.at.scheme != "unknown"), (expr.at.scheme != "unknown"), e.at == expr.at };
 	if (size(possibleMatches) == 1) {
 		return getOneFrom(possibleMatches);
 	} else if (size(possibleMatches) > 1) {
 		throw "Unexpected error: multiple matching expressions found";
 	} else {
-		throw "Unexpected error: no matching expressions found, <expr@at>";
+		throw "Unexpected error: no matching expressions found, <expr.at>";
 	}
 }
 
 @doc{Given a location, find the node that represents the expression at this location}
 public CFGNode findNodeForExpr(CFG cfg, loc l) {
-	possibleMatches = { n | n:exprNode(e,_) <- cfg.nodes, (e@at)?, e@at == l };
+	possibleMatches = { n | n:exprNode(e,_) <- cfg.nodes, (e.at.scheme != "unknown"), e.at == l };
 	if (size(possibleMatches) == 1) {
 		return getOneFrom(possibleMatches);
 	} else if (size(possibleMatches) > 1) {
@@ -60,7 +60,7 @@ public CFGNode findNodeForExpr(CFG cfg, loc l) {
 
 @doc{Given an existing statement, find the node that represents this statement}
 public CFGNode findNodeForStmt(CFG cfg, Stmt stmt) {
-	possibleMatches = { n | n:stmtNode(s,_) <- cfg.nodes, s == stmt, (s@at)?, (stmt@at)?, s@at == stmt@at };	
+	possibleMatches = { n | n:stmtNode(s,_) <- cfg.nodes, s == stmt, (s.at.scheme != "unknown"), (stmt.at.scheme != "unknown"), s.at == stmt.at };	
 	if (size(possibleMatches) == 1) {
 		return getOneFrom(possibleMatches);
 	} else if (size(possibleMatches) > 1) {
@@ -72,7 +72,7 @@ public CFGNode findNodeForStmt(CFG cfg, Stmt stmt) {
 
 @doc{Given a location, find the node that represents the statement at this location}
 public CFGNode findNodeForStmt(CFG cfg, loc l) {
-	possibleMatches = { n | n:stmtNode(s,_) <- cfg.nodes, (s@at)?, s@at == l };	
+	possibleMatches = { n | n:stmtNode(s,_) <- cfg.nodes, (s.at.scheme != "unknown"), s.at == l };	
 	if (size(possibleMatches) == 1) {
 		return getOneFrom(possibleMatches);
 	} else if (size(possibleMatches) > 1) {
@@ -84,7 +84,7 @@ public CFGNode findNodeForStmt(CFG cfg, loc l) {
 
 @doc{Given the location, find the node at this location}
 public CFGNode findNodeForLocation(CFG cfg, loc l) {
-	possibleMatches = { n | n <- cfg.nodes, (n has stmt && (n.stmt@at)? && n.stmt@at == l) || (n has expr && (n.expr@at)? && n.expr@at == l) };
+	possibleMatches = { n | n <- cfg.nodes, (n has stmt && (n.stmt.at.scheme != "unknown") && n.stmt.at == l) || (n has expr && (n.expr.at.scheme != "unknown") && n.expr.at == l) };
 	if (size(possibleMatches) == 1) {
 		return getOneFrom(possibleMatches);
 	} else if (size(possibleMatches) > 1) {
@@ -111,12 +111,12 @@ public bool trueOnAReachingPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNod
 public loc findContainingCFGLoc(Script s, map[loc,CFG] cfgs, loc l) {
 	
 	for (/c:class(cname,_,_,_,mbrs) := s) {
-		for (m:method(mname,_,_,params,body,_) <- mbrs, l < m@at) {
+		for (m:method(mname,_,_,params,body,_) <- mbrs, l < m.at) {
 			return methodPath(cname,mname);
 		}
 	}
 	
-	for (/f:function(fname,_,params,body,_) := s, l < f@at) {
+	for (/f:function(fname,_,params,body,_) := s, l < f.at) {
 		return functionPath(fname);
 	}
 	

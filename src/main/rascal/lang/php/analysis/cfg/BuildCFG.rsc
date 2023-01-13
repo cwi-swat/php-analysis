@@ -271,7 +271,7 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(loc np, ClassIte
 	edges = removeUnrealizablePaths(edges); 
 	lstate = shrink(lstate);
 
- 	return < cfg(np, nodes, edges, m@at, cfgEntryNode, cfgExitNode), lstate >;   
+ 	return < cfg(np, nodes, edges, m.at, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
 // TODO: The code for functions and methods is very similar, so refactor to remove
@@ -358,7 +358,7 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(loc np, Stmt
 	edges = removeUnrealizablePaths(edges); 
 	lstate = shrink(lstate);
 
- 	return < cfg(np, nodes, edges, f@at, cfgEntryNode, cfgExitNode), lstate >;   
+ 	return < cfg(np, nodes, edges, f.at, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
 // Find the initial label for each statement. We return a set since, in some cases,
@@ -935,7 +935,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				if (hasBreakLabel(bl, lstate)) {
 					edges += { jumpEdge(fl, getBreakLabel(bl, lstate)) | fl <- finalLabels };
 				} else {
-					println("WARNING: This program breaks beyond the visible break nesting: <e@at>");
+					println("WARNING: This program breaks beyond the visible break nesting: <e.at>");
 					edges += { escapingBreakEdge(fl, getExitNodeLabel(lstate), someExpr(e)) | fl <- finalLabels };
 				}
 			} else {
@@ -952,7 +952,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			if (hasBreakLabel(1, lstate)) {
 				edges += { jumpEdge(fl, getBreakLabel(1, lstate)) | fl <- finalLabels };
 			} else {
-				println("WARNING: This program breaks beyond the visible break nesting: <s@at>");
+				println("WARNING: This program breaks beyond the visible break nesting: <s.at>");
 				edges += { escapingBreakEdge(fl, getExitNodeLabel(lstate), noExpr()) | fl <- finalLabels };
 			}
 		}
@@ -979,7 +979,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 				if (hasContinueLabel(bl, lstate)) {
 					edges += { jumpEdge(fl, getContinueLabel(bl, lstate)) | fl <- finalLabels };
 				} else {
-					println("WARNING: This program continues beyond the visible continue nesting: <s@at>");
+					println("WARNING: This program continues beyond the visible continue nesting: <s.at>");
 					edges += { escapingContinueEdge(fl, getExitNodeLabel(lstate), someExpr(e)) | fl <- finalLabels };
 				}
 			} else {
@@ -996,7 +996,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			if (hasContinueLabel(1, lstate)) {
 				edges += { jumpEdge(fl, getContinueLabel(1, lstate)) | fl <- finalLabels };
 			} else {
-				println("WARNING: This program continues beyond the visible continue nesting: <s@at>");
+				println("WARNING: This program continues beyond the visible continue nesting: <s.at>");
 				edges += { escapingContinueEdge(fl, getExitNodeLabel(lstate), noExpr()) | fl <- finalLabels };
 			}
 		}

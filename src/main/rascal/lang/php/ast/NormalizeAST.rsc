@@ -35,7 +35,7 @@ public Script oldNamespaces(Script s) {
 }
 
 public Stmt createIf(ElseIf e:elseIf(Expr cond, list[Stmt] body), OptionElse oe) {
-	return \if(cond, body, [], oe)[@at=e@at];
+	return \if(cond, body, [], oe)[at=e.at];
 }
 
 public Script normalizeIf(Script s) {
@@ -49,9 +49,9 @@ public Script normalizeIf(Script s) {
 					workingElse = els;
 					for (e <- reverse(elseifs)) {
 						newIf = createIf(e, workingElse);
-						workingElse = someElse(\else([newIf])[@at=newIf@at])[@at=newIf@at];
+						workingElse = someElse(\else([newIf])[at=newIf.at])[at=newIf.at];
 					}
-					insert(\if(cond,body,[],workingElse)[@at=i@at]);
+					insert(\if(cond,body,[],workingElse)[at=i.at]);
 				}
 			}
 		}

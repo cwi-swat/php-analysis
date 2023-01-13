@@ -24,35 +24,35 @@ public Expr simulateCall(Expr e) {
 			// code is Windows-specific, it could be "\" as well.
 			// TODO: Parameterize this. It could be as simple as adding something into
 			// the configuration, we don't want to litter the code with sep info.
-			if (trim(s1) == "/") return scalar(string("/"))[@at=c@at];
+			if (trim(s1) == "/") return scalar(string("/"))[at=c.at];
 			if (contains(s1, "/")) {
 				parts = split("/", s1);
 				dirpart = intercalate("/",take(size(parts)-1, parts));
-				return scalar(string(dirpart))[@at=c@at];
+				return scalar(string(dirpart))[at=c.at];
 			} else {
-				return scalar(string("."))[@at=c@at];
+				return scalar(string("."))[at=c.at];
 			}
 		} catch : {
 			; // do nothing, we just don't make any changes
 		}
 	} else if (Expr c:staticCall(name(name("MWInit")), name(name("compiledPath")), [actualParameter(scalar(string(s1)),false,false)]) := e) {
-		return scalar(string(s1))[@at=c@at];
+		return scalar(string(s1))[at=c.at];
 	} else if (Expr c:staticCall(name(name("MWInit")), name(name("interpretedPath")), [actualParameter(scalar(string(s1)),false,false)]) := e) {
-		return scalar(string(s1))[@at=c@at];
+		return scalar(string(s1))[at=c.at];
 	} else if (Expr c:call(name(name("strrchr")),[actualParameter(scalar(string(s1)),false,false), actualParameter(scalar(string(s2)),false,false)]) := e) {
 		if (size(s2) >= 1) {
 			if (size(s2) > 1) s2 = s2[0];
 			pos = findLast(s1,s2);
 			if (pos == -1)
-				return fetchConst(name("false"))[@at=c@at];
+				return fetchConst(name("false"))[at=c.at];
 			else
-				return scalar(string(substring(s1,pos)))[@at=c@at];
+				return scalar(string(substring(s1,pos)))[at=c.at];
 		}
 	} else if (Expr c:call(name(name("substr")),[actualParameter(scalar(string(s1)),false,false), actualParameter(scalar(integer(i1)),false,false)]) := e) {
 		if (size(s1) > 0) {
 			if (i1 >= 0) {
 				if (i1 <= (size(s1)-1)) {
-					return scalar(string(substring(s1, i1)))[@at=c@at];
+					return scalar(string(substring(s1, i1)))[at=c.at];
 				} 
 			}
 		}
@@ -63,9 +63,9 @@ public Expr simulateCall(Expr e) {
 					if (i2 >= 1) {
 						s2 = substring(s1,i1);
 						if (size(s2) < i2)
-							return scalar(string(s2))[@at=c@at];
+							return scalar(string(s2))[at=c.at];
 						else
-							return scalar(string(substring(s2, 0,i2)))[@at=c@at];
+							return scalar(string(substring(s2, 0,i2)))[at=c.at];
 					}
 				} 
 			}
@@ -91,7 +91,7 @@ public Expr simulateCall(Expr e) {
 		c.parameters[0].expr.scalarVal.strVal = s1;
 		
 		if (size(findAll(s1,"%")) == 0) {
-			return scalar(string(s1))[@at=c@at];
+			return scalar(string(s1))[at=c.at];
 		}
 		return c;
 	}

@@ -112,7 +112,7 @@ public CFGNode getExitNode(CFG g) {
 
 @doc{Get a map from labels to locations.}
 rel[Lab label, loc at] getLabelLocationRel(CFG g) {
-	exprs = { < n.l, n.expr@at > | n <- g.nodes, n is exprNode, (n.expr@at)? };
-	stmts = { < n.l, n.stmt@at > | n <- g.nodes, n is stmtNode, (n.stmt@at)? };
+	exprs = { < n.l, n.expr.at > | n <- g.nodes, n is exprNode, (n.expr.at.scheme != "unknown") };
+	stmts = { < n.l, n.stmt.at > | n <- g.nodes, n is stmtNode, (n.stmt.at.scheme != "unknown") };
 	return exprs + stmts;
 }

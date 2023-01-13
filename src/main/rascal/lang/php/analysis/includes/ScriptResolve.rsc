@@ -48,10 +48,10 @@ private set[loc] reachable(IncludeGraph igraph, loc l) {
 
 private Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 	return bottom-up visit(e) {
-		case fc:fetchConst(name(cn)) => (iinfo.constMap[cn])[@at=fc@at]
+		case fc:fetchConst(name(cn)) => (iinfo.constMap[cn])[at=fc.at]
 			when cn in iinfo.constMap
 			
-		case fcc:fetchClassConst(name(name(cln)),str cn) => (iinfo.classConstMap[cln][cn])[@at=fcc@at]
+		case fcc:fetchClassConst(name(name(cln)),str cn) => (iinfo.classConstMap[cln][cn])[at=fcc.at]
 			when cln in iinfo.classConstMap && cn in iinfo.classConstMap[cln]
 	}
 }
@@ -76,7 +76,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	clearLookupCache();
 	
 	// First find all the includes in the script. If we don't have any, we are already done.
-	includeMap = ( i@at : i | /i:include(_,_) := sys.files[toResolve] );
+	includeMap = ( i.at : i | /i:include(_,_) := sys.files[toResolve] );
 	timings += < "Starting number of includes:<size(includeMap)>", now() >;
 	if (size(includeMap) == 0) return < {}, timings >;
 		
@@ -98,7 +98,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	set[loc] worklist = { qri | qri <- quickResolved<2>, qri.scheme != "php+lib" } - worked;
 	while (! isEmpty(worklist) ) {
 		next = getOneFrom(worklist); worklist -= next; worked += next;
-		includeMap += ( i@at : i | /i:include(_,_) := sys.files[next] );
+		includeMap += ( i.at : i | /i:include(_,_) := sys.files[next] );
 		nextResolved = (size(quickResolveInfo) > 0) ? ( (next in quickResolveInfo) ? quickResolveInfo[next] : { } ) : quickResolveExpr(sys, iinfo, next, baseLoc, libs=libs);
 		quickResolved += nextResolved;
 		worklist += ({ qri | qri <- nextResolved<2>, qri.scheme != "php+lib" } - worked);
@@ -270,6 +270,6 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 		continueTrying = (unsolvedEdges != originalUnsolved);
 	}	
 	
-	finalResult = { < edge.includeExpr@at, et > | edge <- igraph.edges, et <- getEdgeTargets(igraph, edge) }; 
+	finalResult = { < edge.includeExpr.at, et > | edge <- igraph.edges, et <- getEdgeTargets(igraph, edge) }; 
 	return < finalResult, timings >;
 }

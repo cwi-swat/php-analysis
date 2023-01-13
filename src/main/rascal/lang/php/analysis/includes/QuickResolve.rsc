@@ -14,10 +14,10 @@ import String;
 
 public Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 	return bottom-up visit(e) {
-		case fc:fetchConst(name(cn)) => (iinfo.constMap[cn])[@at=fc@at]
+		case fc:fetchConst(name(cn)) => (iinfo.constMap[cn])[at=fc.at]
 			when cn in iinfo.constMap
 			
-		case fcc:fetchClassConst(name(name(cln)),str cn) => (iinfo.classConstMap[cln][cn])[@at=fcc@at]
+		case fcc:fetchClassConst(name(name(cln)),str cn) => (iinfo.classConstMap[cln][cn])[at=fcc.at]
 			when cln in iinfo.classConstMap && cn in iinfo.classConstMap[cln]
 	}
 }
@@ -38,7 +38,7 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	rel[loc,Expr,loc] resolved = { };
 
 	Script scr = sys.files[toResolve];
-	includes = { < i@at, i > | /i:include(_,_) := scr };
+	includes = { < i.at, i > | /i:include(_,_) := scr };
 	if (size(includes) == 0) return resolved;
 		
 	// Step 1: simplify the include expression using a variety of techniques,
@@ -54,8 +54,8 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	for (iitem:< _, i > <- includes, scalar(string(s)) := i.expr, size(s) > 0, s[0] in { "\\", "/"}) {
 		try {
 			iloc = calculateLoc(sys.files<0>,toResolve,baseLoc,s,checkFS=checkFS);
-			resolved = resolved + <i@at, i, iloc >;
-			unresolved = domainX(unresolved, {i@at});  
+			resolved = resolved + <i.at, i, iloc >;
+			unresolved = domainX(unresolved, {i.at});  
 		} catch UnavailableLoc(_) : {
 			;
 		}
@@ -67,7 +67,7 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	// find files that will never actually be included in practice
 	for (iitem:< _, i > <- unresolved) {
 		possibleMatches = matchIncludes(sys, i, baseLoc, libs=libs);
-		resolved = resolved + { < i@at, i, l > | l <- possibleMatches }; 
+		resolved = resolved + { < i.at, i, l > | l <- possibleMatches }; 
 	}
 	
 	return resolved;

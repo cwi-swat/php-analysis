@@ -55,7 +55,7 @@ public real mygini(list[num] dist) {
 
 public QueryResults getVVUses(str product, str version) {
 	ptmap = loadBinary(product, version);
-	return [exprResult(e@at,e) | <_,e> <-  gatherVarVarUses(ptmap)];
+	return [exprResult(e.at,e) | <_,e> <-  gatherVarVarUses(ptmap)];
 }
 
 public rel[str p, str v, QueryResult qr] getVVUses(Corpus corpus) {
@@ -68,7 +68,7 @@ public lrel[str p, str v, QueryResult qr] getVVUsesAsList(Corpus corpus) {
 
 public QueryResults getVVNews(str product, str version) {
 	ptmap = loadBinary(product, version);
-	return [exprResult(e@at,e) | <_,e> <-  gatherVVNews(ptmap)];
+	return [exprResult(e.at,e) | <_,e> <-  gatherVVNews(ptmap)];
 }
 
 public lrel[str p, str v, QueryResult qr] getVVNewsAsList(Corpus corpus) {
@@ -77,7 +77,7 @@ public lrel[str p, str v, QueryResult qr] getVVNewsAsList(Corpus corpus) {
 
 public QueryResults getVVCalls(str product, str version) {
 	ptmap = loadBinary(product, version);
-	return [exprResult(e@at,e) | <_,e> <-  gatherVVCalls(ptmap)];
+	return [exprResult(e.at,e) | <_,e> <-  gatherVVCalls(ptmap)];
 }
 
 public lrel[str p, str v, QueryResult qr] getVVCallsAsList(Corpus corpus) {
@@ -86,7 +86,7 @@ public lrel[str p, str v, QueryResult qr] getVVCallsAsList(Corpus corpus) {
 
 public QueryResults getVVMethodCalls(str product, str version) {
 	ptmap = loadBinary(product, version);
-	return [exprResult(e@at,e) | <_,e> <-  gatherMethodVVCalls(ptmap)];
+	return [exprResult(e.at,e) | <_,e> <-  gatherMethodVVCalls(ptmap)];
 }
 
 public lrel[str p, str v, QueryResult qr] getVVMethodCallsAsList(Corpus corpus) {
@@ -95,7 +95,7 @@ public lrel[str p, str v, QueryResult qr] getVVMethodCallsAsList(Corpus corpus) 
 
 public QueryResults getVVPropertyRefs(str product, str version) {
 	ptmap = loadBinary(product, version);
-	return [exprResult(e@at,e) | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
+	return [exprResult(e.at,e) | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
 }
 
 public lrel[str p, str v, QueryResult qr] getVVPropertyRefsAsList(Corpus corpus) {
@@ -104,7 +104,7 @@ public lrel[str p, str v, QueryResult qr] getVVPropertyRefsAsList(Corpus corpus)
 
 public QueryResults getVVClassConsts(str product, str version) {
 	ptmap = loadBinary(product, version);
-	return [exprResult(e@at,e) | <_,e> <-  gatherVVClassConsts(ptmap)];
+	return [exprResult(e.at,e) | <_,e> <-  gatherVVClassConsts(ptmap)];
 }
 
 public lrel[str p, str v, QueryResult qr] getVVClassConstsAsList(Corpus corpus) {
@@ -113,7 +113,7 @@ public lrel[str p, str v, QueryResult qr] getVVClassConstsAsList(Corpus corpus) 
 
 public QueryResults getVVStaticCalls(str product, str version) {
 	ptmap = loadBinary(product, version);
-	return [exprResult(e@at,e) | <_,e> <-  gatherStaticVVCalls(ptmap)];
+	return [exprResult(e.at,e) | <_,e> <-  gatherStaticVVCalls(ptmap)];
 }
 
 public lrel[str p, str v, QueryResult qr] getVVStaticCallsAsList(Corpus corpus) {
@@ -122,7 +122,7 @@ public lrel[str p, str v, QueryResult qr] getVVStaticCallsAsList(Corpus corpus) 
 
 public QueryResults getVVStaticCallTargets(str product, str version) {
 	ptmap = loadBinary(product, version);
-	return [exprResult(e@at,e) | <_,e> <-  gatherStaticVVTargets(ptmap)];
+	return [exprResult(e.at,e) | <_,e> <-  gatherStaticVVTargets(ptmap)];
 }
 
 public lrel[str p, str v, QueryResult qr] getVVStaticCallTargetsAsList(Corpus corpus) {
@@ -131,7 +131,7 @@ public lrel[str p, str v, QueryResult qr] getVVStaticCallTargetsAsList(Corpus co
 
 public QueryResults getVVStaticPropNames(str product, str version) {
 	ptmap = loadBinary(product, version);
-	return [exprResult(e@at,e) | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
+	return [exprResult(e.at,e) | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
 }
 
 public lrel[str p, str v, QueryResult qr] getVVStaticPropNamesAsList(Corpus corpus) {
@@ -140,7 +140,7 @@ public lrel[str p, str v, QueryResult qr] getVVStaticPropNamesAsList(Corpus corp
 
 public QueryResults getVVStaticPropTargets(str product, str version) {
 	ptmap = loadBinary(product, version);
-	return [exprResult(e@at,e) | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
+	return [exprResult(e.at,e) | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
 }
 
 public lrel[str p, str v, QueryResult qr] getVVStaticPropTargetsAsList(Corpus corpus) {
@@ -197,16 +197,16 @@ public tuple[lrel[str p, str v, QueryResult qr] vvuses,
 	for (product <- corpus) {
 		ptmap = loadBinary(product,corpus[product]);
 
-		vvuses += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherVarVarUses(ptmap)];
-		vvcalls += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherVVCalls(ptmap)];
-		vvmcalls += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherMethodVVCalls(ptmap)];
-		vvnews += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherVVNews(ptmap)];
-		vvprops += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
-		vvcconsts += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherVVClassConsts(ptmap)];
-		vvscalls += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticVVCalls(ptmap)];
-		vvstargets += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticVVTargets(ptmap)];
-		vvsprops += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
-		vvsptargets += [< product, corpus[product], exprResult(e@at,e) > | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
+		vvuses += [< product, corpus[product], exprResult(e.at,e) > | <_,e> <-  gatherVarVarUses(ptmap)];
+		vvcalls += [< product, corpus[product], exprResult(e.at,e) > | <_,e> <-  gatherVVCalls(ptmap)];
+		vvmcalls += [< product, corpus[product], exprResult(e.at,e) > | <_,e> <-  gatherMethodVVCalls(ptmap)];
+		vvnews += [< product, corpus[product], exprResult(e.at,e) > | <_,e> <-  gatherVVNews(ptmap)];
+		vvprops += [< product, corpus[product], exprResult(e.at,e) > | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
+		vvcconsts += [< product, corpus[product], exprResult(e.at,e) > | <_,e> <-  gatherVVClassConsts(ptmap)];
+		vvscalls += [< product, corpus[product], exprResult(e.at,e) > | <_,e> <-  gatherStaticVVCalls(ptmap)];
+		vvstargets += [< product, corpus[product], exprResult(e.at,e) > | <_,e> <-  gatherStaticVVTargets(ptmap)];
+		vvsprops += [< product, corpus[product], exprResult(e.at,e) > | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
+		vvsptargets += [< product, corpus[product], exprResult(e.at,e) > | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
 	}
 	
 	return < vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets >;
@@ -234,16 +234,16 @@ public tuple[lrel[str p, str v, QueryResult qr] vvuses,
 	lrel[str p, str v, QueryResult qr] vvsprops = [ ];
 	lrel[str p, str v, QueryResult qr] vvsptargets = [ ];
 	
-	vvuses += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherVarVarUses(ptmap)];
-	vvcalls += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherVVCalls(ptmap)];
-	vvmcalls += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherMethodVVCalls(ptmap)];
-	vvnews += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherVVNews(ptmap)];
-	vvprops += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
-	vvcconsts += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherVVClassConsts(ptmap)];
-	vvscalls += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherStaticVVCalls(ptmap)];
-	vvstargets += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherStaticVVTargets(ptmap)];
-	vvsprops += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
-	vvsptargets += [< product, version, exprResult(e@at,e) > | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
+	vvuses += [< product, version, exprResult(e.at,e) > | <_,e> <-  gatherVarVarUses(ptmap)];
+	vvcalls += [< product, version, exprResult(e.at,e) > | <_,e> <-  gatherVVCalls(ptmap)];
+	vvmcalls += [< product, version, exprResult(e.at,e) > | <_,e> <-  gatherMethodVVCalls(ptmap)];
+	vvnews += [< product, version, exprResult(e.at,e) > | <_,e> <-  gatherVVNews(ptmap)];
+	vvprops += [< product, version, exprResult(e.at,e) > | <_,e> <-  gatherPropertyFetchesWithVarNames(ptmap)];
+	vvcconsts += [< product, version, exprResult(e.at,e) > | <_,e> <-  gatherVVClassConsts(ptmap)];
+	vvscalls += [< product, version, exprResult(e.at,e) > | <_,e> <-  gatherStaticVVCalls(ptmap)];
+	vvstargets += [< product, version, exprResult(e.at,e) > | <_,e> <-  gatherStaticVVTargets(ptmap)];
+	vvsprops += [< product, version, exprResult(e.at,e) > | <_,e> <-  gatherStaticPropertyVVNames(ptmap)];
+	vvsptargets += [< product, version, exprResult(e.at,e) > | <_,e> <-  gatherStaticPropertyVVTargets(ptmap)];
 	
 	return < vvuses, vvcalls, vvmcalls, vvnews, vvprops, vvcconsts, vvscalls, vvstargets, vvsprops, vvsptargets >;
 }
@@ -753,7 +753,7 @@ public str magicMethodCounts(Corpus corpus, MMResult res, map[str,set[loc]] tran
 		allMM = res[<p,corpus[p]>].sets + res[<p,corpus[p]>].gets + res[<p,corpus[p]>].isSets + res[<p,corpus[p]>].unsets + res[<p,corpus[p]>].calls + res[<p,corpus[p]>].staticCalls;
 		map[str, int] hits = ( );
 		for (citem <- allMM) {
-			hitloc = citem@at.path;
+			hitloc = citem.at.path;
 			if (hitloc in hits)
 				hits[hitloc] += 1;
 			else
@@ -1582,7 +1582,7 @@ public map[str,set[loc]] calculateMMTransIncludes(Corpus corpus, MMResult mmr, m
 	
 	for (product <- corpus) {
 		version = corpus[product];
-		mmrLocs = { mm@at | mm <- (mmr[<product,version>].sets + mmr[<product,version>].gets + mmr[<product,version>].isSets + mmr[<product,version>].unsets + mmr[<product,version>].calls + mmr[<product,version>].staticCalls) };
+		mmrLocs = { mm.at | mm <- (mmr[<product,version>].sets + mmr[<product,version>].gets + mmr[<product,version>].isSets + mmr[<product,version>].unsets + mmr[<product,version>].calls + mmr[<product,version>].staticCalls) };
 		transFiles = calculateFeatureTrans(includes[<product,version>], mmrLocs);
 		transitiveFiles[product] = transFiles;
 	}
@@ -1772,7 +1772,7 @@ alias FunctionUses = rel[str product, str version, loc fileloc, Expr call];
 public FunctionUses systemFunctionUses(str product, str version, System sys) {
 	rel[str product, str version, loc fileloc, Expr call] res = { };
 	funsToFind = { "create_function", "call_user_func", "call_user_func_array", "call_user_method", "call_user_method_array", "func_get_args", "func_num_args", "func_get_arg" };
-	evals = [ < e@at, e > | /e:call(name(name(str fn)),_) := sys.files, fn in funsToFind ];
+	evals = [ < e.at, e > | /e:call(name(name(str fn)),_) := sys.files, fn in funsToFind ];
 	for (<l,e> <- evals) res += < product, version, l, e >;
 	return res;
 }
@@ -1873,13 +1873,13 @@ public set[Def] varargsFunctionsAndMethods(System sys) {
 	
 	for (/f:function(fname, _, _, body, _) := sys.files) {
 		if (/e:call(name(name(str fn)),_) := body, fn in funsToFind) {
-			res += functionDef(fname, f, f@at);   
+			res += functionDef(fname, f, f.at);   
 		}
 	}
 	for (/c:class(cname, _, _, _, members) := sys.files) {
 		for (m:method(mname, modifiers, byRef, params, body, rtype) <- members) {
 			if (/e:call(name(name(str fn)),_) := body, fn in funsToFind) {
-				res += methodDef(cname, mname, m, m@at);   
+				res += methodDef(cname, mname, m, m.at);   
 			}
 		}
 	}
@@ -1920,17 +1920,17 @@ public rel[loc,Expr,bool] varargsCalls(System sys) {
 	visit(sys.files) {
 		case e:call(name(name(str fn)),args) : {
 			if (fn in functionNames)
-				vaCalls = vaCalls + < e@at, e, fn in systemFunctionNames >;
+				vaCalls = vaCalls + < e.at, e, fn in systemFunctionNames >;
 		}
 		
 		case e:methodCall(_,name(name(str fn)),args) : {
 			if (fn in methodNames)
-				vaCalls = vaCalls + < e@at, e, fn in systemMethods>;
+				vaCalls = vaCalls + < e.at, e, fn in systemMethods>;
 		}
 		
 		case e:staticCall(_,name(name(str fn)),args) : {
 			if (fn in methodNames)
-				vaCalls = vaCalls + < e@at, e, fn in systemMethods>;
+				vaCalls = vaCalls + < e.at, e, fn in systemMethods>;
 		}
 	}
 
@@ -1948,9 +1948,9 @@ public rel[str,str,loc,Expr,bool] varargsCalls(Corpus corpus) {
 }
 
 public rel[loc,Expr] allCalls(System sys) {
-	return { < e@at, e > | /e:call(name(name(str fn)),args) := sys.files } + 
-		   { < e@at, e > | /e:methodCall(_,name(name(str fn)),args) := sys.files } +
-		   { < e@at, e > | /e:staticCall(_,name(name(str fn)),args) := sys.files };
+	return { < e.at, e > | /e:call(name(name(str fn)),args) := sys.files } + 
+		   { < e.at, e > | /e:methodCall(_,name(name(str fn)),args) := sys.files } +
+		   { < e.at, e > | /e:staticCall(_,name(name(str fn)),args) := sys.files };
 }
 
 public rel[str,str,loc,Expr] allCalls(Corpus corpus) {
@@ -1994,8 +1994,8 @@ public rel[str product, str path] classAndInterfaceFiles(Corpus corpus) {
 	rel[str product, str path] res = { };
 	for (p <- corpus) {
 		sys = loadBinary(p,corpus[p]);
-		classPaths = { c@at.path | /c:class(_,_,_,_,_) := sys.files };
-		interfacePaths = { i@at.path | /i:interface(_,_,_) := sys.files };
+		classPaths = { c.at.path | /c:class(_,_,_,_,_) := sys.files };
+		interfacePaths = { i.at.path | /i:interface(_,_,_) := sys.files };
 		res += { < p, pth > | pth <- (classPaths + interfacePaths) };
 	}
 	return res;
@@ -2135,7 +2135,7 @@ public TotalRes whichHaveSomething(Corpus corpus) {
 	// Overloading
 	mmr = loadMMResults();
 	for (t <- mmr, <sl,gl,isl,usl,cl,scl> := mmr[t]) {
-		impactedFiles[t] += { ci@at.path | ci <- (sl+gl+isl+usl+cl+scl) };
+		impactedFiles[t] += { ci.at.path | ci <- (sl+gl+isl+usl+cl+scl) };
 	}	
 	println("After adding magic methods, up to <( 0 | it + size(impactedFiles[t]) | t <- impactedFiles)> files");
 	
