@@ -1143,10 +1143,9 @@ public int main() {
   return 1;
 }
 
-public data FeatureNode = featureNode(set[str] features) | synthNode(set[str] features);
-public anno set[str] FeatureNode@files;
-public anno set[str] FeatureNode@transFiles;
-public anno real FeatureNode@percent;
+public data FeatureNode(set[str] files={}, set[str] transFiles={}, real percent=0.0)
+	= featureNode(set[str] features) 
+	| synthNode(set[str] features);
 
 alias FeatureLattice = rel[FeatureNode,FeatureNode];
 
@@ -1154,7 +1153,7 @@ public FeatureLattice buildFeatureLattice(map[int,set[FeatureNode]] nodesBySize,
 	rel[FeatureNode,FeatureNode] lattice = { };
 	map[FeatureNode,set[FeatureNode]] coveredBy = ( n : { } | i <- nodesBySize, n <- nodesBySize[i] );
 	map[FeatureNode,set[FeatureNode]] covers = ( n : { } | i <- nodesBySize, n <- nodesBySize[i] );
-	map[FeatureNode,set[str]] transFiles = ( bottomNode : bottomNode@files );
+	map[FeatureNode,set[str]] transFiles = ( bottomNode : bottomNode.files );
 	
 	set[int] possibleIndices = nodesBySize<0>;
 	list[int] insertionOrder = sort(toList(possibleIndices));
@@ -1172,7 +1171,7 @@ public FeatureLattice buildFeatureLattice(map[int,set[FeatureNode]] nodesBySize,
 			lattice += { < child, n > | child <- children };
 			for (child <- children) coveredBy[child] = coveredBy[child] + n;
 			covers[n] = children;
-			transFiles[n] = { *(child@files) | child <- children };
+			transFiles[n] = { *(child.files) | child <- children };
 		}
 		println("Added <size(nodesBySize[i])> nodes");
 		
@@ -1183,7 +1182,7 @@ public FeatureLattice buildFeatureLattice(map[int,set[FeatureNode]] nodesBySize,
 		//addedCounter = 0;
 		//for (dc <- directChildren, pn <- (possibleNodes - dc.features), featureNode(dc.features+pn) notin nodesBySize[i]) {
 		//	// Synthesize the node and add it to the bookkeeping structures
-		//	synthNode = featureNode(dc.features + pn)[@files={}];
+		//	synthNode = featureNode(dc.features + pn)[files={}];
 		//	coveredBy[synthNode] = { };
 		//	covers[synthNode] = { };
 		//	nodesBySize[i] = nodesBySize[i] + synthNode;
@@ -1207,7 +1206,7 @@ public FeatureLattice buildFeatureLattice(map[int,set[FeatureNode]] nodesBySize,
 	
 	println("Annotating lattice");
 	lattice = visit(lattice) {
-		case FeatureNode fn => (fn[@transFiles=transFiles[fn]])[@percent=size(transFiles[fn])*100.0/totalFiles]
+		case FeatureNode fn => (fn[transFiles=transFiles[fn]])[percent=size(transFiles[fn])*100.0/totalFiles]
 	}
 	return lattice;
 }
@@ -1232,9 +1231,9 @@ public FeatureLattice calculateFeatureLattice(FMap fmap) {
 	featuresToFiles = ( i : { } | i <- perFile<1>);
 	for (l <- perFile) featuresToFiles[perFile[l]] = featuresToFiles[perFile[l]] + l;
 	
-	set[FeatureNode] nodes = { featureNode(i)[@files=featuresToFiles[i]] | i <- featuresToFiles };
-	FeatureNode bottomNode = (featureNode({}) notin nodes) ? featureNode({})[@files={}] : getOneFrom({ i | i <- nodes, size(i.features) == 0});
-	FeatureNode topNode = (featureNode(toSet(fieldNames)) notin nodes) ? featureNode(toSet(fieldNames))[@files={}] : getOneFrom({ i | i <- nodes, size(i.features) == size(fieldNames)});
+	set[FeatureNode] nodes = { featureNode(i)[files=featuresToFiles[i]] | i <- featuresToFiles };
+	FeatureNode bottomNode = (featureNode({}) notin nodes) ? featureNode({})[files={}] : getOneFrom({ i | i <- nodes, size(i.features) == 0});
+	FeatureNode topNode = (featureNode(toSet(fieldNames)) notin nodes) ? featureNode(toSet(fieldNames))[files={}] : getOneFrom({ i | i <- nodes, size(i.features) == size(fieldNames)});
 	if (bottomNode notin nodes) nodes = nodes + bottomNode;
 	if (topNode notin nodes) nodes = nodes + topNode;
 	
@@ -1254,11 +1253,11 @@ public FeatureLattice calculateTransitiveFiles(FeatureLattice lattice, FeatureNo
 		
 		children = flipped[current];
 		if (size(children) == 0) {
-			transFiles[current] = current@files;
+			transFiles[current] = current.files;
 			if (size(transFiles)%50 == 0) println("transFiles now has <size(transFiles)> elements");
 		} else {
 			for (child <- children) childFiles(child);
-			transFiles[current] = current@files + { *transFiles[child] | child <- children };
+			transFiles[current] = current.files + { *transFiles[child] | child <- children };
 			if (size(transFiles)%50 == 0) println("transFiles now has <size(transFiles)> elements");
 			return;
 		}
@@ -1269,7 +1268,7 @@ public FeatureLattice calculateTransitiveFiles(FeatureLattice lattice, FeatureNo
 	
 	println("Annotating lattice");
 	lattice = visit(lattice) {
-		case FeatureNode fn => (fn[@transFiles=transFiles[fn]])[@percent=size(transFiles[fn])*100.0/totalFiles]
+		case FeatureNode fn => (fn[transFiles=transFiles[fn]])[percent=size(transFiles[fn])*100.0/totalFiles]
 	}
 	return lattice;
 }
@@ -1326,7 +1325,7 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	solutionLabels = neededForLabels[targetPercent];
 	
 	// How many have we found so far? This is the number of files covered by the solution
-	found = size({ *(n@transFiles) | n <- solution});
+	found = size({ *(n.transFiles) | n <- solution});
 	
 	// Which features are left?
 	remainingFeatures = toSet(fieldNames) - solutionLabels;
@@ -1337,7 +1336,7 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	for (feature <- featuresToTry, featureFileCount[labelIndex[feature]] > 0) {
 		solutionLabels += feature;
 		solution = { n | n <- nodes, n.features < solutionLabels };
-		found = size({ *(n@transFiles) | n <- solution});
+		found = size({ *(n.transFiles) | n <- solution});
 		if (found > threshold) break;
 	}
 
@@ -1391,7 +1390,7 @@ public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice)
 	// now, continually grow until we cover 100% of the files
 	while(coveredSoFar < 100) {
 		// nextStepMap holds the number of files we cover if we choose a specific feature
-		nextStepMap = ( feature : size({ *(n@transFiles) | n <- { n | n <- nodes, n.features < (solution + feature) } }) | feature <- remainingFeatures );
+		nextStepMap = ( feature : size({ *(n.transFiles) | n <- { n | n <- nodes, n.features < (solution + feature) } }) | feature <- remainingFeatures );
 		// this then sorts the map results, getting back the one that adds the most files
 		<nextFeature,nextFeatureCount> = head(reverse(sort([ < feature,nextStepMap[feature] > | feature <- nextStepMap ],bool(<str s1,int n1>, <str st,int n2>) { return n1 < n2; })));
 
@@ -1399,7 +1398,7 @@ public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice)
 		// case, we instead add the most popular
 		if (nextFeatureCount == 0 || (size(nextStepMap<0>) > 1 && size(nextStepMap<1>) == 1)) {
 			nextFeature = head(featuresToTry); featuresToTry = tail(featuresToTry);
-			nextFeatureCount = size({*(n@transFiles) | n <- nodes, n.features < (solution+nextFeature)});
+			nextFeatureCount = size({*(n.transFiles) | n <- nodes, n.features < (solution+nextFeature)});
 		}
 			
 		// Here, we did extend, so we add this feature into the solution
@@ -1421,7 +1420,7 @@ public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice)
 					// if we did add something, extend the nextFeatureCount as well, since that should
 					// also have grown (i.e., we cover more files now that we added more stuff into
 					// the solution set)
-					nextFeatureCount = size({*(n@transFiles) | n <- nodes, n.features < solution});
+					nextFeatureCount = size({*(n.transFiles) | n <- nodes, n.features < solution});
 				}
 			} else {
 				break;
@@ -1603,8 +1602,8 @@ public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, C
 	in80 = coverageMap[80];
 	in90 = coverageMap[90];
 	
-	in80Files = { *(n@files) | n <- carrier(lattice), n.features < in80 };
-	in90Files = { *(n@files) | n <- carrier(lattice), n.features < in90 };
+	in80Files = { *(n.files) | n <- carrier(lattice), n.features < in80 };
+	in90Files = { *(n.files) | n <- carrier(lattice), n.features < in90 };
 	
 	map[str product,tuple[set[str] notIn80, set[str] notIn90] filesNotCovered] res = ( );
 	for (product <- corpus) {

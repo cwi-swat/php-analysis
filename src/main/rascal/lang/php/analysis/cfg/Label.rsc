@@ -16,5 +16,5 @@ import lang::php::ast::AbstractSyntax;
      sub-statements/sub-expressions in the code.}
 data Lab = lab(int id);
 
-public anno Lab Expr@lab;
-public anno Lab Stmt@lab;
+public data Expr(Lab lab=lab(-1));
+public data Stmt(Lab lab=lab(-1));

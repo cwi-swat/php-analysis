@@ -20,7 +20,7 @@ import vis::Figure;
 import vis::Render; 
 
 //public void renderCFG(CFG c) {
-//	str getID(CFGNode n) = "<n@lab>";
+//	str getID(CFGNode n) = "<n.lab>";
 //	nodes = [ box(text("<escapeForDot(printCFGNode(n))>"), id(getID(n)), size(40)) | n <- c.nodes ];
 //	edges = [ edge("<e.from>","<e.to>") | e <- c.edges ];
 //	render(graph(nodes,edges,gap(40)));
@@ -31,7 +31,7 @@ public str escapeForDot(str s) {
 }
 
 public void renderCFGAsDot(CFG c, loc writeTo, str title = "") {
-	str getID(CFGNode n) = "<n@lab>";
+	str getID(CFGNode n) = "<n.lab>";
 	c = visit(c) { case inlineHTML(_) => inlineHTML("HTMLCode") }
 	
 	nodes = [ "\"<getID(n)>\" [ label = \"<getID(n)>:<escapeForDot(printCFGNode(n))>\", labeljust=\"l\" ];" | n <- c.nodes ];

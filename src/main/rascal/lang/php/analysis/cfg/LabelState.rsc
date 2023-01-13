@@ -80,7 +80,7 @@ public LabelState popContinueLabel(LabelState lstate) {
 public CFGNode getExitNode(LabelState lstate) = lstate.exitNode;
 
 @doc{Get the label of the current exit node}
-public Lab getExitNodeLabel(LabelState lstate) = lstate.exitNode@lab;
+public Lab getExitNodeLabel(LabelState lstate) = lstate.exitNode.lab;
 
 @doc{Label the statements and expressions in a script.}
 public tuple[Script,LabelState] labelScript(Script script, LabelState lstate) {
@@ -90,8 +90,8 @@ public tuple[Script,LabelState] labelScript(Script script, LabelState lstate) {
 	}
 	
 	labeledScript = bottom-up visit(script) {
-		case Stmt s => s[@lab = incLabel()]
-		case Expr e => e[@lab = incLabel()]
+		case Stmt s => s[lab = incLabel()]
+		case Expr e => e[lab = incLabel()]
 	};
 	
 	return < labeledScript, lstate >;

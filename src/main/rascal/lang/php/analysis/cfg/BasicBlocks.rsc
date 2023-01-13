@@ -57,7 +57,7 @@ public CFG createBasicBlocks(CFG g) {
 			if (currentNode in headerNodes) break;
 			nodeList += currentNode;
 		}
-		basicBlocks += basicBlock(nodeList)[@lab=blockLabel(blockId)];
+		basicBlocks += basicBlock(nodeList)[lab=blockLabel(blockId)];
 		blockId += 1;	
 	}
 
@@ -71,14 +71,14 @@ public CFG createBasicBlocks(CFG g) {
 	FlowEdge getBlockEdge(CFGNode n1, CFGNode n2) {
 		n1Exit = last(n1.nodes);
 		n2Entry = head(n2.nodes);
-		edges = { e | e <- g.edges, n1Exit@lab == e.from, n2Entry@lab == e.to };
+		edges = { e | e <- g.edges, n1Exit.lab == e.from, n2Entry.lab == e.to };
 		if (size(edges) > 1) {
 			for (e <- edges)
 				println("In <g.item>, found flow edge <e>"); 
 			throw "We should not have multiple edges between the same nodes";
 		}
 		e = getOneFrom(edges);
-		return e[from=n1@lab][to=n2@lab];
+		return e[from=n1.lab][to=n2.lab];
 	}
 	
 	CFGNode blockEntryNode() {

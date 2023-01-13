@@ -26,7 +26,7 @@ data SummaryParam
 	| voidParam()
 	;
 
-data Summary 
+data Summary(loc from=|unknown:///|)
 	= functionSummary(loc name, list[SummaryParam] params, bool returnsRef, str returnType, bool mayAlterGlobals, set[str] throwsTypes)
 	| methodSummary(loc name, set[str] modifiers, list[SummaryParam] params, bool returnsRef, str returnType, bool mayAlterGlobals, set[str] throwsTypes)
 	| constructorSummary(loc name, set[str] modifiers, list[SummaryParam] params, bool mayAlterGlobals, set[str] throwsTypes)
@@ -36,8 +36,6 @@ data Summary
 	| invalidSummary(loc name, str reason)
 	| emptySummary(loc name, loc path)
 	;
-	
-public anno loc Summary@from;
 
 public set[Summary] loadFunctionSummaries() {
 	return readBinaryValueFile(#set[Summary], summariesDir + "phpFunctions.bin");

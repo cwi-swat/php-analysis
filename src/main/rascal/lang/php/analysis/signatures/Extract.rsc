@@ -450,7 +450,7 @@ public set[Summary] extractFunctionSummaries(map[PageType,loc] pagePaths) {
 	int count = 0;	
 	for (p <- functionPages, functionPage(bn,fn) := p, l := functionPages[p]) {
 		for (fs <- extractFunctionSummary(bn,fn,l)) {
-			functionSummaries += fs[@from=l];
+			functionSummaries += fs[from=l];
 		}  
 		count += 1;
 		if (count % 100 == 0) println("Extracted <count> function summary pages");
@@ -467,7 +467,7 @@ public set[Summary] extractConstantSummaries(map[PageType,loc] pagePaths) {
 	int count = 0;
 	for (p <- constantPages, constantPage(bn) := p, l := constantPages[p]) {
 		for (cs <- extractConstantSummary(bn,l)) {
-			constantSummaries += cs[@from=l];
+			constantSummaries += cs[from=l];
 		}
 		count += 1;
 		if (count % 100 == 0) println("Extracted <count> constant summary pages");
@@ -484,7 +484,7 @@ public set[Summary] extractClassSummaries(map[PageType,loc] pagePaths) {
 	int count = 0;
 	for (p <- classPages, classPage(bn,cn) := p, l := classPages[p]) {
 		for (cs <- extractClassSummary(bn,cn,l)) {
-			classSummaries += cs[@from=l];
+			classSummaries += cs[from=l];
 		}
 		count += 1;
 		if (count % 100 == 0) println("Extracted <count> class summary pages");
@@ -501,7 +501,7 @@ public set[Summary] extractMethodSummaries(map[PageType,loc] pagePaths) {
 	int count = 0;
 	for (p <- methodPages, methodPage(bn,cn,mn) := p, l:= methodPages[p]) {
 		for (ms <- extractMethodSummary(bn,cn,mn,l)) {
-			methodSummaries += ms[@from=l];
+			methodSummaries += ms[from=l];
 		}
 		count += 1;
 		if (count % 100 == 0) println("Extracted <count> method summary pages");

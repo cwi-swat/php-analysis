@@ -56,18 +56,16 @@ private Expr replaceConstants(Expr e, IncludesInfo iinfo) {
 	}
 }
 
-anno set[ConstItem] IncludeGraphNode@definedConstants;
-anno map[ConstItem,Expr] IncludeGraphNode@definingExps;
-anno bool IncludeGraphNode@setsIncludePath;
+data IncludeGraphNode(set[ConstItem] definedConstants={}, map[ConstItem,Expr] definingExps=(), bool setsIncludePath=false);
 
 public IncludeGraphNode decorateNode(IncludeGraphNode n, map[loc,set[ConstItemExp]] loc2consts, bool setsip) {
 	if (n.fileLoc notin loc2consts) {
-		return n[@definedConstants={}][@definingExps=()][@setsIncludePath=false];
+		return n[definedConstants={}][definingExps=()][setsIncludePath=false];
 	} else {
 		constDefs = loc2consts[n.fileLoc];
 		justDefs = { normalConst(cn) | normalConst(cn,_) <- constDefs } + { classConst(cln,cn) | classConst(cln,cn,_) <- constDefs };
 		exprs = ( normalConst(cn) : cne | normalConst(cn,cne) <- constDefs ) + ( classConst(cln,cn) : cne | classConst(cln,cn,cne) <- constDefs );
-		return n[@definedConstants=justDefs][@definingExps=exprs][@setsIncludePath=setsip];	
+		return n[definedConstants=justDefs][definingExps=exprs][setsIncludePath=setsip];	
 	}
 }
 

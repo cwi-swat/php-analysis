@@ -17,15 +17,15 @@ import Map;
 import IO;
 
 public set[CFGNode] pred(CFG cfg, CFGNode n) {
-	predlabels = { e.from | e <- cfg.edges, e.to == n@lab };
-	return { nd | nd <- cfg.nodes, nd@lab in predlabels };
+	predlabels = { e.from | e <- cfg.edges, e.to == n.lab };
+	return { nd | nd <- cfg.nodes, nd.lab in predlabels };
 }
 
 public set[CFGNode] pred(Graph[CFGNode] g, CFGNode n) = invert(g)[n];
 
 public set[CFGNode] succ(CFG cfg, CFGNode n) {
-	succlabels = { e.to | e <- cfg.edges, e.from == n@lab };
-	return { nd | nd <- cfg.nodes, nd@lab in succlabels };
+	succlabels = { e.to | e <- cfg.edges, e.from == n.lab };
+	return { nd | nd <- cfg.nodes, nd.lab in succlabels };
 }
 
 public set[CFGNode] succ(Graph[CFGNode] g, CFGNode n) = g[n];

@@ -27,29 +27,26 @@ public data CFG
 
 @doc{Control flow graph nodes}
 data CFGNode
-	= functionEntry(str functionName, Lab l)
-	| functionExit(str functionName, Lab l)
-	| methodEntry(str className, str methodName, Lab l)
-	| methodExit(str className, str methodName, Lab l)
-	| closureEntry(str fileName, int offset, int length, Lab l)
-	| closureExit(str fileName, int offset, int length, Lab l)
-	| scriptEntry(Lab l)
-	| scriptExit(Lab l)
-	| stmtNode(Stmt stmt, Lab l)
-	| exprNode(Expr expr, Lab l)
-	| foreachTest(Expr expr, Lab l)
-	| foreachAssignKey(Expr expr, Expr keyExpr, Lab l)
-	| foreachAssignValue(Expr expr, Expr valExpr, Lab l)
-	| headerNode(Stmt stmt, Lab footer, Lab l)
-	| headerNode(Expr expr, Lab footer, Lab l)
-	| footerNode(Stmt stmt, Lab header, Lab l)
-	| footerNode(Expr expr, Lab header, Lab l)
-	| actualProvided(str paramName, bool refAssign, Lab l)
-	| actualNotProvided(str paramName, Expr expr, bool refAssign, Lab l)
+	= functionEntry(str functionName, Lab lab)
+	| functionExit(str functionName, Lab lab)
+	| methodEntry(str className, str methodName, Lab lab)
+	| methodExit(str className, str methodName, Lab lab)
+	| closureEntry(str fileName, int offset, int length, Lab lab)
+	| closureExit(str fileName, int offset, int length, Lab lab)
+	| scriptEntry(Lab lab)
+	| scriptExit(Lab lab)
+	| stmtNode(Stmt stmt, Lab lab)
+	| exprNode(Expr expr, Lab lab)
+	| foreachTest(Expr expr, Lab lab)
+	| foreachAssignKey(Expr expr, Expr keyExpr, Lab lab)
+	| foreachAssignValue(Expr expr, Expr valExpr, Lab lab)
+	| headerNode(Stmt stmt, Lab footer, Lab lab)
+	| headerNode(Expr expr, Lab footer, Lab lab)
+	| footerNode(Stmt stmt, Lab header, Lab lab)
+	| footerNode(Expr expr, Lab header, Lab lab)
+	| actualProvided(str paramName, bool refAssign, Lab lab)
+	| actualNotProvided(str paramName, Expr expr, bool refAssign, Lab lab)
 	;
-
-@doc{Unique ids on control flow graph nodes.}
-public anno Lab CFGNode@lab;
 
 public alias CFGNodes = set[CFGNode];
 
@@ -65,24 +62,24 @@ public str printCFGNode(scriptExit(_)) = "Exit";
 public str printCFGNode(foreachTest(Expr expr, Lab l)) = "Iteration Test";
 public str printCFGNode(foreachAssignKey(Expr expr, Expr keyExpr, Lab l)) = "Assign Foreach Key <pp(keyExpr)>";
 public str printCFGNode(foreachAssignValue(Expr expr, Expr valExpr, Lab l)) = "Assign Foreach Value <pp(valExpr)>";
-public str printCFGNode(headerNode(Expr e,_,Lab l)) = "header: <getName(e)>";
-public str printCFGNode(headerNode(Stmt s,_,Lab l)) = "header: <getName(s)>";
-public str printCFGNode(footerNode(Expr e,_,Lab l)) = "footer: <getName(e)>";
-public str printCFGNode(footerNode(Stmt s,_,Lab l)) = "footer: <getName(s)>";
-public str printCFGNode(stmtNode(Stmt s, Lab l)) {
+public str printCFGNode(headerNode(Expr e,_,Lab lab)) = "header: <getName(e)>";
+public str printCFGNode(headerNode(Stmt s,_,Lab lab)) = "header: <getName(s)>";
+public str printCFGNode(footerNode(Expr e,_,Lab lab)) = "footer: <getName(e)>";
+public str printCFGNode(footerNode(Stmt s,_,Lab lab)) = "footer: <getName(s)>";
+public str printCFGNode(stmtNode(Stmt s, Lab lab)) {
 	switch(s) {
 		case classDef(ClassDef cd) : return "Class <cd.className>";
 		case function(fn,_,_,_,_) : return "Function <fn>";
 		default: return "Stmt: <pp(s)>";
 	}
 }
-public str printCFGNode(exprNode(Expr e, Lab l)) = "Expr: <pp(e)>";
-public str printCFGNode(actualProvided(str paramName, bool refAssign, Lab l)) = "Arbitrary Value <paramName> <refAssign ? "?" : "">= unknown";
-public str printCFGNode(actualNotProvided(str paramName, Expr expr, bool refAssign, Lab l)) = "Default Value <paramName> <refAssign ? "?" : "">= <pp(expr)>";
+public str printCFGNode(exprNode(Expr e, Lab lab)) = "Expr: <pp(e)>";
+public str printCFGNode(actualProvided(str paramName, bool refAssign, Lab lab)) = "Arbitrary Value <paramName> <refAssign ? "?" : "">= unknown";
+public str printCFGNode(actualNotProvided(str paramName, Expr expr, bool refAssign, Lab lab)) = "Default Value <paramName> <refAssign ? "?" : "">= <pp(expr)>";
 
 @doc{Convert the CFG into a Rascal Graph, based on flow edge information}
 public Graph[CFGNode] cfgAsGraph(CFG cfg) {
-	nodeMap = ( n@lab : n | n <- cfg.nodes );
+	nodeMap = ( n.lab : n | n <- cfg.nodes );
 	return { < nodeMap[e.from], nodeMap[e.to] > | e <- cfg.edges, e.from in nodeMap, e.to in nodeMap };
 }
 
