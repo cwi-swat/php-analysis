@@ -20,3 +20,6 @@ local.properties
 .loadpath
 
 .DS_Store
+
+# Maven
+target

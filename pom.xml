@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>php-air</artifactId>
+  <groupId>org.rascalmpl</groupId>
+  <version>0.2.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <scm>
+    <developerConnection>scm:git:https://github.com/cwi-swat/php-analysis.git</developerConnection>			
+    <tag>HEAD</tag>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <repositories>
+    <repository>
+        <id>usethesource</id>
+        <url>https://releases.usethesource.io/maven/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+       <id>usethesource</id>
+       <url>https://releases.usethesource.io/maven/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.rascalmpl</groupId>
+      <artifactId>rascal</artifactId>
+      <version>0.23.2</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+        <configuration>
+          <compilerArgument>-parameters</compilerArgument> 
+          <release>11</release>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.rascalmpl</groupId>
+        <artifactId>rascal-maven-plugin</artifactId>
+        <version>0.8.2</version>
+        <configuration>
+          <errorsAsWarnings>true</errorsAsWarnings>
+          <bin>${project.build.outputDirectory}</bin>
+          <srcs>
+            <src>${project.basedir}/src/main/rascal</src>
+          </srcs>
+        </configuration>
+        <executions>
+          <execution>
+              <id>rascal-compile</id>
+              <phase>compile</phase>
+              <goals>
+                  <goal>compile</goal>
+              </goals>
+          </execution>
+          <execution>
+              <id>rascal-package</id>
+              <phase>pre-package</phase>
+              <goals>
+                  <goal>package</goal>
+              </goals>
+          </execution>
+        </executions>        
+      </plugin>
+    </plugins>
+  </build>
+</project>
