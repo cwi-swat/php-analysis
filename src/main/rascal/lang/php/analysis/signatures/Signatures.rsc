@@ -80,7 +80,7 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 	// that there are no includes.
 		
 	// Finally, get all defined constants
-	items += { constSig(constPath(cn),e) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false,false),actualParameter(e,false,false)]) := scr };
+	items += { constSig(constPath(cn),e) | /call(name(name("define")),[actualParameter(scalar(string(cn)),false,false),actualParameter(e,false,false)]) := scr };
 	
 	return fileSignature(fileloc, items);
 }
@@ -88,7 +88,7 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 public Signature getScriptConstants(loc fileloc, Script scr) {
 	set[SignatureItem] items = 
 		{ classConstSig(classConstPath(cln, cn), ce) | /class(cln,_,_,_,cis) := scr, constCI(consts,_) <- cis, const(cn,ce) <- consts } +
-		{ constSig(constPath(cn),e) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false,false),actualParameter(e,false,false)]) := scr };
+		{ constSig(constPath(cn),e) | /call(name(name("define")),[actualParameter(scalar(string(cn)),false,false),actualParameter(e,false,false)]) := scr };
 	return fileSignature(fileloc, items);
 }
 		

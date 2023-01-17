@@ -28,7 +28,7 @@ public int computeCC(list[Stmt] body) {
 	}
 	
 	foreachLoops = [ f | /f:foreach(_,_,_,_,_) := body ];
-	for (f <- foreachLoops) {
+	for (_ <- foreachLoops) {
 		cc += 1;
 	}
 	

@@ -2,7 +2,6 @@ module lang::php::stats::SLOC
 
 import lang::php::util::Config;
 import lang::php::ast::AbstractSyntax;
-import lang::php::ast::System;
 import lang::php::util::Corpus;
 
 import IO;
@@ -39,8 +38,8 @@ public list[tuple[str p, str v, int count, int fileCount]] getSortedCounts(str l
 	return [ <p,v,lc,fc> | p <- sort(toList(getProducts())), v <- sort(toList(getVersions(p)),compareVersion), <lc,fc> := (loadCounts(p,v))[lang] ];	
 }
 
-public list[tuple[str p, str v, int count, int fileCount]] getSortedCountsCaseInsensitive(str lang="PHP") {
+public list[tuple[str p, str v, int count, int fileCount]] getSortedCountsCaseInsensitive(str _) {
 	pForSort = [ < toUpperCase(p), p > | p <- getProducts() ];
 	pForSort = sort(pForSort, bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[0] < t2[0]; });
-	return [ <p,v,lc,fc> | <p2,p> <- pForSort, v <- sort(toList(getVersions(p)),compareVersion), <lc,fc> := (loadCounts(p,v))["PHP"] ];	
+	return [ <p,v,lc,fc> | <_,p> <- pForSort, v <- sort(toList(getVersions(p)),compareVersion), <lc,fc> := (loadCounts(p,v))["PHP"] ];	
 }

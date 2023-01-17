@@ -10,7 +10,6 @@ module lang::php::analysis::signatures::Summaries
 
 import ValueIO;
 import lang::php::util::Config;
-import lang::php::analysis::NamePaths;
 
 private loc summariesDir = baseLoc + "serialized/summaries";
 

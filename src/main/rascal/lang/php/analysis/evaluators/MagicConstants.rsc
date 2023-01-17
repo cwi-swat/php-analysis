@@ -61,7 +61,7 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 			insert(n[body=body]);
 		}
 		
-		case n:namespaceHeader(namespaceName) : {
+		case namespaceHeader(_) : {
 			;
 			// TODO: This sets the name for the other code in the file.
 			// We need to look at a good way to "fence" these to make
@@ -89,8 +89,8 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 		case s:scalar(lineConstant()) : {
 			try {
 				insert(scalar(integer(s.at.begin.line))[at=s.at]);
-			} catch UnavailableInformation(str msg2catch) : {
-				println("Tried to extract line number from location <s.at> with no line number information, <msg2catch>");
+			} catch UnavailableInformation() : {
+				println("Tried to extract line number from location <s.at> with no line number information");
 			}
 		}
 	}
@@ -128,7 +128,7 @@ public Expr inlineMagicConstants(Expr e, loc baseloc) {
 		when (v@actualValue)?
 		
 		case s:scalar(v:lineConstant()) => 
-			scalar(integer(toInt(v@actualValue)))
+			scalar(integer(toInt(v@actualValue)))[at=s.at]
 		when (v@actualValue)?		
 	}
 	

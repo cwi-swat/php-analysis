@@ -16,8 +16,8 @@ import lang::php::analysis::cfg::BasicBlocks;
 import IO;
 import List;
 import String;
-import vis::Figure;
-import vis::Render; 
+// import vis::Figure;
+// import vis::Render; 
 
 //public void renderCFG(CFG c) {
 //	str getID(CFGNode n) = "<n.lab>";

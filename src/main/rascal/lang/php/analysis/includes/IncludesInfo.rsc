@@ -50,7 +50,7 @@ public void buildIncludesInfo(System sys, str name, loc baseloc, bool forceBuild
 	if (exists(infoLoc + "<name>-l2c.bin") && !forceBuild) return;
 	
 	map[loc,set[ConstItemExp]] loc2consts = ( l : { cdef[e=simplifyExpr(cdef.e, baseloc)]  | cdef <- getScriptConstDefs(sys.files[l]) } | l <- sys.files);
-	rel[ConstItem,loc,Expr] constrel = { < (classConst(cln,cn,ce) := ci) ? classConst(cln,cn) : normalConst(ci.constName), l, ci.e > | l <- loc2consts, ci <- loc2consts[l] };
+	rel[ConstItem,loc,Expr] constrel = { < (classConst(cln,cn,_) := ci) ? classConst(cln,cn) : normalConst(ci.constName), l, ci.e > | l <- loc2consts, ci <- loc2consts[l] };
 
 	map[str, Expr] constMap = ( cn : ce | ci:normalConst(cn) <- constrel<0>, csub := constrel[ci,_], size(csub) == 1, ce:scalar(sv) := getOneFrom(csub), encapsed(_) !:= sv );  
 	if ("DIRECTORY_SEPARATOR" notin constMap)

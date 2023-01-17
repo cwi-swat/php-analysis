@@ -19,7 +19,6 @@ import lang::php::analysis::includes::LibraryIncludes;
 import analysis::graphs::Graph;
 import String;
 import Set;
-import Relation;
 
 data IncludeGraphNode 
 	= igNode(str fileName, loc fileLoc) 
@@ -52,7 +51,7 @@ public IncludeGraph extractIncludeGraph(System scripts, loc productRoot, set[Lib
 	
 	for (l <- scripts.files) {
 		includes = fetchIncludeUses(scripts.files[l]);
-		for (iexp:include(e,itype) <- includes) {
+		for (iexp:include(e,_) <- includes) {
 			solve(e) {
 				e = algebraicSimplification(simulateCalls(e));
 			}

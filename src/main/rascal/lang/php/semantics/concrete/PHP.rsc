@@ -8,8 +8,8 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::semantics::concrete::PHP
 
-import lang::php::ast::AbstractSyntax;
-import lang::php::semantics::shared::Value;
+// import lang::php::ast::AbstractSyntax;
+// import lang::php::semantics::shared::Value;
 
 //public data Expr 
 //	= AssignmentExpr(Var assignTo, bool isRef, Expr assignExpr)
@@ -31,6 +31,6 @@ import lang::php::semantics::shared::Value;
 //	| IgnoreErrorsExpr(Expr expr)
 //	;
 
-public Value eval(Expr e) {
+// public Value eval(Expr e) {
 
-}
+// }

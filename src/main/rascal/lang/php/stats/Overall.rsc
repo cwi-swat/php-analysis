@@ -14,7 +14,7 @@ public str generateFullCorpusInfoTable() {
 	counts = loadCountsCSV();
 	
 	lv = getLatestVersions();
-	ev = ( p : head(vl)[0] | p <- vInfo<0>, vl := sort([ <v,d> | <v,d,pv,_> <- vInfo[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }) );
+	ev = ( p : head(vl)[0] | p <- vInfo<0>, vl := sort([ <v,d> | <v,d,_,_> <- vInfo[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }) );
 	
 	list[tuple[str p, str pname, str pdesc, int vc, tuple[str v, str rdate, str phpversion] oldest, tuple[str v, str rdate, str phpversion] newest]] tableTuples = 
 		[ <p, pname, pdesc, size(vInfo[p]), < replaceLast(v1,"-english",""), prd1, phpv1 >, < replaceLast(v2,"-english",""), prd2, phpv2 > > | p <- pSorted, v1 := ev[p], v2 := lv[p], <p,pname,pdesc> <- pInfo, <p,v1,prd1,phpv1,_> <- vInfo, <p,v2,prd2,phpv2,_> <- vInfo ];

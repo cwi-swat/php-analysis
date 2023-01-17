@@ -35,13 +35,7 @@ public map[PageType,loc] getDBLibraryPages() = getLibraryPages(dbVendorStart);
 public map[PageType,loc] getAllLibraryPages() = getLibraryPages() + getDBLibraryPages();
 
 private node getHTMLFile(loc fileLoc) {
-	while(true) {
-		try {
-			return readHTMLFile(fileLoc);
-		} catch v : {
-			println("Warning, exception: <v>");
-		}
-	}  
+	return readHTMLFile(fileLoc);
 }
 
 public map[PageType,loc] getLibraryPages(loc startingLoc) {
@@ -72,7 +66,7 @@ public map[PageType,loc] getLibraryPages(loc startingLoc) {
 			"href" in getKeywordParameters(n), 
 			str s := getKeywordParameters(n)["href"], 
 			/function\./ := s, "a"(l) := n, 
-			[_*,"img"(),_*] !:= l };
+			[*_,"img"(),*_] !:= l };
 		pathPages += ( functionPage(bookname, funname) : startingLoc.parent + funhref | 
 			fun:"a"(["text"(str funname)]) <- funs, 
 			str funhref := getKeywordParameters(fun)["href"], 
@@ -85,7 +79,7 @@ public map[PageType,loc] getLibraryPages(loc startingLoc) {
 			str s := getKeywordParameters(n)["href"], 
 			/\.constants\./ := s, 
 			"a"(l) := n, 
-			[_*,"img"(),_*] !:= l };
+			[*_,"img"(),*_] !:= l };
 		pathPages += ( constantPage(bookname) : startingLoc.parent + consthref | 
 			const <- constants, 
 			str consthref := getKeywordParameters(const)["href"] );
@@ -97,7 +91,7 @@ public map[PageType,loc] getLibraryPages(loc startingLoc) {
 			"href" in getKeywordParameters(n), 
 			str s := getKeywordParameters(n)["href"], 
 			/class\./ := s, 
-			[_*,"img"(),_*] !:= l };
+			[*_,"img"(),*_] !:= l };
 		pathPages += ( classPage(bookname, classname) : startingLoc.parent + classhref | 
 			class:"a"(["text"(str classname)]) <- classes, 
 			str classhref := getKeywordParameters(class)["href"], 
@@ -144,7 +138,7 @@ public set[Summary] extractFunctionSummary(str bookname, str functionName, loc f
 				// First, find the return type
 				if (!foundRType) {
 					if (rn:"span"(_) := tagItem, "class" in getKeywordParameters(rn), getKeywordParameters(rn)["class"] == "type") {
-						set[str] rtypes = { s | /"text"(s) := rn };
+						set[str] rtypes = { s | /"text"(str s) := rn };
 						if (size(rtypes) != 1) {
 							summaries += invalidSummary(functionPath(functionName,library=bookname), "Function <functionName> has <size(rtypes)> return types, 1 expected");
 							break;
@@ -165,7 +159,7 @@ public set[Summary] extractFunctionSummary(str bookname, str functionName, loc f
 						break;
 					}
 					 
-					set[str] ptypes = { s | /node n:"span"(_) := sn, "class" in getKeywordParameters(n), getKeywordParameters(n)["class"] == "type", /"text"(s) := n };
+					set[str] ptypes = { s | /node n:"span"(_) := sn, "class" in getKeywordParameters(n), getKeywordParameters(n)["class"] == "type", /"text"(str s) := n };
 					if (size(ptypes) != 1) {
 						summaries += invalidSummary(functionPath(functionName,library=bookname), "Function <functionName> has <size(ptypes)> parameter types for the same parameter, 1 expected");
 						addedSummary = true;
@@ -173,7 +167,7 @@ public set[Summary] extractFunctionSummary(str bookname, str functionName, loc f
 					}
 					str ptype = getOneFrom(ptypes);
 					
-					set[str] pnames = { s | /node n:"code"(_) := sn, "class" in getKeywordParameters(n), str cln := getKeywordParameters(n)["class"], /parameter/ := cln, /"text"(s) := n };
+					set[str] pnames = { s | /node n:"code"(_) := sn, "class" in getKeywordParameters(n), str cln := getKeywordParameters(n)["class"], /parameter/ := cln, /"text"(str s) := n };
 					if (size(pnames) != 1) {
 						summaries += invalidSummary(functionPath(functionName,library=bookname), "Function <functionName> has <size(pnames)> parameter names for the same parameter, 1 expected");
 						addedSummary = true;
@@ -267,30 +261,30 @@ public set[Summary] extractClassSummary(str bookname, str className, loc classLo
 	node ctxt = getHTMLFile(classLoc);
 	set[Summary] summaries = { };
 	
-	extendsSet = { cn | /node n:"span"([node m:"span"(["text"(str ext)]), _*, "a"(["text"(str cn)]), _*]) := ctxt,
+	extendsSet = { cn | /node n:"span"([node m:"span"(["text"(str ext)]), *_, "a"(["text"(str cn)]), *_]) := ctxt,
 		"class" in getKeywordParameters(n), getKeywordParameters(n)["class"] == "ooclass",
 		"class" in getKeywordParameters(m), getKeywordParameters(m)["class"] == "modifier",
 		/extends/ := ext };
 
 	implementsSet = { cn | /node n:"span"(l) := ctxt,
 		"class" in getKeywordParameters(n), getKeywordParameters(n)["class"] == "oointerface",
-		[_*,node m:"span"(l2),_*] := l,
+		[*_,node m:"span"(l2),*_] := l,
 		"class" in getKeywordParameters(m), getKeywordParameters(m)["class"] == "interfacename",
-		[_*, "a"(["text"(str cn)]),_*] := l2};
+		[*_, "a"(["text"(str cn)]),*_] := l2};
 
 	set[str] foundFields = { };
 	
 	fieldsWModsWInit = { < fn , ft, init, mtxt > | /node n:"div"(l) := ctxt,
 		"class" in getKeywordParameters(n), getKeywordParameters(n)["class"] == "fieldsynopsis",
-		[_*,node m:"span"(l2),_*] := l,
+		[*_,node m:"span"(l2),*_] := l,
 		"class" in getKeywordParameters(m), getKeywordParameters(m)["class"] == "modifier",
-		[_*,"text"(str mtxt),_*] := l2,
-		[_*,node t:"span"(l3),_*] := l,
+		[*_,"text"(str mtxt),*_] := l2,
+		[*_,node t:"span"(l3),*_] := l,
 		"class" in getKeywordParameters(t), getKeywordParameters(t)["class"] == "type",
 		/"text"(str ft) := l3,
-		[_*,node i:"span"(l4),_*] := l,
+		[*_,node i:"span"(l4),*_] := l,
 		"class" in getKeywordParameters(i), getKeywordParameters(i)["class"] == "initializer",
-		[_*,"text"(str initAll),_*] := l4,
+		[*_,"text"(str initAll),*_] := l4,
 		/=\s*<init:.+>\s*/ := initAll,
 		/"var"(["text"(str fn)]) := l };
 
@@ -298,10 +292,10 @@ public set[Summary] extractClassSummary(str bookname, str className, loc classLo
 	
 	fieldsWMods = { < fn , ft, mtxt > | /node n:"div"(l) := ctxt,
 		"class" in getKeywordParameters(n), getKeywordParameters(n)["class"] == "fieldsynopsis",
-		[_*,node m:"span"(l2),_*] := l,
+		[*_,node m:"span"(l2),*_] := l,
 		"class" in getKeywordParameters(m), getKeywordParameters(m)["class"] == "modifier",
-		[_*,"text"(str mtxt),_*] := l2,
-		[_*,node t:"span"(l3),_*] := l,
+		[*_,"text"(str mtxt),*_] := l2,
+		[*_,node t:"span"(l3),*_] := l,
 		"class" in getKeywordParameters(t), getKeywordParameters(t)["class"] == "type",
 		/"text"(str ft) := l3,
 		/"var"(["text"(str fn)]) := l,
@@ -311,12 +305,12 @@ public set[Summary] extractClassSummary(str bookname, str className, loc classLo
 	
 	fieldsWInit = { < fn, ft, init > | /node n:"div"(l) := ctxt,
 		"class" in getKeywordParameters(n), getKeywordParameters(n)["class"] == "fieldsynopsis",
-		[_*,node t:"span"(l3),_*] := l,
+		[*_,node t:"span"(l3),*_] := l,
 		"class" in getKeywordParameters(t), getKeywordParameters(t)["class"] == "type",
 		/"text"(str ft) := l3,
-		[_*,node i:"span"(l4),_*] := l,
+		[*_,node i:"span"(l4),*_] := l,
 		"class" in getKeywordParameters(i), getKeywordParameters(i)["class"] == "initializer",
-		[_*,"text"(str initAll),_*] := l4,
+		[*_,"text"(str initAll),*_] := l4,
 		/=\s*<init:.+>\s*/ := initAll,
 		/"var"(["text"(str fn)]) := l,
 		fn notin foundFields };
@@ -325,7 +319,7 @@ public set[Summary] extractClassSummary(str bookname, str className, loc classLo
 	
 	fields = { < fn, ft > | /node n:"div"(l) := ctxt,
 		"class" in getKeywordParameters(n), getKeywordParameters(n)["class"] == "fieldsynopsis",
-		[_*,node t:"span"(l3),_*] := l,
+		[*_,node t:"span"(l3),*_] := l,
 		"class" in getKeywordParameters(t), getKeywordParameters(t)["class"] == "type",
 		/"text"(str ft) := l3,
 		/"var"(["text"(str fn)]) := l,
@@ -339,7 +333,7 @@ public set[Summary] extractClassSummary(str bookname, str className, loc classLo
 
 	if (size(summaries) == 0) {
 		println("WARNING: No summaries extracted for class <className> at path <classLoc.path>");
-		summaries += emptySummary([library(bookname),class(className)], classLoc);
+		summaries += emptySummary(classPath(className, library=bookname), classLoc);
 	}
 
 	return summaries;
@@ -354,10 +348,10 @@ public set[Summary] extractMethodSummary(str bookname, str className, str method
 	bool ooMode = true;
 	
 	for (/node n:"div"(nbody) := mtxt, "id" in getKeywordParameters(n), str dId := getKeywordParameters(n)["id"], /<httpishName>/ := dId) {
-		for (/node m:"div"(mbody) := nbody, "id" in getKeywordParameters(m), str mId := getKeywordParameters(m)["id"], /description/ := mId) {
+		for (/node m:"div"(list[node] mbody) := nbody, "id" in getKeywordParameters(m), str mId := getKeywordParameters(m)["id"], /description/ := mId) {
 			for (node k <- mbody) {
 				if (/"text"(str ktxt) := k, /Procedural/ := ktxt) ooMode = false;
-				if (/node ms:"div"(tagList) := k, "class" in getKeywordParameters(ms), str msClass := getKeywordParameters(ms)["class"], /methodsynopsis/ := msClass) {
+				if (/node ms:"div"(list[node] tagList) := k, "class" in getKeywordParameters(ms), str msClass := getKeywordParameters(ms)["class"], /methodsynopsis/ := msClass) {
 					list[SummaryParam] params = [ ];
 					int optionalDepth = 0;
 					set[str] modifiers = { };
@@ -382,14 +376,14 @@ public set[Summary] extractMethodSummary(str bookname, str className, str method
 								break;
 							}
 							 
-							set[str] ptypes = { s | /node n:"span"(_) := sn, "class" in getKeywordParameters(n), getKeywordParameters(n)["class"] == "type", /"text"(s) := n };
+							set[str] ptypes = { s | /node n:"span"(_) := sn, "class" in getKeywordParameters(n), getKeywordParameters(n)["class"] == "type", /"text"(str s) := n };
 							if (size(ptypes) != 1) {
 								paramProblems = true;
 								break;
 							}
 							str ptype = getOneFrom(ptypes);
 							
-							set[str] pnames = { s | /node n:"code"(_) := sn, "class" in getKeywordParameters(n), str cln := getKeywordParameters(n)["class"], /parameter/ := cln, /"text"(s) := n };
+							set[str] pnames = { s | /node n:"code"(_) := sn, "class" in getKeywordParameters(n), str cln := getKeywordParameters(n)["class"], /parameter/ := cln, /"text"(str s) := n };
 							if (size(pnames) != 1) {
 								paramProblems = true;
 								break;

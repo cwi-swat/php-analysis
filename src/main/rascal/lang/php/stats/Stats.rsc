@@ -21,8 +21,8 @@ import IO;
 import ValueIO;
 import lang::csv::IO;
 
-public bool containsVV(Expr e) = size({ v | /v:var(expr(Expr ev)) := e }) > 0;
-public bool containsVV(someExpr(Expr e)) = size({ v | /v:var(expr(Expr ev)) := e }) > 0;
+public bool containsVV(Expr e) = size({ v | /v:var(expr(Expr _)) := e }) > 0;
+public bool containsVV(someExpr(Expr e)) = size({ v | /v:var(expr(Expr _)) := e }) > 0;
 public bool containsVV(noExpr()) = false;
 
 public lrel[loc fileloc, Expr call] gatherExprStats(System scripts, list[Expr](Script) f) {
@@ -356,7 +356,7 @@ public str getStmtKey(\switch(_,_)) = "switch";
 public str getStmtKey(\throw(_)) = "throw";
 public str getStmtKey(tryCatch(_,_)) = "try/catch";
 public str getStmtKey(Stmt::unset(_)) = "unset";
-public str getStmtKey(Stmt::use(_,_,_)) = "use";
+public str getStmtKey(Stmt::useStmt(_,_)) = "use";
 public str getStmtKey(\while(_,_)) = "while";
 
 public list[str] stmtKeyOrder() = [ "break", "class def", "const", "continue", "declare", "do",
@@ -496,13 +496,13 @@ public rel[str Product,str Version,str ReleaseDate,str RequiredPHPVersion,str Co
 }
 
 public rel[str Product,str Version,int Count,int FileCount] loadCountsCSV(loc csvLoc = |project://PHPAnalysis/src/lang/php/extract/csvs/linesOfCode.csv|) {
-	rel[str Product,str Version,int Count,int FileCount] res = readCSV(#rel[str Product,str Version,int Count,int fileCount],cvsLoc);
+	rel[str Product,str Version,int Count,int FileCount] res = readCSV(#rel[str Product,str Version,int Count,int fileCount],csvLoc);
 	return res;
 }
 
 public map[str Product, str Version] getLatestVersionsByDate() {
 	versions = loadVersionsCSV();
-	return ( p : last(vl)[0] | p <- versions<0>, vl := sort([ <v,d> | <v,d,pv,_> <- versions[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[1] < t2[1]; }) );
+	return ( p : last(vl)[0] | p <- versions<0>, vl := sort([ <v,d> | <v,d,_,_> <- versions[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return t1[1] < t2[1]; }) );
 }
 
 public map[str Product, str Version] getLatestPHP4VersionsByDate() {
@@ -517,7 +517,7 @@ public map[str Product, str Version] getLatestPHP5VersionsByDate() {
 
 public map[str Product, str Version] getLatestVersionsByVersionNumber() {
 	versions = loadVersionsCSV();
-	return ( p : last(vl)[0] | p <- versions<0>, vl := sort([ <v,d> | <v,d,pv,_> <- versions[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }) );
+	return ( p : last(vl)[0] | p <- versions<0>, vl := sort([ <v,d> | <v,d,_,_> <- versions[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }) );
 }
 
 public map[str Product, str Version] getLatestPHP4VersionsByVersionNumber() {
@@ -551,5 +551,4 @@ public rel[str Product,str PlainText,str Description] loadProductInfoCSV() {
 	rel[str Product,str PlainText,str Description] res = readCSV(#rel[str Product,str PlainText,str Description],|project://PHPAnalysis/src/lang/php/extract/csvs/ProductInfo.csv|);
 	return res;
 }
-
-									
+								

@@ -152,7 +152,7 @@ public bool compareVersion(str v1, str v2) {
 		v1a = toInt(a1); 
 		try {
 			v1b = toInt(b1);
-		} catch v : {
+		} catch _ : {
 			println("Error, cannot convert <b1> to an int");
 			throw "AAAAAAAAAAAAAAAA";
 		}
@@ -190,7 +190,7 @@ public str bundleCorpusItems(map[str,str] corpus, str corpusName) {
 
 public map[str Product, str Version] getLatestVersionsByVersionNumber() {
 	versionsRel = loadVersionsCSV();
-	return ( p : last(vl)[0] | p <- versionsRel<0>, vl := sort([ <v,d> | <v,d,pv,_> <- versionsRel[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }) );
+	return ( p : last(vl)[0] | p <- versionsRel<0>, vl := sort([ <v,d> | <v,d,_,_> <- versionsRel[p] ],bool(tuple[str,str] t1, tuple[str,str] t2) { return compareVersion(t1[0],t2[0]); }) );
 }
 
 public map[str Product, str Version] getLatestPHP4VersionsByVersionNumber() {

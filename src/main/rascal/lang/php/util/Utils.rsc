@@ -51,15 +51,15 @@ public str executePHP(list[str] opts, loc cwd) {
 private Script parsePHPfile(loc f, list[str] opts, Script error) {
 	//loc parserLoc = usePhpParserJar ? getPhpParserLocFromJar() : lang::php::util::Config::parserLoc;
 	loc parserLoc = lang::php::util::Config::parserLoc;
-	str phpOut;
+	str phpOut = "";
 	try {
 		str filePath = f.path;
 		if (f.authority != "") {
 			filePath = f.authority + "/" + filePath;
 		}
 		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", (parserLoc + astToRascal).path, "-f<filePath>"] + opts, parserWorkingDir);
-	} catch RuntimeException: {
-		return error;
+	} catch _: {
+		return error; 
 	}
 
 	res = errscript("Parser failed in unknown way");
@@ -81,7 +81,7 @@ public bool testPHPInstallation() {
 	try {
 		return hello == trim(executePHP(["-r echo \"<hello>\";"], |tmp:///|));
 	}
-	catch RuntimeException:
+	catch _:
 	 	return false;
 }
 
@@ -123,10 +123,12 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 	if (includeLocationInfo) opts += "--addDecl";
 	if (addUniqueIds) opts += "-i";
 	if (l.scheme == "home") opts += "-r";
-	if (l.scheme == "project") {
-		opts += "-n<l.authority>";
-		opts += "-d<location(|project://<l.authority>|).path>";
-	}
+	// NOTE: For Eclipse project locations, remove for now since we generally
+	// use this on files that are not in an Eclipse project.
+	// if (l.scheme == "project") {
+	// 	opts += "-n<l.authority>";
+	// 	opts += "-d<location(|project://<l.authority>|).path>";
+	// }
 	if (includePhpDocs) opts += "--phpdocs";
 	
 	Script res = parsePHPfile(l, opts, errscript("Could not parse file <l.path>")); 
@@ -249,7 +251,7 @@ public void buildBinaries(bool addLocationAnnotations = true, bool addUniqueIds 
 @doc{Build the serialized ASTs for the current version specific system at a specific location}
 public void buildCurrent(str product, loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
 	str version = "current";
-	buildBinaries(product, version, l, addLocationAnntations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
+	buildBinaries(product, version, l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions, overwrite=overwrite);
 }
 
 @doc{Build the serialized ASTs for all product/version combos in the corpus}
@@ -534,3 +536,5 @@ public void patchBinaries(str systemName, str systemVersion) {
 		writeBinaryValueFile(binLoc, pt, compression=false);		
 	}
 }
+
+private str testString = "test";

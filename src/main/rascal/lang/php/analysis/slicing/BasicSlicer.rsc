@@ -17,7 +17,7 @@ import List;
 import analysis::graphs::Graph;
 
 public set[CFGNode] reachableViaMap(CFG g, CFGNode n, bool star = false, bool backwards=false) {
-	map[Lab, set[Lab]] cfgMap = ( gn.l : ( star ? { gn.l } : { } ) | gn <- g.nodes );
+	map[Lab, set[Lab]] cfgMap = ( gn.lab : ( star ? { gn.lab } : { } ) | gn <- g.nodes );
 	for ( e <- g.edges) {
 		if (backwards) {
 			cfgMap[e.to] += e.from;
@@ -26,7 +26,7 @@ public set[CFGNode] reachableViaMap(CFG g, CFGNode n, bool star = false, bool ba
 		}
 	}
 
-	list[Lab] worklist = toList(cfgMap[n.l]);
+	list[Lab] worklist = toList(cfgMap[n.lab]);
 	set[Lab] worked = { };
 	set[Lab] reachable = { };
 
@@ -38,7 +38,7 @@ public set[CFGNode] reachableViaMap(CFG g, CFGNode n, bool star = false, bool ba
 		worklist = worklist + toList(newReachable);
 	}
 	
-	return { gn | gn <- g.nodes, gn.l in reachable };
+	return { gn | gn <- g.nodes, gn.lab in reachable };
 }
 
 public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Uses u = { }) {
@@ -68,7 +68,7 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	// Which uses do we initially care about? The slicing criteria include both the node
 	// where we start the slice and the names we are interested in; we take uses of those
 	// names, which indicate the definitions that are important to the slice. 
-	rel[Name name, Lab definedAt] importantUses = { ui | tuple[Name name, Lab definedAt] ui <- u[n.l], ui.name in names };
+	rel[Name name, Lab definedAt] importantUses = { ui | tuple[Name name, Lab definedAt] ui <- u[n.lab], ui.name in names };
 	//logMessage("Found <size(importantUses)> important uses:\n<importantUses>", 2);
 	solve(importantUses) {
 		// Now, we compute a fixpoint, extending the set with the uses which contributed to the
@@ -82,7 +82,7 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 	// nodes in the control flow graph (step 1), plus all nodes contained inside these nodes (step 2), and then
 	// predicates/conditionals that contain these nodes (step 3).
 	definingLabels = importantUses.definedAt;
-	definingNodes = { gn | gn <- reachableFromN, gn.l in definingLabels };
+	definingNodes = { gn | gn <- reachableFromN, gn.lab in definingLabels };
 	//logMessage("Found <size(definingNodes)> nodes based on needed definitions", 2);
 	
 	llr = getLabelLocationRel(inputCFG);
@@ -130,7 +130,7 @@ public CFG basicSlice(CFG inputCFG, CFGNode n, set[Name] names, Defs d = { }, Us
 		}
 	}
 
-	containingExprs = { };
+	rel[CFGNode, Expr] containingExprs = { };
 	for (< ni, e > <- predExprNodes) {
 		if (size({ l | l <- containedLocations, l < e.at }) > 0) {
 			containingExprs = containingExprs + < ni, e >;

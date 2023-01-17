@@ -17,9 +17,7 @@ import lang::php::analysis::NamePaths;
 import Set;
 import List;
 import String;
-import Exception;
 import Map;
-import IO;
 
 data ConstItem = normalConst(str constName) | classConst(str className, str constName);
 
@@ -106,7 +104,7 @@ public set[ConstItem] getScriptConstUses(Script scr) {
 
 public set[ConstItemExp] getScriptConstDefs(Script scr) =
 	{ classConst(cln, cn, ce) | /class(cln,_,_,_,cis) := scr, constCI(consts,_) <- cis, const(cn,ce) <- consts } + // TODO: Do we need to worry about const modifiers?
-	{ normalConst(cn, ce) | /c:call(name(name("define")),[actualParameter(scalar(string(cn)),false,false),actualParameter(ce,false,false)]) := scr } +
+	{ normalConst(cn, ce) | /call(name(name("define")),[actualParameter(scalar(string(cn)),false,false),actualParameter(ce,false,false)]) := scr } +
 	{ normalConst(cn, ce) | /Stmt::const(cl) := scr, Const::const(cn,ce) <- cl };
 
 public set[ConstItemExp] getSignatureConsts(Signature sig) {
@@ -149,12 +147,12 @@ public ConstInfo getConstInfo(System sys) {
 		constMap["DIRECTORY_SEPARATOR"] = scalar(string("/"));
 	if ("PATH_SEPARATOR" notin predefined)
 		constMap["PATH_SEPARATOR"] = scalar(string(":"));
-	constMap += ( cn : ce | cn <- constDefExprs, cset := { *de | l <- constDefExprs[cn], de <- constDefExprs[cn][l] }, size(cset) == 1, ce:scalar(sv) := getOneFrom(cset), encapsed(_) !:= sv );  
+	constMap += ( cn : ce | cn <- constDefExprs, cset := { de | l <- constDefExprs[cn], de <- constDefExprs[cn][l] }, size(cset) == 1, ce:scalar(sv) := getOneFrom(cset), encapsed(_) !:= sv );  
 
 	map[str, map[str, Expr]] classConstMap = ( );
 	for (cln <- classConstDefExprs) {
 		constsForCln = classConstDefExprs[cln];
-		mapForCn = ( cn : ce | cn <- constsForCln, cset := { *de | l <- constsForCln[cn], de <- constsForCln[cn][l] }, size(cset) == 1, ce:scalar(sv) := getOneFrom(cset), encapsed(_) !:= sv );
+		mapForCn = ( cn : ce | cn <- constsForCln, cset := { de | l <- constsForCln[cn], de <- constsForCln[cn][l] }, size(cset) == 1, ce:scalar(sv) := getOneFrom(cset), encapsed(_) !:= sv );
 		classConstMap[cln] = mapForCn; 
 	}
 	

@@ -152,8 +152,8 @@ public str getClassConstClassName(loc constPath) = getClassConstInfo(constPath).
 public str getClassConstName(loc constPath) = getClassConstInfo(constPath).constName;
 
 @doc{Create name paths for a script, with or without an explicit namespace}
-public loc scriptPath(str library="", str namespace="") = 
+public loc scriptPath(str library, str namespace="") = 
 	addLibrary(|php+script:///|,library) when size(trim(namespace)) == 0;
-public loc scriptPath(str library="", str namespace="") = 
+public loc scriptPath(str library, str namespace="") = 
 	addLibrary(|php+script:///|,library) when size(trim(namespace)) > 0;
 	

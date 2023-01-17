@@ -17,12 +17,10 @@ import lang::php::pp::PrettyPrinter;
 import lang::php::util::LocUtils;
 import lang::php::analysis::includes::IncludeGraph;
 
-import Exception;
 import IO;
 import List;
 import String;
 import Set;
-import Relation;
 import util::Math;
 
 data FNBits = lit(str s) | fnBit();
@@ -39,7 +37,7 @@ private list[FNBits] fnModel(Expr e) {
 	} else if (scalar(string(s)) := e) {
 		if (trim(s) == "") return [ lit(s) ];
 		list[str] parts = split("/",s);
-		if(size(parts)==0) return [ lit("/") | idx <- [0..size(s)]];
+		if(size(parts)==0) return [ lit("/") | _ <- [0..size(s)]];
 		if (s[0] == "/" && trim(parts[0]) == "") parts = tail(parts);
 		res = [ lit("/"), lit(p) | p <- parts ];
 		if (parts[0] != "") res = tail(res);
@@ -61,15 +59,15 @@ private str fnMatch(Expr e) {
 	if (lastFnBit != -1) res = res[lastFnBit..];
 	
 	solve(res) {
-		while([lit(".."),lit("/"),a*] := res) res = [*a];
-		while([lit("."),lit("/"),a*] := res) res = [*a];
-		while([lit(".."),a*] := res) res = [*a];
-		while([lit("."), a*] := res) res = [*a];
-		while([a*,lit("/"),lit("/"),b*] := res)
+		while([lit(".."),lit("/"),*a] := res) res = [*a];
+		while([lit("."),lit("/"),*a] := res) res = [*a];
+		while([lit(".."),*a] := res) res = [*a];
+		while([lit("."), *a] := res) res = [*a];
+		while([*a,lit("/"),lit("/"),*b] := res)
 			res = [*a,lit("/"),*b];
-		while([a*,lit("/"),lit(c),lit("/"),lit("."),lit("/"),d*] := res)
+		while([*a,lit("/"),lit(c),lit("/"),lit("."),lit("/"),*d] := res)
 			res = [*a,lit("/"),lit(c),lit("/"),*d];
-		while([a*,lit("/"),lit(c),lit("/"),lit(".."),lit("/"),d*] := res)
+		while([*a,lit("/"),lit(_),lit("/"),lit(".."),lit("/"),*d] := res)
 			res = [*a,lit("/"),*d];
 	}
 	list[str] toMatch = [];
@@ -88,7 +86,7 @@ public str showGeneratedRegex(str s) {
 // TODO: Add support for library includes. This is only an issue were we
 // to match an include that was both a library include and an include in
 // our own system.
-public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphEdge e, bool ipMayBeSet, list[str] ipath) {
+public IncludeGraphEdge matchIncludes(System _, IncludeGraph ig, IncludeGraphEdge e, bool _, list[str] _) {
 	Expr attemptToMatch = e.includeExpr.expr;
 	
 	// If this is a literal, we can try to match it; if it is an fbBit, it is some
@@ -112,12 +110,10 @@ public IncludeGraphEdge matchIncludes(System sys, IncludeGraph ig, IncludeGraphE
 	} else {
 		return igEdge(e.source, unknownNode(), e.includeExpr);
 	}
-	
-	return e;
 }
 
 // TODO: Along with the system, we should also include known libraries here
-public set[loc] matchIncludes(System sys, Expr includeExpr, loc baseLoc, set[loc] libs = { }) {
+public set[loc] matchIncludes(System sys, Expr includeExpr, loc _, set[loc] libs = { }) {
 	// Create the regular expression representing the include expression
 	str re = "^\\S*" + fnMatch(includeExpr.expr) + "$";
 

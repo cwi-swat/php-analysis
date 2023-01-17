@@ -23,7 +23,6 @@ import lang::php::analysis::evaluators::SimulateCalls;
 import lang::php::analysis::evaluators::Simplify;
 
 import Set;
-import Relation;
 import String;
 import DateTime;
 import Map;
@@ -46,15 +45,15 @@ private set[loc] reachable(IncludeGraph igraph, loc l) {
 	return res;
 }
 
-private Expr replaceConstants(Expr e, IncludesInfo iinfo) {
-	return bottom-up visit(e) {
-		case fc:fetchConst(name(cn)) => (iinfo.constMap[cn])[at=fc.at]
-			when cn in iinfo.constMap
+// private Expr replaceConstants(Expr e, IncludesInfo iinfo) {
+// 	return bottom-up visit(e) {
+// 		case fc:fetchConst(name(cn)) => (iinfo.constMap[cn])[at=fc.at]
+// 			when cn in iinfo.constMap
 			
-		case fcc:fetchClassConst(name(name(cln)),str cn) => (iinfo.classConstMap[cln][cn])[at=fcc.at]
-			when cln in iinfo.classConstMap && cn in iinfo.classConstMap[cln]
-	}
-}
+// 		case fcc:fetchClassConst(name(name(cln)),str cn) => (iinfo.classConstMap[cln][cn])[at=fcc.at]
+// 			when cln in iinfo.classConstMap && cn in iinfo.classConstMap[cln]
+// 	}
+// }
 
 data IncludeGraphNode(set[ConstItem] definedConstants={}, map[ConstItem,Expr] definingExps=(), bool setsIncludePath=false);
 
@@ -247,7 +246,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 		// calculateLoc, will do the single file match, while matchIncludes below will possibly return
 		// multiple matches.
 		for (e <- basicMatched) {
-			if (iexp:include(scalar(string(sp)),_) := e.includeExpr) {
+			if (include(scalar(string(sp)),_) := e.includeExpr) {
 				try {
 					iloc = calculateLoc(toResolve,baseLoc,sp,site,pathMayBeChanged=size(reachable(igraph,baseLoc) & setsIncludePath) > 0,ipath=ipath);
 					solvingEdges = solvingEdges + e[target=igraph.nodes[iloc]];

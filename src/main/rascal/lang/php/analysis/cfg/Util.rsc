@@ -14,7 +14,6 @@ import Set;
 import List;
 import Node;
 import Map;
-import IO;
 
 public set[CFGNode] pred(CFG cfg, CFGNode n) {
 	predlabels = { e.from | e <- cfg.edges, e.to == n.lab };
@@ -108,24 +107,24 @@ public bool trueOnAReachingPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNod
 }
 
 @doc{Return the location/path of the CFG for the node at the given location}
-public loc findContainingCFGLoc(Script s, map[loc,CFG] cfgs, loc l) {
+public loc findContainingCFGLoc(Script s, loc l) {
 	
-	for (/c:class(cname,_,_,_,mbrs) := s) {
-		for (m:method(mname,_,_,params,body,_) <- mbrs, l < m.at) {
+	for (/class(cname,_,_,_,mbrs) := s) {
+		for (m:method(mname,_,_,_,_,_) <- mbrs, l < m.at) {
 			return methodPath(cname,mname);
 		}
 	}
 	
-	for (/f:function(fname,_,params,body,_) := s, l < f.at) {
+	for (/f:function(fname,_,_,_,_) := s, l < f.at) {
 		return functionPath(fname);
 	}
 	
-	return scriptPath();
+	return scriptPath("");
 }
 
 @doc{Return the CFG for the node at the given location}
 public CFG findContainingCFG(Script s, map[loc,CFG] cfgs, loc l) {
-	return cfgs[findContainingCFGLoc(s, cfgs, l)];
+	return cfgs[findContainingCFGLoc(s, l)];
 }
 
 @doc{Check to see if the predicate can be satisfied on all paths from the start node.}
@@ -279,10 +278,10 @@ public set[&T] findAllReachingUntil(Graph[CFGNode] g, CFGNode startNode, bool(CF
 @doc{Remove a node from the CFG, relinking edges as necessary}
 public CFG removeNode(CFG inputCFG, CFGNode n) {
 	// Get the edges into this node
-	edgesInto = { e | e <- inputCFG.edges, e.to == n.l };
+	edgesInto = { e | e <- inputCFG.edges, e.to == n.lab };
 	
 	// Get the edges from this node
-	edgesFrom = { e | e <- inputCFG.edges, e.from == n.l };
+	edgesFrom = { e | e <- inputCFG.edges, e.from == n.lab };
 	
 	// Now, link up the nodes at each endpoint
 	newEdges = { mergeEdges(e1,e2) | e1 <- edgesInto, e2 <- edgesFrom };
@@ -293,8 +292,8 @@ public CFG removeNode(CFG inputCFG, CFGNode n) {
 public CFG removeNodes(CFG inputCFG, set[CFGNode] ns) {
 	// Turn the edge relation into two maps: one with edges into nodes, one
 	// with edges from nodes.
-	map[Lab, FlowEdges] edgesIntoAllNodes = ( n.l : { } | n <- inputCFG.nodes ); 
-	map[Lab, FlowEdges] edgesFromAllNodes = ( n.l : { } | n <- inputCFG.nodes );
+	map[Lab, FlowEdges] edgesIntoAllNodes = ( n.lab : { } | n <- inputCFG.nodes ); 
+	map[Lab, FlowEdges] edgesFromAllNodes = ( n.lab : { } | n <- inputCFG.nodes );
 
 	// Populate the edge maps
 	for (e <- inputCFG.edges) {
@@ -305,13 +304,13 @@ public CFG removeNodes(CFG inputCFG, set[CFGNode] ns) {
 	// Now, for each node that we will remove, link up their edges appropriately
 	for (n <- ns) {
 		// For node n, get the edges into this node
-		FlowEdges edgesInto = edgesIntoAllNodes[n.l];
+		FlowEdges edgesInto = edgesIntoAllNodes[n.lab];
 
 		// For node n, get the edges from this node
-		FlowEdges edgesFrom = edgesFromAllNodes[n.l];
+		FlowEdges edgesFrom = edgesFromAllNodes[n.lab];
 		
 		// Compute the new edges we want to add; skip those that are self-loops
-		FlowEdges newEdges = { mergeEdges(e1,e2) | e1 <- edgesInto, e1.from != n.l, e2 <- edgesFrom, e2.to != n.l };
+		FlowEdges newEdges = { mergeEdges(e1,e2) | e1 <- edgesInto, e1.from != n.lab, e2 <- edgesFrom, e2.to != n.lab };
 
 		// Add the new edges into the appropriate maps
 		for (ne <- newEdges) {
@@ -334,8 +333,8 @@ public CFG removeNodes(CFG inputCFG, set[CFGNode] ns) {
 	}
 	
 	// Finally, remove the node from the into and from maps and update the nodes set
-	edgesFromAllNodes = domainX(edgesFromAllNodes, { n.l | n <- ns } );
-	edgesIntoAllNodes = domainX(edgesIntoAllNodes, { n.l | n <- ns } );
+	edgesFromAllNodes = domainX(edgesFromAllNodes, { n.lab | n <- ns } );
+	edgesIntoAllNodes = domainX(edgesIntoAllNodes, { n.lab | n <- ns } );
 	inputCFG.nodes = inputCFG.nodes - ns;
 	
 	// Then updates the edges as well
@@ -349,10 +348,10 @@ public CFG removeNodes(CFG inputCFG, set[CFGNode] ns) {
 @doc{Turn condition edges into regular edges if the header for the associated condition is no longer present}
 public CFG transformUnlinkedConditions(CFG inputCFG, set[CFGNode] alsoCheck = { }) {
 	newEdges = { };
-	presentHeaders = { n.l | n <- inputCFG.nodes, n is headerNode };
+	presentHeaders = { n.lab | n <- inputCFG.nodes, n is headerNode };
 	
 	if (!isEmpty(alsoCheck)) {
-		presentHeaders = presentHeaders - { n.l | n <- alsoCheck };
+		presentHeaders = presentHeaders - { n.lab | n <- alsoCheck };
 	}
 	
 	for (e <- inputCFG.edges) {

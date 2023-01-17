@@ -7,8 +7,6 @@
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::ast::AbstractSyntax
 
-import IO;
-
 public data OptionExpr
 	= someExpr(Expr expr) | noExpr();
 
@@ -60,7 +58,8 @@ public data IncludeType(loc at=|unknown:///|, loc decl=|unknown:///|, str id="",
 
 public data PHPType
 	= nullableType(PHPType nestedType)
-	| regularType(Name typeName) | noType();
+	| regularType(Name typeName) 
+	| noType();
 
 // NOTE: In PHP, yield is a statement, but it can also be used as an expression.
 // To handle this, we just treat it as an expression. The parser does this as well.

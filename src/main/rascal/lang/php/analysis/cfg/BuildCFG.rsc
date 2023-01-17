@@ -22,7 +22,6 @@ import List;
 import Set;
 import Node;
 import Relation;
-import Exception;
 
 // TODOs:
 // 4. Initializations of properties in classes, and of parameters with
@@ -60,16 +59,16 @@ public tuple[Script scr, map[loc,CFG] cfgs] buildCFGsAndScript(Script scr, bool 
 
 	//println("Creating CFG for top-level script");
 	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
-	res[scriptPath()] = scriptCFG;
+	res[scriptPath("")] = scriptCFG;
 		
-	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,params,body,_) <- mbrs) {
+	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,_,_,_) <- mbrs) {
 		methodNamePath = methodPath(cname,mname);
 		//println("Creating CFG for <cname>::<mname>");
 		< methodCFG, lstate > = createMethodCFG(methodNamePath, m, lstate);
 		res[methodNamePath] = methodCFG;
 	}
 
-	for (/f:function(fname,_,params,body,rt) := scrLabeled) {
+	for (/f:function(fname,_,_,_,_) := scrLabeled) {
 		functionNamePath = functionPath(fname);
 		//println("Creating CFG for <fname>");
 		< functionCFG, lstate > = createFunctionCFG(functionNamePath, f, lstate);
@@ -93,7 +92,7 @@ public Script stripLabels(Script scr) {
 
 @doc{Retrieve all method declarations from a script.}
 private map[loc, ClassItem] getScriptMethods(Script scr) =
-	( methodPath(cname, mname) : m | /class(cname,_,_,_,mbrs) := scr, m:method(mname,_,_,params,body,rtype) <- mbrs );
+	( methodPath(cname, mname) : m | /class(cname,_,_,_,mbrs) := scr, m:method(mname,_,_,_,_,_) <- mbrs );
 
 // TODO: It is possible in PHP to have non-unique or conditional declarations. We may need a way to represent
 // that here, assuming we ever run across it.
@@ -135,8 +134,8 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 	cfgExitNode = scriptExit(exitLabel)[lab=exitLabel];
 	lstate = addEntryAndExit(lstate, cfgEntryNode, cfgExitNode);
 
-	if (script(list[Stmt] b) !:= scr)
-		return < cfg(scriptPath(), lstate.nodes, { }, cfgEntryNode, cfgExitNode), lstate >;
+	if (script(list[Stmt] _) !:= scr)
+		return < cfg(scriptPath(""), lstate.nodes, { }, cfgEntryNode, cfgExitNode), lstate >;
 	
 	scriptBody = scr.body;
 	sbReduced = visit(scriptBody) {
@@ -179,7 +178,7 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 	labels = { e.from, e.to | e <- edges };
 	nodes = { n | n <- nodes, n.lab in labels } + { cfgEntryNode, cfgExitNode };
 	
- 	return < cfg(scriptPath(), nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
+ 	return < cfg(scriptPath(""), nodes, edges, cfgEntryNode, cfgExitNode), lstate >;   
 }
 
 // TODO: The code for functions and methods is very similar, so refactor to remove
@@ -217,7 +216,7 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(loc np, ClassIte
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
 	list[CFGNode] paramNodes = [ ];
-	for (param(paramName,paramDefault,byRef,isVariadic,paramType) <- m.params) {
+	for (param(paramName,paramDefault,byRef,_,_) <- m.params) {
 		newLabel = incLabel();
 		newNode = (someExpr(e) := paramDefault) 
 			? actualNotProvided(paramName, e, byRef, newLabel)[lab=newLabel] 
@@ -305,7 +304,7 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(loc np, Stmt
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
 	list[CFGNode] paramNodes = [ ];
-	for (param(paramName,paramDefault,byRef,isVariadic,paramType) <- f.params) {
+	for (param(paramName,paramDefault,byRef,_,_) <- f.params) {
 		newLabel = incLabel();
 		newNode = (someExpr(e) := paramDefault) 
 			? actualNotProvided(paramName, e, byRef, newLabel)[lab=newLabel] 
@@ -447,7 +446,7 @@ public set[Lab] init(Stmt s, LabelState lstate) {
 		// In a static declaration, the first initializer provides the first label. If we
 		// have no initializers, than the statement itself provides the label.
 		case static(list[StaticVar] vars) : {
-			initializers = [ e | staticVar(str name, someExpr(Expr e)) <- vars ];
+			initializers = [ e | staticVar(str _, someExpr(Expr e)) <- vars ];
 			if (! isEmpty(initializers)) {
 				return init(head(initializers), lstate);
 			} else {
@@ -509,45 +508,45 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		case array(list[ArrayElement] items,_) : {
 			if (size(items) == 0) {
 				return { e.lab };
-			} else if (arrayElement(someExpr(Expr key), Expr val, bool byRef) := head(items)) {
+			} else if (arrayElement(someExpr(Expr key), Expr _, bool _) := head(items)) {
 				return init(key, lstate);
-			} else if (arrayElement(noExpr(), Expr val, bool byRef) := head(items)) {
+			} else if (arrayElement(noExpr(), Expr val, bool _) := head(items)) {
 				return init(val, lstate);
 			}
 		}
 		
-		case fetchArrayDim(Expr var, OptionExpr dim) : return init(var, lstate);
+		case fetchArrayDim(Expr var, OptionExpr _) : return init(var, lstate);
 		
-		case fetchClassConst(name(Name className), str constName) : return { e.lab };
+		case fetchClassConst(name(Name _), str _) : return { e.lab };
 
-		case fetchClassConst(expr(Expr className), str constName) : return init(className, lstate);
+		case fetchClassConst(expr(Expr className), str _) : return init(className, lstate);
 		
-		case assign(Expr assignTo, Expr assignExpr) : return init(assignExpr, lstate);
+		case assign(Expr _, Expr assignExpr) : return init(assignExpr, lstate);
 		
-		case assignWOp(Expr assignTo, Expr assignExpr, Op operation) : return init(assignExpr, lstate);
+		case assignWOp(Expr _, Expr assignExpr, Op _) : return init(assignExpr, lstate);
 		
-		case listAssign(list[OptionExpr] assignsTo, Expr assignExpr) : return init(assignExpr, lstate);
+		case listAssign(list[OptionExpr] _, Expr assignExpr) : return init(assignExpr, lstate);
 		
-		case refAssign(Expr assignTo, Expr assignExpr) : return init(assignExpr, lstate);
+		case refAssign(Expr _, Expr assignExpr) : return init(assignExpr, lstate);
 		
-		case binaryOperation(Expr left, Expr right, Op operation) : return init(left, lstate);
+		case binaryOperation(Expr left, Expr _, Op _) : return init(left, lstate);
 		
-		case unaryOperation(Expr operand, Op operation) : return init(operand, lstate);
+		case unaryOperation(Expr operand, Op _) : return init(operand, lstate);
 		
 		case new(ClassName className, list[ActualParameter] parameters) : {
 			// TODO: Add support for anonymous classes here...
 			if (computedClassName(Expr cname) := className)
 				return init(cname, lstate);
-			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef, bool isPacked) := head(parameters))
+			else if (size(parameters) > 0 && actualParameter(Expr expr, bool _, bool _) := head(parameters))
 				return init(expr, lstate);
 			return { e.lab };
 		}
 		
-		case cast(CastType castType, Expr expr) : return init(expr, lstate);
+		case cast(CastType _, Expr expr) : return init(expr, lstate);
 		
 		case clone(Expr expr) : return init(expr, lstate);
 		
-		case fetchConst(Name name) : return { e.lab };
+		case fetchConst(Name _) : return { e.lab };
 		
 		case empty(Expr expr) : return init(expr, lstate);
 		
@@ -561,12 +560,12 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		case call(NameOrExpr funName, list[ActualParameter] parameters) : {
 			if (expr(Expr fname) := funName)
 				return init(fname, lstate);
-			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef, bool isPacked) := head(parameters))
+			else if (size(parameters) > 0 && actualParameter(Expr expr, bool _, bool _) := head(parameters))
 				return init(expr, lstate);
 			return { e.lab };
 		}
 		
-		case methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters) : {
+		case methodCall(Expr target, NameOrExpr _, list[ActualParameter] _) : {
 			return init(target, lstate);
 		}
 		
@@ -575,14 +574,14 @@ public set[Lab] init(Expr e, LabelState lstate) {
 				return init(sname, lstate);
 			else if (expr(Expr mname) := methodName)
 				return init(mname, lstate);
-			else if (size(parameters) > 0 && actualParameter(Expr expr, bool byRef, bool isPacked) := head(parameters))
+			else if (size(parameters) > 0 && actualParameter(Expr expr, bool _, bool _) := head(parameters))
 				return init(expr, lstate);
 			return { e.lab };
 		}
 		
-		case include(Expr expr, IncludeType includeType) : return init(expr, lstate);
+		case include(Expr expr, IncludeType _) : return init(expr, lstate);
 		
-		case instanceOf(Expr expr, NameOrExpr toCompare) : return init(expr, lstate);
+		case instanceOf(Expr expr, NameOrExpr _) : return init(expr, lstate);
 		
 		case isSet(list[Expr] exprs) : {
 			if (size(exprs) > 0)
@@ -592,7 +591,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		
 		case print(Expr expr) : return init(expr, lstate);
 		
-		case propertyFetch(Expr target, NameOrExpr propertyName) : return init(target, lstate);
+		case propertyFetch(Expr target, NameOrExpr _) : return init(target, lstate);
 		
 		case shellExec(list[Expr] parts) : {
 			if (size(parts) > 0)
@@ -600,7 +599,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 			return { e.lab };
 		}
 		
-		case ternary(Expr cond, OptionExpr ifBranch, Expr elseBranch) : return init(cond, lstate);
+		case ternary(Expr cond, OptionExpr _, Expr _) : return init(cond, lstate);
 		
 		case staticPropertyFetch(NameOrExpr className, NameOrExpr propertyName) : {
 			if (expr(Expr cname) := className)
@@ -611,18 +610,23 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		}
 		
 		case scalar(encapsed(parts)) : return init(head(parts), lstate);
-		case scalar(Scalar scalarVal) : return { e.lab };
+		case scalar(Scalar _) : return { e.lab };
 		
 		case var(expr(Expr varName)) : return init(varName, lstate);
-		case var(name(Name varName)) : return { e.lab };
+		case var(name(Name _)) : return { e.lab };
 		
 		case yield(someExpr(key), _) : return init(key, lstate);
 		case yield(noExpr(), someExpr(val)) : return init(val, lstate);
 		case yield(noExpr(), noExpr()) : return { e.lab };
 		
-		case listExpr(exprs) : {
-			actualExprs = [ ei | someExpr(ei) <- exprs ];
-			return isEmpty(actualExprs) ? { e.lab } : init(head(actualExprs), lstate);
+		case listExpr(list[ArrayElement] items) : {
+			if (size(items) == 0) {
+				return { e.lab };
+			} else if (arrayElement(someExpr(Expr key), Expr _, bool _) := head(items)) {
+				return init(key, lstate);
+			} else if (arrayElement(noExpr(), Expr val, bool _) := head(items)) {
+				return init(val, lstate);
+			}
 		}
 		
 		case closure(_,_,_,_,_,_) : {
@@ -635,9 +639,9 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		
 		default: {
 			println("Unhandled expression <e>");
-			return { };
 		}
 	}
+	return { };
 }
 
 @doc{Find the label of the final step taken in computing the given statement.}
@@ -676,12 +680,12 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 		}
 
 		// The condition is always checked last, so it provides the final labels
-		case do(Expr cond, list[Stmt] body) : {
+		case do(Expr cond, list[Stmt] _) : {
 			return final(cond, lstate);
 		}
 
 		// We always have at least one expr; the final expr provides the labels.
-		case echo(list[Expr] exprs) : {
+		case echo(list[Expr] _) : {
 			return { s.lab };
 		}
 
@@ -702,7 +706,7 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 		}
 
 		// We know the asVar will run, so we fall back to that if the body is empty.
-		case foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body) : {
+		case foreach(Expr _, OptionExpr _, bool _, Expr asVar, list[Stmt] body) : {
 			set[Lab] finalLabels = isEmpty(body) ? { } : final(last(body), lstate);
 			if (isEmpty(finalLabels)) finalLabels = final(asVar, lstate);
 			return finalLabels;
@@ -773,7 +777,7 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 		
 		// In a static declaration, the final initializer provides the final label.
 		case static(list[StaticVar] vars) : {
-			initializers = [ e | staticVar(str name, someExpr(Expr e)) <- vars ];
+			initializers = [ e | staticVar(str _, someExpr(Expr e)) <- vars ];
 			if (! isEmpty(initializers)) {
 				return final(last(initializers), lstate);
 			} else {
@@ -784,7 +788,7 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 		// The switch statement has such complicated logic, and always uses a join
 		// node, so we won't even bother with trying to compute what could be the
 		// final labels.
-		case \switch(Expr cond, list[Case] cases) : return { s.lab };
+		case \switch(Expr _, list[Case] _) : return { s.lab };
 
 		// In a throw statement, the last thing we do is throw, so the statement provides
 		// the final label.
@@ -831,7 +835,7 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 		// In a while loop, the final label is always from the condition, since that will always be
 		// checked after each run of the body to see if we can continue (or to see if we run the body
 		// in the first place).
-		case \while(Expr cond, list[Stmt] body) : {
+		case \while(Expr cond, list[Stmt] _) : {
 			return final(cond, lstate);
 		}
 
@@ -851,7 +855,7 @@ private set[Lab] final(Expr e, LabelState lstate) {
 	if (e.lab in lstate.footerNodes) return { lstate.footerNodes[e.lab] };
 	
 	switch(e) {
-		case ternary(Expr cond, OptionExpr ifBranch, Expr elseBranch) : {
+		case ternary(Expr _, OptionExpr ifBranch, Expr elseBranch) : {
 			if (someExpr(ie) := ifBranch)
 				return final(ie, lstate) + final(elseBranch, lstate);
 			else
@@ -880,13 +884,13 @@ private tuple[FlowEdges, LabelState] addStmtEdges(FlowEdges edges, LabelState ls
 
 @doc{Add edges between statements given as a sequence, such as in the bodies of other statements.}
 private tuple[FlowEdges, LabelState] addBodyEdges(FlowEdges edges, LabelState lstate, list[Stmt] body) {
-	for ([_*,b1,b2,_*] := body) edges += { flowEdge(f, i) | f <- final(b1, lstate), i <- init(b2, lstate) };
+	for ([*_,b1,b2,*_] := body) edges += { flowEdge(f, i) | f <- final(b1, lstate), i <- init(b2, lstate) };
 	return < edges, lstate >;
 }
 
 @doc{Add edges between expressions that are given as a sequence.}
 private tuple[FlowEdges, LabelState] addExpSeqEdges(FlowEdges edges, LabelState lstate, list[Expr] exps) {
-	for ([_*,e1,e2,_*] := exps) edges += { flowEdge(f, i) | f <- final(e1, lstate), i <- init(e2, lstate) };
+	for ([*_,e1,e2,*_] := exps) edges += { flowEdge(f, i) | f <- final(e1, lstate), i <- init(e2, lstate) };
 	return < edges, lstate >;
 }
 
@@ -1136,7 +1140,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		}
 
-		case foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body) : {
+		case foreach(Expr arrayExpr, OptionExpr keyvar, bool _, Expr asVar, list[Stmt] body) : {
 			headernode = incLabel();
 			footernode = incLabel();
 			lstate.nodes = lstate.nodes + headerNode(s, footernode, headernode)[lab=headernode];
@@ -1303,7 +1307,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			for (fl <- (finalLabels+s.lab), fl notin lstate.footerNodes) lstate.footerNodes[fl] = footernode;
 		}
 
-		case namespace(OptionName nsName, list[Stmt] body) : {
+		case namespace(OptionName _, list[Stmt] body) : {
 			for (b <- body) < edges, lstate > = addStmtEdges(edges, lstate, b);
 			< edges, lstate > = addBodyEdges(edges, lstate, body);
 		}		
@@ -1320,7 +1324,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 		}
 		
 		case static(list[StaticVar] vars) : {
-			varExps = [ e | v:staticVar(str name, someExpr(Expr e)) <- vars ];
+			varExps = [ e | staticVar(str _, someExpr(Expr e)) <- vars ];
 			for (e <- varExps) < edges, lstate > = addExpEdges(edges, lstate, e);
 			< edges, lstate > = addExpSeqEdges(edges, lstate, varExps);
 		}
@@ -1350,7 +1354,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// other, representing the "false" path through all the conditions (i.e.,
 			// if the condition is false, the behavior is to then try the next condition).
 			set[Lab] lastLabels = final(cond, lstate);
-			for (\case(someExpr(e),b) <- cases) {
+			for (\case(someExpr(e),_) <- cases) {
 				if (lastLabels == final(cond, lstate)) {
 					edges += { flowEdge(fc, ii) | fc <- lastLabels, ii <- init(e, lstate) };
 				} else {
@@ -1393,7 +1397,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 
 			// If we still have exprsToLink, this means we have no body that they will run. Link
 			// the true edges for these conditions to the join node.
-			for (e <- exprsToLink) {
+			for (_ <- exprsToLink) {
 				edges += { conditionTrueFlowEdge(fl,footernode,headernode,binaryOperation(cond,ei,equal())) | ei <- exprsToLink, fl <- final(ei,lstate) };
 			}
 			
@@ -1416,7 +1420,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			// Link to the default. This is done if the last condition is false. If there are no case conditions,
 			// we link from the switch condition unconditionally.
 			if (size(defaultLabels) > 0) {
-				caseGuards = [ e | \case(someExpr(e),b) <- cases ];
+				caseGuards = [ e | \case(someExpr(e),_) <- cases ];
 				if (size(caseGuards) > 0) {
 					edges += { conditionFalseFlowEdge(el,bl,headernode,binaryOperation(cond,last(caseGuards),equal())) | el <- final(last(caseGuards), lstate), bl <- defaultLabels };
 				} else {
@@ -1608,7 +1612,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 	
 	switch(e) {
 		case array(list[ArrayElement] items,_) : {
-			for (arrayElement(OptionExpr okey, Expr val, bool byRef) <- items) {
+			for (arrayElement(OptionExpr okey, Expr val, bool _) <- items) {
 				< edges, lstate > = addExpEdges(edges, lstate, val);
 				if (someExpr(Expr key) := okey)
 					< edges, lstate > = addExpEdges(edges, lstate, key);
@@ -1617,7 +1621,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			for (arrayElement(someExpr(kv),v1,_) <- items)
 					edges += makeEdges(final(kv, lstate), init(v1, lstate));
 
-			for ([_*,arrayElement(k1,v1,_),arrayElement(k2,v2,_),_*] := items) {
+			for ([*_,arrayElement(_,v1,_),arrayElement(k2,v2,_),*_] := items) {
 				if (someExpr(kv) := k2)
 					edges += makeEdges(final(v1, lstate), init(kv, lstate));
 				else
@@ -1639,7 +1643,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges += makeEdges(final(var, lstate), finalLabels);
 		}
 		
-		case fetchClassConst(expr(Expr className), str constName) : {
+		case fetchClassConst(expr(Expr className), str _) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
 			edges += makeEdges(final(className, lstate), finalLabels);
 		}
@@ -1650,7 +1654,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges = edges + makeEdges(final(assignExpr, lstate), init(assignTo, lstate)) + makeEdges(final(assignTo, lstate), finalLabels);
 		}
 		
-		case assignWOp(Expr assignTo, Expr assignExpr, Op operation) : {
+		case assignWOp(Expr assignTo, Expr assignExpr, Op _) : {
 			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
 			< edges, lstate > = addExpEdges(edges, lstate, assignTo);
 			edges = edges + makeEdges(final(assignExpr, lstate), init(assignTo, lstate)) + makeEdges(final(assignTo, lstate), finalLabels);
@@ -1675,13 +1679,13 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges = edges + makeEdges(final(assignExpr, lstate), init(assignTo, lstate)) + makeEdges(final(assignTo, lstate), finalLabels);
 		}
 		
-		case binaryOperation(Expr left, Expr right, Op operation) : { 
+		case binaryOperation(Expr left, Expr right, Op _) : { 
 			< edges, lstate > = addExpEdges(edges, lstate, left);
 			< edges, lstate > = addExpEdges(edges, lstate, right);
 			edges = edges + makeEdges(final(left, lstate), init(right, lstate)) + makeEdges(final(right, lstate), finalLabels);
 		}
 		
-		case unaryOperation(Expr operand, Op operation) : {
+		case unaryOperation(Expr operand, Op _) : {
 			< edges, lstate > = addExpEdges(edges, lstate, operand); 
 			edges = edges + makeEdges(final(operand, lstate), finalLabels);
 		}
@@ -1704,7 +1708,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			}
 		}
 		
-		case cast(CastType castType, Expr expr) : {
+		case cast(CastType _, Expr expr) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
 			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
@@ -1812,7 +1816,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		}
 
 		
-		case include(Expr expr, IncludeType includeType) : {
+		case include(Expr expr, IncludeType _) : {
 			< edges, lstate > = addExpEdges(edges, lstate, expr);
 			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
@@ -1845,7 +1849,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges = edges + makeEdges(final(target, lstate),init(propertyName, lstate)) + makeEdges(final(propertyName, lstate),finalLabels);
 		}
 		
-		case propertyFetch(Expr target, name(Name propertyName)) : {
+		case propertyFetch(Expr target, name(Name _)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, target);
 			edges += makeEdges(final(target, lstate), finalLabels);
 		}
@@ -1903,12 +1907,12 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges = edges + makeEdges(final(className, lstate),init(propertyName, lstate)) + makeEdges(final(propertyName, lstate), finalLabels);
 		}
 
-		case staticPropertyFetch(name(Name className), expr(Expr propertyName)) : {
+		case staticPropertyFetch(name(Name _), expr(Expr propertyName)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, propertyName);
 			edges += makeEdges(final(propertyName, lstate), finalLabels);
 		}
 
-		case staticPropertyFetch(expr(Expr className), name(Name propertyName)) : {
+		case staticPropertyFetch(expr(Expr className), name(Name _)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
 			edges += makeEdges(final(className, lstate), finalLabels);
 		}
@@ -1943,14 +1947,26 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges += makeEdges(final(v, lstate), finalLabels);
 		}
 		
-		case listExpr(exprs) : {
-			actualExprs = [ ei | someExpr(ei) <- exprs ];
-			if (size(actualExprs) > 0) {
-				< edges, lstate > = addExpSeqEdges(edges, lstate, actualExprs);
-				edges += makeEdges(final(last(actualExprs), lstate), finalLabels);
+		case listExpr(list[ArrayElement] items) : {
+			for (arrayElement(OptionExpr okey, Expr val, bool _) <- items) {
+				< edges, lstate > = addExpEdges(edges, lstate, val);
+				if (someExpr(Expr key) := okey)
+					< edges, lstate > = addExpEdges(edges, lstate, key);
 			}
-		}
-		
+
+			for (arrayElement(someExpr(kv),v1,_) <- items)
+					edges += makeEdges(final(kv, lstate), init(v1, lstate));
+
+			for ([*_,arrayElement(_,v1,_),arrayElement(k2,v2,_),*_] := items) {
+				if (someExpr(kv) := k2)
+					edges += makeEdges(final(v1, lstate), init(kv, lstate));
+				else
+					edges += makeEdges(final(v1, lstate), init(v2, lstate));
+			}
+
+			if (size(items) > 0, arrayElement(_,val,_) := last(items))
+				edges += makeEdges(final(val, lstate), finalLabels);
+		}		
 	}
 
 	return < edges, lstate >;			

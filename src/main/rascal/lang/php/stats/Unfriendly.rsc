@@ -1,16 +1,5 @@
 module lang::php::stats::Unfriendly
 
-import lang::php::util::Utils;
-import lang::php::stats::Stats;
-import lang::php::ast::System;
-import lang::php::util::Corpus;
-import lang::php::ast::AbstractSyntax;
-import lang::rascal::types::AbstractType;
-import lang::php::util::Config;
-import lang::php::analysis::signatures::Summaries;
-import lang::php::analysis::includes::IncludeGraph;
-import lang::php::analysis::NamePaths;
-
 import List;
 import String;
 import Set;
@@ -19,14 +8,166 @@ import IO;
 import ValueIO;
 import Map;
 import Node;
+import Type;
 import util::Math;
 
+import lang::php::util::Utils;
+import lang::php::stats::Stats;
+import lang::php::ast::System;
+import lang::php::util::Corpus;
+import lang::php::ast::AbstractSyntax;
+import lang::php::util::Config;
+import lang::php::analysis::signatures::Summaries;
+import lang::php::analysis::includes::IncludeGraph;
+import lang::php::analysis::NamePaths;
+
 import lang::csv::IO;
-import VVU; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/VarVarUses.csv?funname=varVarUses|;
-import Exprs; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/exprs.csv?funname=expressionCounts|;
-import Feats; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/FeaturesByFile.csv?funname=getFeats|;
-import Sizes; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/linesPerFile.csv?funname=getLines|;
-import Versions; // = |csv+project://PHPAnalysis/src/lang/php/extract/csvs/Versions.csv?funname=getVersions|;
+
+list[str] vvuColumns = ["ID","Product","Path","Line","Derivable Names",
+	"Assigns Through","Made Global","Uses literal pattern","Uses foreach",
+	"Uses switch","Uses conditional","Derivable with annotations","Notes"];
+
+alias VVUType = rel[int id, str product, str path, int line, str derivableNames,
+	str assignsThrough, str madeGlobal, str usesLiteralPattern,
+	str usesForeach, str usesSwitch, str usesConditional, str derivableWithAnnotations,
+	str notes];
+
+public VVUType varVarUses(loc fileLoc = baseLoc + "/extract/csvs/VarVarUses.csv") {
+	return readCSV(#VVUType, fileLoc);
+}
+
+list[str] exprsColumns = ["product","version","array","fetch array dim",
+	"fetch class const","assign","assign with operation: bitwise and",
+	"assign with operation: bitwise or","assign with operation: bitwise xor",
+	"assign with operation: concat","assign with operation: div",
+	"assign with operation: minus","assign with operation: mod",
+	"assign with operation: mul","assign with operation: plus",
+	"assign with operation: right shift","assign with operation: left shift",
+	"list assign","ref assign","binary operation: bitwise and",
+	"binary operation: bitwise or","binary operation: bitwise xor",
+	"binary operation: concat","binary operation: div","binary operation: minus",
+	"binary operation: mod","binary operation: mul","binary operation: plus",
+	"binary operation: right shift","binary operation: left shift",
+	"binary operation: boolean and","binary operation: boolean or",
+	"binary operation: gt","binary operation: geq","binary operation: logical and",
+	"binary operation: logical or","binary operation: logical xor",
+	"binary operation: not equal","binary operation: not identical",
+	"binary operation: lt","binary operation: leq","binary operation: equal",
+	"binary operation: identical","unary operation: boolean not",
+	"unary operation: bitwise not","unary operation: post dec",
+	"unary operation: pre dec","unary operation: post inc","unary operation: pre inc",
+	"unary operation: unary plus","unary operation: unary minus","new",
+	"cast to int","cast to bool","cast to float","cast to string","cast to array",
+	"cast to object","cast to unset","clone","closure","fetch const","empty",
+	"suppress","eval","exit","call","method call","static call","include",
+	"instanceOf","isSet","print","property fetch","shell exec","ternary",
+	"fetch static property","scalar","var","list"];
+
+alias ExprsType = rel[str product, str version, int array, int fetchArrayDim,
+	int fetchClassConst, int assign, int assignWithBitwiseAnd, int assignWithBitwiseOr,
+	int assignWithBitwiseXor, int assignWithConcat, int assignWithDiv,
+	int assignWithMinus, int assignWithMod, int assignWithMul, int assignWithPlus,
+	int assignWithRightShift, int assignWithLeftShift, int listAssign, int refAssign,
+	int binOpBitwiseAnd, int binOpBitwiseOr, int binOpBitwiseXor, 
+	int binOpConcat, int binOpDev, int binOpMinus, int binOpMod, int binOpMul,
+	int binOpPlus, int binOpRightShift, int binOpLeftShift, int binOpBooleanAnd,
+	int binOpBooleanOr, int binOpGt, int binOpGeq, int binOpLogicalAnd,
+	int binOpLogicalOr, int binOpLogicalXor, int binOpNotEqual, 
+	int binOpNotIdentical, int binOpLt, int binOpLeq, int binOpEqual,
+	int binOpIdentical, int unaryOpBooleanNot, int unaryOpBitwiseNot,
+	int unaryOpPostDec, int unaryOpPreDec, int unaryOpPostInc, int unaryOpPreInc, 
+	int unaryOpPlus, int unaryOpMinus, int new, int castToInt, int castToBool,
+	int castToFloat, int castToString, int castToArray, int castToObject,
+	int castToUnset, int clone, int closure, int fetchConst, int empty, int suppress,
+	int eval, int exit, int call, int methodCall, int staticCall, int include,
+	int instanceOf, int isSet, int print, int propertyFetch, int shellExec, int ternary,
+	int fetchStaticProperty, int scalar, int var, int \list];
+
+public ExprsType expressionCounts(loc fileLoc = baseLoc + "/extract/csvs/exprs.csv") {
+	return readCSV(#ExprsType, fileLoc);
+}
+
+list[str] featsColumns = ["product","version","file","break","classDef",
+	"const","continue","declare","do","echo","expressionStatementChainRule",
+	"for","foreach","functionDef","global","goto","haltCompiler","if",
+	"inlineHTML","interfaceDef","traitDef","label","namespace","return","static",
+	"switch","throw","tryCatch","unset","use","while","array",
+	"fetchArrayDim","fetchClassConst","assign","assignWithOperationBitwiseAnd",
+	"assignWithOperationBitwiseOr","assignWithOperationBitwiseXor",
+	"assignWithOperationConcat","assignWithOperationDiv","assignWithOperationMinus",
+	"assignWithOperationMod","assignWithOperationMul","assignWithOperationPlus",
+	"assignWithOperationRightShift","assignWithOperationLeftShift","listAssign",
+	"refAssign","binaryOperationBitwiseAnd","binaryOperationBitwiseOr",
+	"binaryOperationBitwiseXor","binaryOperationConcat","binaryOperationDiv",
+	"binaryOperationMinus","binaryOperationMod","binaryOperationMul",
+	"binaryOperationPlus","binaryOperationRightShift","binaryOperationLeftShift",
+	"binaryOperationBooleanAnd","binaryOperationBooleanOr","binaryOperationGt",
+	"binaryOperationGeq","binaryOperationLogicalAnd","binaryOperationLogicalOr",
+	"binaryOperationLogicalXor","binaryOperationNotEqual","binaryOperationNotIdentical",
+	"binaryOperationLt","binaryOperationLeq","binaryOperationEqual",
+	"binaryOperationIdentical","unaryOperationBooleanNot","unaryOperationBitwiseNot",
+	"unaryOperationPostDec","unaryOperationPreDec","unaryOperationPostInc",
+	"unaryOperationPreInc","unaryOperationUnaryPlus","unaryOperationUnaryMinus",
+	"new","castToInt","castToBool","castToFloat","castToString","castToArray",
+	"castToObject","castToUnset","clone","closure","fetchConst","empty",
+	"suppress","eval","exit","call","methodCall","staticCall","include",
+	"instanceOf","isSet","print","propertyFetch","shellExec","ternary",
+	"fetchStaticProperty","scalar","var","list","propertyDef","classConstDef",
+	"methodDef","traitUse"];
+
+alias FeatsType = rel[str product, str version, str file, int \break, int \classDef,
+	int \const, int \continue, int \declare, int \do, int \echo, 
+	int \expressionStatementChainRule, int \for, int \foreach, int \functionDef,
+	int \global, int \goto, int \haltCompiler, int \if, int \inlineHTML,
+	int \interfaceDef, int \traitDef, int \label, int \namespace, int \return,
+	int \static, int \switch, int \throw, int \tryCatch, int \unset, int \use,
+	int \while, int \array, int \fetchArrayDim, int \fetchClassConst, int \assign,
+	int \assignWithOperationBitwiseAnd, int \assignWithOperationBitwiseOr,
+	int \assignWithOperationBitwiseXor, int \assignWithOperationConcat,
+	int \assignWithOperationDiv, int \assignWithOperationMinus,
+	int \assignWithOperationMod, int \assignWithOperationMul,
+	int \assignWithOperationPlus, int \assignWithOperationRightShift,
+	int \assignWithOperationLeftShift, int \listAssign, int \refAssign,
+	int \binaryOperationBitwiseAnd, int \binaryOperationBitwiseOr,
+	int \binaryOperationBitwiseXor, int \binaryOperationConcat,
+	int \binaryOperationDiv, int \binaryOperationMinus, int \binaryOperationMod,
+	int \binaryOperationMul, int \binaryOperationPlus, int \binaryOperationRightShift,
+	int \binaryOperationLeftShift, int \binaryOperationBooleanAnd,
+	int \binaryOperationBooleanOr, int \binaryOperationGt, int \binaryOperationGeq,
+	int \binaryOperationLogicalAnd, int \binaryOperationLogicalOr,
+	int \binaryOperationLogicalXor, int \binaryOperationNotEqual,
+	int \binaryOperationNotIdentical, int \binaryOperationLt, int \binaryOperationLeq,
+	int \binaryOperationEqual, int \binaryOperationIdentical,
+	int \unaryOperationBooleanNot, int \unaryOperationBitwiseNot,
+	int \unaryOperationPostDec, int \unaryOperationPreDec, int \unaryOperationPostInc,
+	int \unaryOperationPreInc, int \unaryOperationUnaryPlus,
+	int \unaryOperationUnaryMinus, int \new, int \castToInt, int \castToBool,
+	int \castToFloat, int \castToString, int \castToArray, int \castToObject,
+	int \castToUnset, int \clone, int \closure, int \fetchConst, int \empty,
+	int \suppress, int \eval, int \exit, int \call, int \methodCall, int \staticCall,
+	int \include, int \instanceOf, int \isSet, int \print, int \propertyFetch,
+	int \shellExec, int \ternary, int \fetchStaticProperty, int \scalar, int \var,
+	int \list, int \propertyDef, int \classConstDef, int \methodDef, int \traitUse];
+
+public FeatsType getFeats(loc fileLoc = baseLoc + "/extract/csvs/FeaturesByFile.csv") {
+	return readCSV(#FeatsType, fileLoc);
+}
+
+list[str] linesColumns = ["product", "version", "file", "phplines"];
+
+alias LinesType = rel[str product, str version, str file, int phpLines];
+
+public LinesType getLines(loc fileLoc = baseLoc + "/extract/csvs/linesPerFile.csv") {
+	return readCSV(#LinesType, fileLoc);
+}
+
+list[str] versionsColumns = ["Product","Version","ReleaseDate","RequiredPHPVersion","Comments"];
+
+alias VersionsType = rel[str product, str version, str releaseDate, str requiredPHPVersion, str comments];
+
+public VersionsType getVersions(loc fileLoc = baseLoc + "/extract/csvs/Versions.csv") {
+	return readCSV(#VersionsType, fileLoc);
+}
 
 data QueryResult
 	= exprResult(loc l, Expr e)
@@ -262,9 +403,9 @@ public map[str,tuple[int totalCount, int derivableCount]] varVarUsesInfo(Corpus 
 	map[str,int] derivableCount = ( p : 0 | p <- corpus<0> );
 	map[str,int] totalCount = ( p : 0 | p <- corpus<0> );
 	for (i <- vvu) {
-		if (i.DerivableNames == "Y")
-			derivableCount[i.Product] += 1;
-		totalCount[i.Product] += 1;
+		if (i.derivableNames == "Y")
+			derivableCount[i.product] += 1;
+		totalCount[i.product] += 1;
 	}
 	return ( p : < totalCount[p], derivableCount[p] > | p <- corpus<0> );
 }
@@ -840,10 +981,6 @@ public HistInfo readHistInfo(loc l) {
 	return readBinaryValueFile(#HistInfo, l);
 }
 
-alias HistInfo = rel[str p, str file, int variableVariables, int variableCalls, int variableMethodCalls, int variableNews, 
-                     int variableProperties, int variableClassConsts, int variableStaticCalls, int variableStaticTargets,
-                     int variableStaticProperties, int variableStaticPropertyTargets];
-
 public void writeHistInfoCSV(HistInfo h) {
 	lv = getLatestVersions();
 	println("Building histogram data map");
@@ -858,7 +995,7 @@ public void writeHistInfoCSV(HistInfo h) {
 }
 
 public str squiglies(HistInfo hi) {
-   labels = [l | /label(l,_) := #HistInfo];
+   labels = [l | /Type::label(l,_) := #HistInfo];
    return "\\begin{figure}[t]
           '\\begin{tikzpicture}
           '\\begin{loglogaxis}[width=.6\\columnwidth, ymax=1000,grid=both,legend cell align=left,ylabel={Frequency (log)},xlabel={``Variable feature\'\' occurences per file (log)},cycle list name=exotic,legend pos=outer north east,legend style={xshift=-.1\\columnwidth}]
@@ -975,13 +1112,7 @@ public FMap loadFeatsMap() {
 public bool featsMapExists() = exists(featsMapLoc);
 
 public map[str,list[str]] getFeatureGroups() {
- labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
-  //labels = ["break","classDef","const","continue","declare","do","echo","expressionStatementChainRule","for","foreach","functionDef","global","goto","haltCompiler","if","inlineHTML","interfaceDef","traitDef","label","namespace","return","static","switch","throw","tryCatch","unset","use","whileDef","array","fetchArrayDim","fetchClassConst","assign","assignWithOperationBitwiseAnd","assignWithOperationBitwiseOr","assignWithOperationBitwiseXor","assignWithOperationConcat","assignWithOperationDiv","assignWithOperationMinus","assignWithOperationMod","assignWithOperationMul","assignWithOperationPlus","assignWithOperationRightShift","assignWithOperationLeftShift","listAssign","refAssign","binaryOperationBitwiseAnd","binaryOperationBitwiseOr","binaryOperationBitwiseXor","binaryOperationConcat","binaryOperationDiv","binaryOperationMinus","binaryOperationMod","binaryOperationMul","binaryOperationPlus","binaryOperationRightShift","binaryOperationLeftShift","binaryOperationBooleanAnd","binaryOperationBooleanOr","binaryOperationGt","binaryOperationGeq","binaryOperationLogicalAnd","binaryOperationLogicalOr","binaryOperationLogicalXor","binaryOperationNotEqual","binaryOperationNotIdentical","binaryOperationLt","binaryOperationLeq","binaryOperationEqual","binaryOperationIdentical","unaryOperationBooleanNot","unaryOperationBitwiseNot","unaryOperationPostDec","unaryOperationPreDec","unaryOperationPostInc","unaryOperationPreInc","unaryOperationUnaryPlus","unaryOperationUnaryMinus","new","classConst","castToInt","castToBool","castToFloat","castToString","castToArray","castToObject","castToUnset","clone","closure","fetchConst","empty","suppress","eval","exit","call","methodCall","staticCall","include","instanceOf","isSet","print","propertyFetch","shellExec","exit","fetchStaticProperty","scalar","var","counts"];
-//  feats = getFeats();
-//  println("Building feats map");
-//  featsMap = ( f : getOneFrom(feats[_,_,f]) | f <- feats<2> );
-//  println("Done");
-  //lls = (t.file:t.phplines | t <- ls);
+ labels = [ l | \map(_,rtype) := #FMap.symbol, /Type::label(l,_) := rtype ];
 
  return  ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
          + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
@@ -1019,7 +1150,7 @@ public str groupsTable(set[str] notIn80, set[str] notIn90, set[str] notIn100) {
 
 public str groupsTable() = groupsTable({},{},{});
 
-public list[str] getFeatureLabels() = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
+public list[str] getFeatureLabels() = [ l | \map(_,rtype) := #FMap.symbol, /Type::label(l,_) := rtype ];
 
 public void checkGroups() {
   labels = getFeatureLabels();
@@ -1088,7 +1219,7 @@ public str shortLabel(str l) {
   }
 }
 
-public str fileSizesHistogram(getLinesType ls) {
+public str fileSizesHistogram(LinesType ls) {
   ds = distribution([ b | <a,b> <- ls<file,phplines>]);
   cds = cumulative(ds);
   
@@ -1218,7 +1349,7 @@ public FMap getFMap() {
 }
 
 public FeatureLattice calculateFeatureLattice(FMap fmap) {
-	fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
+	fieldNames = [ fn | \set(\tuple(fl)) := #FeatsType.symbol, label(fn,_) <- fl ];
 	indexes = ( i : fieldNames[i] | i <- index(fieldNames) );
 
 	perFile = ( l : { } | l <- fmap );	
@@ -1298,7 +1429,7 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	println("Calculating coverage needed for <targetPercent>%");
 
 	// Basic info we need for use below
-	fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
+	fieldNames = [ fn | \set(\tuple(fl)) := #FeatsType.symbol, label(fn,_) <- fl ];
 	indexes = ( i : fieldNames[i] | i <- index(fieldNames) );
 	labelIndex = ( fieldNames[i] : i | i <- index(fieldNames) );
 
@@ -1347,7 +1478,7 @@ alias CoverageMap = map[int,set[str]];
 
 public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice) {
 	// The features in the system 
-	features = toSet(tail(tail(tail(getRelFieldNames((#getFeatsType).symbol)))));
+	features = toSet([ fn | \set(\tuple(fl)) := #FeatsType.symbol, label(fn,_) <- fl ]);
 	
 	// The nodes in the system, representing feature * file combinations
 	nodes = carrier(lattice);
@@ -1372,7 +1503,7 @@ public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice)
 	// if we have 5% coverage, anything in more than 95% of the files must
 	// be in it. So, neededForLabels[5] would have the names of any features
 	// that occur in more than 95% of all files
-	list[str] fieldNames = tail(tail(tail(getRelFieldNames((#getFeatsType).symbol))));
+	list[str] fieldNames = [ fn | \set(\tuple(fl)) := #FeatsType.symbol, label(fn,_) <- fl ];
 	map[int,str] indexes = ( i : fieldNames[i] | i <- index(fieldNames) ); 
 	map[str,int] labelIndex = ( fieldNames[i] : i | i <- index(fieldNames) ); 
 	map[int,int] featureFileCount = ( n : size({l|l<-fmap<0>,fmap[l][n]>0}) | n <- index(fieldNames) );
@@ -1390,9 +1521,11 @@ public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice)
 	// now, continually grow until we cover 100% of the files
 	while(coveredSoFar < 100) {
 		// nextStepMap holds the number of files we cover if we choose a specific feature
-		nextStepMap = ( feature : size({ *(n.transFiles) | n <- { n | n <- nodes, n.features < (solution + feature) } }) | feature <- remainingFeatures );
+		map[str,int] nextStepMap = ( feature : size({ *(n.transFiles) | n <- { n | n <- nodes, size(n.features) < size(solution + feature) } }) | feature <- remainingFeatures );
 		// this then sorts the map results, getting back the one that adds the most files
-		<nextFeature,nextFeatureCount> = head(reverse(sort([ < feature,nextStepMap[feature] > | feature <- nextStepMap ],bool(<str s1,int n1>, <str st,int n2>) { return n1 < n2; })));
+		lrel[str,int] featuresWithCounts = [ < feature,nextStepMap[feature] > | feature <- nextStepMap ];
+		lrel[str,int] reversedFeaturesWithCounts = reverse(sort(featuresWithCounts,bool(tuple[int s, int n] left, tuple[int s, int n] right) { left.n < right.n; })); 
+		<nextFeature, nextFeatureCount> = head(reversedFeaturesWithCounts);
 
 		// it is possible that any one feature won't extend our set of solutions; if that is the
 		// case, we instead add the most popular
@@ -1597,7 +1730,7 @@ public System loadBinaryWithIncludes(str product, str version) {
 }
 
 public NotCoveredMap notCoveredBySystem(Corpus corpus, FeatureLattice lattice, CoverageMap coverageMap) {
-	fieldNames = toSet(tail(tail(tail(getRelFieldNames((#getFeatsType).symbol)))));
+	fieldNames = toSet([ fn | \set(\tuple(fl)) := #FeatsType.symbol, label(fn,_) <- fl ]);
 	
 	in80 = coverageMap[80];
 	in90 = coverageMap[90];
@@ -2184,3 +2317,5 @@ public rel[str p, str v, int fc, int lc, int dc, real perFiles] totalStats(Corpu
 	
 	return res;
 }
+
+private str hello = "hello";

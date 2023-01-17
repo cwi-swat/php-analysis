@@ -25,6 +25,8 @@ public Branch buildBranch(loc l) {
 		return file(l.file, l);
 	} else if (isDirectory(l)) {
 		return branch(l.file, { buildBranch(li) | li <- l.ls });
+	} else {
+		throw SchemeNotSupported(l); // TODO: There may be a better option for this
 	}
 }
 
@@ -126,8 +128,8 @@ public loc calculateLoc(set[loc] possibleLocs, loc baseLoc, loc rootLoc, str pat
 	// For each possible path, see if we can find it
 	for (p <- paths) {
 		list[str] parts = split("/",p);
-		while([a*,b,"..",c*] := parts, b != "..") parts = [*a,*c];
-		while([a*,".",c*] := parts) parts = [*a,*c];
+		while([*a,b,"..",*c] := parts, b != "..") parts = [*a,*c];
+		while([*a,".",*c] := parts) parts = [*a,*c];
 		newPath = intercalate("/", parts);
 
 		// performed a malformedness check -- if we throw while trying

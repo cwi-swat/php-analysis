@@ -13,7 +13,6 @@ import lang::php::ast::AbstractSyntax;
 import Set;
 import List;
 import String;
-import Exception;
 
 public Scalar concatScalars(Scalar sc1:string(str s1), Scalar sc2:string(str s2)) = string(s1+s2);
 public Scalar concatScalars(Scalar sc1:string(str s1), Scalar sc2:integer(int i1)) = string("<s1><i1>");

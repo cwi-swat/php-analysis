@@ -12,7 +12,6 @@ import lang::php::ast::AbstractSyntax;
 import Set;
 import List;
 import String;
-import Exception;
 
 private set[str] simulatedFunctions = { "dirname", "MWInit", "strrchr", "substr" };
 
@@ -70,9 +69,9 @@ public Expr simulateCall(Expr e) {
 				} 
 			}
 		}
-	} else if (Expr c:call(name(name("sprintf")),[actualParameter(scalar(string(s1)),false,false), ps*]) := e) {
+	} else if (Expr c:call(name(name("sprintf")),[actualParameter(scalar(string(s1)),false,false), *ps]) := e) {
 		markers = findAll(s1,"%");
-		doReplacement = [ false | i <- markers ];
+		doReplacement = [ false | _ <- markers ];
 		for (i <- index(markers), size(s1) >= (markers[i]+1), s1[markers[i]+1] == "s", size(ps) >= i, scalar(string(_)) := ps[i].expr) {
 			doReplacement[i] = true;		
 		}
@@ -101,7 +100,7 @@ public Expr simulateCall(Expr e) {
 
 public Script simulateCalls(Script scr) {
 	return bottom-up visit(scr) {
-		case c:call(name(name(s)),ps) : {
+		case c:call(name(name(s)),_) : {
 			if (s in simulatedFunctions) {
 				newcall = simulateCall(c);
 				if (c != newcall) insert(newcall);
@@ -112,7 +111,7 @@ public Script simulateCalls(Script scr) {
 
 public Expr simulateCalls(Expr expr) {
 	return bottom-up visit(expr) {
-		case c:call(name(name(s)),ps) : {
+		case c:call(name(name(s)),_) : {
 			if (s in simulatedFunctions) {
 				newcall = simulateCall(c);
 				if (c != newcall) insert(newcall);

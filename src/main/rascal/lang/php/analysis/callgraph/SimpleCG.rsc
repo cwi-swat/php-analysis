@@ -30,7 +30,7 @@ public CallGraph computeSystemCallGraph(System s) {
 	// Third, change these into a specific format that is easier to match against
 	rel[str functionName, CallTarget callTargets] functionTargets = { };
 	rel[str methodName, CallTarget callTargets] methodTargets = { };
-	for (fileSignature(fileloc, items) <- sysSignatures<1>) {
+	for (fileSignature(_, items) <- sysSignatures<1>) {
 		for (fs <- items, fs is functionSig) {
 			functionTargets += < fs.namepath.file, functionTarget(fs.namepath.file, fs.at) >;
 		}
@@ -79,7 +79,7 @@ public CallGraph computeScriptCallGraph(Script s, map[str functionName, set[Call
 				// that function, else we treat it as a call to potentially any function in
 				// the system. NOTE: We don't create an edge to either call_user_func or
 				// call_user_func_array, even though we could create those edges as well.
-				if ([actualParameter(scalar(string(fn2)),_,_)] := ps) {
+				if ([actualParameter(scalar(string(_)),_,_)] := ps) {
 					if (fn in functionTargetsMap) {
 						res = res + ( { c.at } join functionTargetsMap[fn] ); 
 					} else {
@@ -104,7 +104,7 @@ public CallGraph computeScriptCallGraph(Script s, map[str functionName, set[Call
 		}
 
 		case sc:staticCall(name(name(cn)),name(name(mn)),_) : {
-			if (mn in methodTargetsMap && {_*,mc:methodTarget(cn,mn,_)} := methodTargetsMap[mn]) {
+			if (mn in methodTargetsMap && {*_,mc:methodTarget(cn,mn,_)} := methodTargetsMap[mn]) {
 				res = res + < sc.at, mc >;
 			} else {
 				res = res + < sc.at, unknownTarget("<cn>::<mn>") >;

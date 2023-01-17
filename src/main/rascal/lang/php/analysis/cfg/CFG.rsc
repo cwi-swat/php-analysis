@@ -10,7 +10,6 @@ module lang::php::analysis::cfg::CFG
 
 import lang::php::ast::AbstractSyntax;
 import lang::php::pp::PrettyPrinter;
-import lang::php::analysis::NamePaths;
 import lang::php::analysis::cfg::Label;
 import lang::php::analysis::cfg::FlowEdge;
 import analysis::graphs::Graph;
@@ -109,7 +108,7 @@ public CFGNode getExitNode(CFG g) {
 
 @doc{Get a map from labels to locations.}
 rel[Lab label, loc at] getLabelLocationRel(CFG g) {
-	exprs = { < n.l, n.expr.at > | n <- g.nodes, n is exprNode, (n.expr.at.scheme != "unknown") };
-	stmts = { < n.l, n.stmt.at > | n <- g.nodes, n is stmtNode, (n.stmt.at.scheme != "unknown") };
+	exprs = { < n.lab, n.expr.at > | n <- g.nodes, n is exprNode, (n.expr.at.scheme != "unknown") };
+	stmts = { < n.lab, n.stmt.at > | n <- g.nodes, n is stmtNode, (n.stmt.at.scheme != "unknown") };
 	return exprs + stmts;
 }

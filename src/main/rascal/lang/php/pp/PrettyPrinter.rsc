@@ -281,8 +281,8 @@ public str padIfNotEmpty(str s) = "<s> " when size(s) != 0;
 public str padIfNotEmpty(str s) = s when size(s) == 0;
 
 // public data PHPType = nullableType(str typeName) | regularType(str typeName) | noType();
-public str pp(nullableType(str typeName)) = "?<typeName>";
-public str pp(regularType(str typeName)) = typeName;
+public str pp(nullableType(PHPType nestedType)) = "?<pp(nestedType)>";
+public str pp(regularType(Name typeName)) = pp(typeName);
 public str pp(noType()) = "";
 
 //public data Scalar
@@ -477,7 +477,7 @@ public str pp(tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] f
 public str pp(Stmt::unset(list[Expr] unsetVars)) = "unset(<intercalate(",",[pp(u)|u<-unsetVars])>);";
 
 //	| use(list[Use] uses, OptionName prefix, UseType useType)
-public str pp(Stmt::use(list[Use] uses, OptionName prefix, UseType useType)) = "use <intercalate(",",[pp(u)|u<-uses])>;";
+public str pp(Stmt::useStmt(list[Use] uses, UseType useType)) = "use <intercalate(",",[pp(u)|u<-uses])>;";
 
 //	| \while(Expr cond, list[Stmt] body)
 public str pp(\while(Expr cond, list[Stmt] body)) = 

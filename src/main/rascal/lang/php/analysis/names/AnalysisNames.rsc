@@ -4,6 +4,7 @@ import lang::php::ast::AbstractSyntax;
 import lang::php::pp::PrettyPrinter;
 
 import IO;
+import Exception;
 
 data AnalysisName
 	= nameSet(set[AnalysisName] possibleNames)
@@ -41,6 +42,7 @@ public AnalysisName computeName(NameOrExpr e) {
 		// TODO: Do we need another layer here?
 		return computeName(ie);
 	}
+	throw UnavailableInformation(); // TODO: Do we even need this module? Clean up if not needed...
 }
 
 @doc{

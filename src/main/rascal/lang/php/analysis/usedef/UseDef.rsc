@@ -9,7 +9,6 @@ import lang::php::pp::PrettyPrinter;
 import lang::php::analysis::cfg::Util;
 
 import Relation;
-import IO;
 import Set;
 import List;
 
@@ -149,7 +148,7 @@ public set[Name] getNestedNames(CFGNode n, set[loc] locsToFilter) {
 	res = { < rn, rl > | < rn, rl > <- res, rl notin locsToFilter };
 	int afterFilteringSize = size(res);
 	//if (beforeFilteringSize != afterFilteringSize) {
-	//	println("<n.l>:Before/after filtering: <beforeFilteringSize>/<afterFilteringSize> elements");
+	//	println("<n.lab>:Before/after filtering: <beforeFilteringSize>/<afterFilteringSize> elements");
 	//}
 		
 	return res<0>;
@@ -160,29 +159,29 @@ public rel[Name name, DefExpr definedAs, Lab definedAt] getDefInfo(CFGNode n) {
 	switch (n) {
 		case exprNode(assign(Expr e1, Expr e2),_) : {
 			names = getNames(e1);
-			res = res + { < ni, defExpr(e2), n.l > | ni <- names };
+			res = res + { < ni, defExpr(e2), n.lab > | ni <- names };
 		}
 
 		case exprNode(assignWOp(Expr e1, Expr e2, op),_) : {
 			names = getNames(e1);
-			res = res + { < ni, defExprWOp(ni, e2, op), n.l > | ni <- names };
+			res = res + { < ni, defExprWOp(ni, e2, op), n.lab > | ni <- names };
 		}
 
 		case exprNode(refAssign(Expr e1, Expr e2),_) : {
 			names = getNames(e1);
-			res = res + { < ni, defExpr(e2), n.l > | ni <- names };
+			res = res + { < ni, defExpr(e2), n.lab > | ni <- names };
 		}
 		
 		case headerNode(global(el),_,_) : {
-			res = res + { < ni, globalDef(ni), n.l > | ei <- el, ni <- getNames(ei) };
+			res = res + { < ni, globalDef(ni), n.lab > | ei <- el, ni <- getNames(ei) };
 		}
 
-		case foreachAssignValue(Expr expr, Expr valExpr, Lab l) : {
-			res = res + { < ni, defExpr(expr), n.l > | ni <- getNames(valExpr) };
+		case foreachAssignValue(Expr expr, Expr valExpr, Lab _) : {
+			res = res + { < ni, defExpr(expr), n.lab > | ni <- getNames(valExpr) };
 		}
 		
-		case foreachAssignKey(Expr expr, Expr keyExpr, Lab l) : {
-			res = res + { < ni, defExpr(expr), n.l > | ni <- getNames(keyExpr) };
+		case foreachAssignKey(Expr expr, Expr keyExpr, Lab _) : {
+			res = res + { < ni, defExpr(expr), n.lab > | ni <- getNames(keyExpr) };
 		}
 	}
 	return res;
@@ -214,8 +213,8 @@ public Defs definitions(CFG inputCFG) {
 	// since they are provided globally and so are already defined.
 	usedSuperGlobalNames = { sgn | sgn <- superGlobalNames, /var(name(name(sgn))) := inputCFG.nodes };
 	usedIndexedNames = { < vn, idxname > | /fetchArrayDim(var(name(name(vn))),someExpr(scalar(string(idxname)))) := inputCFG.nodes, vn in usedSuperGlobalNames };
-	resMap[entry.l] = { < varName(sgn), globalDef(varName(sgn)), entry.l >  | sgn <- usedSuperGlobalNames }
-					+ { < elementName(sgn, idxname), globalDef(elementName(sgn, idxname)), entry.l > | < sgn, idxname > <- usedIndexedNames };
+	resMap[entry.lab] = { < varName(sgn), globalDef(varName(sgn)), entry.lab >  | sgn <- usedSuperGlobalNames }
+					+ { < elementName(sgn, idxname), globalDef(elementName(sgn, idxname)), entry.lab > | < sgn, idxname > <- usedIndexedNames };
 	
 	// Introduce the names for any parameters and add them as defs in the entry node, since they
 	// are actually defined automatically by the function.
@@ -227,13 +226,13 @@ public Defs definitions(CFG inputCFG) {
 		// The actualProvided nodes represent formal parameters with no defaults, so the actual must
 		// be provided to the program (and we don't know what that is)
 		for (n <- actualProvidedNodes) {
-			resMap[entry.l] = resMap[entry.l] + { < varName(n.paramName), inputParamDef(varName(n.paramName)), entry.l > };
+			resMap[entry.lab] = resMap[entry.lab] + { < varName(n.paramName), inputParamDef(varName(n.paramName)), entry.lab > };
 		}
 
 		// The actualNotProvided nodes represent formal parameters with defaults, allowing cases
 		// where an actual is not provided explicitly.
 		for (n <- actualNotProvidedNodes) {
-			resMap[entry.l] = resMap[entry.l] + { < varName(n.paramName), inputParamDef(varName(n.paramName)), entry.l >, < varName(n.paramName), defExpr(n.expr), entry.l > };
+			resMap[entry.lab] = resMap[entry.lab] + { < varName(n.paramName), inputParamDef(varName(n.paramName)), entry.lab >, < varName(n.paramName), defExpr(n.expr), entry.lab > };
 		}
 	}
 	  
@@ -249,9 +248,9 @@ public Defs definitions(CFG inputCFG) {
 		n = worklist[0];
 		worklist = worklist[1..];
 		workset = workset - n;
-		resStart = resMap[n.l] ? {};
+		resStart = resMap[n.lab] ? {};
 		
-		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = { *(resMap[ni.l]? {}) | ni <- gmapInverted[n]};
+		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = { *(resMap[ni.lab]? {}) | ni <- gmapInverted[n]};
 		rel[Name name, DefExpr definedAs, Lab definedAt] kills = { };
 		
 		if (isDefNode(n)) {
@@ -266,14 +265,14 @@ public Defs definitions(CFG inputCFG) {
 		directKills = { ni.name | ni <- kills };
 		indirectKills = { ni.name | ni <- inbound, elementName(vn,_) := ni.name, varName(vn) in directKills };
 		
-		tempRel = { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- inbound, ni.name notin (directKills + indirectKills) } 
-			    + { < n.l, ni.name, ni.definedAs, ni.definedAt > | ni <- kills };
+		tempRel = { < n.lab, ni.name, ni.definedAs, ni.definedAt > | ni <- inbound, ni.name notin (directKills + indirectKills) } 
+			    + { < n.lab, ni.name, ni.definedAs, ni.definedAt > | ni <- kills };
 			    
 		for (l <- tempRel<0>) {
 			resMap[l] = (resMap[l] ? {}) + tempRel[l];
 		}
 		
-		resEnd = resMap[n.l] ? {};
+		resEnd = resMap[n.lab] ? {};
 		
 		if (resStart != resEnd) {
 			newElements = [ gi | gi <- gmap[n], gi notin workset ];
@@ -299,16 +298,16 @@ public Uses uses(CFG inputCFG, Defs defs) {
 
 	set[loc] locsToFilter = { };
 	visit (inputCFG.nodes) {
-		case assign(ni:Expr e1, _) : {
+		case assign(ni:Expr _, _) : {
 			locsToFilter = locsToFilter + ni.at;
 		}
 
-		case refAssign(ni:Expr e1, _) : {
+		case refAssign(ni:Expr _, _) : {
 			locsToFilter = locsToFilter + ni.at;
 		}
 	}
 	
-	map[Lab, rel[Name name, DefExpr definedAs, Lab definedAt]] defsMap = ( n.l : { } | n <- inputCFG.nodes );
+	map[Lab, rel[Name name, DefExpr definedAs, Lab definedAt]] defsMap = ( n.lab : { } | n <- inputCFG.nodes );
 	for ( < dl, dn, da, ddl > <- defs ) {
 		defsMap[dl] += < dn, da, ddl >;
 	}
@@ -317,10 +316,10 @@ public Uses uses(CFG inputCFG, Defs defs) {
 		// created by this node)
 		rel[Name name, DefExpr definedAs, Lab definedAt] inbound = { };
 		for (ni <- gmapInverted[n]) {
-			inbound = inbound + defsMap[ni.l];
+			inbound = inbound + defsMap[ni.lab];
 		}
 		names = getNestedNames(n,locsToFilter);
-		res = res + { < n.l, name, definedAt > | Name name <- names, < name, _, definedAt > <- inbound };
+		res = res + { < n.lab, name, definedAt > | Name name <- names, < name, _, definedAt > <- inbound };
 	}
 	
 	return res;

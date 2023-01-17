@@ -32,7 +32,7 @@ public CFG createBasicBlocks(CFG g) {
 	exitNode = getExitNode(g);
 	forwards = cfgAsGraph(g);
 	backwards = invert(forwards);
-	basicBlocks = { };
+	set[CFGNode] basicBlocks = { };
 	blockId = 1;
 	
 	// First, identify all the basic block "headers". The headers are either merge points

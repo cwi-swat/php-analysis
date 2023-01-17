@@ -38,7 +38,7 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	rel[loc,Expr,loc] resolved = { };
 
 	Script scr = sys.files[toResolve];
-	includes = { < i.at, i > | /i:include(_,_) := scr };
+	rel[loc,Expr] includes = { < i.at, i > | /i:include(_,_) := scr };
 	if (size(includes) == 0) return resolved;
 		
 	// Step 1: simplify the include expression using a variety of techniques,
@@ -51,7 +51,7 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	// be something in the set of files that make up the system; in this case we
 	// should be able to match it to a unique file
 	unresolved = includes;
-	for (iitem:< _, i > <- includes, scalar(string(s)) := i.expr, size(s) > 0, s[0] in { "\\", "/"}) {
+	for (< _, i > <- includes, scalar(string(s)) := i.expr, size(s) > 0, s[0] in { "\\", "/"}) {
 		try {
 			iloc = calculateLoc(sys.files<0>,toResolve,baseLoc,s,checkFS=checkFS);
 			resolved = resolved + <i.at, i, iloc >;
@@ -65,7 +65,7 @@ public rel[loc,Expr,loc] quickResolveExpr(System sys, IncludesInfo iinfo, loc to
 	// match the include to one or more potential files; if this matches multiple
 	// possible files, that's fine, this is a conservative estimation so we may
 	// find files that will never actually be included in practice
-	for (iitem:< _, i > <- unresolved) {
+	for (< _, i > <- unresolved) {
 		possibleMatches = matchIncludes(sys, i, baseLoc, libs=libs);
 		resolved = resolved + { < i.at, i, l > | l <- possibleMatches }; 
 	}
