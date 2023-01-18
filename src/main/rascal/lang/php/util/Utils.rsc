@@ -299,48 +299,6 @@ public System loadBinary(str name) {
 
 public bool binaryExists(str product, str version) = exists(parsedDir + "<product>-<version>.pt");
 
-public void writeFeatureCounts(str product, str version, map[str,int] fc) {
-	println("Writing counts for <product>-<version>");
-	loc fcLoc = statsDir + "<product>-<version>.fc";
-	writeBinaryValueFile(fcLoc, fc);
-}
-
-public void writeStats(str product, str version, map[str,int] fc, map[str,int] sc, map[str,int] ec) {
-	loc fcLoc = statsDir + "<product>-<version>.fc";
-	loc scLoc = statsDir +  "<product>-<version>.sc";
-	loc ecLoc = statsDir +  "<product>-<version>.ec";
-	writeBinaryValueFile(fcLoc, fc);
-	writeBinaryValueFile(scLoc, sc);
-	writeBinaryValueFile(ecLoc, ec);
-}
-
-public tuple[map[str,int] fc, map[str,int] sc, map[str,int] ec] getStats(str product, str version) {
-	loc fcLoc = statsDir + "<product>-<version>.fc";
-	loc scLoc = statsDir +  "<product>-<version>.sc";
-	loc ecLoc = statsDir +  "<product>-<version>.ec";
-	return < readBinaryValueFile(#map[str,int],fcLoc), readBinaryValueFile(#map[str,int],scLoc), readBinaryValueFile(#map[str,int],ecLoc) >;
-}
-
-public map[tuple[str,str],tuple[map[str,int] fc, map[str,int] sc, map[str,int] ec]] getStats(str product) {
-	return ( < product, v > : getStats(product,v) | v <- getVersions(product) );
-}
-
-public map[tuple[str,str],tuple[map[str,int] fc, map[str,int] sc, map[str,int] ec]] getStats() {
-	return ( < product, v > : getStats(product,v) | product <- getProducts(), v <- getVersions(product) );
-}
-
-public list[tuple[str p, str v, map[str,int] fc, map[str,int] sc, map[str,int] ec]] getSortedStats() {
-	list[tuple[str p, str v, map[str,int] fc, map[str,int] sc, map[str,int] ec]] res = [ ];
-	
-	sm = getStats();
-	pvset = sm<0>;
-
-	for (p <- sort(toList(pvset<0>)), v <- sort(toList(pvset[p]),compareVersion))
-		res += < p, v, sm[<p,v>].fc, sm[<p,v>].sc, sm[<p,v>].ec >;
-	
-	return res;
-}
-
 public map[tuple[str product, str version], System] getLatestTrees() {
 	lv = getLatestVersions();
 	return ( <p,lv[p]> : loadBinary(p,lv[p]) | p <- lv<0> );

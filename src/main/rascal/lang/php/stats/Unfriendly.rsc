@@ -10,6 +10,7 @@ import Map;
 import Node;
 import Type;
 import util::Math;
+import Exception;
 
 import lang::php::util::Utils;
 import lang::php::stats::Stats;
@@ -1192,7 +1193,7 @@ public str generalFeatureSquiglies(FMap featsMap) {
   '\\begin{tikzpicture}
   '\\begin{semilogyaxis}[grid=both, ymax=10000, ylabel={Frequency (log)}, xlabel={Feature ratio per file (\\%)},height=.4\\textwidth,width=\\textwidth,xmin=0,axis x line=bottom, axis y line=left,legend cell align=left,cycle list name=linestyles*, legend columns=3,legend style={xshift=0cm,yshift=.5cm}]
   '<for (g <- sort([*groups<0>])) { indices = [ indexOf(labels, l) | l <- groups[g], l != "expressionStatementChainRule"];>
-  '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | e <- featsMap[file]]), s != 0}, g, printingGroups)>
+  '<squigly3({<file,toInt(((sum([featsMap[file][i] | i <- indices ]) * 1.0) / s) * 200) / 10 * 5> | file <- featsMap, s := sum([e | int e <- featsMap[file]]), s != 0}, g, printingGroups)>
   '<}>\\end{semilogyaxis}
   '\\end{tikzpicture}
   '\\caption{What features should one expect to find in a given PHP file? This histogram shows, for each feature group, how many times it covers a certain percentage of the total number of features per file. Lines between dots are guidelines for the eye only.\\label{Figure:FeatureHistograms}} 
@@ -1220,7 +1221,7 @@ public str shortLabel(str l) {
 }
 
 public str fileSizesHistogram(LinesType ls) {
-  ds = distribution([ b | <a,b> <- ls<file,phplines>]);
+  ds = distribution([ b | <a,b> <- ls<file,phpLines>]);
   cds = cumulative(ds);
   
   return "\\begin{figure}
@@ -1267,7 +1268,9 @@ public tuple[int threshold, int after] almostAll(map[int bucket, int cumulativeF
     if (dist[b] >= th) {
       return <b, m - dist[b]>;
     }
-  } 
+  }
+
+  throw IllegalArgument(); 
 }
 
 public int main() {
@@ -1405,7 +1408,7 @@ public FeatureLattice calculateTransitiveFiles(FeatureLattice lattice, FeatureNo
 }
 
 public void checkGroups() {
-  labels = [ l | /label(l,_) := getMapRangeType((#FMap).symbol)];
+  labels = [ l | \map(_,rtype) := #FMap.symbol, /Type::label(l,_) := rtype ];
   groups = ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
          + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
          + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label"])
@@ -1524,7 +1527,7 @@ public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice)
 		map[str,int] nextStepMap = ( feature : size({ *(n.transFiles) | n <- { n | n <- nodes, size(n.features) < size(solution + feature) } }) | feature <- remainingFeatures );
 		// this then sorts the map results, getting back the one that adds the most files
 		lrel[str,int] featuresWithCounts = [ < feature,nextStepMap[feature] > | feature <- nextStepMap ];
-		lrel[str,int] reversedFeaturesWithCounts = reverse(sort(featuresWithCounts,bool(tuple[int s, int n] left, tuple[int s, int n] right) { left.n < right.n; })); 
+		lrel[str,int] reversedFeaturesWithCounts = reverse(sort(featuresWithCounts,bool(tuple[str s, int n] left, tuple[str s, int n] right) { return left.n < right.n; })); 
 		<nextFeature, nextFeatureCount> = head(reversedFeaturesWithCounts);
 
 		// it is possible that any one feature won't extend our set of solutions; if that is the
@@ -1760,8 +1763,8 @@ public NotCoveredMap readNotCoveredInfo() {
 public str coverageComparison(Corpus corpus, NotCoveredMap ncm) {
 	filecount = loadCountsCSV();
 
-	eightyPer = ( );
-	ninetyPer = ( );
+	map[str,real] eightyPer = ( );
+	map[str,real] ninetyPer = ( );
 	
 	for (p <- sort(toList(corpus<0>),bool(str s1,str s2) { return toUpperCase(s1) < toUpperCase(s2); }), v := corpus[p], <notIn80,notIn90> := ncm[p], <v,_,fc> <- filecount[p]) {
 		eightyPer[p] = 100.0-round(size(notIn80)*10000.0/fc)/100.0;
@@ -1980,7 +1983,7 @@ public str functionUsesCounts(Corpus corpus, FunctionUses functionUses) {
 }
 
 public FunctionUses filterFunctionUses(FunctionUses functionUses, set[str] fnames) =
-	{ fu | fu:<p,v,l,e> <- functionUses, call(name(name(s)),_) := e, s in fnames };
+	{ <p,v,l,e> | <p,v,l,e> <- functionUses, call(name(name(s)),_) := e, s in fnames };
 
 public FunctionUses filterFunctionUses(FunctionUses functionUses, str fname) =
 	filterFunctionUses(functionUses, { fname });

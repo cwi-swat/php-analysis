@@ -551,4 +551,3 @@ public rel[str Product,str PlainText,str Description] loadProductInfoCSV() {
 	rel[str Product,str PlainText,str Description] res = readCSV(#rel[str Product,str PlainText,str Description],|project://PHPAnalysis/src/lang/php/extract/csvs/ProductInfo.csv|);
 	return res;
 }
-								
