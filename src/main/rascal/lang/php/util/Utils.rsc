@@ -137,7 +137,7 @@ public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds)
 }
 
 @doc{Load all PHP files at a given directory location, with options for which extensions are PHP files, location annotations, and unique node ids.}
-private System loadPHPFiles(loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) throws AssertionFailed {
+public System loadPHPFiles(loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }) throws AssertionFailed {
 
 	if ((l.scheme == "file" || l.scheme == "home") && !exists(l)) throw AssertionFailed("Location <l> does not exist");
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
