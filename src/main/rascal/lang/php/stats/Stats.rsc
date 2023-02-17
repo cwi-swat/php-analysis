@@ -366,7 +366,7 @@ public list[str] stmtKeyOrder() = [ "break", "class def", "const", "continue", "
 								    "namespace", "return", "static", "switch", "throw",
 								    "try/catch", "unset", "use", "while" ];
 								    
-public str getClassItemKey(ClassItem::property(set[Modifier] modifiers, list[Property] prop)) = "propertyDef";
+public str getClassItemKey(ClassItem::property(set[Modifier] modifiers, list[Property] prop, PHPType ptype)) = "propertyDef";
 public str getClassItemKey(ClassItem::constCI(list[Const] consts, set[Modifier] modifiers)) = "classConstDef";
 public str getClassItemKey(ClassItem::method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType)) = "methodDef";
 public str getClassItemKey(ClassItem::traitUse(list[Name] traits, list[Adaptation] adaptations)) = "traitUse";

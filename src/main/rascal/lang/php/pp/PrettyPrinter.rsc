@@ -284,6 +284,8 @@ public str padIfNotEmpty(str s) = s when size(s) == 0;
 
 // public data PHPType = nullableType(str typeName) | regularType(str typeName) | noType();
 public str pp(nullableType(PHPType nestedType)) = "?<pp(nestedType)>";
+public str pp(unionType(list[PHPType] types)) = intercalate(",",[pp(t) | t <- types]);
+public str pp(intersectionType(list[PHPType] types)) = intercalate("&",[pp(t) | t <- types]);
 public str pp(regularType(Name typeName)) = pp(typeName);
 public str pp(noType()) = "";
 
@@ -543,8 +545,8 @@ public str pp(Use::use(Name importName, noName(), UseType useType)) = "<pp(impor
 
 //public data ClassItem 
 //	= property(set[Modifier] modifiers, list[Property] prop)
-public str pp(ClassItem::property(set[Modifier] modifiers, list[Property] prop)) =
-	"<for(p <- prop) {><intercalate(" ",[pp(m)|m<-modifiers])> <pp(p)>;
+public str pp(ClassItem::property(set[Modifier] modifiers, list[Property] prop, PHPType ptype)) =
+	"<for(p <- prop) {><intercalate(" ",[pp(m)|m<-modifiers])> <pp(ptype)> <pp(p)>;
 	'<}>";
 
 //	| constCI(list[Const] consts)

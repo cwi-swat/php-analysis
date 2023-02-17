@@ -58,7 +58,9 @@ public data IncludeType(loc at=|unknown:///|, loc decl=|unknown:///|, str id="",
 
 public data PHPType
 	= nullableType(PHPType nestedType)
-	| regularType(Name typeName) 
+	| regularType(Name typeName)
+	| unionType(list[PHPType] types)
+	| intersectionType(list[PHPType] types)
 	| noType();
 
 // NOTE: In PHP, yield is a statement, but it can also be used as an expression.
@@ -218,7 +220,7 @@ public data Use(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc sco
 	= use(Name importName, OptionName asName, UseType useType);
 
 public data ClassItem(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= property(set[Modifier] modifiers, list[Property] prop)
+	= property(set[Modifier] modifiers, list[Property] prop, PHPType propType)
 	| constCI(list[Const] consts, set[Modifier] modifiers)
 	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType)
 	| traitUse(list[Name] traits, list[Adaptation] adaptations)
