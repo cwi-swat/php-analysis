@@ -144,7 +144,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	// a string analysis to rule this out, though, if possible.	
 	set[loc] setsIncludePath = { l | l <- worked, l.scheme != "php+lib", /call(name(name("set_include_path")),_) := sys.files[l] } +
 							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("chdir")),_) := sys.files[l] } + 
-							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("ini_set")),[actualParameter(pe,_,false)]) := sys.files[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
+							   { l | l <- worked, l.scheme != "php+lib", /call(name(name("ini_set")),[actualParameter(pe,_,false,_)]) := sys.files[l], (scalar(string("include_path")) := pe || scalar(string(_)) !:= pe) };
 	timings += < "Found <size(setsIncludePath)> locations that set the include path", now() >;
 
 	// Decorate the nodes in the include graph with info on constants and behaviors.

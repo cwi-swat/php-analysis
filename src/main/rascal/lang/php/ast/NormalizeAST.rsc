@@ -85,23 +85,23 @@ public Script discardEmpties(Script s) {
 public Script useBuiltins(Script s) {
 	solve(s) {
 		s = bottom-up visit(s) {
-			case call(name(name("isset")),params) => isSet([e | actualParameter(e,_,_) <- params])
+			case call(name(name("isset")),params) => isSet([e | actualParameter(e,_,_,_) <- params])
 			
 			case call(name(name("exit")),[]) => exit(noExpr(), true)
 			
-			case call(name(name("exit")),[actualParameter(e,_,_)]) => exit(someExpr(e), true)
+			case call(name(name("exit")),[actualParameter(e,_,_,_)]) => exit(someExpr(e), true)
 			
 			case call(name(name("die")),[]) => exit(noExpr(), false)
 			
-			case call(name(name("die")),[actualParameter(e,_,_)]) => exit(someExpr(e), false)
+			case call(name(name("die")),[actualParameter(e,_,_,_)]) => exit(someExpr(e), false)
 
-			case call(name(name("print")),[actualParameter(e,_,_)]) => Expr::print(e)
+			case call(name(name("print")),[actualParameter(e,_,_,_)]) => Expr::print(e)
 			
-			case exprstmt(call(name(name("unset")),params)) => unset([e | actualParameter(e,_,_) <- params])
+			case exprstmt(call(name(name("unset")),params)) => unset([e | actualParameter(e,_,_,_) <- params])
 
-			case call(name(name("empty")),[actualParameter(e,_,_)]) => empty(e)
+			case call(name(name("empty")),[actualParameter(e,_,_,_)]) => empty(e)
 
-			case call(name(name("eval")),[actualParameter(e,_,_)]) => eval(e)
+			case call(name(name("eval")),[actualParameter(e,_,_,_)]) => eval(e)
 		}
 	}
 	return s;

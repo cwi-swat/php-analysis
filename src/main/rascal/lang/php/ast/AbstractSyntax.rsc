@@ -17,7 +17,7 @@ public data OptionElse
 	= someElse(Else e) | noElse();
 
 public data ActualParameter(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= actualParameter(Expr expr, bool byRef, bool isPacked);
+	= actualParameter(Expr expr, bool byRef, bool isPacked, OptionName paramName);
 
 public data Const(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= const(str name, Expr constValue);

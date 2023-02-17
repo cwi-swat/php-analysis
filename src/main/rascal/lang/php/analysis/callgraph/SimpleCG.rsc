@@ -79,7 +79,7 @@ public CallGraph computeScriptCallGraph(Script s, map[str functionName, set[Call
 				// that function, else we treat it as a call to potentially any function in
 				// the system. NOTE: We don't create an edge to either call_user_func or
 				// call_user_func_array, even though we could create those edges as well.
-				if ([actualParameter(scalar(string(_)),_,_)] := ps) {
+				if ([actualParameter(scalar(string(_)),_,_,_)] := ps) {
 					if (fn in functionTargetsMap) {
 						res = res + ( { c.at } join functionTargetsMap[fn] ); 
 					} else {

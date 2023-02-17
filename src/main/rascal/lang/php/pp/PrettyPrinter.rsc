@@ -26,11 +26,13 @@ public str pp(noName()) = "";
 public str pp(someElse(Else e)) = pp(e);
 public str pp(noElse()) = "";
 
-//public data ActualParameter = actualParameter(Expr expr, bool byRef, bool isPacked);
-public str pp(actualParameter(Expr e, true, false)) = "&<pp(e)>";
-public str pp(actualParameter(Expr e, false, false)) = pp(e);
-public str pp(actualParameter(Expr e, true, true)) = "...&<pp(e)>";
-public str pp(actualParameter(Expr e, false, true)) = "...<pp(e)>";
+// NOTE: We cannot have a named varargs actual, so we do not create a special case for it
+public str pp(actualParameter(Expr e, true, false, noName())) = "&<pp(e)>";
+public str pp(actualParameter(Expr e, false, false, noName())) = pp(e);
+public str pp(actualParameter(Expr e, true, false, someName(Name n))) = "<pp(n)>: &<pp(e)>";
+public str pp(actualParameter(Expr e, false, false, someName(Name n))) = "<pp(n)>: <pp(e)>";
+public str pp(actualParameter(Expr e, true, true, OptionName _)) = "...&<pp(e)>";
+public str pp(actualParameter(Expr e, false, true, OptionName _)) = "...<pp(e)>";
 
 //public data Const = const(str name, Expr constValue);
 public str pp(Const::const(str name, Expr constValue)) = "<name> = <pp(constValue)>";

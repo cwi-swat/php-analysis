@@ -537,7 +537,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 			// TODO: Add support for anonymous classes here...
 			if (computedClassName(Expr cname) := className)
 				return init(cname, lstate);
-			else if (size(parameters) > 0 && actualParameter(Expr expr, bool _, bool _) := head(parameters))
+			else if (size(parameters) > 0 && actualParameter(Expr expr, bool _, bool _, OptionName _) := head(parameters))
 				return init(expr, lstate);
 			return { e.lab };
 		}
@@ -560,7 +560,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		case call(NameOrExpr funName, list[ActualParameter] parameters) : {
 			if (expr(Expr fname) := funName)
 				return init(fname, lstate);
-			else if (size(parameters) > 0 && actualParameter(Expr expr, bool _, bool _) := head(parameters))
+			else if (size(parameters) > 0 && actualParameter(Expr expr, bool _, bool _, OptionName _) := head(parameters))
 				return init(expr, lstate);
 			return { e.lab };
 		}
@@ -574,7 +574,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 				return init(sname, lstate);
 			else if (expr(Expr mname) := methodName)
 				return init(mname, lstate);
-			else if (size(parameters) > 0 && actualParameter(Expr expr, bool _, bool _) := head(parameters))
+			else if (size(parameters) > 0 && actualParameter(Expr expr, bool _, bool _, OptionName _) := head(parameters))
 				return init(expr, lstate);
 			return { e.lab };
 		}
@@ -1691,8 +1691,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		}
 		
 		case new(ClassName className, list[ActualParameter] parameters) : {
-			for (actualParameter(aexp,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_) <- parameters]);
+			for (actualParameter(aexp,_,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_,_) <- parameters]);
 
 			// TODO: Add support for anonymous classes
 			if (computedClassName(Expr cn) := className) {
@@ -1744,8 +1744,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		}
 		
 		case call(NameOrExpr funName, list[ActualParameter] parameters) : {
-			for (actualParameter(aexp,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_) <- parameters]);
+			for (actualParameter(aexp,_,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_,_) <- parameters]);
 		
 			if (expr(Expr fn) := funName) {
 				< edges, lstate > = addExpEdges(edges, lstate, fn);
@@ -1764,8 +1764,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		case methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters) : {
 			< edges, lstate > = addExpEdges(edges, lstate, target);
 
-			for (actualParameter(aexp,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_) <- parameters]);
+			for (actualParameter(aexp,_,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_,_) <- parameters]);
 			
 			if (expr(Expr mn) := methodName) {
 				< edges, lstate > = addExpEdges(edges, lstate, mn);
@@ -1788,8 +1788,8 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 
 		
 		case staticCall(NameOrExpr staticTarget, NameOrExpr methodName, list[ActualParameter] parameters) : {
-			for (actualParameter(aexp,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
-			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_) <- parameters]);
+			for (actualParameter(aexp,_,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
+			< edges, lstate > = addExpSeqEdges(edges, lstate, [ae|actualParameter(ae,_,_,_) <- parameters]);
 
 			if (expr(Expr tn) := staticTarget) {
 				< edges, lstate > = addExpEdges(edges, lstate, tn);
