@@ -9,7 +9,6 @@
 module lang::php::stats::PrepStats
 
 import lang::php::stats::Stats;
-import lang::php::ast::AbstractSyntax;
 import lang::php::util::Corpus;
 import List;
 import Set;

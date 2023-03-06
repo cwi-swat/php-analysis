@@ -95,7 +95,7 @@ public CallGraph computeScriptCallGraph(Script s, map[str functionName, set[Call
 			}
 		}
 
-		case mc:methodCall(_,name(name(mn)),_) : {
+		case mc:methodCall(_,name(name(mn)),_,_) : {
 			if (mn in methodTargetsMap) {
 				res = res + ( { mc.at } join methodTargetsMap[mn] );
 			} else {
@@ -124,7 +124,7 @@ public CallGraph computeScriptCallGraph(Script s, map[str functionName, set[Call
 			res = res + ( { c.at} join allFunctions );
 		}
 
-		case mc:methodCall(_,_,_) : {
+		case mc:methodCall(_,_,_,_) : {
 			res = res + ( { mc.at} join allMethods );
 		}
 	}

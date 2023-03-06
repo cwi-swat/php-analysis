@@ -432,7 +432,7 @@ public str createSubfloat(lrel[str p, str v, QueryResult qr] qrlist, str caption
 	lv = getLatestVersions();
 	ci = loadCountsCSV();
 	// relation between products and the files that contain the features of interest
-	pr = { < p, qr.l.path > | <p, v, qr > <- qrlist };
+	pr = { < p, qr.l.path > | <p, _, qr > <- qrlist };
 	// number of occurrences of the feature in a given product
 	pc = ( p : size([qr|<p,_,qr><-qrlist])  | p <- lv<0> );
 
@@ -700,7 +700,7 @@ public IncludesCountBeforeAfterTuple calculateSystemIncludesCounts(System sys, r
 		computedIncludesCount = size(computedIncludes);
 		computedIncludesFilesCount = size({ l.path | <l,_> <- computedIncludes });
 		map[str,int] fileDistMap = ( );
-		for (<l,e> <- computedIncludes) {
+		for (<l,_> <- computedIncludes) {
 			if (l.path in fileDistMap) {
 				fileDistMap[l.path] += 1;
 			} else {
@@ -716,7 +716,7 @@ public IncludesCountBeforeAfterTuple calculateSystemIncludesCounts(System sys, r
 
 	IncludesCountTuple calcResolved() {
 		map[loc,int] exprLocCounts = ( );
-		for ( < fileLoc, exprLoc, targetLoc > <- resolved ) {
+		for ( < _, exprLoc, _ > <- resolved ) {
 			if (exprLoc in exprLocCounts) {
 				exprLocCounts[exprLoc] += 1;
 			} else {
@@ -727,7 +727,7 @@ public IncludesCountBeforeAfterTuple calculateSystemIncludesCounts(System sys, r
 		nonUniqueSourcesCount = size(nonUniqueIncludes<0,1>);
 		nonUniqueFilesCount = size(nonUniqueIncludes<0>);
 		map[str,int] fileDistMap = ( );
-		for (< fileLoc, exprLoc > <- nonUniqueIncludes<0,1>) {
+		for (< fileLoc, _ > <- nonUniqueIncludes<0,1>) {
 			if ( fileLoc.path in fileDistMap ) {
 				fileDistMap[fileLoc.path] += 1;
 			} else {
@@ -769,7 +769,7 @@ public map[tuple[str p, str v], int] includeCounts(Corpus corpus) {
 	map[tuple[str p, str v], int] res = ( );
 	for (p <- corpus) {
 		sys = loadBinary(p,corpus[p]);
-		totalIncludes = size([ i | /i:include(iexp,_) := sys.files ]);
+		totalIncludes = size([ i | /i:include(_,_) := sys.files ]);
 		res[<p,corpus[p]>] = totalIncludes;
 	}
 	return res;
@@ -1024,7 +1024,7 @@ public str squiglies(HistInfo hi) {
 }
 
 public str squigly(rel[str, int] counts, str label) {
-  ds = distribution([b|<a,b> <- counts]);
+  ds = distribution([b|<_,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
@@ -1034,7 +1034,7 @@ public str squigly(rel[str, int] counts, str label) {
 }
 
 public str squiglyRound(rel[str, int] counts, str label) {
-  ds = distribution([b|<a,b> <- counts]);
+  ds = distribution([b|<_,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
@@ -1044,7 +1044,7 @@ public str squiglyRound(rel[str, int] counts, str label) {
 }
 
 public str squigly2(rel[str, int] counts, str label) {
-  ds = distribution([b|<a,b> <- counts]);
+  ds = distribution([b|<_,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
@@ -1058,7 +1058,7 @@ public str squigly2(rel[str, int] counts, str label) {
 }
 
 public str squigly3(rel[str, int] counts, str label, map[str,str] printingGroups) {
-  ds = distribution([b|<a,b> <- counts]);
+  ds = distribution([b|<_,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   
   if ((ds - (0:0)) == ()) {
@@ -1071,7 +1071,7 @@ public str squigly3(rel[str, int] counts, str label, map[str,str] printingGroups
 }
 
 public str labeledSquigly(rel[str, int] counts, str label) {
-  ds = distribution([b|<a,b> <- counts]);
+  ds = distribution([b|<_,b> <- counts]);
   s = sum([ ds[n] | n <- ds ]) * 1.0;
   perc = (s - ds[0]) / s;
   perc = round(perc * 10000.0) / 100.0;
@@ -1221,7 +1221,7 @@ public str shortLabel(str l) {
 }
 
 public str fileSizesHistogram(LinesType ls) {
-  ds = distribution([ b | <a,b> <- ls<file,phpLines>]);
+  ds = distribution([ b | <_,b> <- ls<file,phpLines>]);
   cds = cumulative(ds);
   
   return "\\begin{figure}
@@ -1568,7 +1568,7 @@ public CoverageMap minimumFeaturesForPercent2(FMap fmap, FeatureLattice lattice)
 }
 
 public CoverageMap featuresForPercents(FMap fmap, FeatureLattice lattice, list[int] percents) {
-	return ( p : features | p <- percents, < nodes, features, files > := minimumFeaturesForPercent(fmap,lattice,p) );
+	return ( p : features | p <- percents, < _, features, _ > := minimumFeaturesForPercent(fmap,lattice,p) );
 }
 
 public CoverageMap featuresForAllPercents(FMap fmap, FeatureLattice lattice) {
@@ -1633,8 +1633,8 @@ public str coverageGraph(CoverageMap coverageMap) {
 
 public str vvUsagePatternsTable(Corpus corpus) {
 	vvUses = varVarUses();
-	map[str,int] templateCounts = ( p : size({n|<n,p,path,line,"Y",at,mg,lpat,feach,sw,cond,der,notes> <- vvUses,(lpat=="X"||feach=="X"||sw=="X"||cond=="X")}) | p <- vvUses<1> );
-	map[str,int] reflectiveCounts = ( p : size({n|<n,p,path,line,drv,at,mg,lpat,feach,sw,cond,der,notes> <- vvUses, drv != "Y"}) | p <- vvUses<1> );
+	map[str,int] templateCounts = ( p : size({n|<n,p,_,_,"Y",_,_,lpat,feach,sw,cond,_,_> <- vvUses,(lpat=="X"||feach=="X"||sw=="X"||cond=="X")}) | p <- vvUses<1> );
+	map[str,int] reflectiveCounts = ( p : size({n|<n,p,_,_,drv,_,_,_,_,_,_,_,_> <- vvUses, drv != "Y"}) | p <- vvUses<1> );
 	map[str,int] totalCounts = ( p : size({n| <n,p,_,_,_,_,_,_,_,_,_,_,_> <- vvUses}) | p <- vvUses<1> );
 	
 	templateTotal = ( 0 | it + templateCounts[p] | p <- templateCounts<0> );
@@ -1868,7 +1868,7 @@ public str evalCounts(Corpus corpus, EvalUses evalUses, FunctionUses fuses, map[
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
 		evalsForProduct = size(evalUses[p,v]);
 		map[str,int] hits = ( );
-		for (<l,e> <- (evalUses[p,v]+fuses[p,v])) {
+		for (<l,_> <- (evalUses[p,v]+fuses[p,v])) {
 			hitloc = l.path;
 			if (hitloc in hits)
 				hits[hitloc] += 1;
@@ -1927,7 +1927,7 @@ public void functionUsesByFun(FunctionUses functionUses) {
 	for (<p,v> <- functionUses<0,1>) {
 		functionsForPV = functionUses[p,v];
 		map[str,int] fcount = ( );
-		for (<l,e> <- functionsForPV, call(name(name(fn)),_) := e) {
+		for (<_,e> <- functionsForPV, call(name(name(fn)),_) := e) {
 			if (fn notin fcount)
 				fcount[fn] = 1;
 			else
@@ -1948,7 +1948,7 @@ public str functionUsesCounts(Corpus corpus, FunctionUses functionUses) {
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
 		usesForProduct = size(functionUses[p,v]);
 		map[str, int] hits = ( );
-		for (<l,e> <- functionUses[p,v]) {
+		for (<l,_> <- functionUses[p,v]) {
 			hitloc = l.path;
 			if (hitloc in hits)
 				hits[hitloc] += 1;
@@ -2006,14 +2006,14 @@ public set[Def] varargsFunctionsAndMethods(System sys) {
 	set[Def] res = { };
 	funsToFind = { "func_get_args", "func_num_args", "func_get_arg" };
 	
-	for (/f:function(fname, _, _, body, _) := sys.files) {
-		if (/e:call(name(name(str fn)),_) := body, fn in funsToFind) {
+	for (/f:function(fname, _, _, body, _, _) := sys.files) {
+		if (/call(name(name(str fn)),_) := body, fn in funsToFind) {
 			res += functionDef(fname, f, f.at);   
 		}
 	}
-	for (/c:class(cname, _, _, _, members) := sys.files) {
-		for (m:method(mname, modifiers, byRef, params, body, rtype) <- members) {
-			if (/e:call(name(name(str fn)),_) := body, fn in funsToFind) {
+	for (/class(cname, _, _, _, members, _) := sys.files) {
+		for (m:method(mname, _, _, _, body, _, _) <- members) {
+			if (/call(name(name(str fn)),_) := body, fn in funsToFind) {
 				res += methodDef(cname, mname, m, m.at);   
 			}
 		}
@@ -2053,17 +2053,17 @@ public rel[loc,Expr,bool] varargsCalls(System sys) {
 	// function calls, standard method calls, and calls to static methods.
 	rel[loc,Expr,bool] vaCalls = { };
 	visit(sys.files) {
-		case e:call(name(name(str fn)),args) : {
+		case e:call(name(name(str fn)),_) : {
 			if (fn in functionNames)
 				vaCalls = vaCalls + < e.at, e, fn in systemFunctionNames >;
 		}
 		
-		case e:methodCall(_,name(name(str fn)),args) : {
+		case e:methodCall(_,name(name(str fn)),_,_) : {
 			if (fn in methodNames)
 				vaCalls = vaCalls + < e.at, e, fn in systemMethods>;
 		}
 		
-		case e:staticCall(_,name(name(str fn)),args) : {
+		case e:staticCall(_,name(name(str fn)),_) : {
 			if (fn in methodNames)
 				vaCalls = vaCalls + < e.at, e, fn in systemMethods>;
 		}
@@ -2083,9 +2083,9 @@ public rel[str,str,loc,Expr,bool] varargsCalls(Corpus corpus) {
 }
 
 public rel[loc,Expr] allCalls(System sys) {
-	return { < e.at, e > | /e:call(name(name(str fn)),args) := sys.files } + 
-		   { < e.at, e > | /e:methodCall(_,name(name(str fn)),args) := sys.files } +
-		   { < e.at, e > | /e:staticCall(_,name(name(str fn)),args) := sys.files };
+	return { < e.at, e > | /e:call(name(name(str _)),_) := sys.files } + 
+		   { < e.at, e > | /e:methodCall(_,name(name(str _)),_,_) := sys.files } +
+		   { < e.at, e > | /e:staticCall(_,name(name(str _)),_) := sys.files };
 }
 
 public rel[str,str,loc,Expr] allCalls(Corpus corpus) {
@@ -2118,8 +2118,8 @@ public map[str product,tuple[int classes, int interfaces] ciCount] classAndInter
 	map[str product,tuple[int classes, int interfaces] ciCount] res = ( );
 	for (p <- corpus) {
 		sys = loadBinary(p,corpus[p]);
-		classCount = size({ c | /c:class(_,_,_,_,_) := sys.files });
-		interfaceCount = size({ i | /i:interface(_,_,_) := sys.files });
+		classCount = size({ c | /c:class(_,_,_,_,_,_) := sys.files });
+		interfaceCount = size({ i | /i:interface(_,_,_,_) := sys.files });
 		res[p] = < classCount, interfaceCount >;
 	}
 	return res;
@@ -2129,8 +2129,8 @@ public rel[str product, str path] classAndInterfaceFiles(Corpus corpus) {
 	rel[str product, str path] res = { };
 	for (p <- corpus) {
 		sys = loadBinary(p,corpus[p]);
-		classPaths = { c.at.path | /c:class(_,_,_,_,_) := sys.files };
-		interfacePaths = { i.at.path | /i:interface(_,_,_) := sys.files };
+		classPaths = { c.at.path | /c:class(_,_,_,_,_,_) := sys.files };
+		interfacePaths = { i.at.path | /i:interface(_,_,_,_) := sys.files };
 		res += { < p, pth > | pth <- (classPaths + interfacePaths) };
 	}
 	return res;
@@ -2144,7 +2144,7 @@ public str showVarArgsUses(Corpus corpus, rel[str p, str v, Def d] vaDefs, rel[s
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
 		
 		map[str, int] hits = ( );
-		for (<l,e,b> <- vaCalls[p,v]) {
+		for (<l,_,_> <- vaCalls[p,v]) {
 			hitloc = l.path;
 			if (hitloc in hits)
 				hits[hitloc] += 1;
@@ -2193,7 +2193,7 @@ public str invokeFunctionUsesCounts(Corpus corpus, FunctionUses functionUses, ma
 		< lineCount, fileCount > = getOneFrom(ci[p,v]);
 		usesForProduct = size(functionUses[p,v]);
 		map[str, int] hits = ( );
-		for (<l,e> <- functionUses[p,v]) {
+		for (<l,_> <- functionUses[p,v]) {
 			hitloc = l.path;
 			if (hitloc in hits)
 				hits[hitloc] += 1;
@@ -2201,10 +2201,10 @@ public str invokeFunctionUsesCounts(Corpus corpus, FunctionUses functionUses, ma
 				hits[hitloc] = 1;
 		}
 		
-		callUserFunctionCount = size({ fn | fn:<p,v,l,call(name(name("call_user_func")),_)> <- functionUses });
-		callUserFunctionArrayCount = size({ fn | fn:<p,v,l,call(name(name("call_user_func_array")),_)> <- functionUses });
-		callUserMethodCount = size({ fn | fn:<p,v,l,call(name(name("call_user_method")),_)> <- functionUses });
-		callUserMethodArrayCount = size({ fn | fn:<p,v,l,call(name(name("call_user_method_array")),_)> <- functionUses });
+		callUserFunctionCount = size({ fn | fn:<p,v,_,call(name(name("call_user_func")),_)> <- functionUses });
+		callUserFunctionArrayCount = size({ fn | fn:<p,v,_,call(name(name("call_user_func_array")),_)> <- functionUses });
+		callUserMethodCount = size({ fn | fn:<p,v,_,call(name(name("call_user_method")),_)> <- functionUses });
+		callUserMethodArrayCount = size({ fn | fn:<p,v,_,call(name(name("call_user_method_array")),_)> <- functionUses });
 		
 		giniC = (size(hits) > 1) ? mygini([ hits[hl] | hl <- hits ]) : 0;
 		giniToPrint = (giniC == 0.0) ? 0.0 : round(giniC*1000.0)/1000.0;

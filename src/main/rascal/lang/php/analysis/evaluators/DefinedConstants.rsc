@@ -16,7 +16,6 @@ import lang::php::analysis::NamePaths;
 
 import Set;
 import List;
-import String;
 import Map;
 
 data ConstItem = normalConst(str constName) | classConst(str className, str constName);
@@ -103,7 +102,7 @@ public set[ConstItem] getScriptConstUses(Script scr) {
 }
 
 public set[ConstItemExp] getScriptConstDefs(Script scr) =
-	{ classConst(cln, cn, ce) | /class(cln,_,_,_,cis) := scr, constCI(consts,_) <- cis, const(cn,ce) <- consts } + // TODO: Do we need to worry about const modifiers?
+	{ classConst(cln, cn, ce) | /class(cln,_,_,_,cis,_) := scr, constCI(consts,_,_) <- cis, const(cn,ce) <- consts } + // TODO: Do we need to worry about const modifiers?
 	{ normalConst(cn, ce) | /call(name(name("define")),[actualParameter(scalar(string(cn)),false,false,_),actualParameter(ce,false,false,_)]) := scr } +
 	{ normalConst(cn, ce) | /Stmt::const(cl) := scr, Const::const(cn,ce) <- cl };
 

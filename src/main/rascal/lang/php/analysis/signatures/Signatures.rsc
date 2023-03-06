@@ -34,9 +34,9 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 	
 	// First, pull out all class definitions
 	classDefs = { c | /ClassDef c := scr };
-	for (class(cln,_,_,_,cis) <- classDefs) {
+	for (class(cln,_,_,_,cis,_) <- classDefs) {
 		items += classSig(classPath(cln));
-		for (mt:method(mn,_,_,mps,_,_) <- cis) {
+		for (mt:method(mn,_,_,mps,_,_,_) <- cis) {
 			if (buildInfo) {
 				if ( (mt.at.scheme != "unknown") ) {
 					items += methodSig(methodPath(cln, mn), [ paramInfo(mp.paramName, mp.byRef) | mp <- mps ])[at=mt.at];
@@ -51,13 +51,13 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 				}
 			}
 		}
-		for(constCI(consts,_) <- cis, const(cn,ce) <- consts) {
+		for(constCI(consts,_,_) <- cis, const(cn,ce) <- consts) {
 			items += classConstSig(classConstPath(cln, cn), ce);
 		}
 	}
 	
 	// Second, get all top-level functions
-	for (/f:function(fn,_,fps,_,_) := scr) {
+	for (/f:function(fn,_,fps,_,_,_) := scr) {
 		if (buildInfo) {
 			if ( (f.at.scheme != "unknown") ) {
 				items += functionSig(functionPath(fn), [ paramInfo(fp.paramName, fp.byRef) | fp <- fps ])[at=f.at];
@@ -87,7 +87,7 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 
 public Signature getScriptConstants(loc fileloc, Script scr) {
 	set[SignatureItem] items = 
-		{ classConstSig(classConstPath(cln, cn), ce) | /class(cln,_,_,_,cis) := scr, constCI(consts,_) <- cis, const(cn,ce) <- consts } +
+		{ classConstSig(classConstPath(cln, cn), ce) | /class(cln,_,_,_,cis,_) := scr, constCI(consts,_,_) <- cis, const(cn,ce) <- consts } +
 		{ constSig(constPath(cn),e) | /call(name(name("define")),[actualParameter(scalar(string(cn)),false,false,_),actualParameter(e,false,false,_)]) := scr };
 	return fileSignature(fileloc, items);
 }

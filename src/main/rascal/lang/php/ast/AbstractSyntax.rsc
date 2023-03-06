@@ -17,13 +17,15 @@ public data OptionElse
 	= someElse(Else e) | noElse();
 
 public data ActualParameter(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= actualParameter(Expr expr, bool byRef, bool isPacked, OptionName paramName);
+	= actualParameter(Expr expr, bool byRef, bool isPacked, OptionName paramName)
+	| variadicPlaceholder()
+	;
 
 public data Const(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= const(str name, Expr constValue);
 
 public data ArrayElement(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= arrayElement(OptionExpr key, Expr val, bool byRef)
+	= arrayElement(OptionExpr key, Expr val, bool byRef, bool unpack)
 	| emptyElement();
 
 public data Name(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
@@ -80,20 +82,20 @@ public data Expr(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc sc
 	| new(ClassName classToInstantiate, list[ActualParameter] parameters)
 	| cast(CastType castType, Expr expr)
 	| clone(Expr expr)
-	| closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static, PHPType returnType)
+	| closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static, PHPType returnType, list[AttributeGroup] attributeGroups)
 	| fetchConst(Name name)
 	| empty(Expr expr)
 	| suppress(Expr expr)
 	| eval(Expr expr)
 	| exit(OptionExpr exitExpr, bool isExit)
 	| call(NameOrExpr funName, list[ActualParameter] parameters)
-	| methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters)
+	| methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters, bool nullsafe)
 	| staticCall(NameOrExpr staticTarget, NameOrExpr methodName, list[ActualParameter] parameters)
 	| include(Expr expr, IncludeType includeType)
 	| instanceOf(Expr expr, NameOrExpr toCompare)
 	| isSet(list[Expr] exprs)
 	| print(Expr expr)
-	| propertyFetch(Expr target, NameOrExpr propertyName)
+	| propertyFetch(Expr target, NameOrExpr propertyName, bool nullsafe)
 	| shellExec(list[Expr] parts)
 	| ternary(Expr cond, OptionExpr ifBranch, Expr elseBranch)
 	| staticPropertyFetch(NameOrExpr className, NameOrExpr propertyName)
@@ -102,6 +104,9 @@ public data Expr(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc sc
 	| yield(OptionExpr keyExpr, OptionExpr valueExpr)
 	| yieldFrom(Expr fromExpr)
 	| listExpr(list[ArrayElement] listExprs)
+	| arrowFunction(bool isStatic, bool byRef, list[Param] params, PHPType returnType, Expr body, list[AttributeGroup] attributeGroups)
+	| \throw(Expr expr)
+	| match(Expr cond, list[MatchArm] arms)
 	;
 
 public data Op(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
@@ -143,7 +148,7 @@ public data Op(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scop
 	;
 
 public data Param(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= param(str paramName, OptionExpr paramDefault,bool byRef,bool isVariadic, PHPType paramType);
+	= param(str paramName, OptionExpr paramDefault,bool byRef,bool isVariadic, PHPType paramType, set[Modifier] modifiers, list[AttributeGroup] attributeGroups);
 
 public data Scalar(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="", str actualValue="")
 	= classConstant()
@@ -171,7 +176,7 @@ public data Stmt(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc sc
 	| exprstmt(Expr expr)
 	| \for(list[Expr] inits, list[Expr] conds, list[Expr] exprs, list[Stmt] body)
 	| foreach(Expr arrayExpr, OptionExpr keyvar, bool byRef, Expr asVar, list[Stmt] body)
-	| function(str name, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType)
+	| function(str name, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType, list[AttributeGroup] attributeGroups)
 	| global(list[Expr] exprs)
 	| goto(str label)
 	| haltCompiler(str remainingText)
@@ -185,14 +190,15 @@ public data Stmt(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc sc
 	| \return(OptionExpr returnExpr)
 	| static(list[StaticVar] vars)
 	| \switch(Expr cond, list[Case] cases)
-	| \throw(Expr expr)
+	// | \throw(Expr expr) NOW AN EXPRESSION
 	| tryCatch(list[Stmt] body, list[Catch] catches)
 	| tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
 	| unset(list[Expr] unsetVars)
-	| useStmt(list[Use] uses, UseType useType)
+	| useStmt(list[Use] uses, OptionName prefixName, UseType useType)
 	| \while(Expr cond, list[Stmt] body)
 	| emptyStmt()
 	| block(list[Stmt] body)
+	| enumDef(EnumDef enumDef)
 	;
 
 public data UseType
@@ -220,10 +226,11 @@ public data Use(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc sco
 	= use(Name importName, OptionName asName, UseType useType);
 
 public data ClassItem(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= property(set[Modifier] modifiers, list[Property] prop, PHPType propType)
-	| constCI(list[Const] consts, set[Modifier] modifiers)
-	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType)
+	= property(set[Modifier] modifiers, list[Property] prop, PHPType propType, list[AttributeGroup] attributeGroups)
+	| constCI(list[Const] consts, set[Modifier] modifiers, list[AttributeGroup] attributeGroups)
+	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType, list[AttributeGroup] attributeGroups)
 	| traitUse(list[Name] traits, list[Adaptation] adaptations)
+	| enumCase(str caseName, OptionExpr caseExpr, list[AttributeGroup] attributeGroups)
 	;
 
 public data Adaptation
@@ -240,19 +247,36 @@ public data Modifier(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", lo
 	| protected()
 	| static()
 	| abstract()
-	| final();
+	| final()
+	| readonly()
+	;
 
 public data ClassDef(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= class(str className, set[Modifier] modifiers, OptionName extends, list[Name] implements, list[ClassItem] members);
+	= class(str className, set[Modifier] modifiers, OptionName extends, list[Name] implements, list[ClassItem] members, list[AttributeGroup] attributeGroups);
 
 public data InterfaceDef(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= interface(str interfaceName, list[Name] extends, list[ClassItem] members);
+	= interface(str interfaceName, list[Name] extends, list[ClassItem] members, list[AttributeGroup] attributeGroups);
 
 public data TraitDef
-	= trait(str traitName, list[ClassItem] members);
+	= trait(str traitName, list[ClassItem] members, list[AttributeGroup] attributeGroups);
 
 public data StaticVar(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= staticVar(str name, OptionExpr defaultValue);
+
+public data MatchArm
+	= matchArm(list[Expr] conds, Expr body)
+	;
+
+public data EnumDef(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
+	= enum(str enumName, PHPType scalarType, list[Name] implements, list[ClassItem] members, list[AttributeGroup] attributeGroups);
+
+public data Attribute(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
+	= attribute(Name attrName, list[ActualParameter] args)
+	;
+
+public data AttributeGroup
+	= attributeGroup(list[Attribute] attributes)
+	;
 
 public data Script(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= script(list[Stmt] body) | errscript(str err);

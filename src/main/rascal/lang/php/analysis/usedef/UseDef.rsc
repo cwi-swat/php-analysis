@@ -78,10 +78,10 @@ public list[Name] getNames(Expr n) {
 		case fetchArrayDim(var(expr(Expr e)),_) :
 			return [ computedName(e) ];
 		
-		case propertyFetch(target, name(name(vn))) :
+		case propertyFetch(target, name(name(vn)), bool _) :
 			return [ propertyName(target, vn) ];
 			
-		case propertyFetch(target, expr(Expr e)) :
+		case propertyFetch(target, expr(Expr e), bool _) :
 			return [ computedPropertyName(target, e) ];
 		
 		case staticPropertyFetch(name(name(target)), name(name(vn))) :
@@ -125,10 +125,10 @@ public set[Name] getNestedNames(CFGNode n, set[loc] locsToFilter) {
 		case ni:fetchArrayDim(var(expr(Expr e)),_) :
 			res = res + < computedName(e), ni.at >;
 		
-		case ni:propertyFetch(target, name(name(vn))) :
+		case ni:propertyFetch(target, name(name(vn)), bool _) :
 			res = res + < propertyName(target, vn), ni.at >;
 			
-		case ni:propertyFetch(target, expr(Expr e)) :
+		case ni:propertyFetch(target, expr(Expr e), bool _) :
 			res = res + < computedPropertyName(target, e), ni.at >;
 		
 		case ni:staticPropertyFetch(name(name(target)), name(name(vn))) :

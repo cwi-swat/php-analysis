@@ -13,7 +13,6 @@ import lang::php::analysis::cfg::FlowEdge;
 import lang::php::analysis::cfg::Label;
 import lang::php::analysis::NamePaths;
 
-import Node;
 import Relation;
 import List;
 import String;

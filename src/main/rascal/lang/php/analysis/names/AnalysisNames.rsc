@@ -60,7 +60,7 @@ public AnalysisName computeName(Expr e) {
 			return unknownVar();
 		}
 		
-		case propertyFetch(pt, name(name(p))) : {
+		case propertyFetch(pt, name(name(p)), bool _) : {
 			ptname = computeName(pt);
 			if (ptname is compoundName) {
 				return compoundName(ptname.parts + fieldName(p));
@@ -69,7 +69,7 @@ public AnalysisName computeName(Expr e) {
 			}
 		}
 
-		case propertyFetch(pt, expr(_)) : {
+		case propertyFetch(pt, expr(_), bool _) : {
 			ptname = computeName(pt);
 			if (ptname is compoundName) {
 				return compoundName(ptname.parts + unknownField());

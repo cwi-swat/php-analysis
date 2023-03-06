@@ -29,21 +29,21 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 	// __CLASS__, __METHOD__, __FUNCTION__, __NAMESPACE__, and __TRAIT__.
 
 	scr = top-down visit(scr) {
-		case c:class(className,_,_,_,members) : {
+		case c:class(className,_,_,_,members,_) : {
 			members = bottom-up visit(members) {
 				case s:scalar(classConstant()) => scalar(string(className))[at=s.at]
 			}
 			insert(c[members=members]);
 		}
 		
-		case m:method(methodName,_,_,_,body,_) : {
+		case m:method(methodName,_,_,_,body,_,_) : {
 			body = bottom-up visit(body) {
 				case s:scalar(methodConstant()) => scalar(string(methodName))[at=s.at]
 			}
 			insert(m[body=body]);
 		}
 		
-		case f:function(funcName,_,_,body,_) : {
+		case f:function(funcName,_,_,body,_,_) : {
 			body = bottom-up visit(body) {
 				case s:scalar(funcConstant()) => scalar(string(funcName))[at=s.at]
 			}

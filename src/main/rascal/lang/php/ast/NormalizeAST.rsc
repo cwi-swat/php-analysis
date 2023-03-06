@@ -10,7 +10,6 @@ module lang::php::ast::NormalizeAST
 
 import lang::php::ast::AbstractSyntax;
 import List;
-import IO;
 import Node;
 import String;
 
@@ -141,62 +140,62 @@ public Script normalizeArrayAccesses(Script s) {
 			case staticPropertyFetch(pc,expr(fetchArrayDim(var(vn),ad))) =>
 				fetchArrayDim(staticPropertyFetch(pc,vn),ad)
 				 
-			case propertyFetch(e,expr(fetchArrayDim(var(vn),ad))) =>
-				 fetchArrayDim(propertyFetch(e,vn),ad)
+			case propertyFetch(e,expr(fetchArrayDim(var(vn),ad)), bool b) =>
+				 fetchArrayDim(propertyFetch(e,vn,b),ad)
 
 			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(var(vn),ad2),ad))) =>
 				 fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad2),ad)
 				 
-			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(var(vn),ad2),ad))) =>
-				 fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad2),ad)
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(var(vn),ad2),ad)), bool b) =>
+				 fetchArrayDim(fetchArrayDim(propertyFetch(e,vn,b),ad2),ad)
 
 			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad3),ad2),ad))) =>
 				 fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad3),ad2),ad)
 				 
-			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad3),ad2),ad))) =>
-				 fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad3),ad2),ad)
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad3),ad2),ad)), bool b) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn,b),ad3),ad2),ad)
 
 			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad4),ad3),ad2),ad))) =>
 				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad4),ad3),ad2),ad)
 				 
-			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad4),ad3),ad2),ad))) =>
-				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad4),ad3),ad2),ad)
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad4),ad3),ad2),ad)), bool b) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn,b),ad4),ad3),ad2),ad)
 
 			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad5),ad4),ad3),ad2),ad))) =>
 				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad5),ad4),ad3),ad2),ad)
 				 
-			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad5),ad4),ad3),ad2),ad))) =>
-				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad5),ad4),ad3),ad2),ad)
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad5),ad4),ad3),ad2),ad)), bool b) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn,b),ad5),ad4),ad3),ad2),ad)
 
 			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad6),ad5),ad4),ad3),ad2),ad))) =>
 				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad6),ad5),ad4),ad3),ad2),ad)
 				 
-			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad6),ad5),ad4),ad3),ad2),ad))) =>
-				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad6),ad5),ad4),ad3),ad2),ad)
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad6),ad5),ad4),ad3),ad2),ad)), bool b) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn,b),ad6),ad5),ad4),ad3),ad2),ad)
 
 			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
 				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad7),ad6),ad5),ad4),ad3),ad2),ad)
 				 
-			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
-				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad7),ad6),ad5),ad4),ad3),ad2),ad)), bool b) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn,b),ad7),ad6),ad5),ad4),ad3),ad2),ad)
 
 			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
 				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
 				 
-			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
-				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)), bool b) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn,b),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
 
 			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
 				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
 				 
-			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
-				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)), bool b) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn,b),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
 
 			case staticPropertyFetch(pc,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad10),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
 				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(staticPropertyFetch(pc,vn),ad10),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
 				 
-			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad10),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad))) =>
-				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn),ad10),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
+			case propertyFetch(e,expr(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(var(vn),ad10),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)), bool b) =>
+				 fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(fetchArrayDim(propertyFetch(e,vn,b),ad10),ad9),ad8),ad7),ad6),ad5),ad4),ad3),ad2),ad)
 		}
 	}
 	return s;
@@ -256,12 +255,12 @@ public Script addPublicModifierWhenNotProvided(Script s) {
 	
 	solve(s) {
 		s = visit(s) {
-			case origNode:property(set[Modifier] mfs, prop, ptype) => 
-				setAnnotations( property(mfs + publicModifier, prop), getAnnotations(origNode))
+			case origNode:property(set[Modifier] mfs, prop, ptype, pattrs) => 
+				setAnnotations( property(mfs + publicModifier, prop, ptype, pattrs), getAnnotations(origNode))
 			when \public() notin mfs && \private() notin mfs && \protected() notin mfs
 				
-			case origNode:method(str mname, set[Modifier] mfs, byRef, params, body, rtype) => 
-				setAnnotations( method(mname, mfs + publicModifier, byRef, params, body, rtype), getAnnotations(origNode))
+			case origNode:method(str mname, set[Modifier] mfs, byRef, params, body, rtype, mattrs) => 
+				setAnnotations( method(mname, mfs + publicModifier, byRef, params, body, rtype, mattrs), getAnnotations(origNode))
 			when \public() notin mfs && \private() notin mfs && \protected() notin mfs
 		}
 	}

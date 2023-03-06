@@ -33,15 +33,17 @@ public str pp(actualParameter(Expr e, true, false, someName(Name n))) = "<pp(n)>
 public str pp(actualParameter(Expr e, false, false, someName(Name n))) = "<pp(n)>: <pp(e)>";
 public str pp(actualParameter(Expr e, true, true, OptionName _)) = "...&<pp(e)>";
 public str pp(actualParameter(Expr e, false, true, OptionName _)) = "...<pp(e)>";
+public str pp(variadicPlaceholder()) = "...";
 
 //public data Const = const(str name, Expr constValue);
 public str pp(Const::const(str name, Expr constValue)) = "<name> = <pp(constValue)>";
 
-//public data ArrayElement = arrayElement(OptionExpr key, Expr val, bool byRef);
-public str pp(arrayElement(someExpr(Expr expr), Expr val, true)) = "<pp(expr)> =\> &<pp(val)>";
-public str pp(arrayElement(someExpr(Expr expr), Expr val, false)) = "<pp(expr)> =\> <pp(val)>";
-public str pp(arrayElement(noExpr(), Expr val, true)) = "&<pp(val)>";
-public str pp(arrayElement(noExpr(), Expr val, false)) = pp(val);
+public str pp(arrayElement(someExpr(Expr expr), Expr val, true, false)) = "<pp(expr)> =\> &<pp(val)>";
+public str pp(arrayElement(someExpr(Expr expr), Expr val, false, false)) = "<pp(expr)> =\> <pp(val)>";
+public str pp(arrayElement(noExpr(), Expr val, true, false)) = "&<pp(val)>";
+public str pp(arrayElement(noExpr(), Expr val, false, false)) = pp(val);
+// NOTE: I believe the ... notation is only available for this form of array element.
+public str pp(arrayElement(noExpr(), Expr val, false, true)) = "...<pp(val)>";
 
 //public data Name = name(str name);
 public str pp(Name::name(str n)) = replaceAll(n, "/", "\\");
@@ -118,21 +120,21 @@ public str pp(clone(Expr expr)) = "clone <pp(expr)>";
 
 //	| closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, bool byRef, bool static, PHPType returnType)
 // TODO: Add remaining closure cases...
-public str pp(closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, false, false, PHPType returnType)) = 
+public str pp(closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, false, false, PHPType returnType, _)) = 
 	"function (<intercalate(",",[pp(p)|p<-params])>) use (<intercalate(",",[pp(cu)|cu<-closureUses])>)
 	'{
 	'	<for(s<-statements) {><pp(s)><}>
 	'}"
 	when !isEmpty(closureUses);
 
-public str pp(closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, false, false, PHPType returnType)) = 
+public str pp(closure(list[Stmt] statements, list[Param] params, list[ClosureUse] closureUses, false, false, PHPType returnType, _)) = 
 	"function (<intercalate(",",[pp(p)|p<-params])>)
 	'{
 	'	<for(s<-statements) {><pp(s)><}>
 	'}"
 	when isEmpty(closureUses);
 
-public str pp(closure(_,_,_,_,_,_)) = 
+public str pp(closure(_,_,_,_,_,_,_)) = 
 	"/* this closure not supported yet by pretty printer */";
 	
 //	| fetchConst(Name name)
@@ -155,7 +157,9 @@ public str pp(call(NameOrExpr funName, list[ActualParameter] parameters)) =
 	"<pp(funName)>(<intercalate(",",[pp(p)|p<-parameters])>)";
 
 //	| methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters)
-public str pp(methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters)) =
+public str pp(methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters, true)) =
+	"<pp(target)>?-\><pp(methodName)>(<intercalate(",",[pp(p)|p<-parameters])>)";
+public str pp(methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters, false)) =
 	"<pp(target)>-\><pp(methodName)>(<intercalate(",",[pp(p)|p<-parameters])>)";
 
 //	| staticCall(NameOrExpr staticTarget, NameOrExpr methodName, list[ActualParameter] parameters)
@@ -175,7 +179,8 @@ public str pp(isSet(list[Expr] exprs)) = "isset(<intercalate(",",[pp(e)|e<-exprs
 public str pp(Expr::print(Expr expr)) = "print(<pp(expr)>)";
 
 //	| propertyFetch(Expr target, NameOrExpr propertyName)
-public str pp(propertyFetch(Expr target, NameOrExpr propertyName)) = "<pp(target)>-\><pp(propertyName)>";
+public str pp(propertyFetch(Expr target, NameOrExpr propertyName, true)) = "<pp(target)>?-\><pp(propertyName)>";
+public str pp(propertyFetch(Expr target, NameOrExpr propertyName, false)) = "<pp(target)>-\><pp(propertyName)>";
 
 //	| shellExec(list[Expr] parts)
 // TODO: literal text is handled as string and will add quotes, this is not correct.
@@ -270,14 +275,22 @@ public default bool ppOnRight(Op x) = isUnary(x) && !ppOnLeft(x);
 //						  bool byRef,
 //						  bool isVariadic, 
 //						  PHPType paramType);
-public str pp(param(str pn, noExpr(), true, true, PHPType returnType)) = "<padIfNotEmpty(pp(returnType))>&$<pn>...";
-public str pp(param(str pn, noExpr(), true, false, PHPType returnType)) = "<padIfNotEmpty(pp(returnType))>&$<pn>";
-public str pp(param(str pn, noExpr(), false, true, PHPType returnType)) = "<padIfNotEmpty(pp(returnType))>$<pn>...";
-public str pp(param(str pn, noExpr(), false, false, PHPType returnType)) = "<padIfNotEmpty(pp(returnType))>$<pn>";
-public str pp(param(str pn, someExpr(Expr e), true, true, PHPType returnType)) = "<padIfNotEmpty(pp(returnType))>&$<pn>... = <pp(e)>";
-public str pp(param(str pn, someExpr(Expr e), true, false, PHPType returnType)) = "<padIfNotEmpty(pp(returnType))>&$<pn> = <pp(e)>";
-public str pp(param(str pn, someExpr(Expr e), false, true, PHPType returnType)) = "<padIfNotEmpty(pp(returnType))>$<pn>... = <pp(e)>";
-public str pp(param(str pn, someExpr(Expr e), false, false, PHPType returnType)) = "<padIfNotEmpty(pp(returnType))>$<pn> = <pp(e)>";
+public str pp(param(str pn, noExpr(), true, true, PHPType returnType, mods, _)) 
+	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>&$<pn>...";
+public str pp(param(str pn, noExpr(), true, false, PHPType returnType, mods, _)) 
+	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>&$<pn>";
+public str pp(param(str pn, noExpr(), false, true, PHPType returnType, mods, _)) 
+	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>$<pn>...";
+public str pp(param(str pn, noExpr(), false, false, PHPType returnType, mods, _)) 
+	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>$<pn>";
+public str pp(param(str pn, someExpr(Expr e), true, true, PHPType returnType, mods, _)) 
+	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>&$<pn>... = <pp(e)>";
+public str pp(param(str pn, someExpr(Expr e), true, false, PHPType returnType, mods, _)) 
+	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>&$<pn> = <pp(e)>";
+public str pp(param(str pn, someExpr(Expr e), false, true, PHPType returnType, mods, _)) 
+	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>$<pn>... = <pp(e)>";
+public str pp(param(str pn, someExpr(Expr e), false, false, PHPType returnType, mods, _)) 
+	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>$<pn> = <pp(e)>";
 
 public str padIfNotEmpty(str s) = "<s> " when size(s) != 0;
 public str padIfNotEmpty(str s) = s when size(s) == 0;
@@ -376,11 +389,11 @@ public str pp(foreach(Expr arrayExpr, noExpr(), true, Expr asVar, list[Stmt] bod
 	'}";
 	
 //	| function(str name, bool byRef, list[Param] params, list[Stmt] body)
-public str pp(function(str name, true, list[Param] params, list[Stmt] body, PHPType returnType)) = 
+public str pp(function(str name, true, list[Param] params, list[Stmt] body, PHPType returnType,_)) = 
 	"function &<name>(<intercalate(",",[pp(p)|p<-params])>) {
 	'	<for (b <- body) {><pp(b)><}>
 	'}";
-public str pp(function(str name, false, list[Param] params, list[Stmt] body, PHPType returnType)) = 
+public str pp(function(str name, false, list[Param] params, list[Stmt] body, PHPType returnType,_)) = 
 	"function <name>(<intercalate(",",[pp(p)|p<-params])>) {
 	'	<for (b <- body) {><pp(b)><}>
 	'}";
@@ -481,7 +494,8 @@ public str pp(tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] f
 public str pp(Stmt::unset(list[Expr] unsetVars)) = "unset(<intercalate(",",[pp(u)|u<-unsetVars])>);";
 
 //	| use(list[Use] uses, OptionName prefix, UseType useType)
-public str pp(Stmt::useStmt(list[Use] uses, UseType useType)) = "use <intercalate(",",[pp(u)|u<-uses])>;";
+// TODO: This needs to account for the type and prefix
+public str pp(Stmt::useStmt(list[Use] uses, OptionName prefixName, UseType useType)) = "use <intercalate(",",[pp(u)|u<-uses])>;";
 
 //	| \while(Expr cond, list[Stmt] body)
 public str pp(\while(Expr cond, list[Stmt] body)) = 
@@ -545,31 +559,31 @@ public str pp(Use::use(Name importName, noName(), UseType useType)) = "<pp(impor
 
 //public data ClassItem 
 //	= property(set[Modifier] modifiers, list[Property] prop)
-public str pp(ClassItem::property(set[Modifier] modifiers, list[Property] prop, PHPType ptype)) =
+public str pp(ClassItem::property(set[Modifier] modifiers, list[Property] prop, PHPType ptype, _)) =
 	"<for(p <- prop) {><intercalate(" ",[pp(m)|m<-modifiers])> <pp(ptype)> <pp(p)>;
 	'<}>";
 
 //	| constCI(list[Const] consts)
-public str pp(constCI(list[Const] consts, set[Modifier] modifiers)) = "const <intercalate(",",[pp(c)|c<-consts])>;";
+public str pp(constCI(list[Const] consts, set[Modifier] modifiers, _)) = "const <intercalate(",",[pp(c)|c<-consts])>;";
 
 //	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body)
 // TODO classes of interfaces have no body
-public str pp(method(str name, set[Modifier] modifiers, true, list[Param] params, list[Stmt] body, PHPType returnType)) =
+public str pp(method(str name, set[Modifier] modifiers, true, list[Param] params, list[Stmt] body, PHPType returnType, _)) =
 	"<intercalate(" ", [pp(m)|m<-modifiers])> function &<name>(<intercalate(",",[pp(p)|p<-params])>) {<for (b <- body) {>
 	'	<pp(b)><}>
 	'}"
 	when !(\abstract() in modifiers); 
 
-public str pp(method(str name, set[Modifier] modifiers, true, list[Param] params, list[Stmt] body, PHPType returnType)) =
+public str pp(method(str name, set[Modifier] modifiers, true, list[Param] params, list[Stmt] body, PHPType returnType, _)) =
 	"<intercalate(" ", [pp(m)|m<-modifiers])> function &<name>(<intercalate(",",[pp(p)|p<-params])>);";
 
-public str pp(method(str name, set[Modifier] modifiers, false, list[Param] params, list[Stmt] body, PHPType returnType)) =
+public str pp(method(str name, set[Modifier] modifiers, false, list[Param] params, list[Stmt] body, PHPType returnType, _)) =
 	"<intercalate(" ", [pp(m)|m<-modifiers])> function <name>(<intercalate(",",[pp(p)|p<-params])>) {<for (b <- body) {>
 	'	<pp(b)><}>
 	'}"
 	when !(\abstract() in modifiers); 
 
-public str pp(method(str name, set[Modifier] modifiers, false, list[Param] params, list[Stmt] body, PHPType returnType)) =
+public str pp(method(str name, set[Modifier] modifiers, false, list[Param] params, list[Stmt] body, PHPType returnType, _)) =
 	"<intercalate(" ", [pp(m)|m<-modifiers])> function <name>(<intercalate(",",[pp(p)|p<-params])>);";
 
 //	| traitUse(list[Name] traits, list[Adaptation] adaptations)
@@ -605,6 +619,7 @@ public str pp(\protected()) = "protected";
 public str pp(Modifier::\static()) = "static";
 public str pp(\abstract()) = "abstract";
 public str pp(\final()) = "final";
+public str pp(\readonly()) = "readonly";
 
 //public data ClassDef = class(str className,
 //							 set[Modifier] modifiers, 
@@ -612,36 +627,36 @@ public str pp(\final()) = "final";
 //							 list[Name] implements, 
 //							 list[ClassItem] members);
 //
-public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members)) =
+public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members, _)) =
 	"class <className> extends <pp(extends)> {
 	'	<for (m <- members) {>
 	'	<pp(m)><}>
 	'}" when isEmpty(modifiers) && isEmpty(implements);
-public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members)) =
+public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members, _)) =
 	"class <className> {
 	'	<for (m <- members) {><pp(m)><}>
 	'}" when isEmpty(modifiers) && isEmpty(implements);
-public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members)) =
+public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members, _)) =
 	"class <className> extends <pp(extends)> implements <intercalate(",",[pp(i)|i<-implements])> {
 	'	<for (m <- members) {><pp(m)><}>
 	'}" when isEmpty(modifiers) && !isEmpty(implements);
-public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members)) =
+public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members, _)) =
 	"class <className> implements <intercalate(",",[pp(i)|i<-implements])> {
 	'	<for (m <- members) {><pp(m)><}>
 	'}" when isEmpty(modifiers) && !isEmpty(implements);
-public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members)) =
+public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members, _)) =
 	"<intercalate(" ",[pp(m)|m<-modifiers])> class <className> extends <pp(extends)> {
 	'	<for (m <- members) {><pp(m)><}>
 	'}" when !isEmpty(modifiers) && isEmpty(implements);
-public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members)) =
+public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members, _)) =
 	"<intercalate(" ",[pp(m)|m<-modifiers])> class <className> {
 	'	<for (m <- members) {><pp(m)><}>
 	'}" when !isEmpty(modifiers) && isEmpty(implements);
-public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members)) =
+public str pp(class(str className, set[Modifier] modifiers, someName(Name extends), list[Name] implements, list[ClassItem] members, _)) =
 	"<intercalate(" ",[pp(m)|m<-modifiers])> class <className> extends <pp(extends)> implements <intercalate(",",[pp(i)|i<-implements])> {
 	'	<for (m <- members) {><pp(m)><}>
 	'}" when !isEmpty(modifiers) && !isEmpty(implements);
-public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members)) =
+public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name] implements, list[ClassItem] members, _)) =
 	"<intercalate(" ",[pp(m)|m<-modifiers])> class <className> implements <intercalate(",",[pp(i)|i<-implements])> {
 	'	<for (m <- members) {><pp(m)><}>
 	'}" when !isEmpty(modifiers) && !isEmpty(implements);
@@ -650,17 +665,17 @@ public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name]
 //									list[Name] extends, 
 //									list[ClassItem] members);
 //									
-public str pp(interface(str interfaceName, list[Name] extends, list[ClassItem] members)) =
+public str pp(interface(str interfaceName, list[Name] extends, list[ClassItem] members, _)) =
 	"interface <interfaceName> {
 	'	<for (m <- members) {><pp(m)><}>
 	'}" when isEmpty(extends);
-public str pp(interface(str interfaceName, list[Name] extends, list[ClassItem] members)) =
+public str pp(interface(str interfaceName, list[Name] extends, list[ClassItem] members, _)) =
 	"interface <interfaceName> extends <intercalate(",",[pp(e)|e<-extends])> {
 	'	<for (m <- members) {><pp(m)><}>
 	'}" when !isEmpty(extends);
 
 //public data TraitDef = trait(str traitName, list[ClassItem] members);
-public str pp(trait(str traitName, list[ClassItem] members)) = 
+public str pp(trait(str traitName, list[ClassItem] members, _)) = 
 	"trait <traitName> {
 	'	<for (m <- members) {>
 	'	<pp(m)><}>

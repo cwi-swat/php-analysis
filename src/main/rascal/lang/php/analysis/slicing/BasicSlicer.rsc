@@ -11,7 +11,7 @@ import lang::php::analysis::cfg::Visualize;
 import lang::php::util::Utils;
 
 import Relation;
-import IO;
+// import IO;
 import Set;
 import List;
 import analysis::graphs::Graph;

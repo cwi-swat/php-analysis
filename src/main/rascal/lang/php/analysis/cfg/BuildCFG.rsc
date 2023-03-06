@@ -61,14 +61,14 @@ public tuple[Script scr, map[loc,CFG] cfgs] buildCFGsAndScript(Script scr, bool 
 	< scriptCFG, lstate > = createScriptCFG(scrLabeled, lstate);
 	res[scriptPath("")] = scriptCFG;
 		
-	for (/class(cname,_,_,_,mbrs) := scrLabeled, m:method(mname,_,_,_,_,_) <- mbrs) {
+	for (/class(cname,_,_,_,mbrs,_) := scrLabeled, m:method(mname,_,_,_,_,_,_) <- mbrs) {
 		methodNamePath = methodPath(cname,mname);
 		//println("Creating CFG for <cname>::<mname>");
 		< methodCFG, lstate > = createMethodCFG(methodNamePath, m, lstate);
 		res[methodNamePath] = methodCFG;
 	}
 
-	for (/f:function(fname,_,_,_,_) := scrLabeled) {
+	for (/f:function(fname,_,_,_,_,_) := scrLabeled) {
 		functionNamePath = functionPath(fname);
 		//println("Creating CFG for <fname>");
 		< functionCFG, lstate > = createFunctionCFG(functionNamePath, f, lstate);
@@ -92,14 +92,14 @@ public Script stripLabels(Script scr) {
 
 @doc{Retrieve all method declarations from a script.}
 private map[loc, ClassItem] getScriptMethods(Script scr) =
-	( methodPath(cname, mname) : m | /class(cname,_,_,_,mbrs) := scr, m:method(mname,_,_,_,_,_) <- mbrs );
+	( methodPath(cname, mname) : m | /class(cname,_,_,_,mbrs,_) := scr, m:method(mname,_,_,_,_,_,_) <- mbrs );
 
 // TODO: It is possible in PHP to have non-unique or conditional declarations. We may need a way to represent
 // that here, assuming we ever run across it.
 
 @doc{Retrieve all function declarations from a script. Note: this assumes that definitions are unique.}
 private map[loc, Stmt] getScriptFunctions(Script scr) =
-	( functionPath(fname) : f | /f:function(fname,_,_,_,_) := scr );
+	( functionPath(fname) : f | /f:function(fname,_,_,_,_,_) := scr );
 
 private tuple[set[CFGNode] nodes, set[FlowEdge] edges] cleanUpGraph(LabelState lstate, set[FlowEdge] edges) {
 	allTargets = { e.to | e <- edges };
@@ -142,7 +142,7 @@ private tuple[CFG scriptCFG, LabelState lstate] createScriptCFG(Script scr, Labe
 		case r:classDef(_) => emptyStmt()[lab=r.lab]
 		case r:interfaceDef(_) => emptyStmt()[lab=r.lab]
 		case r:traitDef(_) => emptyStmt()[lab=r.lab]
-		case r:function(_,_,_,_,_) => emptyStmt()[lab=r.lab]
+		case r:function(_,_,_,_,_,_) => emptyStmt()[lab=r.lab]
 	}
 	
 	lstate.gotoNodes = ( ln : lstmt.lab | /lstmt:label(ln) := sbReduced ); 
@@ -216,7 +216,7 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(loc np, ClassIte
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
 	list[CFGNode] paramNodes = [ ];
-	for (param(paramName,paramDefault,byRef,_,_) <- m.params) {
+	for (param(paramName,paramDefault,byRef,_,_,_,_) <- m.params) {
 		newLabel = incLabel();
 		newNode = (someExpr(e) := paramDefault) 
 			? actualNotProvided(paramName, e, byRef, newLabel)[lab=newLabel] 
@@ -304,7 +304,7 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(loc np, Stmt
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
 	list[CFGNode] paramNodes = [ ];
-	for (param(paramName,paramDefault,byRef,_,_) <- f.params) {
+	for (param(paramName,paramDefault,byRef,_,_,_,_) <- f.params) {
 		newLabel = incLabel();
 		newNode = (someExpr(e) := paramDefault) 
 			? actualNotProvided(paramName, e, byRef, newLabel)[lab=newLabel] 
@@ -458,7 +458,7 @@ public set[Lab] init(Stmt s, LabelState lstate) {
 		case \switch(Expr cond, _) : return init(cond, lstate);
 
 		// In a throw statement, the expression to throw provides the first label.
-		case \throw(Expr expr) : return init(expr, lstate);
+		// case \throw(Expr expr) : return init(expr, lstate);
 
 		// In a try/catch, the body provides the first label. If the body is empty, we
 		// just use the label from the statement (the catch clauses would never fire, since
@@ -508,9 +508,9 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		case array(list[ArrayElement] items,_) : {
 			if (size(items) == 0) {
 				return { e.lab };
-			} else if (arrayElement(someExpr(Expr key), Expr _, bool _) := head(items)) {
+			} else if (arrayElement(someExpr(Expr key), Expr _, bool _, bool _) := head(items)) {
 				return init(key, lstate);
-			} else if (arrayElement(noExpr(), Expr val, bool _) := head(items)) {
+			} else if (arrayElement(noExpr(), Expr val, bool _, bool _) := head(items)) {
 				return init(val, lstate);
 			}
 		}
@@ -565,7 +565,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 			return { e.lab };
 		}
 		
-		case methodCall(Expr target, NameOrExpr _, list[ActualParameter] _) : {
+		case methodCall(Expr target, NameOrExpr _, list[ActualParameter] _, _) : {
 			return init(target, lstate);
 		}
 		
@@ -591,7 +591,7 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		
 		case print(Expr expr) : return init(expr, lstate);
 		
-		case propertyFetch(Expr target, NameOrExpr _) : return init(target, lstate);
+		case propertyFetch(Expr target, NameOrExpr _, bool _) : return init(target, lstate);
 		
 		case shellExec(list[Expr] parts) : {
 			if (size(parts) > 0)
@@ -622,20 +622,23 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		case listExpr(list[ArrayElement] items) : {
 			if (size(items) == 0) {
 				return { e.lab };
-			} else if (arrayElement(someExpr(Expr key), Expr _, bool _) := head(items)) {
+			} else if (arrayElement(someExpr(Expr key), Expr _, bool _, bool _) := head(items)) {
 				return init(key, lstate);
-			} else if (arrayElement(noExpr(), Expr val, bool _) := head(items)) {
+			} else if (arrayElement(noExpr(), Expr val, bool _, bool _) := head(items)) {
 				return init(val, lstate);
 			}
 		}
 		
-		case closure(_,_,_,_,_,_) : {
+		case closure(_,_,_,_,_,_,_) : {
 			return { e.lab };
 		}
 		
 		case yieldFrom(Expr fromExpr) : {
 			return init(fromExpr, lstate);
 		}
+
+		case \throw(Expr expr) : 
+			return init(expr, lstate);
 		
 		default: {
 			println("Unhandled expression <e>");
@@ -792,9 +795,9 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 
 		// In a throw statement, the last thing we do is throw, so the statement provides
 		// the final label.
-		case \throw(_) : {
-			return { s.lab };
-		}
+		// case \throw(_) : {
+		// 	return { s.lab };
+		// }
 		
 		// In a try/catch, we look at the final statements of the body (the non-exception
 		// case) and of each catch block (the exception cases). We will have separate exception
@@ -1453,12 +1456,12 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			lstate = popBreakLabel(popContinueLabel(lstate));
 		}
 
-		case \throw(Expr expr) : {
-			< edges, lstate > = addExpEdges(edges, lstate, expr);
-			edges += { flowEdge(fe, fl) | fe <- final(expr, lstate), fl <- finalLabels };
-			edges += { jumpEdge(fl, cl) | fl <- finalLabels, cl <- lstate.catchHandlers<1> };
-			edges += { jumpEdge(fl, getExitNodeLabel(lstate)) | fl <- finalLabels }; 
-		}
+		// case \throw(Expr expr) : {
+		// 	< edges, lstate > = addExpEdges(edges, lstate, expr);
+		// 	edges += { flowEdge(fe, fl) | fe <- final(expr, lstate), fl <- finalLabels };
+		// 	edges += { jumpEdge(fl, cl) | fl <- finalLabels, cl <- lstate.catchHandlers<1> };
+		// 	edges += { jumpEdge(fl, getExitNodeLabel(lstate)) | fl <- finalLabels }; 
+		// }
 
 		case tryCatch(list[Stmt] body, list[Catch] catches) : {
 			headernode = incLabel();
@@ -1612,23 +1615,23 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 	
 	switch(e) {
 		case array(list[ArrayElement] items,_) : {
-			for (arrayElement(OptionExpr okey, Expr val, bool _) <- items) {
+			for (arrayElement(OptionExpr okey, Expr val, bool _, bool _) <- items) {
 				< edges, lstate > = addExpEdges(edges, lstate, val);
 				if (someExpr(Expr key) := okey)
 					< edges, lstate > = addExpEdges(edges, lstate, key);
 			}
 
-			for (arrayElement(someExpr(kv),v1,_) <- items)
+			for (arrayElement(someExpr(kv),v1,_,_) <- items)
 					edges += makeEdges(final(kv, lstate), init(v1, lstate));
 
-			for ([*_,arrayElement(_,v1,_),arrayElement(k2,v2,_),*_] := items) {
+			for ([*_,arrayElement(_,v1,_,_),arrayElement(k2,v2,_,_),*_] := items) {
 				if (someExpr(kv) := k2)
 					edges += makeEdges(final(v1, lstate), init(kv, lstate));
 				else
 					edges += makeEdges(final(v1, lstate), init(v2, lstate));
 			}
 
-			if (size(items) > 0, arrayElement(_,val,_) := last(items))
+			if (size(items) > 0, arrayElement(_,val,_,_) := last(items))
 				edges += makeEdges(final(val, lstate), finalLabels);
 		}
 		
@@ -1761,7 +1764,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			}
 		}
 		
-		case methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters) : {
+		case methodCall(Expr target, NameOrExpr methodName, list[ActualParameter] parameters, _) : {
 			< edges, lstate > = addExpEdges(edges, lstate, target);
 
 			for (actualParameter(aexp,_,_,_) <- parameters) < edges, lstate > = addExpEdges(edges, lstate, aexp);
@@ -1843,13 +1846,13 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges += makeEdges(final(expr, lstate), finalLabels);
 		}
 		
-		case propertyFetch(Expr target, expr(Expr propertyName)) : {
+		case propertyFetch(Expr target, expr(Expr propertyName), bool _) : {
 			< edges, lstate > = addExpEdges(edges, lstate, target);
 			< edges, lstate > = addExpEdges(edges, lstate, propertyName);
 			edges = edges + makeEdges(final(target, lstate),init(propertyName, lstate)) + makeEdges(final(propertyName, lstate),finalLabels);
 		}
 		
-		case propertyFetch(Expr target, name(Name _)) : {
+		case propertyFetch(Expr target, name(Name _), bool _) : {
 			< edges, lstate > = addExpEdges(edges, lstate, target);
 			edges += makeEdges(final(target, lstate), finalLabels);
 		}
@@ -1948,25 +1951,33 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 		}
 		
 		case listExpr(list[ArrayElement] items) : {
-			for (arrayElement(OptionExpr okey, Expr val, bool _) <- items) {
+			for (arrayElement(OptionExpr okey, Expr val, bool _, bool _) <- items) {
 				< edges, lstate > = addExpEdges(edges, lstate, val);
 				if (someExpr(Expr key) := okey)
 					< edges, lstate > = addExpEdges(edges, lstate, key);
 			}
 
-			for (arrayElement(someExpr(kv),v1,_) <- items)
+			for (arrayElement(someExpr(kv),v1,_,_) <- items)
 					edges += makeEdges(final(kv, lstate), init(v1, lstate));
 
-			for ([*_,arrayElement(_,v1,_),arrayElement(k2,v2,_),*_] := items) {
+			for ([*_,arrayElement(_,v1,_,_),arrayElement(k2,v2,_,_),*_] := items) {
 				if (someExpr(kv) := k2)
 					edges += makeEdges(final(v1, lstate), init(kv, lstate));
 				else
 					edges += makeEdges(final(v1, lstate), init(v2, lstate));
 			}
 
-			if (size(items) > 0, arrayElement(_,val,_) := last(items))
+			if (size(items) > 0, arrayElement(_,val,_,_) := last(items))
 				edges += makeEdges(final(val, lstate), finalLabels);
 		}		
+
+		case \throw(Expr expr) : {
+			< edges, lstate > = addExpEdges(edges, lstate, expr);
+			edges += { flowEdge(fe, fl) | fe <- final(expr, lstate), fl <- finalLabels };
+			edges += { jumpEdge(fl, cl) | fl <- finalLabels, cl <- lstate.catchHandlers<1> };
+			edges += { jumpEdge(fl, getExitNodeLabel(lstate)) | fl <- finalLabels }; 
+		}
+
 	}
 
 	return < edges, lstate >;			

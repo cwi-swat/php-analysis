@@ -68,7 +68,7 @@ public str printCFGNode(footerNode(Stmt s,_,Lab lab)) = "footer: <getName(s)>";
 public str printCFGNode(stmtNode(Stmt s, Lab lab)) {
 	switch(s) {
 		case classDef(ClassDef cd) : return "Class <cd.className>";
-		case function(fn,_,_,_,_) : return "Function <fn>";
+		case function(fn,_,_,_,_,_) : return "Function <fn>";
 		default: return "Stmt: <pp(s)>";
 	}
 }

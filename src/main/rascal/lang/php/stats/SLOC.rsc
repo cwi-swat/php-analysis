@@ -1,7 +1,6 @@
 module lang::php::stats::SLOC
 
 import lang::php::util::Config;
-import lang::php::ast::AbstractSyntax;
 import lang::php::util::Corpus;
 
 import IO;
