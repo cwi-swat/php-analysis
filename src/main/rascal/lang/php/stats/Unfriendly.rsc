@@ -1443,12 +1443,12 @@ public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap,
 	totalFileCount = size(fmap<0>);
 	
 	// map from feature to the percent of files that implement that feature
-	featureFilePercent = ( n : featureFileCount[n]*100.0/totalFileCount | n <- featureFileCount );
+	featureFilePercent = ( n : totalFileCount > 0 ? featureFileCount[n]*100.0/totalFileCount : 0.0 | n <- featureFileCount );
 	
 	// features needed for a given percent -- if we aim for 20%, for instance, any feature occuring
 	// in 80% or more of the files must be in this; we get both the IDs and the labels
-	neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..101] );
-	neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor );
+	map[int,set[int]] neededFor = ( m : { n | n <- featureFilePercent, featureFilePercent[n] > 100-m } | m <- [1..101] );
+	map[int,set[str]] neededForLabels = ( n : { indexes[p] | p <- neededFor[n] } | n <- neededFor );
 	
 	// Based on the percent, how many files (at least) do we need?
 	threshold = round(totalFileCount * (targetPercent / 100.0));
