@@ -37,6 +37,11 @@
       <artifactId>rascal</artifactId>
       <version>0.28.3</version>
     </dependency>
+    <dependency>
+      <groupId>edu.appstate.cs</groupId>
+      <artifactId>rascal-git</artifactId>
+      <version>0.1.0</version>
+    </dependency>
   </dependencies>
 
   <build>

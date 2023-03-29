@@ -1,4 +1,3 @@
 Project-Name: php-analysis
 Source: src/main/rascal
-Require-Libraries: 
-    
+Require-Libraries: |lib://rascal-git|
