@@ -38,7 +38,7 @@ public data NameOrExpr(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", 
 public data ClassName
 	= explicitClassName(Name name)
 	| computedClassName(Expr expr)
-	| anonymousClass(Stmt stmt);
+	| anonymousClassDef(Stmt stmt);
 
 public data CastType(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= \int()
@@ -252,7 +252,9 @@ public data Modifier(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", lo
 	;
 
 public data ClassDef(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= class(str className, set[Modifier] modifiers, OptionName extends, list[Name] implements, list[ClassItem] members, list[AttributeGroup] attributeGroups);
+	= class(str className, set[Modifier] modifiers, OptionName extends, list[Name] implements, list[ClassItem] members, list[AttributeGroup] attributeGroups)
+	| anonymousClass(OptionName extends, list[Name] implements, list[ClassItem] members, list[AttributeGroup] attributeGroups)
+	;
 
 public data InterfaceDef(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= interface(str interfaceName, list[Name] extends, list[ClassItem] members, list[AttributeGroup] attributeGroups);

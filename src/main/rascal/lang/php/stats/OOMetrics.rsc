@@ -70,7 +70,7 @@ public map[str child,list[str] parents] inheritsChains(System product) {
 		}
 	}
 	
-	return ( c.className : chainAux(c.className) | c <- getClasses(product) );
+	return ( c.className : chainAux(c.className) | c <- getClasses(product), c has className );
 }
 
 public map[int size, int count] chainSizes(map[str child, list[str] parents] chain) {

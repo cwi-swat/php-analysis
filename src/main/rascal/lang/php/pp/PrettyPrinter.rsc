@@ -75,7 +75,7 @@ public str pp(requireOnce()) = "require_once";
 // public data ClassName = explicitClassName(Name name) | computedClassName(Expr expr) | anonymousClass(Stmt stmt);
 public str pp(explicitClassName(Name name)) = pp(name);
 public str pp(computedClassName(Expr expr)) = pp(expr);
-public str pp(anonymousClass(Stmt stmt)) = pp(stmt);
+public str pp(anonymousClassDef(Stmt stmt)) = pp(stmt);
 
 //public data Expr 
 //	= array(list[ArrayElement] items, bool usesBracketNotation)
@@ -660,7 +660,25 @@ public str pp(class(str className, set[Modifier] modifiers, noName(), list[Name]
 	"<intercalate(" ",[pp(m)|m<-modifiers])> class <className> implements <intercalate(",",[pp(i)|i<-implements])> {
 	'	<for (m <- members) {><pp(m)><}>
 	'}" when !isEmpty(modifiers) && !isEmpty(implements);
-	
+
+public str pp(anonymousClass(someName(Name extends), list[Name] implements, list[ClassItem] members, _)) =
+	"class extends <pp(extends)> {
+	'	<for (m <- members) {>
+	'	<pp(m)><}>
+	'}" when isEmpty(implements);
+public str pp(anonymousClass(noName(), list[Name] implements, list[ClassItem] members, _)) =
+	"class {
+	'	<for (m <- members) {><pp(m)><}>
+	'}" when isEmpty(implements);
+public str pp(anonymousClass(someName(Name extends), list[Name] implements, list[ClassItem] members, _)) =
+	"class extends <pp(extends)> implements <intercalate(",",[pp(i)|i<-implements])> {
+	'	<for (m <- members) {><pp(m)><}>
+	'}" when !isEmpty(implements);
+public str pp(anonymousClass(noName(), list[Name] implements, list[ClassItem] members, _)) =
+	"class implements <intercalate(",",[pp(i)|i<-implements])> {
+	'	<for (m <- members) {><pp(m)><}>
+	'}" when !isEmpty(implements);
+
 //public data InterfaceDef = interface(str interfaceName, 
 //									list[Name] extends, 
 //									list[ClassItem] members);

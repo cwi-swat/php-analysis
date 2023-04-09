@@ -109,6 +109,7 @@ public bool trueOnAReachingPath(Graph[CFGNode] g, CFGNode startNode, bool(CFGNod
 @doc{Return the location/path of the CFG for the node at the given location}
 public loc findContainingCFGLoc(Script s, loc l) {
 	
+	// TODO: Add support for anonymous classes
 	for (/class(cname,_,_,_,mbrs,_) := s) {
 		for (m:method(mname,_,_,_,_,_,_) <- mbrs, l < m.at) {
 			return methodPath(cname,mname);

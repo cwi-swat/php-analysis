@@ -29,6 +29,7 @@ public Script inlineMagicConstants(Script scr, loc l, loc baseloc) {
 	// __CLASS__, __METHOD__, __FUNCTION__, __NAMESPACE__, and __TRAIT__.
 
 	scr = top-down visit(scr) {
+		// TODO: Support anonymous classes? These have system-generated names...
 		case c:class(className,_,_,_,members,_) : {
 			members = bottom-up visit(members) {
 				case s:scalar(classConstant()) => scalar(string(className))[at=s.at]
