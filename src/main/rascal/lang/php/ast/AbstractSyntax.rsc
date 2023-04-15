@@ -259,7 +259,7 @@ public data ClassDef(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", lo
 public data InterfaceDef(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= interface(str interfaceName, list[Name] extends, list[ClassItem] members, list[AttributeGroup] attributeGroups);
 
-public data TraitDef
+public data TraitDef(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= trait(str traitName, list[ClassItem] members, list[AttributeGroup] attributeGroups);
 
 public data StaticVar(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
