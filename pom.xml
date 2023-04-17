@@ -40,7 +40,7 @@
     <dependency>
       <groupId>edu.appstate.cs</groupId>
       <artifactId>rascal-git</artifactId>
-      <version>0.1.0</version>
+      <version>0.1.5</version>
     </dependency>
   </dependencies>
 
