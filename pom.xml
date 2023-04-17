@@ -67,8 +67,17 @@
           <compilerArgument>-parameters</compilerArgument> 
           <release>11</release>
         </configuration>
-      </plugin>
-      <plugin>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.3</version>
+        <configuration>
+            <tagNameFormat>v@{project.version}</tagNameFormat>
+            <arguments>-Drascal.compile.skip -DskipTests -Drascal.tutor.skip</arguments>
+        </configuration>
+    </plugin>
+    <plugin>
         <groupId>org.rascalmpl</groupId>
         <artifactId>rascal-maven-plugin</artifactId>
         <version>0.15.1</version>
