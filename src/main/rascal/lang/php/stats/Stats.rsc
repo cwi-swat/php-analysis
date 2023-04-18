@@ -111,6 +111,19 @@ public list[ClassItem] fetchOverloadedUnset(System scripts) = [ x | l <- scripts
 public list[ClassItem] fetchOverloadedCall(System scripts) = [ x | l <- scripts.files<0>, /x:method("__call",_,_,_,_,_,_) := scripts.files[l] ];
 public list[ClassItem] fetchOverloadedCallStatic(System scripts) = [ x | l <- scripts.files<0>, /x:method("__callStatic",_,_,_,_,_,_) := scripts.files[l] ];
 
+@doc{Other magic methods}
+public list[ClassItem] fetchConstructMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__construct",_,_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchDestructMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__destruct",_,_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchSleepMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__sleep",_,_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchWakeupMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__wakeup",_,_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchSerializeMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__serialize",_,_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchUnserializeMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__unserialize",_,_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchToStringMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__toString",_,_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchInvokeMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__invoke",_,_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchSetStateMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__set_state",_,_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchCloneMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__clone",_,_,_,_,_,_) := scripts.files[l] ];
+public list[ClassItem] fetchDebugInfoMethods(System scripts) = [ x | l <- scripts.files<0>, /x:method("__debugInfo",_,_,_,_,_,_) := scripts.files[l] ];
+
 @doc{Support for var-args functions}
 public list[Expr] fetchVACalls(Script scr) = [ v | /v:call(name(name(fn)),_) := scr, fn in {"func_get_args","func_get_arg","func_num_args"} ];
 public lrel[loc fileloc, Expr call] getVACallUses(System scripts) = gatherExprStats(scripts, fetchVACalls);
