@@ -39,7 +39,7 @@ import lang::php::pp::PrettyPrinter;
 
 
 public str executePHP(list[str] opts, loc cwd) {
-	str phpBinLoc = usePhpParserJar ? "php" : phploc.path;
+	str phpBinLoc = usePhpParserJar ? "php" : phpLoc.path;
 
   	PID pid = createProcess(phpBinLoc, args=opts, workingDir=cwd);
 	str phcOutput = readEntireStream(pid);
@@ -369,16 +369,16 @@ public void checkConfiguration() {
 		println("astToRascal appears to be fine");
 	}
 	
-	println("phploc should contain the location of the php executable");
+	println("phpLoc should contain the location of the php executable");
 
-	if (!exists(phploc)) {
-		println("Path <phploc> does not exist");
+	if (!exists(phpLoc)) {
+		println("Path <phpLoc> does not exist");
 		checkParse = false;
-	} else if (exists(phploc) && !isFile(phploc)) {
-		println("Path <phploc> exists, but is not a file");
+	} else if (exists(phpLoc) && !isFile(phpLoc)) {
+		println("Path <phpLoc> exists, but is not a file");
 		checkParse = false;
 	} else {
-		println("phploc appears to be fine");
+		println("phpLoc appears to be fine");
 	}
 	
 	if (checkParse) {

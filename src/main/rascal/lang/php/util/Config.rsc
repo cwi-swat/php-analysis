@@ -16,7 +16,7 @@ module lang::php::util::Config
 public bool usePhpParserJar = false;
 
 @doc{The location of the PHP executable}
-public loc phploc = |file:///usr/local/php5/bin/php|;
+public loc phpLoc = |file:///usr/local/php5/bin/php|;
 
 @doc{The base install location for the PHP-Parser project}
 public loc parserLoc = |file:///Users/yourid/PHPAnalysis/PHP-Parser|;
