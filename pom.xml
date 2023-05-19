@@ -59,7 +59,7 @@
 
   <build>
     <resources>
-        <resource>
+      <resource>
         <directory>.</directory>
         <filtering>false</filtering>
         <includes>
@@ -69,6 +69,10 @@
       <resource><!-- we have to copy the rascal sources in the jar for the evaluator to find it-->
         <directory>src/main/rascal</directory>
         <filtering>false</filtering>
+        <excludes>
+          <exclude>lang/php/util/Config.rsc</exclude>
+          <exclude>lang/php/util/Config.rsc-dist</exclude>
+        </excludes>
       </resource>
     </resources>  
     <plugins>
@@ -123,7 +127,7 @@
           <compilerArgument>-parameters</compilerArgument> 
           <release>11</release>
         </configuration>
-    </plugin>
+      </plugin>
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
@@ -131,6 +135,16 @@
         <configuration>
             <tagNameFormat>v@{project.version}</tagNameFormat>
             <arguments>-Drascal.compile.skip -DskipTests -Drascal.tutor.skip</arguments>
+        </configuration>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+            <excludes>
+              <exclude>**/Config.tpl</exclude>
+            </excludes>
         </configuration>
     </plugin>
     <plugin>
@@ -142,6 +156,9 @@
           <srcs>
             <src>${project.basedir}/src/main/rascal</src>
           </srcs>
+          <srcIgnores>
+            <ignore>${project.basedir}/src/main/rascal/lang/php/util/Config.rsc</ignore>
+          </srcIgnores>
         </configuration>
         <executions>
           <execution>
