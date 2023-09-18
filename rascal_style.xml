@@ -8,4 +8,12 @@
         <allowBlankLines>true</allowBlankLines>
         <isMultiLine>true</isMultiLine>
     </rascal_style>
+    <sdf_style>
+        <firstLine>%%</firstLine>
+        <endLine>%%</endLine>
+        <firstLineDetectionPattern>%%$</firstLineDetectionPattern>
+        <lastLineDetectionPattern>%%$</lastLineDetectionPattern>
+        <allowBlankLines>true</allowBlankLines>
+        <isMultiLine>true</isMultiLine>
+    </sdf_style>
 </additionalHeaders>

@@ -96,12 +96,14 @@
                 <exclude>.editorconfig</exclude>
                 <exclude>CITATION</exclude>
                 <exclude>FUNDING</exclude>
+                <exclude>**/*.txt</exclude>
               </excludes>
             </licenseSet>
           </licenseSets>
           <mapping>
             <java>SLASHSTAR_STYLE</java>
             <rsc>RASCAL_STYLE</rsc>
+            <sdf>SDF_STYLE</sdf>
           </mapping>
         </configuration>
         <executions>
