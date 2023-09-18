@@ -59,6 +59,46 @@
     </resources>  
     <plugins>
       <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <!-- check and possible add license header
+          run mvn license:format to automatically update all license headers
+          and add missing ones -->
+        <version>4.1</version>
+        <configuration>
+          <headerDefinitions>
+            <headerDefinition>rascal_style.xml</headerDefinition>
+          </headerDefinitions>
+          <licenseSets>
+            <licenseSet>
+                <header>../LICENSE.txt</header>
+              <excludes>
+                <exclude>rascal_style.xml</exclude>
+                <exclude>**/README</exclude>
+                <exclude>src/test/resources/**</exclude>
+                <exclude>src/main/resources/**</exclude>
+                <exclude>**/*.tpl</exclude>
+                <exclude>META-INF/**</exclude>
+                <exclude>.editorconfig</exclude>
+                <exclude>CITATION</exclude>
+                <exclude>FUNDING</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>
+          <mapping>
+            <java>SLASHSTAR_STYLE</java>
+            <rsc>RASCAL_STYLE</rsc>
+          </mapping>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
@@ -103,7 +143,29 @@
                   <goal>package</goal>
               </goals>
           </execution>
-        </executions>        
+          <execution>
+              <id>default-cli</id>
+              <phase>compile</phase>
+              <goals>
+                  <goal>tutor</goal>
+              </goals>
+              <configuration>
+                  <enableStandardLibrary>true</enableStandardLibrary>
+                  <errorsAsWarnings>false</errorsAsWarnings>
+                  <bin>${project.build.outputDirectory}</bin>
+                  <license>${project.basedir}/LICENSE</license>
+                  <citation>${project.basedir}/CITATION.md</citation>
+                  <sources>|http://github.com/cwi-swat/php-analysis/blob/main|</sources>
+                  <issues>|http://github.com/cwi-swat/php-analysis/issues|</issues>
+                  <srcs>
+                      <src>${project.basedir}/src</src>
+                      <src>${project.basedir}/doc</src>
+                  </srcs>
+                  <ignores>
+                  </ignores>
+              </configuration>
+          </execution>
+      </executions>        
       </plugin>
     </plugins>
   </build>

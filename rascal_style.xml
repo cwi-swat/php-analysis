@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<additionalHeaders>
+    <rascal_style>
+        <firstLine>@license{</firstLine>
+        <endLine>}</endLine>
+        <firstLineDetectionPattern>@license\{.*$</firstLineDetectionPattern>
+        <lastLineDetectionPattern>\}$</lastLineDetectionPattern>
+        <allowBlankLines>true</allowBlankLines>
+        <isMultiLine>true</isMultiLine>
+    </rascal_style>
+</additionalHeaders>
