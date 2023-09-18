@@ -183,7 +183,33 @@
               </configuration>
           </execution>
       </executions>        
-      </plugin>
+  </plugin>
+  <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <version>3.0.0-M3</version>
+      <executions>
+          <execution>
+              <id>test</id>
+              <phase>test</phase>
+              <configuration>
+                  <argLine>
+                      -ea
+                      -Xmx2G
+                      -Xss128m
+                      -Dfile.encoding=UTF-8
+                  </argLine>
+                  <includes>
+                      <include>**/*Tests.java</include>
+                  </includes>
+                  <testSourceDirectory>${basedir}/src/</testSourceDirectory>
+              </configuration>
+              <goals>
+                  <goal>test</goal>
+              </goals>
+          </execution>
+      </executions>
+  </plugin>
     </plugins>
   </build>
 </project>
