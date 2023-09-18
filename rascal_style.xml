@@ -9,11 +9,21 @@
         <isMultiLine>true</isMultiLine>
     </rascal_style>
     <sdf_style>
-        <firstLine>%%</firstLine>
-        <endLine>%%</endLine>
-        <firstLineDetectionPattern>%%$</firstLineDetectionPattern>
-        <lastLineDetectionPattern>%%$</lastLineDetectionPattern>
+        <firstLine>%% </firstLine>
+        <endLine>%% </endLine>
+        <firstLineDetectionPattern>%% $</firstLineDetectionPattern>
+        <lastLineDetectionPattern>%% $</lastLineDetectionPattern>
+        <beforeEachLine>%% </beforeEachLine>
         <allowBlankLines>true</allowBlankLines>
         <isMultiLine>true</isMultiLine>
     </sdf_style>
+    <phppp_style>
+        <firstLine># </firstLine>
+        <endLine># </endLine>
+        <firstLineDetectionPattern># $</firstLineDetectionPattern>
+        <lastLineDetectionPattern># $</lastLineDetectionPattern>
+        <beforeEachLine># </beforeEachLine>
+        <allowBlankLines>true</allowBlankLines>
+        <isMultiLine>true</isMultiLine>
+    </phppp_style>
 </additionalHeaders>
