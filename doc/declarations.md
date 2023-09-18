@@ -1,3 +1,9 @@
+---
+title: Declarations
+---
+
+Here we document the qualified naming scheme for the locations  we used.
+
 * namespaces
     * `|php+namespace:///a/b|` for namespace `A\B`
     * `|php+namespace:///|` for global namespace
