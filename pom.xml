@@ -34,7 +34,7 @@
     <dependency>
       <groupId>org.rascalmpl</groupId>
       <artifactId>rascal</artifactId>
-      <version>0.28.3</version>
+      <version>0.33.8</version>
     </dependency>
     <dependency>
       <groupId>edu.appstate.cs</groupId>
@@ -79,7 +79,7 @@
     <plugin>
         <groupId>org.rascalmpl</groupId>
         <artifactId>rascal-maven-plugin</artifactId>
-        <version>0.15.1</version>
+        <version>0.21.1</version>
         <configuration>
           <errorsAsWarnings>true</errorsAsWarnings>
           <enableStandardLibrary>false</enableStandardLibrary>
