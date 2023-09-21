@@ -1,3 +1,9 @@
+---
+title: PHP annotations
+---
+
+Here we document the PHP code annotations that are used and defined by different (static) analyses in this project.
+
 Syntax of `@param`
 
 ```

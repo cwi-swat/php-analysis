@@ -1,9 +1,10 @@
-# Php Type Constraint Operations
+---
+title: PHP Type Constraint Operations
+---
 
-Some examples:
+Here we document some examples of the type inference constraints  we extract from PHP code.
 
-
-**Assign operators (some sort of case)**
+## Assign operators (some sort of case)
 
 ```
 $a .= ... // $a is a String
@@ -14,7 +15,7 @@ $x = (int) $y; // $x = Integer
 $x = 1; // $x = Integer
 ```
 
-**Method call**
+## Method call
 
 ```
 $a -> methodCall();
@@ -22,7 +23,7 @@ $a -> methodCall();
 
 ```
 
-** Conditional statements **
+## Conditional statements 
 
 ```
 $a instanceOf "C" // is_a
@@ -32,7 +33,7 @@ is_numeric($a) // $a is numeric
 is_bool($a) // $a is a boolean
 ```
 
-** Member addition **
+## Member addition 
 
 ```
 class Empty {}
@@ -41,13 +42,13 @@ $e->newField = "value"; // newField is added
 echo $e->newField; // newField is used
 ```
 
-** Return types of methods and functions **
+## Return types of methods and functions 
 
 ```
 function f () { return true }; // return type of f is a boolean
 ```
 
-** Object instantiation **
+## Object instantiation 
 
 ```
 $x = new Obj; // $x = instance of class Obj
@@ -63,7 +64,7 @@ getPersonId(new Person(), 1, 2, true); // correct
 getPersonId(); // incorrect
 ```
 
-** self/static/parent **
+## self/static/parent **
 
 ```
 self::methodCall(); // current class
@@ -71,7 +72,7 @@ parent::methodCall(); // one of the parent classes
 static::methodCall(); // class of instantiation
 ```
 
-** Out of scope **
+## Out of scope 
 
 ```
 - Variable variables (resolve to everything)
@@ -80,7 +81,7 @@ static::methodCall(); // class of instantiation
 ```
 
 
-** Other Notes **
+## Other Notes
 
 ```
 non parsing scripts are ignored

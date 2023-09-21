@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2013, NWO-I Centrum Wiskunde & Informatica (CWI), Mark Hills, Apalachean State University
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+    1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+    2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-->
   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -59,6 +73,49 @@
     </resources>  
     <plugins>
       <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <!-- check and possible add license header
+          run mvn license:format to automatically update all license headers
+          and add missing ones -->
+        <version>4.1</version>
+        <configuration>
+          <headerDefinitions>
+            <headerDefinition>rascal_style.xml</headerDefinition>
+          </headerDefinitions>
+          <licenseSets>
+            <licenseSet>
+                <header>LICENSE</header>
+              <excludes>
+                <exclude>rascal_style.xml</exclude>
+                <exclude>**/README</exclude>
+                <exclude>src/test/resources/**</exclude>
+                <exclude>src/main/resources/**</exclude>
+                <exclude>**/*.tpl</exclude>
+                <exclude>META-INF/**</exclude>
+                <exclude>.editorconfig</exclude>
+                <exclude>CITATION</exclude>
+                <exclude>FUNDING</exclude>
+                <exclude>**/*.txt</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>
+          <mapping>
+            <java>SLASHSTAR_STYLE</java>
+            <rsc>RASCAL_STYLE</rsc>
+            <sdf>SDF_STYLE</sdf>
+            <phppp>PHPPP_STYLE</phppp>
+          </mapping>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
@@ -103,8 +160,56 @@
                   <goal>package</goal>
               </goals>
           </execution>
-        </executions>        
-      </plugin>
+          <execution>
+              <id>default-cli</id>
+              <phase>compile</phase>
+              <goals>
+                  <goal>tutor</goal>
+              </goals>
+              <configuration>
+                  <enableStandardLibrary>true</enableStandardLibrary>
+                  <errorsAsWarnings>false</errorsAsWarnings>
+                  <bin>${project.build.outputDirectory}</bin>
+                  <license>${project.basedir}/LICENSE</license>
+                  <citation>${project.basedir}/CITATION.md</citation>
+                  <sources>|http://github.com/cwi-swat/php-analysis/blob/main|</sources>
+                  <issues>|http://github.com/cwi-swat/php-analysis/issues|</issues>
+                  <srcs>
+                      <src>${project.basedir}/src</src>
+                      <src>${project.basedir}/doc</src>
+                  </srcs>
+                  <ignores>
+                  </ignores>
+              </configuration>
+          </execution>
+      </executions>        
+  </plugin>
+  <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <version>3.0.0-M3</version>
+      <executions>
+          <execution>
+              <id>test</id>
+              <phase>test</phase>
+              <configuration>
+                  <argLine>
+                      -ea
+                      -Xmx2G
+                      -Xss128m
+                      -Dfile.encoding=UTF-8
+                  </argLine>
+                  <includes>
+                      <include>**/*Tests.java</include>
+                  </includes>
+                  <testSourceDirectory>${basedir}/src/</testSourceDirectory>
+              </configuration>
+              <goals>
+                  <goal>test</goal>
+              </goals>
+          </execution>
+      </executions>
+  </plugin>
     </plugins>
   </build>
 </project>

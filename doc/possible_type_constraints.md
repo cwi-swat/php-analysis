@@ -1,4 +1,8 @@
-##### Possible Type Constraints:
+---
+title: Possible Type Constraints
+---
+
+This is design inspiration for the type inference algorithm.
 
 Declarations:
 
@@ -10,7 +14,7 @@ There are differnt 'levels' of constraints.
 * On function/method level (what variables are used within the scope)
 * Between scopes (for method calls)
 
-** Types: **
+## Types: 
 
 * a variable `$a` has { t1, ..., tn } types. (within a certain scope)
 * assignement of variables: `$x = $y` (types of y = types of x)
@@ -25,7 +29,7 @@ There are differnt 'levels' of constraints.
 
 #### Declarations
 
-** Variable **
+## Variable 
  
  * The type of a variable is the type of the disjunction of all occurances of the variable within a within the scope.
  * On scopes:
@@ -34,20 +38,20 @@ There are differnt 'levels' of constraints.
    * method scope
    * exception for global key word, it is in the global scope AND in the function/method scope
 
-** Constants **
+## Constants 
  
  * Constant
 
-** Interface **
+## Interface 
 
  * Decl: name of the interface
  * Decl: extends (= subtype of ...)
 
-** Trait **
+## Trait 
 
 ?? out of scope ?? (not used alot, yet... can be added later)
 
-** Class **
+## Class 
 
  * Decl: name of the class (including namespace)
  * Decl: extends (= subtype of ...)
@@ -55,31 +59,31 @@ There are differnt 'levels' of constraints.
  * Decl: has constructor
  * Decl: constructor minimum re	quired fields
   
-** Class Constant **
+## Class Constant
 
  * Decl: name of the constant
  * Decl: class of the constant
  * Decl: type of the constant (?)
  
-** Class Property **
+## Class Property 
 
  * Decl: name of the property
  * Decl: class of the property
 
-** Class Methods (/function) **
+## Class Methods (/function) 
 
  * Decl: name of the method
  * Decl: has parameter constraints (see below)
  * Decl: which class the method is in 
  * The return type is the disjunction of the types of all return statements (or void/null when none provided)
  
-** Function **
+## Function
 
  * Decl: name of the function (including namespace)
  * Decl: has parameter constraints (see below)
  * The return type is the disjunction of the types of all return statements (or void/null when none provided)
 
-** Actual Parameter constraints **
+## Actual Parameter constraints 
  
  * Decl: Minimum required params
  * Decl: type hints
@@ -87,7 +91,7 @@ There are differnt 'levels' of constraints.
  
 #### Types
 
-** Cast operators **
+## Cast operators 
 
  Casts     | Input                            | Output      | Rascal                | Notes
 --- | --- | --- | --- | ---
@@ -110,7 +114,7 @@ There are differnt 'levels' of constraints.
 
 ---
 
-** Rules for Negation operator: ** `-l` -> (double | int)
+## Rules for Negation operator: `-l` -> (double | int)
 
 `l` | result
 --- | ---
@@ -120,7 +124,7 @@ _ | integer
 
 ---
 
-** Rules for Addition operator: ** `l + r` -> (array | double | int)
+## Rules for Addition operator: `l + r` -> (array | double | int)
 
 `l` | `r` | result
 --- | --- | ---
@@ -133,11 +137,11 @@ _ | _ | integer
 
 ---
 
-** Rules for Subtraction operator: ** `l - r` -> (double | int)
+## Rules for Subtraction operator:  `l - r` -> (double | int)
 
-** Rules for Multiplication operator: ** `l * r` -> ( double | int)
+## Rules for Multiplication operator:  `l * r` -> ( double | int)
 
-** Rules for Division operator: ** `l / r` -> (double | int)
+## Rules for Division operator:  `l / r` -> (double | int)
 
 `l` | `r` | result
 --- | --- | ---
@@ -149,7 +153,7 @@ _ | _ | integer
 
 ---
 
-** Rules for Modulus operator: ** `l % r` -> (int)
+## Rules for Modulus operator:  `l % r` -> (int)
 
 `l` | `r` | result
 --- | --- | ---
@@ -182,11 +186,11 @@ Code | typeOf(`$b`) | typeOf(`$a`) | Notes
 
 ### Bitwise Operators:
 
-** Rules for Bitwise And operator: ** `$a & $b`
+## Rules for Bitwise And operator:  `$a & $b`
 
-** Rules for Bitwise Or (inclusive or) operator: ** `$a | $b`
+## Rules for Bitwise Or (inclusive or) operator:  `$a | $b`
 
-** Rules for Bitwise Or (exclusive or) operator: ** `$a ^ $b`
+## Rules for Bitwise Or (exclusive or) operator:  `$a ^ $b`
 
 typeOf(`$a`) | typeOf(`$b`) | Result | Notes
 --- | --- | --- | ---
@@ -195,9 +199,9 @@ _ | _ | integer
 
 ---
 
-** Rules for Bitwise Shift left operator: ** `$a << $b`
+## Rules for Bitwise Shift left operator:  `$a << $b`
 
-** Rules for Bitwise Shift right operator: ** `$a >> $b`
+## Rules for Bitwise Shift right operator: `$a >> $b`
 
 
 typeOf(`$a`) | typeOf(`$b`) | Result | Notes
@@ -206,7 +210,7 @@ _ | _ | integer | always an integer
 
 ---
 
-** Rules for Bitwise Not operator: ** `~$a`
+## Rules for Bitwise Not operator: `~$a`
 
 typeOf(`$a`) | Result | Notes
 --- | --- | --- | ---
@@ -218,23 +222,23 @@ _ | error
 
 ### Comparison Operators:
 
-** Rules for Equal operator: ** `$a == $b`
+## Rules for Equal operator: `$a == $b`
 
-** Rules for Identical operator: ** `$a === $b`
+## Rules for Identical operator: `$a === $b`
 
-** Rules for Not equal operator: ** `$a != $b`
+## Rules for Not equal operator: `$a != $b`
 
-** Rules for Not equal operator: ** `$a <> $b`
+## Rules for Not equal operator: `$a <> $b`
 
-** Rules for Not identical operator: ** `$a !== $b`
+## Rules for Not identical operator: `$a !== $b`
 
-** Rules for Less then operator: ** `$a < $b`
+## Rules for Less then operator: `$a < $b`
 
-** Rules for Greater then operator: ** `$a > $b`
+## Rules for Greater then operator: `$a > $b`
 
-** Rules for Less or equal operator: ** `$a <= $b`
+## Rules for Less or equal operator: `$a <= $b`
 
-** Rules for Greater or equal operator: ** `$a >= $b`
+## Rules for Greater or equal operator: `$a >= $b`
 
 typeOf(`$a`) | typeOf(`$b`) | Result | Notes
 --- | --- | --- | ---
@@ -244,9 +248,9 @@ _ | _ | boolean | always a boolean
 
 ### Incrementing/Decrementing operators
 
-** Rules for Pre-increment operator: ** `++$a`
+## Rules for Pre-increment operator: `++$a`
 
-** Rules for Post-increment operator: ** `$a++`
+## Rules for Post-increment operator: `$a++`
 
 typeOf(`$a`) | Result | Notes
 --- | --- |---
@@ -255,9 +259,9 @@ null | integer
 _ | _ | other types do not change type
 
 ---
-** Rules for Pre-decrement operator: ** `--$a`
+## Rules for Pre-decrement operator: `--$a`
 
-** Rules for Post-decrement operator: ** `$a--`
+## Rules for Post-decrement operator: `$a--`
 
 typeOf(`$a`) | Result | Notes
 --- | --- | ---
@@ -268,17 +272,17 @@ _ | _ | other types do not change type
 
 ### Logical Operators:
 
-** Rules for And operator: ** `$a and $b`
+## Rules for And operator: `$a and $b`
 
-** Rules for Or operator: ** `$a or $b`
+## Rules for Or operator: `$a or $b`
 
-** Rules for Xor equal operator: ** `$a xor $b`
+## Rules for Xor equal operator: `$a xor $b`
 
-** Rules for Not equal operator: ** `!$a`
+## Rules for Not equal operator: `!$a`
 
-** Rules for And identical operator: ** `$a && $b`
+## Rules for And identical operator: `$a && $b`
 
-** Rules for Or then operator: ** `$a || $b`
+## Rules for Or then operator: `$a || $b`
 
 typeOf(`$a`) | typeOf(`$b`) | Result | Notes
 --- | --- | --- | ---
@@ -286,7 +290,7 @@ _ | _ | boolean | always a boolean
 
 ---
 
-** assignments **
+## assignments 
 
 ```
 $b = $a // (sub)typeOf($b) is (sub)typeOf($a)
@@ -294,7 +298,7 @@ $c = $b = $a; // (sub)typeOf($a) = (sub)typeOf($b) && (sub)typeOf($b) = (sub)typ
 
 ```
 
-** class instantiation **
+## class instantiation 
 
 ```
 $a = new A; // type of $a is class with name "A"; (FQN: Full Qualified Name)
@@ -303,7 +307,7 @@ $a = new A(1);	// type of $a is class with name "A"; (FQN: Full Qualified Name)
 				// minimum required params = 0 OR 1;
 ```
 
-** Ternary operator (elvis) **
+## Ternary operator (elvis) 
 
 ```
 $a ? $b : $c // result of this whole expression is: typeOf($b) OR typeOf($c)
@@ -311,11 +315,11 @@ $a ? $b : $c // result of this whole expression is: typeOf($b) OR typeOf($c)
 
 #### Other thoughts...
 
-** Assumption **
+## Assumption 
 
 I assume that the program is correct. But because it is hard to check if programs are fine in dynamic languagues this is a thread to validity.
  
-** Other **
+## Other 
 
 ?? Adding scope constraints??
 
@@ -339,7 +343,7 @@ Subtypes:
 		> class A extends B {}	
 
 ```
-** Note: ** add default classes, functions, variables and constants to the list of declarations
+## Note: add default classes, functions, variables and constants to the list of declarations
 
 
 Symbols:
@@ -362,7 +366,7 @@ $a->call($b)	| typeOf(a) has method "call" OR magic method __call
 
 ```
 
-** Constraint Examples **
+## Constraint Examples 
 
 ```
 syntax below: 
