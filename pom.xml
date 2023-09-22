@@ -136,7 +136,7 @@
     <plugin>
         <groupId>org.rascalmpl</groupId>
         <artifactId>rascal-maven-plugin</artifactId>
-        <version>0.21.1</version>
+        <version>0.21.2</version>
         <configuration>
           <errorsAsWarnings>true</errorsAsWarnings>
           <enableStandardLibrary>false</enableStandardLibrary>
