@@ -1,4 +1,4 @@
-This is software will be directly citable via Zenodo soon. However, these are relavant publications
+This is software will be directly citable via Zenodo soon. However, these are relevant publications
 that you can cite in the mean time:
 
 ```bibtex
