@@ -48,7 +48,7 @@
     <dependency>
       <groupId>org.rascalmpl</groupId>
       <artifactId>rascal</artifactId>
-      <version>0.40.4</version>
+      <version>0.40.14</version>
     </dependency>
     <dependency>
       <groupId>edu.appstate.cs</groupId>
@@ -136,9 +136,8 @@
     <plugin>
         <groupId>org.rascalmpl</groupId>
         <artifactId>rascal-maven-plugin</artifactId>
-        <version>0.27.5</version>
+        <version>0.28.8</version>
         <configuration>
-          <errorsAsWarnings>true</errorsAsWarnings>
           <enableStandardLibrary>false</enableStandardLibrary>
           <bin>${project.build.outputDirectory}</bin>
           <srcs>
