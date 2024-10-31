@@ -487,7 +487,7 @@ public set[Lab] init(Stmt s, LabelState lstate) {
 		case unset(list[Expr] unsetVars) : return init(head(unsetVars), lstate);
 
 		// A use statement is atomic.
-		case use(_,_,_) : return { s.lab };
+		case useStmt(_,_,_) : return { s.lab };
 
 		// In a while loop, the while condition is executed first and thus provides the first label.
 		case \while(Expr cond, _) : return init(cond, lstate);	
@@ -836,7 +836,7 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 		}
 
 		// A use is treated as a unit
-		case use(_,_,_) : {
+		case useStmt(_,_,_) : {
 			return { s.lab };
 		}
 		
