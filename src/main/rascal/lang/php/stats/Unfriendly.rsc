@@ -1165,16 +1165,6 @@ public str groupsTable() = groupsTable({},{},{});
 
 public list[str] getFeatureLabels() = [ l | \map(_,rtype) := #FMap.symbol, /Type::label(l,_) := rtype ];
 
-public void checkGroups() {
-  labels = getFeatureLabels();
-  groups = getFeatureGroups();
-  //keys = [rascalFriendlyKey(k) | k <- (exprKeyOrder()+stmtKeyOrder())];
-  missing = {*labels} - {*groups[g] | g <- groups};
-  extra = {*groups[g] | g <- groups} - {*labels};
-  for (m <- missing) println("Missing: <m>");
-  for (e <- extra) println("Extra: <e>");          
-}
-
 public str generalFeatureSquiglies(FMap featsMap) {
    labels = getFeatureLabels();
    groups = getFeatureGroups();
@@ -1417,27 +1407,6 @@ public FeatureLattice calculateTransitiveFiles(FeatureLattice lattice, FeatureNo
 		case FeatureNode fn => (fn[transFiles=transFiles[fn]])[percent=size(transFiles[fn])*100.0/totalFiles]
 	}
 	return lattice;
-}
-
-public void checkGroups() {
-  labels = [ l | \map(_,rtype) := #FMap.symbol, /Type::label(l,_) := rtype ];
-  groups = ("binary ops"     : [ l | str l:/^binaryOp.*/ <- labels ])
-         + ("unary ops"      : [l | str l:/^unaryOp.*/ <- labels ])
-         + ("control flow"   : ["break","continue","declare","do","for","foreach","goto","if","return","switch","throw","tryCatch","while","exit","suppress","label"])
-         + ("assignment ops" : [l | str l:/^assign.*/ <-labels] + ["listAssign","refAssign", "unset"])
-         + ("definitions" : ["functionDef","interfaceDef","traitDef","classDef","namespace","global","static","const","use","include","closure"])
-         + ("invocations" : ["call","methodCall","staticCall", "eval", "shellExec"])
-         + ("allocations" : ["array","new","scalar", "clone"]) 
-         + ("casts"       : [l | str l:/^cast.*/ <- labels])
-         + ("print"       : ["print","echo","inlineHTML" ])
-         + ("predicates"  : ["isSet","empty","instanceOf"])
-         + ("lookups"     : ["fetchArrayDim","fetchClassConst","var","classConst","fetchConst","propertyFetch","fetchStaticProperty"])
-         ;
-  keys = [rascalFriendlyKey(k) | k <- (exprKeyOrder()+stmtKeyOrder())];
-  missing = toSet(keys) - {*g|g<-groups<1>};
-  extra = {*g|g<-groups<1>} - toSet(keys);
-  for (m <- missing) println("Missing: <m>");
-  for (e <- extra) println("Extra: <e>");          
 }
 
 public tuple[set[FeatureNode],set[str],int] minimumFeaturesForPercent(FMap fmap, FeatureLattice lattice, int targetPercent) {
