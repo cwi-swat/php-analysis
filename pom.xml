@@ -85,17 +85,17 @@
           </headerDefinitions>
           <licenseSets>
             <licenseSet>
-                <header>LICENSE</header>
+                <header>LICENSE.md</header>
               <excludes>
                 <exclude>rascal_style.xml</exclude>
-                <exclude>**/README</exclude>
+                <exclude>**/README.md</exclude>
                 <exclude>src/test/resources/**</exclude>
                 <exclude>src/main/resources/**</exclude>
                 <exclude>**/*.tpl</exclude>
                 <exclude>META-INF/**</exclude>
                 <exclude>.editorconfig</exclude>
-                <exclude>CITATION</exclude>
-                <exclude>FUNDING</exclude>
+                <exclude>CITATION.md</exclude>
+                <exclude>FUNDING.md</exclude>
                 <exclude>**/*.txt</exclude>
               </excludes>
             </licenseSet>
