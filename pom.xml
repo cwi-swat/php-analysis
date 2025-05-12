@@ -53,7 +53,7 @@
     <dependency>
       <groupId>edu.appstate.cs</groupId>
       <artifactId>rascal-git</artifactId>
-      <version>0.1.16-RC1</version>
+      <version>0.1.16-RC2</version>
     </dependency>
   </dependencies>
 
@@ -166,8 +166,6 @@
               </goals>
               <configuration>
                   <bin>${project.build.outputDirectory}</bin>
-                  <license>${project.basedir}/LICENSE</license>
-                  <citation>${project.basedir}/CITATION.md</citation>
                   <sources>|http://github.com/cwi-swat/php-analysis/blob/main|</sources>
                   <issues>|http://github.com/cwi-swat/php-analysis/issues|</issues>
                   <srcs>
