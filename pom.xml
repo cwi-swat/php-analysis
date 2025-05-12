@@ -48,12 +48,12 @@
     <dependency>
       <groupId>org.rascalmpl</groupId>
       <artifactId>rascal</artifactId>
-      <version>0.40.17</version>
+      <version>0.41.0-RC42</version>
     </dependency>
     <dependency>
       <groupId>edu.appstate.cs</groupId>
       <artifactId>rascal-git</artifactId>
-      <version>0.1.15</version>
+      <version>0.1.16-RC1</version>
     </dependency>
   </dependencies>
 
@@ -136,9 +136,8 @@
     <plugin>
         <groupId>org.rascalmpl</groupId>
         <artifactId>rascal-maven-plugin</artifactId>
-        <version>0.28.9</version>
+        <version>0.30.0-RC25</version>
         <configuration>
-          <enableStandardLibrary>false</enableStandardLibrary>
           <bin>${project.build.outputDirectory}</bin>
           <srcs>
             <src>${project.basedir}/src/main/rascal</src>
@@ -166,8 +165,6 @@
                   <goal>tutor</goal>
               </goals>
               <configuration>
-                  <enableStandardLibrary>true</enableStandardLibrary>
-                  <errorsAsWarnings>false</errorsAsWarnings>
                   <bin>${project.build.outputDirectory}</bin>
                   <license>${project.basedir}/LICENSE</license>
                   <citation>${project.basedir}/CITATION.md</citation>
@@ -177,8 +174,6 @@
                       <src>${project.basedir}/src/main/rascal</src>
                       <src>${project.basedir}/doc</src>
                   </srcs>
-                  <ignores>
-                  </ignores>
               </configuration>
           </execution>
       </executions>        
