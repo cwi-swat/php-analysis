@@ -568,8 +568,8 @@ public str pp(ClassItem::property(set[Modifier] modifiers, list[Property] prop, 
 	"<for(p <- prop) {><intercalate(" ",[pp(m)|m<-modifiers])> <pp(ptype)> <pp(p)>;
 	'<}>";
 
-//	| constCI(list[Const] consts)
-public str pp(constCI(list[Const] consts, set[Modifier] modifiers, _)) = "const <intercalate(",",[pp(c)|c<-consts])>;";
+//	| classConst(list[Const] consts)
+public str pp(classConst(list[Const] consts, set[Modifier] modifiers, _)) = "const <intercalate(",",[pp(c)|c<-consts])>;";
 
 //	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body)
 // TODO classes of interfaces have no body

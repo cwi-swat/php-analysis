@@ -239,7 +239,7 @@ public data Use(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc sco
 
 public data ClassItem(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= property(set[Modifier] modifiers, list[Property] prop, PHPType propType, list[AttributeGroup] attributeGroups)
-	| constCI(list[Const] consts, set[Modifier] modifiers, list[AttributeGroup] attributeGroups)
+	| classConst(list[Const] consts, set[Modifier] modifiers, list[AttributeGroup] attributeGroups)
 	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType, list[AttributeGroup] attributeGroups)
 	| traitUse(list[Name] traits, list[Adaptation] adaptations)
 	| enumCase(str caseName, OptionExpr caseExpr, list[AttributeGroup] attributeGroups)
