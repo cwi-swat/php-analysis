@@ -17,7 +17,7 @@ module tests::lang::php::pp::PrettyPrinter
 import lang::php::ast::AbstractSyntax;
 import lang::php::ast::System;
 import lang::php::pp::PrettyPrinter;
-import lang::php::util::Config;
+import lang::php::config::Config;
 import lang::php::util::Utils;
 
 import IO;

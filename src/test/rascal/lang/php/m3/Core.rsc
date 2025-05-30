@@ -16,7 +16,7 @@ import lang::php::m3::Core;
 import lang::php::m3::FillM3;
 import lang::php::m3::Containment;
 import lang::php::m3::Uses;
-import lang::php::util::Config;
+import lang::php::config::Config;
 import lang::php::ast::AbstractSyntax;
 import lang::php::ast::System;
 

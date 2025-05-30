@@ -14,7 +14,7 @@ module lang::php::analysis::includes::IncludesInfo
 
 import lang::php::ast::AbstractSyntax;
 import lang::php::ast::System;
-import lang::php::util::Config;
+import lang::php::config::Config;
 import lang::php::analysis::evaluators::AlgebraicSimplification;
 import lang::php::analysis::evaluators::SimulateCalls;
 import lang::php::analysis::evaluators::MagicConstants;

@@ -16,7 +16,7 @@ module lang::php::util::Utils
 import lang::php::util::Corpus;
 import lang::php::ast::System;
 import lang::php::ast::AbstractSyntax;
-import lang::php::util::Config;
+import lang::php::config::Config;
 
 import IO;
 import ValueIO;
@@ -54,8 +54,8 @@ public str executePHP(list[str] opts, loc cwd) {
 }
 
 private Script parsePHPfile(loc f, list[str] opts, Script error) {
-	//loc parserLoc = usePhpParserJar ? getPhpParserLocFromJar() : lang::php::util::Config::parserLoc;
-	loc parserLoc = lang::php::util::Config::parserLoc;
+	//loc parserLoc = usePhpParserJar ? getPhpParserLocFromJar() : lang::php::config::Config::parserLoc;
+	loc parserLoc = lang::php::config::Config::parserLoc;
 	str phpOut = "";
 	try {
 		str filePath = f.path;

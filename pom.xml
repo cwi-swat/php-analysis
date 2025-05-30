@@ -70,8 +70,8 @@
         <directory>src/main/rascal</directory>
         <filtering>false</filtering>
         <excludes>
-          <exclude>lang/php/util/Config.rsc</exclude>
-          <exclude>lang/php/util/Config.rsc-dist</exclude>
+          <exclude>lang/php/config/Config.rsc</exclude>
+          <exclude>lang/php/config/Config.rsc-dist</exclude>
         </excludes>
       </resource>
     </resources>  
@@ -157,7 +157,7 @@
             <src>${project.basedir}/src/main/rascal</src>
           </srcs>
           <srcIgnores>
-            <ignore>${project.basedir}/src/main/rascal/lang/php/util/Config.rsc</ignore>
+            <ignore>${project.basedir}/src/main/rascal/lang/php/config/Config.rsc</ignore>
           </srcIgnores>
         </configuration>
         <executions>

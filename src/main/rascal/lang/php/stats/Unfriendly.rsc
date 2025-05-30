@@ -29,7 +29,7 @@ import lang::php::stats::Stats;
 import lang::php::ast::System;
 import lang::php::util::Corpus;
 import lang::php::ast::AbstractSyntax;
-import lang::php::util::Config;
+import lang::php::config::Config;
 import lang::php::analysis::signatures::Summaries;
 import lang::php::analysis::includes::IncludeGraph;
 import lang::php::analysis::NamePaths;

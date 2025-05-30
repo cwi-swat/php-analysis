@@ -14,7 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 module lang::php::analysis::signatures::Summaries
 
 import ValueIO;
-import lang::php::util::Config;
+import lang::php::config::Config;
 
 private loc summariesDir = baseLoc + "serialized/summaries";
 

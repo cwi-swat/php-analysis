@@ -12,7 +12,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 module lang::php::stats::SLOC
 
-import lang::php::util::Config;
+import lang::php::config::Config;
 import lang::php::util::Corpus;
 
 import IO;

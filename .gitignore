@@ -22,3 +22,10 @@ local.properties
 
 # Maven
 target
+
+# VSCode
+.vscode
+
+# PHP Config file, should not be in GitHub
+src/main/rascal/lang/php/config/Config.rsc
+

@@ -14,7 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 module lang::php::util::Corpus
 
 import lang::php::stats::Stats;
-import lang::php::util::Config;
+import lang::php::config::Config;
 
 import String;
 import IO;

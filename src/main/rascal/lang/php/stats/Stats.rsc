@@ -17,7 +17,7 @@ import lang::php::util::Utils;
 import lang::php::ast::AbstractSyntax;
 import lang::php::util::Corpus;
 import lang::php::ast::System;
-import lang::php::util::Config;
+import lang::php::config::Config;
 
 import Set;
 import String;
