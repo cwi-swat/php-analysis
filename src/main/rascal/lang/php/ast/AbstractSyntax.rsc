@@ -160,7 +160,7 @@ public data Op(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scop
 	;
 
 public data Param(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= param(str paramName, OptionExpr paramDefault,bool byRef,bool isVariadic, PHPType paramType, set[Modifier] modifiers, list[AttributeGroup] attributeGroups);
+	= param(str paramName, OptionExpr paramDefault,bool byRef,bool isVariadic, PHPType paramType, set[Modifier] modifiers, list[AttributeGroup] attributeGroups, list[PropertyHook] propertyHooks);
 
 public data Scalar(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="", str actualValue="")
 	= classConstant()
@@ -169,6 +169,7 @@ public data Scalar(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc 
 	| funcConstant()
 	| lineConstant()
 	| methodConstant()
+	| propertyConstant()
 	| namespaceConstant()
 	| traitConstant()
 	| float(real realVal)
@@ -180,7 +181,7 @@ public data Scalar(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc 
 public data Stmt(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= \break(OptionExpr breakExpr)
 	| classDef(ClassDef classDef)
-	| const(list[Const] consts)
+	| const(list[Const] consts, list[AttributeGroup] attributeGroups)
 	| \continue(OptionExpr continueExpr)
 	| declare(list[Declaration] decls, list[Stmt] body)
 	| do(Expr cond, list[Stmt] body)
@@ -202,7 +203,6 @@ public data Stmt(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc sc
 	| \return(OptionExpr returnExpr)
 	| static(list[StaticVar] vars)
 	| \switch(Expr cond, list[Case] cases)
-	// | \throw(Expr expr) NOW AN EXPRESSION
 	| tryCatch(list[Stmt] body, list[Catch] catches)
 	| tryCatchFinally(list[Stmt] body, list[Catch] catches, list[Stmt] finallyBody)
 	| unset(list[Expr] unsetVars)
@@ -238,8 +238,8 @@ public data Use(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc sco
 	= use(Name importName, OptionName asName, UseType useType);
 
 public data ClassItem(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= property(set[Modifier] modifiers, list[Property] prop, PHPType propType, list[AttributeGroup] attributeGroups)
-	| classConst(list[Const] consts, set[Modifier] modifiers, list[AttributeGroup] attributeGroups)
+	= property(set[Modifier] modifiers, list[Property] prop, PHPType propType, list[AttributeGroup] attributeGroups, list[PropertyHook] propertyHooks)
+	| classConst(list[Const] consts, set[Modifier] modifiers, list[AttributeGroup] attributeGroups, PHPType constType)
 	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType, list[AttributeGroup] attributeGroups)
 	| traitUse(list[Name] traits, list[Adaptation] adaptations)
 	| enumCase(str caseName, OptionExpr caseExpr, list[AttributeGroup] attributeGroups)
@@ -253,6 +253,11 @@ public data Adaptation
 public data Property(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= property(str propertyName, OptionExpr defaultValue);
 
+public data PropertyHook(loc at=|unknown:///|, loc decl=|unknown:///|)
+	= propertyHookExpr(str name, set[Modifier] modifiers, bool byRef, list[Param] params, Expr exprBody, list[AttributeGroup] attributeGroups)
+	| propertyHookStmts(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body, list[AttributeGroup] attributeGroups)
+	;
+
 public data Modifier(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= \public()
 	| \private()
@@ -261,6 +266,10 @@ public data Modifier(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", lo
 	| abstract()
 	| final()
 	| readonly()
+	| publicSet()
+	| privateSet()
+	| protectedSet()
+	| magic()
 	;
 
 public data ClassDef(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
