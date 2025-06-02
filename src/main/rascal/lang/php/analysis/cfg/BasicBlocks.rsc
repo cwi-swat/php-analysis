@@ -15,7 +15,6 @@ module lang::php::analysis::cfg::BasicBlocks
 
 import lang::php::analysis::cfg::CFG;
 import lang::php::analysis::cfg::FlowEdge;
-import lang::php::analysis::cfg::Label;
 import lang::php::analysis::NamePaths;
 
 import Relation;

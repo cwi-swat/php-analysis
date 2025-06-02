@@ -13,8 +13,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::analysis::cfg::Label
 
-import lang::php::ast::AbstractSyntax;
-
 @doc{Labels are added to expressions and statements to give us a 
      shorthand to refer to the various statements, expressions, and
      sub-statements/sub-expressions in the code.}

@@ -176,7 +176,7 @@ public void dependencyCounts(loc l, rel[str owner, str repo, Composer cinfo] com
 
     map[str,int] dependencyCounts = ( );
 
-    for (<owner, repo, cinfo> <- composerInfo, cinfo is composer) {
+    for (<_, _, cinfo> <- composerInfo, cinfo is composer) {
         for ( < vendorName, projectName, _ > <- cinfo.packageDependencies[dependencyType] ) {
             dependencyName = "<vendorName>/<projectName>";
             if (dependencyName in dependencyCounts) {
@@ -221,7 +221,7 @@ public lrel[str constraintType, PackageVersionConstraint constraint] fetchConstr
 
     // Second, fill the list with all the constraints. We track the dependency type too, but we
     // skip suggest dependencies since these are just textual, there are no constraints.
-    for (< owner, repo, cinfo > <- composerInfo, cinfo is composer) {
+    for (< _, _, cinfo > <- composerInfo, cinfo is composer) {
         for ( < dependencyType, _, _, constraint > <- cinfo.packageDependencies, dependencyType != "suggest") {
             constraintList = constraintList + < dependencyType, constraint >;
         }

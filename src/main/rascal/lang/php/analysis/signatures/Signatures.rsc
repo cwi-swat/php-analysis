@@ -56,7 +56,7 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 				}
 			}
 		}
-		for(classConst(consts,_,_) <- cis, const(cn,ce) <- consts) {
+		for(classConst(consts,_,_,_) <- cis, const(cn,ce) <- consts) {
 			items += classConstSig(classConstPath(cln, cn), ce);
 		}
 	}
@@ -92,7 +92,7 @@ public Signature getFileSignature(loc fileloc, Script scr, bool buildInfo=false)
 
 public Signature getScriptConstants(loc fileloc, Script scr) {
 	set[SignatureItem] items = 
-		{ classConstSig(classConstPath(cln, cn), ce) | /class(cln,_,_,_,cis,_) := scr, classConst(consts,_,_) <- cis, const(cn,ce) <- consts } +
+		{ classConstSig(classConstPath(cln, cn), ce) | /class(cln,_,_,_,cis,_) := scr, classConst(consts,_,_,_) <- cis, const(cn,ce) <- consts } +
 		{ constSig(constPath(cn),e) | /call(name(name("define")),[actualParameter(scalar(string(cn)),false,false,_),actualParameter(e,false,false,_)]) := scr };
 	return fileSignature(fileloc, items);
 }

@@ -280,21 +280,21 @@ public default bool ppOnRight(Op x) = isUnary(x) && !ppOnLeft(x);
 //						  bool byRef,
 //						  bool isVariadic, 
 //						  PHPType paramType);
-public str pp(param(str pn, noExpr(), true, true, PHPType returnType, mods, _)) 
+public str pp(param(str pn, noExpr(), true, true, PHPType returnType, mods, _, _)) 
 	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>&$<pn>...";
-public str pp(param(str pn, noExpr(), true, false, PHPType returnType, mods, _)) 
+public str pp(param(str pn, noExpr(), true, false, PHPType returnType, mods, _, _)) 
 	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>&$<pn>";
-public str pp(param(str pn, noExpr(), false, true, PHPType returnType, mods, _)) 
+public str pp(param(str pn, noExpr(), false, true, PHPType returnType, mods, _, _)) 
 	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>$<pn>...";
-public str pp(param(str pn, noExpr(), false, false, PHPType returnType, mods, _)) 
+public str pp(param(str pn, noExpr(), false, false, PHPType returnType, mods, _, _)) 
 	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>$<pn>";
-public str pp(param(str pn, someExpr(Expr e), true, true, PHPType returnType, mods, _)) 
+public str pp(param(str pn, someExpr(Expr e), true, true, PHPType returnType, mods, _, _)) 
 	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>&$<pn>... = <pp(e)>";
-public str pp(param(str pn, someExpr(Expr e), true, false, PHPType returnType, mods, _)) 
+public str pp(param(str pn, someExpr(Expr e), true, false, PHPType returnType, mods, _, _)) 
 	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>&$<pn> = <pp(e)>";
-public str pp(param(str pn, someExpr(Expr e), false, true, PHPType returnType, mods, _)) 
+public str pp(param(str pn, someExpr(Expr e), false, true, PHPType returnType, mods, _, _)) 
 	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>$<pn>... = <pp(e)>";
-public str pp(param(str pn, someExpr(Expr e), false, false, PHPType returnType, mods, _)) 
+public str pp(param(str pn, someExpr(Expr e), false, false, PHPType returnType, mods, _, _)) 
 	= "<padIfNotEmpty(intercalate(" ",[pp(m)|m<-mods]))><padIfNotEmpty(pp(returnType))>$<pn> = <pp(e)>";
 
 public str padIfNotEmpty(str s) = "<s> " when size(s) != 0;
@@ -343,7 +343,7 @@ public str pp(\break(noExpr())) = "break;";
 public str pp(classDef(ClassDef classDef)) = pp(classDef);
 
 //	| const(list[Const] consts)
-public str pp(Stmt::const(list[Const] consts)) = "const <intercalate(",",[pp(c)|c<-consts])>;";
+public str pp(Stmt::const(list[Const] consts, list[AttributeGroup] attributeGroups)) = "const <intercalate(",",[pp(c)|c<-consts])>;";
 
 //	| \continue(OptionExpr continueExpr)
 public str pp(\continue(someExpr(Expr continueExpr))) = "continue <pp(continueExpr)>;";
@@ -564,12 +564,12 @@ public str pp(Use::use(Name importName, noName(), UseType useType)) = "<pp(impor
 
 //public data ClassItem 
 //	= property(set[Modifier] modifiers, list[Property] prop)
-public str pp(ClassItem::property(set[Modifier] modifiers, list[Property] prop, PHPType ptype, _)) =
+public str pp(ClassItem::property(set[Modifier] modifiers, list[Property] prop, PHPType ptype, _, _)) =
 	"<for(p <- prop) {><intercalate(" ",[pp(m)|m<-modifiers])> <pp(ptype)> <pp(p)>;
 	'<}>";
 
 //	| classConst(list[Const] consts)
-public str pp(classConst(list[Const] consts, set[Modifier] modifiers, _)) = "const <intercalate(",",[pp(c)|c<-consts])>;";
+public str pp(classConst(list[Const] consts, set[Modifier] modifiers, _, _)) = "const <intercalate(",",[pp(c)|c<-consts])>;";
 
 //	| method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body)
 // TODO classes of interfaces have no body

@@ -351,7 +351,7 @@ public list[str] castTypeOrder() = [ "int", "bool", "float", "string", "array", 
 
 public str getStmtKey(\break(_)) = "break";
 public str getStmtKey(classDef(_)) = "class def";
-public str getStmtKey(Stmt::const(_)) = "const";
+public str getStmtKey(Stmt::const(_,_)) = "const";
 public str getStmtKey(\continue(_)) = "continue";
 public str getStmtKey(declare(_,_)) = "declare";
 public str getStmtKey(do(_,_)) = "do";
@@ -384,12 +384,13 @@ public list[str] stmtKeyOrder() = [ "break", "class def", "const", "continue", "
 								    "namespace", "return", "static", "switch", "throw",
 								    "try/catch", "unset", "use", "while" ];
 								    
-public str getClassItemKey(ClassItem::property(set[Modifier] modifiers, list[Property] prop, PHPType ptype, _)) = "propertyDef";
-public str getClassItemKey(ClassItem::classConst(list[Const] consts, set[Modifier] modifiers, _)) = "classConstDef";
-public str getClassItemKey(ClassItem::method(str name, set[Modifier] modifiers, bool byRef, list[Param] params, list[Stmt] body, PHPType returnType, _)) = "methodDef";
-public str getClassItemKey(ClassItem::traitUse(list[Name] traits, list[Adaptation] adaptations)) = "traitUse";
+public str getClassItemKey(ClassItem::property(set[Modifier] _, list[Property] _, PHPType _, list[AttributeGroup] _, list[PropertyHook] _)) = "propertyDef";
+public str getClassItemKey(ClassItem::classConst(list[Const] _, set[Modifier] _, list[AttributeGroup] _, PHPType _)) = "classConstDef";
+public str getClassItemKey(ClassItem::method(str name, set[Modifier] _, bool _, list[Param] _, list[Stmt] _, PHPType _, list[AttributeGroup] _)) = "methodDef";
+public str getClassItemKey(ClassItem::traitUse(list[Name] _, list[Adaptation] _)) = "traitUse";
+public str getClassItemKey(ClassItem::enumCase(str _, OptionExpr _, list[AttributeGroup] _)) = "enumCaseDef";
 								    
-public list[str] classItemKeyOrder() = ["propertyDef","classConstDef","methodDef","traitUse"];
+public list[str] classItemKeyOrder() = ["propertyDef","classConstDef","methodDef","traitUse","enumCaseDef"];
 
 public list[str] featureOrder() = [ "class consts with variable class name",
 									"assignments into variable-variables",

@@ -233,10 +233,10 @@ public Composer loadComposerFile(loc l, bool justPublishedPackages = false) {
     if ("authors" in js) {
         if (list[node] ats := js["authors"]) {
             for (atr <- ats) {
-                authName = if(atr has name, str s := atr.name) just(s); else nothing();
-                authEmail = if(atr has email, str s := atr.email) just(s); else nothing();
-                authHomepage = if (atr has homepage, str s := atr.homepage) just(s); else nothing();
-                authRole = if (atr has role, str s := atr.role) just(s); else nothing();
+                authName = (atr has name && str s := atr.name) ? just(s) : nothing();
+                authEmail = (atr has email && str s := atr.email) ? just(s) : nothing();
+                authHomepage = (atr has homepage && str s := atr.homepage) ? just(s) : nothing();
+                authRole = (atr has role && str s := atr.role) ? just(s) : nothing();
                 authors = authors + author(authName, authEmail, authHomepage, authRole);
             }
         } else {

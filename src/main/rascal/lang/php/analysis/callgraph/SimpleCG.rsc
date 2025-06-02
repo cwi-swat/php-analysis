@@ -13,7 +13,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 module lang::php::analysis::callgraph::SimpleCG
 
 import lang::php::ast::AbstractSyntax;
-import lang::php::analysis::NamePaths;
 import lang::php::analysis::signatures::Summaries;
 import lang::php::analysis::signatures::Signatures;
 import lang::php::ast::System;

@@ -21,8 +21,8 @@ import lang::php::ast::System;
 public list[ClassDef] getClasses(System product) = [ c | /ClassDef c := product.files ];
 public list[InterfaceDef] getInterfaces(System product) = [ i | /InterfaceDef i := product.files ];
 public list[ClassItem] getMethods(System product) = [ m |  /m:method(_, _, _, _, _, _, _) := product.files ];
-public list[Property] getProperties(System product) = [ p | /property(_, list[Property] prop, _, _) := product.files, p <- prop ];
-public list[ClassItem] getPropertyDecls(System product) = [ p | /ClassItem p:property(_, _, _, _) := product.files ];
+public list[Property] getProperties(System product) = [ p | /property(_, list[Property] prop, _, _, _) := product.files, p <- prop ];
+public list[ClassItem] getPropertyDecls(System product) = [ p | /ClassItem p:property(_, _, _, _, _) := product.files ];
 public list[Stmt] getFunctions(System product) = [ f | /f:function(_,_,_,_,_,_) := product.files ];
 
 public int classesCount(System product) {

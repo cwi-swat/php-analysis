@@ -127,7 +127,7 @@ private PackageVersionConstraint parseWildcardConstraint(WildcardConstraint wc) 
 public PackageVersionConstraint parseConstraint(str constraintText) {
     try {
         return parseConstraint(parse(#VersionConstraint, constraintText));
-    } catch ParseError(loc l): {
+    } catch ParseError(loc _): {
         return rawConstraint(constraintText);
     }
 }

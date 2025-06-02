@@ -260,8 +260,8 @@ public Script addPublicModifierWhenNotProvided(Script s) {
 	
 	solve(s) {
 		s = visit(s) {
-			case origNode:property(set[Modifier] mfs, prop, ptype, pattrs) => 
-				setAnnotations( property(mfs + publicModifier, prop, ptype, pattrs), getAnnotations(origNode))
+			case origNode:property(set[Modifier] mfs, prop, ptype, pattrs, phooks) => 
+				setAnnotations( property(mfs + publicModifier, prop, ptype, pattrs, phooks), getAnnotations(origNode))
 			when \public() notin mfs && \private() notin mfs && \protected() notin mfs
 				
 			case origNode:method(str mname, set[Modifier] mfs, byRef, params, body, rtype, mattrs) => 

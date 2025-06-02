@@ -221,7 +221,7 @@ private tuple[CFG methodCFG, LabelState lstate] createMethodCFG(loc np, ClassIte
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
 	list[CFGNode] paramNodes = [ ];
-	for (param(paramName,paramDefault,byRef,_,_,_,_) <- m.params) {
+	for (param(paramName,paramDefault,byRef,_,_,_,_,_) <- m.params) {
 		newLabel = incLabel();
 		newNode = (someExpr(e) := paramDefault) 
 			? actualNotProvided(paramName, e, byRef, newLabel)[lab=newLabel] 
@@ -309,7 +309,7 @@ private tuple[CFG functionCFG, LabelState lstate] createFunctionCFG(loc np, Stmt
 	// Add initial nodes to represent initializing parameters with default values,
 	// plus add flow edges between these default initializers
 	list[CFGNode] paramNodes = [ ];
-	for (param(paramName,paramDefault,byRef,_,_,_,_) <- f.params) {
+	for (param(paramName,paramDefault,byRef,_,_,_,_,_) <- f.params) {
 		newLabel = incLabel();
 		newNode = (someExpr(e) := paramDefault) 
 			? actualNotProvided(paramName, e, byRef, newLabel)[lab=newLabel] 
@@ -376,7 +376,7 @@ public set[Lab] init(Stmt s, LabelState lstate) {
 
 		// Given a list of constants, the first thing that occurs is the expression that is
 		// assigned to the first constant in the list.
-		case const(list[Const] consts) : {
+		case const(list[Const] consts, _) : {
 			return init(head(consts).constValue, lstate);
 		}
 
@@ -668,7 +668,7 @@ private set[Lab] final(Stmt s, LabelState lstate) {
 		}
 		
 		// We always have at least one const; the final const provides the labels.
-		case const(list[Const] consts) : {
+		case const(list[Const] consts, _) : {
 			return final(last(consts).constValue, lstate);
 		}
 
@@ -968,7 +968,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 		// For consts, we add the edges internal to each const expression, plus we link up
 		// the expressions. The final labels are already the final labels for the last
 		// const initializer expression, so we don't need to further link those up here.
-		case const(list[Const] consts) : {
+		case const(list[Const] consts, _) : {
 			vals = [ c.constValue | c <- consts ];
 			for (v <- vals) < edges, lstate > = addExpEdges(edges, lstate, v);
 			< edges, lstate > = addExpSeqEdges(edges, lstate, vals);
