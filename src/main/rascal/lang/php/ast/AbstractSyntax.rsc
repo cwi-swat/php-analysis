@@ -84,7 +84,7 @@ public data PHPType
 public data Expr(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= array(list[ArrayElement] items, bool usesBracketNotation)
 	| fetchArrayDim(Expr var, OptionExpr dim)
-	| fetchClassConst(NameOrExpr className, str constantName)
+	| fetchClassConst(NameOrExpr className, NameOrExpr classConstantName)
 	| assign(Expr assignTo, Expr assignExpr)
 	| assignWOp(Expr assignTo, Expr assignExpr, Op operation)
 	| listAssign(list[OptionExpr] assignsTo, Expr assignExpr) // NOTE: deprecated, no longer appears in ASTs
@@ -223,7 +223,7 @@ public data Declaration(loc at=|unknown:///|, loc decl=|unknown:///|, str id="",
 	= declaration(str key, Expr val);
 
 public data Catch(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
-	= \catch(list[Name] xtypes, str varName, list[Stmt] body);
+	= \catch(list[Name] xtypes, OptionExpr varName, list[Stmt] body);
 
 public data Case(loc at=|unknown:///|, loc decl=|unknown:///|, str id="", loc scope=|unknown:///|, str phpdoc="")
 	= \case(OptionExpr cond, list[Stmt] body);

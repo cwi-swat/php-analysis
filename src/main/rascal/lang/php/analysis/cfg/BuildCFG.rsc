@@ -13,6 +13,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 @contributor{Mark Hills - Mark.Hills@cwi.nl (CWI)}
 module lang::php::analysis::cfg::BuildCFG
 
+// TODO: In \catch nodes the name can now be an expr, properly extract labels and edges
+
 import lang::php::ast::AbstractSyntax;
 import lang::php::analysis::NamePaths;
 import lang::php::analysis::cfg::CFG;
@@ -522,10 +524,12 @@ public set[Lab] init(Expr e, LabelState lstate) {
 		
 		case fetchArrayDim(Expr var, OptionExpr _) : return init(var, lstate);
 		
-		case fetchClassConst(name(Name _), str _) : return { e.lab };
+		case fetchClassConst(name(Name _), name(Name _)) : return { e.lab };
 
-		case fetchClassConst(expr(Expr className), str _) : return init(className, lstate);
-		
+		case fetchClassConst(expr(Expr className), NameOrExpr _) : return init(className, lstate);
+
+		case fetchClassConst(name(Name _), expr(Expr constName)) : return init(constName, lstate);
+
 		case assign(Expr _, Expr assignExpr) : return init(assignExpr, lstate);
 		
 		case assignWOp(Expr _, Expr assignExpr, Op _) : return init(assignExpr, lstate);
@@ -1475,7 +1479,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			lstate.nodes = lstate.nodes + footerNode(s, headernode, footernode)[lab=footernode];
 
 			oldHandlers = lstate.catchHandlers;
-			for(\catch(_,str xt,cbody) <- catches) {
+			for(\catch(list[Name] xtypes,_,cbody) <- catches, name(xt) <- xtypes) {
 				if (size(cbody) > 0 && size(init(head(cbody), lstate)) > 0) {
 					lstate.catchHandlers[xt] = getOneFrom(init(head(cbody), lstate));
 				} else {
@@ -1511,7 +1515,7 @@ public tuple[FlowEdges,LabelState] internalFlow(Stmt s, LabelState lstate) {
 			lstate.nodes = lstate.nodes + footerNode(s, headernode, footernode)[lab=footernode];
 
 			oldHandlers = lstate.catchHandlers;
-			for(\catch(_,str xt,cbody) <- catches) {
+			for(\catch(list[Name] xtypes,_,cbody) <- catches, name(xt) <- xtypes) {
 				if (size(cbody) > 0 && size(init(head(cbody), lstate)) > 0) {
 					lstate.catchHandlers[xt] = getOneFrom(init(head(cbody), lstate));
 				} else if (size(finallyBody) > 0 && size(init(head(finallyBody), lstate)) > 0) {
@@ -1651,11 +1655,22 @@ public tuple[FlowEdges,LabelState] internalFlow(Expr e, LabelState lstate) {
 			edges += makeEdges(final(var, lstate), finalLabels);
 		}
 		
-		case fetchClassConst(expr(Expr className), str _) : {
+		case fetchClassConst(expr(Expr className), name(Name _)) : {
 			< edges, lstate > = addExpEdges(edges, lstate, className);
 			edges += makeEdges(final(className, lstate), finalLabels);
 		}
-		
+
+		case fetchClassConst(name(Name _), expr(Expr constName)) : {
+			< edges, lstate > = addExpEdges(edges, lstate, constName);
+			edges += makeEdges(final(constName, lstate), finalLabels);
+		}
+
+		case fetchClassConst(expr(Expr className), expr(Expr constName)) : {
+			< edges, lstate > = addExpEdges(edges, lstate, className);
+			< edges, lstate > = addExpEdges(edges, lstate, constName);
+			edges = edges + makeEdges(final(className, lstate), init(constName, lstate)) + makeEdges(final(constName, lstate), finalLabels);
+		}
+
 		case assign(Expr assignTo, Expr assignExpr) : { 
 			< edges, lstate > = addExpEdges(edges, lstate, assignExpr); 
 			< edges, lstate > = addExpEdges(edges, lstate, assignTo);

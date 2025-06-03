@@ -40,10 +40,14 @@ import lang::php::pp::PrettyPrinter;
 
 public str executePHP(list[str] opts, loc cwd) {
 	str phpBinLoc = usePhpParserJar ? "php" : phpLoc.path;
-
+	// logMessage(phpBinLoc,2);
+	// logMessage("<opts>", 2);
+	// logMessage("<cwd>", 2);
   	PID pid = createProcess(phpBinLoc, args=opts, workingDir=cwd);
 	str phcOutput = readEntireStream(pid);
 	str phcErr = readEntireErrStream(pid);
+	// logMessage(phcOutput,2);
+	// logMessage(phcErr,2);
 	killProcess(pid);
 
 	if (trim(phcErr) == "" || /Fatal error/ !:= phcErr) {
@@ -62,7 +66,7 @@ private Script parsePHPfile(loc f, list[str] opts, Script error) {
 		if (f.authority != "") {
 			filePath = f.authority + "/" + filePath;
 		}
-		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", (parserLoc + astToRascal).path, "-f<filePath>"] + opts, parserWorkingDir);
+		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", "-d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_STRICT\"", (parserLoc + astToRascal).path, "-f<filePath>"] + opts, parserWorkingDir);
 	} catch _: {
 		return error; 
 	}

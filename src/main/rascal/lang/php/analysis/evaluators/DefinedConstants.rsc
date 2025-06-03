@@ -76,7 +76,7 @@ public Script evalConsts(loc scriptLoc, Script scr, ConstInfo cinfo, set[Include
 
 	// Replace constants and class constants with their defining values where possible
 	scr = visit(scr) {
-		case c:fetchClassConst(name(name(cln)), str cn) : {
+		case c:fetchClassConst(name(name(cln)), name(name(cn))) : {
 			if (cln in cinfo.classConstMap && cn in cinfo.classConstMap[cln]) {
 				insert(cinfo.classConstMap[cln][cn][at=c.at]);
 			} else if (cln in classConstsInScript && cn in classConstsInScript[cln]) {
@@ -100,7 +100,7 @@ public set[ConstItem] getScriptConstUses(Script scr) {
 	visit(scr) {
 		case fetchConst(name(s)) :
 			res += normalConst(s);
-		case fetchClassConst(name(name(cln)), cn) :
+		case fetchClassConst(name(name(cln)), name(name(cn))) :
 			res += classConst(cln, cn);
 	}
 	return res;

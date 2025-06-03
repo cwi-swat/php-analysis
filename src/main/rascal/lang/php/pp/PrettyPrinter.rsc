@@ -92,7 +92,7 @@ public str pp(fetchArrayDim(Expr var, someExpr(Expr dim))) = "<pp(var)>[<pp(dim)
 public str pp(fetchArrayDim(Expr var, noExpr())) = "<pp(var)>[]";
 
 //	| fetchClassConst(NameOrExpr className, str constName)
-public str pp(fetchClassConst(NameOrExpr className, str constName)) = "<pp(className)>::<pp(constName)>";
+public str pp(fetchClassConst(NameOrExpr className, NameOrExpr constName)) = "<pp(className)>::<pp(constName)>";
 
 //	| assign(Expr assignTo, Expr assignExpr)
 public str pp(assign(Expr assignTo, Expr assignExpr)) = "<pp(assignTo)> = <pp(assignExpr)>";
@@ -521,8 +521,8 @@ public str pp(block(list[Stmt] body)) =
 public str pp(declaration(str key, Expr val)) = "<key>=<pp(val)>";
 
 //public data Catch = \catch(list[Name] xtypes, str varName, list[Stmt] body);
-public str pp(\catch(list[Name] xtypes, str varName, list[Stmt] body)) =
-	"catch (<intercalate(" | ", [ pp(xti) | xti <- xtypes ])> <varName>) {
+public str pp(\catch(list[Name] xtypes, OptionExpr varName, list[Stmt] body)) =
+	"catch (<intercalate(" | ", [ pp(xti) | xti <- xtypes ])> <pp(varName)>) {
 	'	<for (b <- body) {><pp(b)><}> }";
 	
 //public data Case = \case(OptionExpr cond, list[Stmt] body);

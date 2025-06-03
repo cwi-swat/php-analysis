@@ -166,7 +166,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 	Expr resolveConstExpr(Expr resolveExpr, loc constLoc) {
 		// Get the constants used inside resolveExpr
 		usedConstants = { normalConst(cn) | /fetchConst(name(cn)) := resolveExpr } +
-						{ classConst(cln,cn) | /fetchClassConst(name(name(cln)),str cn) := resolveExpr };
+						{ classConst(cln,cn) | /fetchClassConst(name(name(cln)),name(name(cn))) := resolveExpr };
 
 		// Find any of these that are uniquely defined (e.g., defined once or always defined as the
 		// same literal expression)
