@@ -41,7 +41,7 @@ public test bool testIsField()     = isField(|php+field:///|);
 public test bool testIsInterface() = isInterface(|php+interface:///|);
 
 
-public loc testFolder = analysisLoc + "src/tests/resources/m3";
+public loc testFolder = analysisLoc() + "src/tests/resources/m3";
 
 // test the creation of m3s
 public test bool testFillM3() {

@@ -45,7 +45,7 @@ alias VVUType = rel[int id, str product, str path, int line, str derivableNames,
 	str usesForeach, str usesSwitch, str usesConditional, str derivableWithAnnotations,
 	str notes];
 
-public VVUType varVarUses(loc fileLoc = baseLoc + "/extract/csvs/VarVarUses.csv") {
+public VVUType varVarUses(loc fileLoc = baseLoc() + "/extract/csvs/VarVarUses.csv") {
 	return readCSV(#VVUType, fileLoc);
 }
 
@@ -96,7 +96,7 @@ alias ExprsType = rel[str product, str version, int array, int fetchArrayDim,
 	int instanceOf, int isSet, int print, int propertyFetch, int shellExec, int ternary,
 	int fetchStaticProperty, int scalar, int var, int \list];
 
-public ExprsType expressionCounts(loc fileLoc = baseLoc + "/extract/csvs/exprs.csv") {
+public ExprsType expressionCounts(loc fileLoc = baseLoc() + "/extract/csvs/exprs.csv") {
 	return readCSV(#ExprsType, fileLoc);
 }
 
@@ -162,7 +162,7 @@ alias FeatsType = rel[str product, str version, str file, int \break, int \class
 	int \shellExec, int \ternary, int \fetchStaticProperty, int \scalar, int \var,
 	int \list, int \propertyDef, int \classConstDef, int \methodDef, int \traitUse];
 
-public FeatsType getFeats(loc fileLoc = baseLoc + "/extract/csvs/FeaturesByFile.csv") {
+public FeatsType getFeats(loc fileLoc = baseLoc() + "/extract/csvs/FeaturesByFile.csv") {
 	return readCSV(#FeatsType, fileLoc);
 }
 
@@ -170,7 +170,7 @@ list[str] linesColumns = ["product", "version", "file", "phplines"];
 
 alias LinesType = rel[str product, str version, str file, int phpLines];
 
-public LinesType getLines(loc fileLoc = baseLoc + "/extract/csvs/linesPerFile.csv") {
+public LinesType getLines(loc fileLoc = baseLoc() + "/extract/csvs/linesPerFile.csv") {
 	return readCSV(#LinesType, fileLoc);
 }
 
@@ -178,7 +178,7 @@ list[str] versionsColumns = ["Product","Version","ReleaseDate","RequiredPHPVersi
 
 alias VersionsType = rel[str product, str version, str releaseDate, str requiredPHPVersion, str comments];
 
-public VersionsType getVersions(loc fileLoc = baseLoc + "/extract/csvs/Versions.csv") {
+public VersionsType getVersions(loc fileLoc = baseLoc() + "/extract/csvs/Versions.csv") {
 	return readCSV(#VersionsType, fileLoc);
 }
 
@@ -764,12 +764,12 @@ public IncludesCountBeforeAfterTuple calculateSystemIncludesCounts(System sys, r
 	return < initialCounts, unresolvedCounts >;
 }
 
-private loc includesCountsLoc = baseLoc + "serialized/features/includeCounts.bin";
+private loc includesCountsLoc = baseLoc() + "serialized/features/includeCounts.bin";
 
 public bool includesCountsExists() = exists(includesCountsLoc);
 
 public void saveIncludesCounts(ICResult res) {
-	if (!exists(baseLoc + "serialized/features")) mkDirectory(baseLoc + "serialized/features");
+	if (!exists(baseLoc() + "serialized/features")) mkDirectory(baseLoc() + "serialized/features");
 	writeBinaryValueFile(includesCountsLoc, res);
 }
 
@@ -1111,10 +1111,10 @@ public void featureCountsPerFile(Corpus corpus) {
 
 alias FMap = map[str file,tuple[int \break,int \classDef,int \const,int \continue,int \declare,int \do,int \echo,int \expressionStatementChainRule,int \for,int \foreach,int \functionDef,int \global,int \goto,int \haltCompiler,int \if,int \inlineHTML,int \interfaceDef,int \traitDef,int \label,int \namespace,int \return,int \static,int \switch,int \throw,int \tryCatch,int \unset,int \use,int \while,int \array,int \fetchArrayDim,int \fetchClassConst,int \assign,int \assignWithOperationBitwiseAnd,int \assignWithOperationBitwiseOr,int \assignWithOperationBitwiseXor,int \assignWithOperationConcat,int \assignWithOperationDiv,int \assignWithOperationMinus,int \assignWithOperationMod,int \assignWithOperationMul,int \assignWithOperationPlus,int \assignWithOperationRightShift,int \assignWithOperationLeftShift,int \listAssign,int \refAssign,int \binaryOperationBitwiseAnd,int \binaryOperationBitwiseOr,int \binaryOperationBitwiseXor,int \binaryOperationConcat,int \binaryOperationDiv,int \binaryOperationMinus,int \binaryOperationMod,int \binaryOperationMul,int \binaryOperationPlus,int \binaryOperationRightShift,int \binaryOperationLeftShift,int \binaryOperationBooleanAnd,int \binaryOperationBooleanOr,int \binaryOperationGt,int \binaryOperationGeq,int \binaryOperationLogicalAnd,int \binaryOperationLogicalOr,int \binaryOperationLogicalXor,int \binaryOperationNotEqual,int \binaryOperationNotIdentical,int \binaryOperationLt,int \binaryOperationLeq,int \binaryOperationEqual,int \binaryOperationIdentical,int \unaryOperationBooleanNot,int \unaryOperationBitwiseNot,int \unaryOperationPostDec,int \unaryOperationPreDec,int \unaryOperationPostInc,int \unaryOperationPreInc,int \unaryOperationUnaryPlus,int \unaryOperationUnaryMinus,int \new,int \castToInt,int \castToBool,int \castToFloat,int \castToString,int \castToArray,int \castToObject,int \castToUnset,int \clone,int \closure,int \fetchConst,int \empty,int \suppress,int \eval,int \exit,int \call,int \methodCall,int \staticCall,int \include,int \instanceOf,int \isSet,int \print,int \propertyFetch,int \shellExec,int \ternary,int \fetchStaticProperty,int \scalar,int \var,int \list,int \propertyDef,int \classConstDef,int \methodDef,int \traitUse] counts];
 
-private loc featsMapLoc = baseLoc + "serialized/features/featsmap.bin";
+private loc featsMapLoc = baseLoc() + "serialized/features/featsmap.bin";
 
 public void saveFeatsMap(FMap m) {
-	if (!exists(baseLoc + "serialized/features")) mkDirectory(baseLoc + "serialized/features");
+	if (!exists(baseLoc() + "serialized/features")) mkDirectory(baseLoc() + "serialized/features");
     writeBinaryValueFile(featsMapLoc, m);
 }
 
@@ -1566,10 +1566,10 @@ public CoverageMap featuresForAllPercents(FMap fmap, FeatureLattice lattice) {
 //	return featuresForPercents2(fmap, lattice, [1..101]);
 //}
 
-private loc coverageMapLoc = baseLoc + "serialized/features/coverageMap.bin";
+private loc coverageMapLoc = baseLoc() + "serialized/features/coverageMap.bin";
 
 public void saveCoverageMap(CoverageMap coverageMap) {
-	if (!exists(baseLoc + "serialized/features")) mkDirectory(baseLoc + "serialized/features");
+	if (!exists(baseLoc() + "serialized/features")) mkDirectory(baseLoc() + "serialized/features");
 	writeBinaryValueFile(coverageMapLoc, coverageMap);
 }
 
@@ -1579,10 +1579,10 @@ public CoverageMap loadCoverageMap() {
 
 public bool coverageMapExists() = exists(coverageMapLoc);
 
-private loc featureLatticeLoc = baseLoc + "serialized/features/featureLattice.bin";
+private loc featureLatticeLoc = baseLoc() + "serialized/features/featureLattice.bin";
 
 public void saveFeatureLattice(FeatureLattice fl) {
-	if (!exists(baseLoc + "serialized/features")) mkDirectory(baseLoc + "serialized/features");
+	if (!exists(baseLoc() + "serialized/features")) mkDirectory(baseLoc() + "serialized/features");
 	writeBinaryValueFile(featureLatticeLoc, fl);
 }
 
@@ -1708,7 +1708,7 @@ public map[str,set[loc]] calculateMMTransIncludes(Corpus corpus, MMResult mmr, m
 
 // TODO: Change to use new inclues analysis
 public System loadBinaryWithIncludes(str product, str version) {
-	parsedItem = parsedDir + "<product>-<version>-icp.pt";
+	parsedItem = parsedDir() + "<product>-<version>-icp.pt";
 	println("Loading binary: <parsedItem>");
 	return readBinaryValueFile(#System,parsedItem);
 }

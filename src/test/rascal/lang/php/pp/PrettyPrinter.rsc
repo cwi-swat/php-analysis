@@ -24,8 +24,8 @@ import IO;
 import List;
 import String;
 
-private loc srcFolder = parserLoc + "PHP-Parser/test/code/parser";
-private loc outputFolder = analysisLoc + "src/tests/resources/pp";
+private loc srcFolder = parserLoc() + "PHP-Parser/test/code/parser";
+private loc outputFolder = analysisLoc() + "src/tests/resources/pp";
 private str ppFileExtension = "phppp";
 // these files fail to parse, ignore them
 private list[str] ignoreFiles = [ "constant_expr.test", "assign.test", "int.test", "generator.test" ];

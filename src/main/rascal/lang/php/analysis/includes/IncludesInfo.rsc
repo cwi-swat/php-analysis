@@ -28,7 +28,7 @@ import IO;
 import ValueIO;
 import Map;
 
-private loc infoLoc = baseLoc + "serialized/includeInfo";
+private loc infoLoc = baseLoc() + "serialized/includeInfo";
 
 
 public void buildIncludesInfo(str p, str v, loc baseloc, bool forceBuild=false) {

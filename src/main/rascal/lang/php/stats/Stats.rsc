@@ -468,23 +468,23 @@ public void buildStats() {
 
 public void writeFeatureCounts(str product, str version, map[str,int] fc) {
 	println("Writing counts for <product>-<version>");
-	loc fcLoc = statsDir + "<product>-<version>.fc";
+	loc fcLoc = statsDir() + "<product>-<version>.fc";
 	writeBinaryValueFile(fcLoc, fc);
 }
 
 public void writeStats(str product, str version, map[str,int] fc, map[str,int] sc, map[str,int] ec) {
-	loc fcLoc = statsDir + "<product>-<version>.fc";
-	loc scLoc = statsDir +  "<product>-<version>.sc";
-	loc ecLoc = statsDir +  "<product>-<version>.ec";
+	loc fcLoc = statsDir() + "<product>-<version>.fc";
+	loc scLoc = statsDir() +  "<product>-<version>.sc";
+	loc ecLoc = statsDir() +  "<product>-<version>.ec";
 	writeBinaryValueFile(fcLoc, fc);
 	writeBinaryValueFile(scLoc, sc);
 	writeBinaryValueFile(ecLoc, ec);
 }
 
 public tuple[map[str,int] fc, map[str,int] sc, map[str,int] ec] getStats(str product, str version) {
-	loc fcLoc = statsDir + "<product>-<version>.fc";
-	loc scLoc = statsDir +  "<product>-<version>.sc";
-	loc ecLoc = statsDir +  "<product>-<version>.ec";
+	loc fcLoc = statsDir() + "<product>-<version>.fc";
+	loc scLoc = statsDir() +  "<product>-<version>.sc";
+	loc ecLoc = statsDir() +  "<product>-<version>.ec";
 	return < readBinaryValueFile(#map[str,int],fcLoc), readBinaryValueFile(#map[str,int],scLoc), readBinaryValueFile(#map[str,int],ecLoc) >;
 }
 

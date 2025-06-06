@@ -30,28 +30,28 @@ public data RuntimeException
 	| productNotFound(str product)
 	;
 	 
-private loc extraCorpusRoot = baseLoc + "corpus-extra";
-private loc pluginRoot = corpusRoot + "WordPressPlugins";
+private loc extraCorpusRoot = baseLoc() + "corpus-extra";
+private loc pluginRoot = corpusRoot() + "WordPressPlugins";
 
 private set[str] products() {
-	if (useBinaries)
-		return { pn | l <- parsedDir.ls, "pt" == l.extension, /<pn:[^\-]+>-.*/ := l.file };
+	if (useBinaries())
+		return { pn | l <- parsedDir().ls, "pt" == l.extension, /<pn:[^\-]+>-.*/ := l.file };
 	else
-		return { l.file | l <- corpusRoot.ls, isDirectory(l) };
+		return { l.file | l <- corpusRoot().ls, isDirectory(l) };
 }
 					   
 private rel[str,str] versions() {
-	if (useBinaries)
-		return { < pn, vn > | l <- parsedDir.ls, "pt" == l.extension, /<pn:[^\-]+>-<vn:.+>[.]pt/ := l.file };
+	if (useBinaries())
+		return { < pn, vn > | l <- parsedDir().ls, "pt" == l.extension, /<pn:[^\-]+>-<vn:.+>[.]pt/ := l.file };
 	else
-		return { < p, v> | p <- products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-_][-_]<v:.+>/ := l.file };
+		return { < p, v> | p <- products(), l <- (corpusRoot()+p).ls, isDirectory(l), /[^\-_][-_]<v:.+>/ := l.file };
 }
 
 private set[str] versions(str p) {
-	if (useBinaries)
-		return { vn | l <- parsedDir.ls, "pt" == l.extension, /<pn:[^\-]+>-<vn:.+>[.]pt/ := l.file, p == pn };
+	if (useBinaries())
+		return { vn | l <- parsedDir().ls, "pt" == l.extension, /<pn:[^\-]+>-<vn:.+>[.]pt/ := l.file, p == pn };
 	else
-		return { v | p in products(), l <- (corpusRoot+p).ls, isDirectory(l), /[^\-_][-_]<v:.+>/ := l.file };
+		return { v | p in products(), l <- (corpusRoot()+p).ls, isDirectory(l), /[^\-_][-_]<v:.+>/ := l.file };
 }
 
 //private rel[str,str] plugins = { < "Akismet", "2.5.5" >, < "All-In-One-SEO-Pack","1.6.14.2" >,
@@ -70,13 +70,13 @@ private set[str] versions(str p) {
 public bool corpusItemExists(str product, str version) {
 	if (product in products()) {
 		if (version in versions(product)) {
-			loc productRoot = corpusRoot + product + "<toLowerCase(product)>-<version>";
+			loc productRoot = corpusRoot() + product + "<toLowerCase(product)>-<version>";
 			if (exists(productRoot)) return true;
-			productRoot = corpusRoot + product + "<toLowerCase(product)>_<version>";
+			productRoot = corpusRoot() + product + "<toLowerCase(product)>_<version>";
 			if (exists(productRoot)) return true;
-			productRoot = corpusRoot + product + "<product>-<version>";
+			productRoot = corpusRoot() + product + "<product>-<version>";
 			if (exists(productRoot)) return true;
-			productRoot = corpusRoot + product + "<product>_<version>";
+			productRoot = corpusRoot() + product + "<product>_<version>";
 			if (exists(productRoot)) return true;
 			return false;
 		}
@@ -88,13 +88,13 @@ public bool corpusItemExists(str product, str version) {
 public loc getCorpusItem(str product, str version) {
 	if (product in products()) {
 		if (version in versions(product)) {
-			loc productRoot = corpusRoot + product + "<toLowerCase(product)>-<version>";
+			loc productRoot = corpusRoot() + product + "<toLowerCase(product)>-<version>";
 			if (exists(productRoot)) return productRoot;
-			productRoot = corpusRoot + product + "<toLowerCase(product)>_<version>";
+			productRoot = corpusRoot() + product + "<toLowerCase(product)>_<version>";
 			if (exists(productRoot)) return productRoot;
-			productRoot = corpusRoot + product + "<product>-<version>";
+			productRoot = corpusRoot() + product + "<product>-<version>";
 			if (exists(productRoot)) return productRoot;
-			productRoot = corpusRoot + product + "<product>_<version>";
+			productRoot = corpusRoot() + product + "<product>_<version>";
 			if (exists(productRoot)) return productRoot;
 			throw productNotFound(product, version, productRoot);
 		}
@@ -187,7 +187,7 @@ public str bundleCorpusItems(map[str,str] corpus, str corpusName) {
 	list[str] corpusPaths = [ ];
 	for (p <- corpus, v := corpus[p]) {
 		itemPath = getCorpusItem(p,v);
-		sysAndVersion = itemPath.path[size(corpusRoot.path)+1..];
+		sysAndVersion = itemPath.path[size(corpusRoot().path)+1..];
 		corpusPaths = corpusPaths + sysAndVersion;
 	}
 	return "zip -r <corpusName>.zip " + intercalate(" ", corpusPaths);

@@ -39,7 +39,7 @@ import lang::php::pp::PrettyPrinter;
 
 
 public str executePHP(list[str] opts, loc cwd) {
-	str phpBinLoc = usePhpParserJar ? "php" : phpLoc.path;
+	str phpBinLoc = usePhpParserJar() ? "php" : phpLoc().path;
 	// logMessage(phpBinLoc,2);
 	// logMessage("<opts>", 2);
 	// logMessage("<cwd>", 2);
@@ -59,14 +59,14 @@ public str executePHP(list[str] opts, loc cwd) {
 
 private Script parsePHPfile(loc f, list[str] opts, Script error) {
 	//loc parserLoc = usePhpParserJar ? getPhpParserLocFromJar() : lang::php::config::Config::parserLoc;
-	loc parserLoc = lang::php::config::Config::parserLoc;
+	loc parserLoc = lang::php::config::Config::parserLoc();
 	str phpOut = "";
 	try {
 		str filePath = f.path;
 		if (f.authority != "") {
 			filePath = f.authority + "/" + filePath;
 		}
-		phpOut = executePHP(["-d memory_limit=<parserMemLimit>", "-d short_open_tag=On", "-d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_STRICT\"", (parserLoc + astToRascal).path, "-f<filePath>"] + opts, parserWorkingDir);
+		phpOut = executePHP(["-d memory_limit=<parserMemLimit()>", "-d short_open_tag=On", "-d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_STRICT\"", (parserLoc + astToRascal()).path, "-f<filePath>"] + opts, parserWorkingDir());
 	} catch _: {
 		return error; 
 	}
@@ -96,7 +96,7 @@ public bool testPHPInstallation() {
 
 @doc{Parse an individual PHP statement using the external parser, returning the associated AST.}
 public Stmt parsePHPStatement(str s) {
-	tempFile = parserLoc + "tmp/parseStmt.php";
+	tempFile = parserLoc() + "tmp/parseStmt.php";
 	if (!exists(tempFile.parent)) {
 		mkDirectory(tempFile.parent);
 	}
@@ -114,13 +114,8 @@ public Expr parsePHPExpression(str s) {
 	throw "Could not parse expression <s>";
 }
 
-@doc{Load a single PHP file with location annotations.}
-public Script loadPHPFile(loc l) throws AssertionFailed {
-	return loadPHPFile(l, true, false);
-}
-
 @doc{Load a single PHP file, with options for location annotations and unique node ids.}
-public Script loadPHPFile(loc l, bool addLocationAnnotations, bool addUniqueIds) throws AssertionFailed {
+public Script loadPHPFile(loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, bool includeLocationInfo = false, bool includePhpDocs = false) throws AssertionFailed {
 	if (!exists(l)) return errscript("Location <l> does not exist");
 	if (l.scheme notin {"file","home","project"}) return errscript("Only file, home, and project locations are supported");
 	if (!isFile(l)) return errscript("Location <l> must be a file");
@@ -165,7 +160,7 @@ public System loadPHPFiles(loc l, bool addLocationAnnotations = true, bool addUn
 		logMessage("<((folderCounter * 100) / folderTotal)>% [<folderCounter>/<folderTotal>] Parsing <size(phpEntries)> files in directory: <l>", 2);
 		for (e <- phpEntries) {
 			try {
-				Script scr = loadPHPFile(e, addLocationAnnotations, addUniqueIds);
+				Script scr = loadPHPFile(e, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds);
 				phpNodes.files[e] = scr;
 			} catch IO(msg) : {
 				println("<msg>");
@@ -193,14 +188,14 @@ public System loadProduct(str product, str version, bool addLocationAnnotations 
 
 @doc{Build the serialized ASTs for a specific system at a specific location}
 public void buildBinaries(str product, str version, loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
-	loc binLoc = parsedDir + "<product>-<version>.pt";
+	loc binLoc = parsedDir() + "<product>-<version>.pt";
 	if (overwrite || (!overwrite && !exists(binLoc))) {
 		logMessage("Parsing <product>-<version>. \>\> Location: <l>.", 1);
 		System files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 		files = namedVersionedSystem(product, version, l, files.files);
 		logMessage("Now writing file: <binLoc>...", 2);
-		if (!exists(parsedDir)) {
-			mkDirectory(parsedDir);
+		if (!exists(parsedDir())) {
+			mkDirectory(parsedDir());
 		}
 		writeBinaryValueFile(binLoc, files, compression=false);
 		logMessage("... done.", 2);
@@ -211,14 +206,14 @@ public void buildBinaries(str product, str version, loc l, bool addLocationAnnot
 
 @doc{Build the serialized ASTs for a specific system at a specific location}
 public void buildAndCheckBinaries(str product, str version, loc l, bool addLocationAnnotations = true, bool addUniqueIds = false, set[str] extensions = { "php", "inc" }, bool overwrite = true) {
-	loc binLoc = parsedDir + "<product>-<version>.pt";
+	loc binLoc = parsedDir() + "<product>-<version>.pt";
 	if (overwrite || (!overwrite && !exists(binLoc))) {
 		logMessage("Parsing <product>-<version>. \>\> Location: <l>.", 1);
 		System files = loadPHPFiles(l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds, extensions=extensions);
 		files = namedVersionedSystem(product, version, l, files.files);
 		logMessage("Now writing file: <binLoc>...", 2);
-		if (!exists(parsedDir)) {
-			mkDirectory(parsedDir);
+		if (!exists(parsedDir())) {
+			mkDirectory(parsedDir());
 		}
 		writeBinaryValueFile(binLoc, files, compression=false);
 		logMessage("... done.", 2);
@@ -271,7 +266,7 @@ public void buildCurrent(loc systemLoc, bool addLocationAnnotations = true, bool
 @doc{Build the serialized ASTs for a specific system if they have not been built already}
 public void buildMissingBinaries(str product, str version, bool addLocationAnnotations = true, bool addUniqueIds = false) {
 	loc l = getCorpusItem(product,version);
-	loc binLoc = parsedDir + "<product>-<version>.pt";
+	loc binLoc = parsedDir() + "<product>-<version>.pt";
 	if (!exists(binLoc)) {
 		buildBinaries(product, version, l, addLocationAnnotations=addLocationAnnotations, addUniqueIds=addUniqueIds);
 	}
@@ -301,12 +296,12 @@ public System loadBinary(str product, str version) = loadBinary("<product>-<vers
 
 @doc{Load the serialized ASTs for the named system in the corpus.}
 public System loadBinary(str name) {
-	parsedItem = parsedDir + "<name>.pt";
+	parsedItem = parsedDir() + "<name>.pt";
 	logMessage("Loading binary: <parsedItem>", 1);
 	return readBinaryValueFile(#System,parsedItem);
 }
 
-public bool binaryExists(str product, str version) = exists(parsedDir + "<product>-<version>.pt");
+public bool binaryExists(str product, str version) = exists(parsedDir() + "<product>-<version>.pt");
 
 public map[tuple[str product, str version], System] getLatestTrees() {
 	lv = getLatestVersions();
@@ -337,7 +332,7 @@ public int countFolders(loc d) = (1 | it + countFolders(d+f) | str f <- listEntr
 	Log level 2 => debug logging;
 }
 public void logMessage(str message, int level) {
-	if (level <= logLevel) {
+	if (level <= logLevel()) {
 		//str date = printDate(now(), "Y-MM-dd HH:mm:ss");
 		//println("<date> :: <message>");
 		println("<now()> :: <message>");
@@ -351,11 +346,11 @@ public void checkConfiguration() {
 	println("");
 	println("parserLoc should be set to the directory containing the PHP-Parser project");
 	
-	if (!exists(parserLoc)) {
-		println("Path <parserLoc> does not exist");
+	if (!exists(parserLoc())) {
+		println("Path <parserLoc()> does not exist");
 		checkParse = false;
-	} else if (exists(parserLoc) && !isDirectory(parserLoc)) {
-		println("Path <parserLoc> exists, but is not a directory");
+	} else if (exists(parserLoc()) && !isDirectory(parserLoc())) {
+		println("Path <parserLoc()> exists, but is not a directory");
 		checkParse = false;
 	} else {
 		println("parserLoc appears to be fine");
@@ -363,11 +358,11 @@ public void checkConfiguration() {
 	
 	println("astToRascal should be the location of file AST2Rascal inside PHP-Parser");
 	
-	if (!exists(parserLoc + astToRascal)) {
-		println("Path <parserLoc+astToRascal> is not valid, file not found");
+	if (!exists(parserLoc() + astToRascal())) {
+		println("Path <parserLoc()+astToRascal()> is not valid, file not found");
 		checkParse = false;
-	} else if (exists(parserLoc + astToRascal) && !(isFile(parserLoc + astToRascal))) {
-		println("Path <parserLoc+astToRascal> is not a file");
+	} else if (exists(parserLoc() + astToRascal()) && !(isFile(parserLoc() + astToRascal()))) {
+		println("Path <parserLoc()+astToRascal()> is not a file");
 		checkParse = false;
 	} else {
 		println("astToRascal appears to be fine");
@@ -375,11 +370,11 @@ public void checkConfiguration() {
 	
 	println("phpLoc should contain the location of the php executable");
 
-	if (!exists(phpLoc)) {
-		println("Path <phpLoc> does not exist");
+	if (!exists(phpLoc())) {
+		println("Path <phpLoc()> does not exist");
 		checkParse = false;
-	} else if (exists(phpLoc) && !isFile(phpLoc)) {
-		println("Path <phpLoc> exists, but is not a file");
+	} else if (exists(phpLoc()) && !isFile(phpLoc())) {
+		println("Path <phpLoc()> exists, but is not a file");
 		checkParse = false;
 	} else {
 		println("phpLoc appears to be fine");
@@ -400,7 +395,7 @@ public void checkConfiguration() {
 }
 
 public void convertCorpusItemToNamedSystem(str product, str version) {
-	parsedItem = parsedDir + "<product>-<version>.pt";
+	parsedItem = parsedDir() + "<product>-<version>.pt";
 	logMessage("Converting binary: <parsedItem>", 1);
 	if (exists(parsedItem)) {
 		try {
@@ -444,7 +439,7 @@ public void reparseLocations(str systemName, str systemVersion, set[loc] locs) {
 		pt.files[l] = reparsedScript;
 	}
 
-	loc binLoc = parsedDir + "<systemName>-<systemVersion>.pt";
+	loc binLoc = parsedDir() + "<systemName>-<systemVersion>.pt";
 	logMessage("Writing binary for <systemName>, version <systemVersion>",2);
 	writeBinaryValueFile(binLoc, pt, compression=false);
 }
@@ -456,7 +451,7 @@ public void removeNonFileLocs(str systemName, str systemVersion) {
 		logMessage("Found <size(nonFileLocs)> non-file locations, removing from system", 2);
 		pt.files = domainX(pt.files, nonFileLocs);
 
-		loc binLoc = parsedDir + "<systemName>-<systemVersion>.pt";
+		loc binLoc = parsedDir() + "<systemName>-<systemVersion>.pt";
 		logMessage("Writing binary for <systemName>, version <systemVersion>",2);
 		writeBinaryValueFile(binLoc, pt, compression=false);
 	}
@@ -499,7 +494,7 @@ public void patchBinaries(str systemName, str systemVersion) {
 	}
 
 	if (size(fixedLocs) > 0) {
-		loc binLoc = parsedDir + "<systemName>-<systemVersion>.pt";
+		loc binLoc = parsedDir() + "<systemName>-<systemVersion>.pt";
 		writeBinaryValueFile(binLoc, pt, compression=false);		
 	}
 }

@@ -88,26 +88,26 @@ public map[loc, Composer] loadComposerFilesForCorpus() {
 public map[loc, ClocResult] slocForCorpus() {
     map[loc, ClocResult] result = ( );
     for (l <- composerCorpus) {
-        cres = phpLinesOfCode(l, clocLoc);
+        cres = phpLinesOfCode(l, clocLoc());
         result[l] = cres;
     }
     return result;
 }
     
 public void saveSlocInfo(map[loc, ClocResult] results) {
-    writeBinaryValueFile(baseLoc + "extract/clocinfo/composer-cloc.bin", results);
+    writeBinaryValueFile(baseLoc() + "extract/clocinfo/composer-cloc.bin", results);
 }
 
 public map[loc, ClocResult] loadSlocInfo() {
-    return readBinaryValueFile(#map[loc, ClocResult], baseLoc + "extract/clocinfo/composer-cloc.bin");
+    return readBinaryValueFile(#map[loc, ClocResult], baseLoc() + "extract/clocinfo/composer-cloc.bin");
 }
 
 public void saveComposerInfo(map[loc, Composer] results) {
-    writeBinaryValueFile(baseLoc + "extract/composer/composer-info.bin", results);
+    writeBinaryValueFile(baseLoc() + "extract/composer/composer-info.bin", results);
 }
 
 public map[loc, Composer] loadComposerInfo() {
-    return readBinaryValueFile(#map[loc, Composer], baseLoc + "extract/composer/composer-info.bin");
+    return readBinaryValueFile(#map[loc, Composer], baseLoc() + "extract/composer/composer-info.bin");
 }
 
 @doc{

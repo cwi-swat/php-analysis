@@ -16,7 +16,7 @@ module lang::php::analysis::signatures::Summaries
 import ValueIO;
 import lang::php::config::Config;
 
-private loc summariesDir = baseLoc + "serialized/summaries";
+private loc summariesDir = baseLoc() + "serialized/summaries";
 
 data SummaryParam
 	= standardParam(str paramType, str paramName)

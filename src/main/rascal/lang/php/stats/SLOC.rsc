@@ -23,10 +23,10 @@ import Set;
 public map[str lang, tuple[int lineCount, int fileCount] counts] loadCounts(str product, str version) {
 	map[str lang, tuple[int lineCount, int fileCount] counts] res = ( );
 	
-	countItem = countsDir + "<toLowerCase(product)>-<version>";
+	countItem = countsDir() + "<toLowerCase(product)>-<version>";
 	
 	if (!exists(countItem))
-		countItem = countsDir + "<toLowerCase(product)>_<version>";
+		countItem = countsDir() + "<toLowerCase(product)>_<version>";
 	
 	if (!exists(countItem))
 		throw "Could not find counts file for <toLowerCase(product)>-<version>";
