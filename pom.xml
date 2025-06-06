@@ -69,10 +69,6 @@
       <resource><!-- we have to copy the rascal sources in the jar for the evaluator to find it-->
         <directory>src/main/rascal</directory>
         <filtering>false</filtering>
-        <excludes>
-          <exclude>lang/php/config/Config.rsc</exclude>
-          <exclude>lang/php/config/Config.rsc-dist</exclude>
-        </excludes>
       </resource>
     </resources>  
     <plugins>
