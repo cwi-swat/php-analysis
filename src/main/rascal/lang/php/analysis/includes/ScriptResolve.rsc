@@ -206,7 +206,7 @@ public tuple[rel[loc,loc] resolved, lrel[str,datetime] timings] scriptResolve(Sy
 		resolvedExpr = bottom-up visit(resolveExpr) {
 			case fetchConst(name(cn)) => solvedConstants[normalConst(cn)] when normalConst(cn) in solvedConstants
 			
-			case fetchClassConst(name(name(cln)),str cn) => solvedConstants[classConst(cln,cn)] when classConst(cln,cn) in solvedConstants
+			case fetchClassConst(name(name(cln)),name(name(cn))) => solvedConstants[classConst(cln,cn)] when classConst(cln,cn) in solvedConstants
 		}
 		
 		// Finally, perform our standard simplifications on the expression, performing
