@@ -1,0 +1,58 @@
+# Main PHP Analysis configuration settings.
+php-air:
+  # The location of the PHP executable in Rascal location format.
+  phpLoc: "file:///opt/homebrew/bin/php"
+  # The debugging level for log statements.
+  # 0 means disable logging
+  # 1 means typical logging statements
+  # 2 means debug-level logging
+  logLevel: 2
+  # The location of the cloc tool, used for source lines of code,
+  # in Rascal location format.
+  clocLoc: "file:///opt/homebrew/bin/cloc"
+
+# Settings related to parsing PHP code.
+parsing:
+  # Indicates whether to use the parser contained in a distributed jar 
+  # file or from the directory given as parserLoc. By default, this should
+  # be false unless you have such a file (e.g., a Java-based parsing library
+  # for PHP).
+  usePhpParserJar: false
+  # The base install location for the PHP-Parser project, in Rascal location format.
+  parserLoc: "file:///Users/hillsma/Projects/php-analysis/PHP-Parser"
+  # The memory limit for PHP when the parser is run. This may need to
+  # be increased if the parser runs out of memory, e.g., because of an
+  # especially large or deeply-nested script.
+  parserMemLimit: "1024M"
+  # The name of the AST to Rascal conversion script. This should not be
+  # modified unless you have created your own version of this.
+  astToRascal: "AST2Rascal.php"
+  # The working directory for when the parser runs, in Rascal location format.
+  parserWorkingDir: "file:///Users/hillsma/Projects/php-analysis/PHP-Parser"
+
+# Analysis-related settings.
+analysis:
+  # The base location for the corpus and any serialized files, in Rascal
+  # location format. You would normally put code to analyze under this folder,
+  # but this isn't required. Any serialized data will be stored under this folder.
+  baseLoc: "home:///PHPAnalysis"
+  # The base install location for the php-analysis project. This is only
+  # needed if you are working directly on the project, versus using it as
+  # a dependency, since this is needed to run tests. This is given in
+  # Rascal location format.
+  analysisLoc: "file:///Users/hillsma/Projects/php-analysis/php-analysis/"
+  # Where to put the binary representations of parsed systems, in Rascal 
+  # location format.
+  parsedDir: "home:///PHPAnalysis/serialized/parsed"
+  # Where to put the binary representations of extracted statistics, in
+  # Rascal location format.
+  statsDir: "home:///PHPAnalysis/serialized/stats"
+  # Where to put extracted counts (e.g., SLOC), in Rascal location format.
+  countsDir: "home:///PHPAnalysis/serialized/counts"
+  # Where the PHP sources for the corpus reside. This is for systems given
+  # with each system version in a separate directory. This is in Rascal
+  # location format.
+  corpusRoot: "home:///PHPAnalysis/systems"
+  # This should only ever be true if we don't have source, i.e., we only have the
+  # extracted binaries for parsed systems. This should normally be false.
+  useBinaries: false

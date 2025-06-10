@@ -16,6 +16,8 @@ import lang::php::util::Option;
 
 import IO;
 import Exception;
+import String;
+import util::SystemAPI;
 import lang::yaml::Model;
 
 public data Exception
@@ -51,40 +53,114 @@ public Config getConfig() {
 	return c;
 }
 
-private Config loadConfig() {
-	bool usePhpParserJar = false;
-	loc phpLoc = |file:///opt/homebrew/bin/php|;
-	loc parserLoc = |file:///Users/hillsma/Projects/php-analysis/PHP-Parser|;
-	loc analysisLoc = |file:///Users/hillsma/Projects/php-analysis/php-analysis/|;
-	str parserMemLimit = "1024M";
-	str astToRascal = "AST2Rascal.php";
-	loc parserWorkingDir = (parserLoc + astToRascal).parent;
-	loc baseLoc = |home:///PHPAnalysis|;
-	loc parsedDir = baseLoc + "serialized/parsed";
-	loc statsDir = baseLoc + "serialized/stats";
-	loc corpusRoot = baseLoc + "systems";
-	loc countsDir = baseLoc + "serialized/counts";
-	bool useBinaries = false;
-	int logLevel = 2;
-	loc clocLoc = |file:///opt/homebrew/bin/cloc|;
+public Option[str] findStringValueInMappingByKey(Node yml, str key) {
+	for ( /Node m:mapping(_) := yml, Node k <- m.\map, scalar(key) := k) {
+		if (scalar(str s) := m.\map[k]) {
+			return some(s);
+		}
+	}
+	return none();
+}
 
+public Option[loc] findLocValueInMappingByKey(Node yml, str key) {
+	for ( /Node m:mapping(_) := yml, Node k <- m.\map, scalar(key) := k) {
+		if (scalar(str s) := m.\map[k]) {
+			int sepPosition = findFirst(s, "://");
+			return some(|<s[..sepPosition]>://<s[sepPosition+3..]>|);
+		}
+	}
+	return none();
+}
+
+public Option[int] findIntValueInMappingByKey(Node yml, str key) {
+	for ( /Node m:mapping(_) := yml, Node k <- m.\map, scalar(key) := k) {
+		if (scalar(int n) := m.\map[k]) {
+			return some(n);
+		}
+	}
+	return none();
+}
+
+public Option[bool] findBoolValueInMappingByKey(Node yml, str key) {
+	for ( /Node m:mapping(_) := yml, Node k <- m.\map, scalar(key) := k) {
+		if (scalar(bool b) := m.\map[k]) {
+			return some(b);
+		}
+	}
+	return none();
+}
+
+private Config loadConfig() {
 	Config c = config(
-		some(usePhpParserJar),
-		some(phpLoc),
-		some(parserLoc),
-		some(analysisLoc),
-		some(parserMemLimit),
-		some(astToRascal),
-		some(parserWorkingDir),
-		some(baseLoc), 
-		some(parsedDir), 
-		some(statsDir), 
-		some(corpusRoot), 
-		some(countsDir), 
-		some(useBinaries),
-		some(logLevel), 
-		some(clocLoc)
+		none(),
+		none(),
+		none(),
+		none(),
+		none(),
+		none(),
+		none(),
+		none(), 
+		none(), 
+		none(), 
+		none(), 
+		none(), 
+		none(),
+		none(), 
+		none()
 	);
+
+	senv = getSystemEnvironment();
+	if ("PHP_AIR_CONFIG" notin senv) {
+		throw configMissing("", "PHP_AIR_CONFIG environment variable is not set");
+	} else {
+		configPath = senv["PHP_AIR_CONFIG"];
+		configFile = |file://<configPath>|;
+		if (!exists(configFile)) {
+			throw configMissing("", "The file <configPath> does not exist");
+		} else if (!isFile(configFile)) {
+			throw configMissing("", "<configPath> is not a file");
+		} else {
+			try {
+				yml = loadYAML(readFile(configFile));
+
+				Option[loc] phpLoc = findLocValueInMappingByKey(yml, "phpLoc");
+				Option[int] logLevel = findIntValueInMappingByKey(yml, "logLevel");
+				Option[loc] clocLoc = findLocValueInMappingByKey(yml, "clocLoc");
+
+				Option[bool] usePhpParserJar = findBoolValueInMappingByKey(yml, "usePhpParserJar");
+				Option[loc] parserLoc = findLocValueInMappingByKey(yml, "parserLoc");
+				Option[str] parserMemLimit = findStringValueInMappingByKey(yml, "parserMemLimit");
+				Option[str] astToRascal = findStringValueInMappingByKey(yml, "astToRascal");
+				Option[loc] parserWorkingDir = findLocValueInMappingByKey(yml, "parserWorkingDir");
+
+				Option[loc] analysisLoc = findLocValueInMappingByKey(yml, "analysisLoc");
+				Option[loc] baseLoc = findLocValueInMappingByKey(yml, "baseLoc");
+				Option[loc] parsedDir = findLocValueInMappingByKey(yml, "parsedDir");
+				Option[loc] statsDir = findLocValueInMappingByKey(yml, "statsDir");
+				Option[loc] corpusRoot = findLocValueInMappingByKey(yml, "corpusRoot");
+				Option[loc] countsDir = findLocValueInMappingByKey(yml, "countsDir");
+				Option[bool] useBinaries = findBoolValueInMappingByKey(yml, "useBinaries");
+
+				c = config(usePhpParserJar,
+					phpLoc,
+					parserLoc,
+					analysisLoc,
+					parserMemLimit,
+					astToRascal,
+					parserWorkingDir,
+					baseLoc, 
+					parsedDir, 
+					statsDir, 
+					corpusRoot, 
+					countsDir, 
+					useBinaries,
+					logLevel, 
+					clocLoc);
+			} catch Exception e: {
+				throw configMissing("", "The config file did not load correctly: <e>");
+			}
+		}
+	}
 
 	return c;
 }

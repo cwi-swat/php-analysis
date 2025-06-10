@@ -66,8 +66,9 @@ private Script parsePHPfile(loc f, list[str] opts, Script error) {
 		if (f.authority != "") {
 			filePath = f.authority + "/" + filePath;
 		}
+
 		phpOut = executePHP(["-d memory_limit=<parserMemLimit()>", "-d short_open_tag=On", "-d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_STRICT\"", (parserLoc + astToRascal()).path, "-f<filePath>"] + opts, parserWorkingDir());
-	} catch _: {
+	} catch Exception e: {
 		return error; 
 	}
 
@@ -332,7 +333,7 @@ public int countFolders(loc d) = (1 | it + countFolders(d+f) | str f <- listEntr
 	Log level 2 => debug logging;
 }
 public void logMessage(str message, int level) {
-	if (level <= logLevel()) {
+	if (level <= (logLevel())) {
 		//str date = printDate(now(), "Y-MM-dd HH:mm:ss");
 		//println("<date> :: <message>");
 		println("<now()> :: <message>");
