@@ -166,7 +166,7 @@
           </execution>
           <execution>
               <id>rascal-package</id>
-              <phase>pre-package</phase>
+              <phase>prepare-package</phase>
               <goals>
                   <goal>package</goal>
               </goals>
