@@ -48,12 +48,12 @@
     <dependency>
       <groupId>org.rascalmpl</groupId>
       <artifactId>rascal</artifactId>
-      <version>0.41.0</version>
+      <version>0.41.2</version>
     </dependency>
     <dependency>
       <groupId>edu.appstate.cs</groupId>
       <artifactId>rascal-git</artifactId>
-      <version>0.1.16</version>
+      <version>0.1.17</version>
     </dependency>
   </dependencies>
 
