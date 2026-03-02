@@ -48,12 +48,12 @@
     <dependency>
       <groupId>org.rascalmpl</groupId>
       <artifactId>rascal</artifactId>
-      <version>0.41.2</version>
+      <version>0.42.0</version>
     </dependency>
     <dependency>
       <groupId>edu.appstate.cs</groupId>
       <artifactId>rascal-git</artifactId>
-      <version>0.1.17</version>
+      <version>0.1.18</version>
     </dependency>
   </dependencies>
 
@@ -127,7 +127,7 @@
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.3</version>
+        <version>3.3.1</version>
         <configuration>
             <tagNameFormat>v@{project.version}</tagNameFormat>
             <arguments>-Drascal.compile.skip -DskipTests -Drascal.tutor.skip</arguments>
@@ -146,7 +146,7 @@
     <plugin>
         <groupId>org.rascalmpl</groupId>
         <artifactId>rascal-maven-plugin</artifactId>
-        <version>0.30.0</version>
+        <version>0.31.0</version>
         <configuration>
           <bin>${project.build.outputDirectory}</bin>
           <srcs>
