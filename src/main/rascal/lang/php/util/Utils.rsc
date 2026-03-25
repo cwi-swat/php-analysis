@@ -147,7 +147,7 @@ public System loadPHPFiles(loc l, bool addLocationAnnotations = true, bool addUn
 	if ((l.scheme == "file" || l.scheme == "home") && !exists(l)) throw AssertionFailed("Location <l> does not exist");
 	if (!isDirectory(l)) throw AssertionFailed("Location <l> must be a directory");
 
-	// regex filter exlucdes test/	
+	// regex filter excludes test/	
 	list[loc] entries = [ l + e | e <- listEntries(l)];
 	list[loc] dirEntries = [ e | e <- entries, isDirectory(e)];
 	list[loc] phpEntries = [ e | e <- entries, e.extension in extensions, isFile(e)];
