@@ -15,6 +15,7 @@ module lang::php::config::Config
 import lang::php::util::Option;
 
 import IO;
+import Set;
 import Exception;
 import String;
 import util::SystemAPI;
@@ -50,6 +51,11 @@ public Config getConfig() {
 	if (c is emptyConfig) {
 		c = loadConfig();
 	}
+	return c;
+}
+
+public Config reloadConfig() {
+	c = loadConfig();
 	return c;
 }
 
@@ -109,16 +115,17 @@ private Config loadConfig() {
 		none()
 	);
 
-	senv = getSystemEnvironment();
-	if ("PHP_AIR_CONFIG" notin senv) {
-		throw configMissing("", "PHP_AIR_CONFIG environment variable is not set");
+	set[loc] configFiles = findResources("config.yaml");
+	if (size(configFiles) == 0) {
+		throw configMissing("", "No config.yaml file found");
+	} else if (size(configFiles) > 1) {
+		throw configMissing("", "Found <size(configFiles)> config.yaml files, should only have 1.");
 	} else {
-		configPath = senv["PHP_AIR_CONFIG"];
-		configFile = |file://<configPath>|;
+		configFile = getOneFrom(configFiles);
 		if (!exists(configFile)) {
-			throw configMissing("", "The file <configPath> does not exist");
+			throw configMissing("", "The file <configFile.path> does not exist");
 		} else if (!isFile(configFile)) {
-			throw configMissing("", "<configPath> is not a file");
+			throw configMissing("", "<configFile.path> is not a file");
 		} else {
 			try {
 				yml = loadYAML(readFile(configFile));

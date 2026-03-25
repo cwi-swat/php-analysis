@@ -1,28 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) 2013, NWO-I Centrum Wiskunde & Informatica (CWI), Mark Hills, Appalachian State University
-    All rights reserved.
-
-    Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-    1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-    2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
--->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>php-analysis</artifactId>
   <groupId>org.rascalmpl</groupId>
+  <artifactId>php-analysis</artifactId>
   <version>0.3.4-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <scm>
-    <developerConnection>scm:git:https://github.com/cwi-swat/php-analysis.git</developerConnection>			
+    <developerConnection>scm:git:https://github.com/cwi-swat/php-analysis.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -32,15 +19,15 @@
 
   <repositories>
     <repository>
-        <id>usethesource</id>
-        <url>https://releases.usethesource.io/maven/</url>
+      <id>usethesource</id>
+      <url>https://releases.usethesource.io/maven/</url>
     </repository>
   </repositories>
 
   <pluginRepositories>
     <pluginRepository>
-       <id>usethesource</id>
-       <url>https://releases.usethesource.io/maven/</url>
+      <id>usethesource</id>
+      <url>https://releases.usethesource.io/maven/</url>
     </pluginRepository>
   </pluginRepositories>
 
@@ -58,19 +45,23 @@
   </dependencies>
 
   <build>
+
     <resources>
       <resource>
         <directory>.</directory>
         <filtering>false</filtering>
         <includes>
           <include>META-INF/RASCAL.MF</include>
+          <include>/src/main/**/*.rsc</include>
         </includes>
+        <excludes>
+          <exclude>**/*.java</exclude>
+          <exclude>**/*.class</exclude>
+          <exclude>**/*.php</exclude>
+        </excludes>
       </resource>
-      <resource><!-- we have to copy the rascal sources in the jar for the evaluator to find it-->
-        <directory>src/main/rascal</directory>
-        <filtering>false</filtering>
-      </resource>
-    </resources>  
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>com.mycila</groupId>
@@ -85,7 +76,7 @@
           </headerDefinitions>
           <licenseSets>
             <licenseSet>
-                <header>LICENSE.md</header>
+              <header>LICENSE.md</header>
               <excludes>
                 <exclude>rascal_style.xml</exclude>
                 <exclude>**/README.md</exclude>
@@ -115,35 +106,39 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
         <configuration>
-          <compilerArgument>-parameters</compilerArgument> 
+          <compilerArgument>-parameters</compilerArgument>
           <release>11</release>
         </configuration>
       </plugin>
-    <plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>3.3.1</version>
         <configuration>
-            <tagNameFormat>v@{project.version}</tagNameFormat>
-            <arguments>-Drascal.compile.skip -DskipTests -Drascal.tutor.skip</arguments>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+          <arguments>-Drascal.compile.skip -DskipTests -Drascal.tutor.skip</arguments>
         </configuration>
-    </plugin>
-    <plugin>
+      </plugin>
+      
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.3.0</version>
         <configuration>
-            <excludes>
-              <exclude>**/Config.tpl</exclude>
-            </excludes>
+          <excludes>
+            <exclude>**/Config.tpl</exclude>
+          </excludes>
         </configuration>
-    </plugin>
-    <plugin>
+      </plugin>
+
+      <plugin>
         <groupId>org.rascalmpl</groupId>
         <artifactId>rascal-maven-plugin</artifactId>
         <version>0.31.0</version>
@@ -151,70 +146,70 @@
           <bin>${project.build.outputDirectory}</bin>
           <srcs>
             <src>${project.basedir}/src/main/rascal</src>
+            <src>${project.basedir}/src/main/resources</src>
           </srcs>
-          <srcIgnores>
-            <ignore>${project.basedir}/src/main/rascal/lang/php/config/Config.rsc</ignore>
-          </srcIgnores>
         </configuration>
         <executions>
           <execution>
-              <id>rascal-compile</id>
-              <phase>compile</phase>
-              <goals>
-                  <goal>compile</goal>
-              </goals>
+            <id>rascal-compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
           </execution>
           <execution>
-              <id>rascal-package</id>
-              <phase>prepare-package</phase>
-              <goals>
-                  <goal>package</goal>
-              </goals>
+            <id>rascal-package</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>package</goal>
+            </goals>
           </execution>
           <execution>
-              <id>default-cli</id>
-              <phase>compile</phase>
-              <goals>
-                  <goal>tutor</goal>
-              </goals>
-              <configuration>
-                  <bin>${project.build.outputDirectory}</bin>
-                  <sources>|http://github.com/cwi-swat/php-analysis/blob/main|</sources>
-                  <issues>|http://github.com/cwi-swat/php-analysis/issues|</issues>
-                  <srcs>
-                      <src>${project.basedir}/src/main/rascal</src>
-                      <src>${project.basedir}/doc</src>
-                  </srcs>
-              </configuration>
+            <id>default-cli</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>tutor</goal>
+            </goals>
+            <configuration>
+              <bin>${project.build.outputDirectory}</bin>
+              <sources>|http://github.com/cwi-swat/php-analysis/blob/main|</sources>
+              <issues>|http://github.com/cwi-swat/php-analysis/issues|</issues>
+              <srcs>
+                <src>${project.basedir}/src/main/rascal</src>
+                <src>${project.basedir}/src/main/resources</src>
+                <src>${project.basedir}/doc</src>
+              </srcs>
+            </configuration>
           </execution>
-      </executions>        
-  </plugin>
-  <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-surefire-plugin</artifactId>
-      <version>3.0.0-M3</version>
-      <executions>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M3</version>
+        <executions>
           <execution>
-              <id>test</id>
-              <phase>test</phase>
-              <configuration>
-                  <argLine>
-                      -ea
-                      -Xmx2G
-                      -Xss128m
-                      -Dfile.encoding=UTF-8
-                  </argLine>
-                  <includes>
-                      <include>**/*Tests.java</include>
-                  </includes>
-                  <testSourceDirectory>${basedir}/src/</testSourceDirectory>
-              </configuration>
-              <goals>
-                  <goal>test</goal>
-              </goals>
+            <id>test</id>
+            <phase>test</phase>
+            <configuration>
+              <argLine>
+                -ea
+                -Xmx2G
+                -Xss128m
+                -Dfile.encoding=UTF-8
+              </argLine>
+              <includes>
+                <include>**/*Tests.java</include>
+              </includes>
+              <testSourceDirectory>${basedir}/src/</testSourceDirectory>
+            </configuration>
+            <goals>
+              <goal>test</goal>
+            </goals>
           </execution>
-      </executions>
-  </plugin>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
