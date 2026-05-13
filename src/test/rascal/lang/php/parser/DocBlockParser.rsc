@@ -53,7 +53,7 @@ public bool testParser(type[&T<:Tree] t, lrel[str input, node expectedResult] in
             node n = implode(#node, parse(t, i.input));
         	
             // check if the result is the expected result
-            assert n == i.expectedResult : "Expected:\n<i.expectedResult>\nActual:\n<delAnnotationsRec(n)>";
+            assert n == i.expectedResult : "Expected:\n<i.expectedResult>\nActual:\n<unsetRec(n)>";
         	
         } catch ParseError(loc l): {
             println("PARSE ERROR!! I found a parse error at type: <t> || input: <i> \nThis test stopped.\n"); 

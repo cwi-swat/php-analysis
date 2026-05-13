@@ -48,7 +48,7 @@
     <dependency>
       <groupId>org.rascalmpl</groupId>
       <artifactId>rascal</artifactId>
-      <version>0.42.0</version>
+      <version>0.43.0-RC1</version>
     </dependency>
     <dependency>
       <groupId>edu.appstate.cs</groupId>
