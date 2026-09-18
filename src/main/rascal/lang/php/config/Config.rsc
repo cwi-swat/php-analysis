@@ -20,106 +20,76 @@ import Exception;
 import String;
 import util::SystemAPI;
 import lang::yaml::Model;
+import lang::php::config::ConfigLoader;
 
 public data Exception
 	= configMissing(str key, str msg)
 	;
 
+@doc{Base configuration settings used by all parts of PHP AiR.}
+public data ConfigBase
+	= configBase(
+		int logLevel = 0,
+		loc phpLoc = |unknown:///|,
+		loc clocLoc = |unknown:///|
+	);
+
+@doc{Config settings specifically related to parsing PHP code.}
+public data ConfigParsing
+	= configParsing(
+		bool usePhpParserJar = false,
+		loc parserLoc = |unknown:///|,
+		str parserMemLimit = "1024M",
+		str astToRascal = "AST2Rascal.php",
+		loc parserWorkingDir = |unknown:///|
+	);
+
+@doc{Config settings specifically for the analysis framework.}
+public data ConfigAnalysis
+	= configAnalysis(
+		loc baseLoc = |unknown:///|,
+		loc analysisLoc = |unknown:///|,
+		loc parsedDir = |unknown:///|,
+		loc statsDir = |unknown:///|,
+		loc countsDir = |unknown:///|,
+		loc corpusRoot = |unknown:///|,
+		bool useBinaries = false
+	);
+
+@doc{The overall configuration used by PHP AiR and child projects.}
 public data Config 
 	= config(
-		Option[bool] usePhpParserJar,
-		Option[loc] phpLoc,
-		Option[loc] parserLoc,
-		Option[loc] analysisLoc,
-		Option[str] parserMemLimit,
-		Option[str] astToRascal,
-		Option[loc] parserWorkingDir,
-		Option[loc] baseLoc, 
-		Option[loc] parsedDir, 
-		Option[loc] statsDir, 
-		Option[loc] corpusRoot, 
-		Option[loc] countsDir, 
-		Option[bool] useBinaries,
-		Option[int] logLevel, 
-		Option[loc] clocLoc)
-	| emptyConfig()
+		ConfigBase base = configBase(), 
+		ConfigParsing parsing = configParsing(), 
+		ConfigAnalysis analysis = configAnalysis())
+	| unloaded()
 	;
 
-private Config c = emptyConfig();
+@doc{A singleton to hold the loaded configuration.}
+private Config c = unloaded();
 
+@doc{Manage the singleton, loading the config if it hasn't been loaded yet.}
 public Config getConfig() {
-	if (c is emptyConfig) {
+	if (c is unloaded) {
 		c = loadConfig();
 	}
 	return c;
 }
 
+@doc{Force a reload of the configuration.}
 public Config reloadConfig() {
 	c = loadConfig();
 	return c;
 }
 
-public Option[str] findStringValueInMappingByKey(Node yml, str key) {
-	for ( /Node m:mapping(_) := yml, Node k <- m.\map, scalar(key) := k) {
-		if (scalar(str s) := m.\map[k]) {
-			return some(s);
-		}
-	}
-	return none();
-}
-
-public Option[loc] findLocValueInMappingByKey(Node yml, str key) {
-	for ( /Node m:mapping(_) := yml, Node k <- m.\map, scalar(key) := k) {
-		if (scalar(str s) := m.\map[k]) {
-			int sepPosition = findFirst(s, "://");
-			return some(|<s[..sepPosition]>://<s[sepPosition+3..]>|);
-		}
-	}
-	return none();
-}
-
-public Option[int] findIntValueInMappingByKey(Node yml, str key) {
-	for ( /Node m:mapping(_) := yml, Node k <- m.\map, scalar(key) := k) {
-		if (scalar(int n) := m.\map[k]) {
-			return some(n);
-		}
-	}
-	return none();
-}
-
-public Option[bool] findBoolValueInMappingByKey(Node yml, str key) {
-	for ( /Node m:mapping(_) := yml, Node k <- m.\map, scalar(key) := k) {
-		if (scalar(bool b) := m.\map[k]) {
-			return some(b);
-		}
-	}
-	return none();
-}
-
+@doc{Load the YAML configuration file.}
 private Config loadConfig() {
-	Config c = config(
-		none(),
-		none(),
-		none(),
-		none(),
-		none(),
-		none(),
-		none(),
-		none(), 
-		none(), 
-		none(), 
-		none(), 
-		none(), 
-		none(),
-		none(), 
-		none()
-	);
 
 	set[loc] configFiles = findResources("config.yaml");
 	if (size(configFiles) == 0) {
 		throw configMissing("", "No config.yaml file found");
 	} else if (size(configFiles) > 1) {
-		throw configMissing("", "Found <size(configFiles)> config.yaml files, should only have 1.");
+		throw configMissing("", "Found <size(configFiles)> config.yaml files, should only have 1");
 	} else {
 		configFile = getOneFrom(configFiles);
 		if (!exists(configFile)) {
@@ -129,171 +99,11 @@ private Config loadConfig() {
 		} else {
 			try {
 				yml = loadYAML(readFile(configFile));
-
-				Option[loc] phpLoc = findLocValueInMappingByKey(yml, "phpLoc");
-				Option[int] logLevel = findIntValueInMappingByKey(yml, "logLevel");
-				Option[loc] clocLoc = findLocValueInMappingByKey(yml, "clocLoc");
-
-				Option[bool] usePhpParserJar = findBoolValueInMappingByKey(yml, "usePhpParserJar");
-				Option[loc] parserLoc = findLocValueInMappingByKey(yml, "parserLoc");
-				Option[str] parserMemLimit = findStringValueInMappingByKey(yml, "parserMemLimit");
-				Option[str] astToRascal = findStringValueInMappingByKey(yml, "astToRascal");
-				Option[loc] parserWorkingDir = findLocValueInMappingByKey(yml, "parserWorkingDir");
-
-				Option[loc] analysisLoc = findLocValueInMappingByKey(yml, "analysisLoc");
-				Option[loc] baseLoc = findLocValueInMappingByKey(yml, "baseLoc");
-				Option[loc] parsedDir = findLocValueInMappingByKey(yml, "parsedDir");
-				Option[loc] statsDir = findLocValueInMappingByKey(yml, "statsDir");
-				Option[loc] corpusRoot = findLocValueInMappingByKey(yml, "corpusRoot");
-				Option[loc] countsDir = findLocValueInMappingByKey(yml, "countsDir");
-				Option[bool] useBinaries = findBoolValueInMappingByKey(yml, "useBinaries");
-
-				c = config(usePhpParserJar,
-					phpLoc,
-					parserLoc,
-					analysisLoc,
-					parserMemLimit,
-					astToRascal,
-					parserWorkingDir,
-					baseLoc, 
-					parsedDir, 
-					statsDir, 
-					corpusRoot, 
-					countsDir, 
-					useBinaries,
-					logLevel, 
-					clocLoc);
+				Config c = yaml2config(#Config, yml);
+				return c;
 			} catch Exception e: {
 				throw configMissing("", "The config file did not load correctly: <e>");
-			}
+			}			
 		}
 	}
-
-	return c;
-}
-
-@doc{Indicates whether to use the parser contained in a distributed jar file or from the directory given below}
-public bool usePhpParserJar() {
-	c = getConfig();
-	return (c has usePhpParserJar && some(bool b) := c.usePhpParserJar) ? b : false;
-}
-
-@doc{The location of the PHP executable}
-public loc phpLoc() {
-	c = getConfig();
-	if (c has phpLoc && some(loc l) := c.phpLoc) {
-		return l;
-	}
-	throw configMissing("phpLoc", "Make sure to set phpLoc to a valid location in your configuration file");
-}
-
-@doc{The base install location for the PHP-Parser project}
-public loc parserLoc() {
-	c = getConfig();
-	if (c has parserLoc && some(loc l) := c.parserLoc) {
-		return l;
-	}
-	throw configMissing("parserLoc", "Make sure to set parserLoc to a valid location in your configuration file");
-}
-
-@doc{The base install location for the php-analysis project}
-public loc analysisLoc() {
-	c = getConfig();
-	if (c has analysisLoc && some(loc l) := c.analysisLoc) {
-		return l;
-	}
-	throw configMissing("analysisLoc", "Make sure to set analysisLoc to a valid location in your configuration file");
-}
-	
-@doc{The memory limit for PHP when the parser is run}
-public str parserMemLimit() {
-	c = getConfig();
-	return (c has parserMemLimit && some(str s) := c.parserMemLimit) ? s : "1024M";
-}
-
-@doc{The location of the AST2Rascal.php file, inside the PHP-Parser directories}
-public str astToRascal() {
-	c = getConfig();
-	return (c has astToRascal && some(str s) := c.astToRascal) ? s : "AST2Rascal.php";
-}
-
-@doc{The working directory for when the parser runs}
-public loc parserWorkingDir() {
-	c = getConfig();
-	if (c has parserWorkingDir && some(loc l) := c.parserWorkingDir) {
-		return l;
-	}
-	throw configMissing("parserWorkingDir", "Make sure to set parserWorkingDir to a valid location in your configuration file");
-}
-
-@doc{The base location for the corpus and any serialized files}
-public loc baseLoc() {
-	c = getConfig();
-	if (c has baseLoc && some(loc l) := c.baseLoc) {
-		return l;
-	}
-	throw configMissing("baseLoc", "Make sure to set baseLoc to a valid location in your configuration file");
-}
-
-@doc{Where to put the binary representations of parsed systems}
-public loc parsedDir() {
-	c = getConfig();
-	if (c has parsedDir && some(loc l) := c.parsedDir) {
-		return l;
-	}
-	throw configMissing("parsedDir", "Make sure to set parsedDir to a valid location in your configuration file");
-}
-
-@doc{Where to put the binary representations of extracted statistics}
-public loc statsDir() {
-	c = getConfig();
-	if (c has statsDir && some(loc l) := c.statsDir) {
-		return l;
-	}
-	throw configMissing("statsDir", "Make sure to set statsDir to a valid location in your configuration file");
-}
-
-@doc{Where the PHP sources for the corpus reside}
-public loc corpusRoot() {
-	c = getConfig();
-	if (c has corpusRoot && some(loc l) := c.corpusRoot) {
-		return l;
-	}
-	throw configMissing("corpusRoot", "Make sure to set corpusRoot to a valid location in your configuration file");
-}
-
-@doc{Where to put extracted counts (e.g., SLOC)}
-public loc countsDir() {
-	c = getConfig();
-	if (c has countsDir && some(loc l) := c.countsDir) {
-		return l;
-	}
-	throw configMissing("countsDir", "Make sure to set countsDir to a valid location in your configuration file");
-}
-
-@doc{This should only ever be true if we don't have source, we only have the extracted binaries for parsed systems}
-public bool useBinaries() {
-	c = getConfig();
-	return (c has useBinaries && some(bool b) := c.useBinaries) ? b : false;
-}
-
-@doc{Debugging options
-	@logLevel {
-		Log level 0 => no logging;
-		Log level 1 => main logging;
-		Log level 2 => debug logging;
-	}
-}
-public int logLevel() {
-	c = getConfig();
-	return (c has logLevel && some(int n) := c.logLevel) ? n : 2;
-}
-
-@doc{The location of the cloc tool}
-public loc clocLoc() {
-	c = getConfig();
-	if (c has clocLoc && some(loc l) := c.clocLoc) {
-		return l;
-	}
-	throw configMissing("clocLoc", "Make sure to set clocLoc to a valid location in your configuration file");
 }
