@@ -17,12 +17,12 @@
 
   <groupId>org.rascalmpl</groupId>
   <artifactId>php-analysis</artifactId>
-  <version>0.3.5-SNAPSHOT</version>
+  <version>0.3.5</version>
   <packaging>jar</packaging>
 
   <scm>
     <developerConnection>scm:git:https://github.com/cwi-swat/php-analysis.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v0.3.5</tag>
   </scm>
 
   <properties>
