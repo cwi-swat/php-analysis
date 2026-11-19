@@ -68,7 +68,7 @@ public Script normalizeIf(Script s) {
 public Script flattenBlocks(Script s) {
 	solve(s) {
 		s = bottom-up visit(s) {
-			case [list[Stmt]] [*Stmt xs,block(list[Stmt] ys),*Stmt zs] => [*xs,*ys,*zs]
+			case [*Stmt xs,block(list[Stmt] ys),*Stmt zs] => [*xs,*ys,*zs]
 		}
 	}
 	return s;
@@ -77,10 +77,7 @@ public Script flattenBlocks(Script s) {
 public Script discardEmpties(Script s) {
 	solve(s) {
 		s = bottom-up visit(s) {
-			case [list[Stmt]] [*Stmt xs,emptyStmt(),*Stmt zs] : {
-				list[Stmt] r = [*xs,*zs];
-				insert(r);
-			}
+			case [*Stmt xs,emptyStmt(),*Stmt zs] => [*xs,*zs]
 		}
 	}
 	return s;
