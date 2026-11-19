@@ -30,7 +30,7 @@ data ClocResult
 	could be a single file or a directory.
 }
 public ClocResult phpLinesOfCode(loc l, loc clocPath) {
-	pid = createProcess(clocPath.path, args = [l.path]);
+	pid = createProcess(clocPath, args = [l]);
 	res = readEntireStream(pid);
 	killProcess(pid);
 	if(/PHP\s+<n1:\d+>\s+<n2:\d+>\s+<n3:\d+>\s+<n4:\d+>/ := res) {
